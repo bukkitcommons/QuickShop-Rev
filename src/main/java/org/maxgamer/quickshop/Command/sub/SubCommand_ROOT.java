@@ -21,9 +21,9 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.command.CommandContainer;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_ROOT implements CommandProcesser {
 

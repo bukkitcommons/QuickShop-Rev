@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.net.URL;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.Util.HttpRequest;
+import org.maxgamer.quickshop.utils.HttpRequest;
 
 public class GithubAPI {
   private Gson gson = new GsonBuilder().disableHtmlEscaping().create();

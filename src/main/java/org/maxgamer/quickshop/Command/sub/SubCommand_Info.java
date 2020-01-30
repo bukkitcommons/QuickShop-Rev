@@ -25,10 +25,10 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.ContainerShop;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Shop.ShopChunk;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.ContainerShop;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopChunk;
 
 public class SubCommand_Info implements CommandProcesser {
 

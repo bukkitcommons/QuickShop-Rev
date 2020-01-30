@@ -1,6 +1,7 @@
 package org.maxgamer.quickshop.configuration.impl;
 
 import java.util.List;
+import java.util.UUID;
 import org.bukkit.Material;
 import org.maxgamer.quickshop.configuration.annotation.Configuration;
 import org.maxgamer.quickshop.configuration.annotation.Node;
@@ -30,6 +31,9 @@ public class BaseConfig {
 
   @Node(value = "settings.plugin.logger.use-log4j")
   public static boolean useLog4j = true;
+  
+  @Node(value = "settings.plugin.logger.log-actions")
+  public static boolean logActions = true;
 
   @Node(value = "settings.plugin.logger.debug", rewrite = true)
   public static boolean debugLogger = false;
@@ -82,8 +86,8 @@ public class BaseConfig {
   @Node(value = "settings.plugin.enable-updater")
   public static boolean enableUpdater = true;
 
-  @Node(value = "settings.eco.price.fee-for-price-mod")
-  public static double priceModFee = 0.00;
+  @Node(value = "settings.eco.price.mod-fee")
+  public static double priceModFee = -1;
 
   @Node(value = "settings.eco.price.minimum")
   public static double minimumPrice = -1;
@@ -129,6 +133,9 @@ public class BaseConfig {
 
   @Node(value = "settings.safety.enhanced-display-protection")
   public static boolean enhancedDisplayProtection = false;
+  
+  @Node(value = "settings.safety.enhanced-shop-protection")
+  public static boolean enhancedShopProtection = false;
 
   @Node(value = "settings.safety.enable-alert")
   public static boolean enableAlert = false;
@@ -190,4 +197,43 @@ public class BaseConfig {
   
   @Node(value = "shop.plugin.PlaceHolderAPI")
   public static boolean placeHolderAPI = false;
+  
+  @Node(value = "shop.plugin.enable-metrics")
+  public static boolean enableMetrics = true;
+  
+  @Node(value = "shop.server.uuid", rewrite = true)
+  public static String uuid = UUID.randomUUID().toString();
+  
+  @Node(value = "server.platform")
+  public static int serverPlatform = 0;
+  
+  @Node(value = "shop.update-sign-when-inventory-moving")
+  public static boolean updateSignOnInvMove = true;
+  
+  @Node(value = "shop.sneak-to-control")
+  public static boolean sneakToControl = false;
+  
+  @Node(value = "shop.sneak-to-trade")
+  public static boolean sneakToTrade = false;
+  
+  @Node(value = "shop.sneak-to-creat")
+  public static boolean sneakToCreat = false;
+  
+  @Node(value = "shop.auto-fetch-shop-messages")
+  public static boolean autoFetchShopMessages = false;
+  
+  @Node(value = "shop.display-name-visible")
+  public static boolean displayNameVisible = true;
+  
+  @Node(value = "shop.pay-unlimited-shop-owners")
+  public static boolean payUnlimitedShopOwners = false;
+  
+  @Node(value = "shop.force-load-downgrade-items.enable")
+  public static boolean forceLoadDowngradeItems = false;
+  
+  @Node(value = "shop.force-load-downgrade-items.method")
+  public static int forceLoadDowngradeItemsMethod = 0;
+  
+  @Node(value = "shop.blacklist-lores")
+  public static List<String> blacklistLores = Lists.newArrayList();
 }

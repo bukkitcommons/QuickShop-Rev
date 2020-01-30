@@ -22,10 +22,10 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Util.MsgUtil;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_SilentUnlimited implements CommandProcesser {
   private final QuickShop plugin = QuickShop.instance;

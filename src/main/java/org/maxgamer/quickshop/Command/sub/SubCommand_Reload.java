@@ -21,8 +21,8 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.utils.MsgUtil;
 
 public class SubCommand_Reload implements CommandProcesser {
 

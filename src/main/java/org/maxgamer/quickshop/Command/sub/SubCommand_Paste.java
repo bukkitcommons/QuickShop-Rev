@@ -26,9 +26,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.utils.paste.Paste;
+import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.paste.impl.Paste;
 
 public class SubCommand_Paste implements CommandProcesser {
 

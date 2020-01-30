@@ -28,10 +28,10 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.MsgUtil;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_Debug implements CommandProcesser {
 

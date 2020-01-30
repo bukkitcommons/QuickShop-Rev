@@ -1,41 +1,24 @@
-/*
- * This file is a part of project QuickShop, the name is ResidenceIntegration.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.integration.impl;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
+import com.google.common.collect.Lists;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.annotation.Configuration;
+import org.maxgamer.quickshop.configuration.annotation.Node;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 
-@SuppressWarnings("DuplicatedCode")
+@Configuration("integrations.yml")
 public class ResidenceIntegration implements IntegratedPlugin {
-  List<String> createLimits;
-  List<String> tradeLimits;
-
-  public ResidenceIntegration(QuickShop plugin) {
-    this.createLimits = plugin.getConfig().getStringList("integration.residence.create");
-    this.tradeLimits = plugin.getConfig().getStringList("integration.residence.trade");
-  }
+  @Node("integration.residence.create")
+  List<String> createLimits = Lists.newArrayList();
+  @Node("integration.residence.trade")
+  List<String> tradeLimits = Lists.newArrayList();
 
   @Override
   public @NotNull String getName() {

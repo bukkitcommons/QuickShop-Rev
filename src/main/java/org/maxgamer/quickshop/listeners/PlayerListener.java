@@ -43,13 +43,13 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.Info;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Shop.ShopAction;
-import org.maxgamer.quickshop.Util.MsgUtil;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
+import org.maxgamer.quickshop.shop.Info;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopAction;
+import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.Util;
 
 // import com.griefcraft.lwc.LWC;
 // import com.griefcraft.lwc.LWCPlugin;
@@ -76,7 +76,7 @@ public class PlayerListener implements Listener {
         if (plugin.getShopManager().getShop(Objects.requireNonNull(block).getLocation()) != null
             && (Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation()))
                 .getOwner().equals(e.getPlayer().getUniqueId()) || e.getPlayer().isOp())) {
-          if (plugin.getConfig().getBoolean("shop.sneak-to-control")
+          if (BaseConfig.sneakToControl
               && !e.getPlayer().isSneaking()) {
             return;
           }
@@ -137,13 +137,13 @@ public class PlayerListener implements Listener {
     }
     // Purchase handling
     if (shop != null && QuickShop.getPermissionManager().hasPermission(p, "quickshop.use")) {
-      if (plugin.getConfig().getBoolean("shop.sneak-to-trade") && !p.isSneaking()) {
+      if (BaseConfig.sneakToTrade && !p.isSneaking()) {
         return;
       }
 
       shop.onClick();
 
-      if (plugin.getConfig().getBoolean("effect.sound.onclick")) {
+      if (BaseConfig.clickSound) {
         e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f,
             1.0f);
       }
@@ -178,7 +178,7 @@ public class PlayerListener implements Listener {
           items = Math.min(items, shop.getRemainingSpace());
           // Amount check player selling item total cost and the shop owner's balance
           items = Math.min(items, ownerCanAfford);
-        } else if (plugin.getConfig().getBoolean("shop.pay-unlimited-shop-owners")) {
+        } else if (BaseConfig.payUnlimitedShopOwners) {
           // even if the shop is unlimited, the config option pay-unlimited-shop-owners is set to
           // true,
           // the unlimited shop owner should have enough money.
@@ -202,7 +202,7 @@ public class PlayerListener implements Listener {
         && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.sell")
         && p.getGameMode() != GameMode.CREATIVE) {
       if (e.useInteractedBlock() == Result.DENY
-          || plugin.getConfig().getBoolean("shop.sneak-to-create") && !p.isSneaking()
+          || BaseConfig.sneakToCreat && !p.isSneaking()
           || !plugin.getShopManager().canBuildShop(p, b, e.getBlockFace())) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
@@ -290,7 +290,7 @@ public class PlayerListener implements Listener {
   public void onJoin(PlayerJoinEvent e) {
 
     // Notify the player any messages they were sent
-    if (plugin.getConfig().getBoolean("shop.auto-fetch-shop-messages")) {
+    if (BaseConfig.autoFetchShopMessages) {
       MsgUtil.flush(e.getPlayer());
     }
   }

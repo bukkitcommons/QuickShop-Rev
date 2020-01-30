@@ -24,9 +24,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.UpdateInfomation;
-import org.maxgamer.quickshop.Util.Updater;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.utils.UpdateInfomation;
+import org.maxgamer.quickshop.utils.Updater;
 
 public class SubCommand_Update implements CommandProcesser {
 

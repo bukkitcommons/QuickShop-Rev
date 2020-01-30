@@ -19,10 +19,10 @@ package org.maxgamer.quickshop.event;
 import lombok.Getter;
 import org.bukkit.block.Sign;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.shop.Shop;
 
 /** Calling when shop sign update, Can't cancel */
-public class ShopSignUpdatedEvent extends QSEvent {
+public class ShopSignUpdatedEvent extends ShopEvent {
 
   @Getter
   @NotNull

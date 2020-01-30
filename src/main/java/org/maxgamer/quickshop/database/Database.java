@@ -23,14 +23,12 @@ import java.sql.SQLException;
 import lombok.Cleanup;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.utils.Util;
 
 public class Database {
 
   @NotNull
   private final DatabaseCore core;
-  // Fix null pointer...
-  private final QuickShop plugin = QuickShop.instance;
 
   /**
    * Creates a new database and validates its connection.
@@ -60,82 +58,6 @@ public class Database {
   public void close() {
     this.core.close();
   }
-
-  // /**
-  // * Copies the contents of this database into the given database. Does not
-  // * delete the contents of this database, or change any settings. This may
-  // * take a long time, and will print out progress reports to System.out
-  // * <p>
-  // * This method does not create the tables in the new database. You need to
-  // * do that yourself.
-  // *
-  // * @param db The database to copy data to
-  // * @throws SQLException if an error occurs.
-  // */
-  // @Deprecated /* Buggy, owner pls use Database Tools to migrate */
-  // public void copyTo(@NotNull Database db) throws SQLException {
-  // ResultSet rs = getConnection().getMetaData().getTables(null, null, "%", null);
-  // List<String> tables = new LinkedList<>();
-  // while (rs.next()) {
-  // tables.add(rs.getString("TABLE_NAME"));
-  // }
-  // rs.close();
-  // core.flush();
-  // // For each table
-  // String prefix = plugin.().getString("database.prefix");
-  // for (String table : tables) {
-  // if (table.contains("schedule")) {
-  // return; // go way!
-  // }
-  // String finalTable;
-  // if (table.startsWith(Objects.requireNonNull(prefix))) {
-  // finalTable = table;
-  // } else {
-  // finalTable = prefix + table;
-  // plugin.getLogger().info("CovertHelper: Fixed table name from SQLite " + table +
-  // " to MySQL " + finalTable);
-  // }
-  //
-  // if (table.toLowerCase().startsWith("sqlite_autoindex_")) {
-  // continue;
-  // }
-  // plugin.getLogger().log(Level.WARNING, "Copying " + table + " to " + finalTable);
-  // // Wipe the old records
-  // db.getConnection().prepareStatement("DELETE FROM " + finalTable).execute();
-  // // Fetch all the data from the existing database
-  // rs = getConnection().prepareStatement("SELECT * FROM " + table).executeQuery();
-  // int n = 0;
-  // // Build the query
-  // StringBuilder query = new StringBuilder("INSERT INTO " + finalTable + " VALUES (");
-  // // Append another placeholder for the value
-  // query.append("?");
-  // for (int i = 2; i <= rs.getMetaData().getColumnCount(); i++) {
-  // // Add the rest of the placeholders and values. This is so we
-  // // have (?, ?, ?) and not (?, ?, ?, ).
-  // query.append(", ?");
-  // }
-  // // End the query
-  // query.append(")");
-  // PreparedStatement ps = db.getConnection().prepareStatement(query.toString());
-  // while (rs.next()) {
-  // n++;
-  // for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-  // ps.setObject(i, rs.getObject(i));
-  // }
-  // ps.addBatch();
-  // if (n % 100 == 0) {
-  // ps.executeBatch();
-  // plugin.getLogger().log(Level.WARNING, n + " records copied...");
-  // }
-  // }
-  // ps.executeBatch();
-  // // Close the resultset of that table
-  // rs.close();
-  // }
-  // // Success!
-  // db.getConnection().close();
-  // this.getConnection().close();
-  // }
 
   /**
    * Executes the given statement either immediately, or soon.
@@ -184,8 +106,7 @@ public class Database {
    * @return True if the table is found
    * @throws SQLException Throw exception when failed execute somethins on SQL
    */
-  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-  boolean hasTable(@NotNull String table) throws SQLException {
+  public boolean hasTable(@NotNull String table) throws SQLException {
     ResultSet rs = getConnection().getMetaData().getTables(null, null, "%", null);
     while (rs.next()) {
       if (table.equalsIgnoreCase(rs.getString("TABLE_NAME"))) {

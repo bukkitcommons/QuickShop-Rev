@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.annotation.Configuration;
 import org.maxgamer.quickshop.configuration.annotation.Node;
 import com.google.common.collect.Lists;
@@ -24,33 +25,44 @@ import lombok.experimental.Accessors;
 public class ConfigurationManager {
   private final File parent;
   private final Map<Class<?>, ConfigurationData> configurations = Maps.newHashMap();
+  
+  public ConfigurationManager unload(@NotNull Class<?> confClass) {
+    configurations.remove(confClass);
+    return this;
+  }
+  
+  @Nullable
+  public ConfigurationData get(@NotNull Class<?> confClass) {
+    return configurations.get(confClass);
+  }
 
   @SneakyThrows
-  public ConfigurationData save(Class<?> confClass) {
+  public ConfigurationData save(@NotNull Class<?> confClass) {
     ConfigurationData data = configurations.get(confClass);
+    if (data != null) {
+      forEachNode(confClass, (field, node) -> {
+        String path = node.value();
+        Bukkit.getLogger()
+            .warning("rewrite: " + field.getName() + ", value " + data.conf().get(path));
+        if (node.rewrite()) {
+          data.conf().set(path, getStatic(field));
+        }
+        Bukkit.getLogger()
+            .warning("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
+      });
 
-    forEachNode(confClass, (field, node) -> {
-      String path = node.value();
-      Bukkit.getLogger()
-          .warning("rewrite: " + field.getName() + ", value " + data.conf().get(path));
-      if (node.rewrite()) {
-        data.conf().set(path, getStatic(field));
-      }
-      Bukkit.getLogger()
-          .warning("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
-    });
-
-    data.conf().save(data.file());
+      data.conf().save(data.file());
+    }
     return data;
   }
 
   @SneakyThrows
-  public static Object getStatic(Field field) {
+  private static Object getStatic(@NotNull Field field) {
     return field.get(null);
   }
 
   @SneakyThrows
-  public static void setStatic(Field field, Object value) {
+  private static void setStatic(@NotNull Field field, @Nullable Object value) {
     field.set(null, value);
   }
 
@@ -64,13 +76,15 @@ public class ConfigurationManager {
     }
   }
 
+  @NotNull
   public static ConfigurationManager getManager(@NotNull Plugin plugin) {
     return new ConfigurationManager(new File(".".concat(File.separator).concat("plugins")
         .concat(File.separator).concat(plugin.getName()).concat(File.separator)));
   }
 
+  @Nullable
   @SneakyThrows
-  public void load(Class<?> confClass) {
+  public ConfigurationData load(@NotNull Class<?> confClass) {
     Configuration filePath = confClass.getAnnotation(Configuration.class);
     if (filePath != null) {
       File file = createConfigurationFile(new File(parent, filePath.value()));
@@ -91,18 +105,20 @@ public class ConfigurationManager {
         Bukkit.getLogger().warning("field: " + field.getName() + ", value (fixed) " + value);
       });
 
+      return data;
     }
+    return null;
   }
 
   @SneakyThrows
-  private File createConfigurationFile(File file) {
+  private File createConfigurationFile(@NotNull File file) {
     createParents(file);
     file.createNewFile();
     return file;
   }
 
   @SneakyThrows
-  private void createParents(File file) {
+  private void createParents(@NotNull File file) {
     List<File> parents = Lists.newArrayList();
 
     synchronized (parent) {

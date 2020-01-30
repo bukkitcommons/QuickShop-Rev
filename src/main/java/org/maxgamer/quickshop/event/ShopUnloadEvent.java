@@ -18,10 +18,10 @@ package org.maxgamer.quickshop.event;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.shop.Shop;
 
 /** Getting the unloading shop, Can't cancel. */
-public class ShopUnloadEvent extends QSEvent {
+public class ShopUnloadEvent extends ShopEvent {
 
   @NotNull
   @Getter

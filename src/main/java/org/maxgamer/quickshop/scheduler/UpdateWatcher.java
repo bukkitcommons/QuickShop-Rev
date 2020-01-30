@@ -29,9 +29,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.MsgUtil;
-import org.maxgamer.quickshop.Util.UpdateInfomation;
-import org.maxgamer.quickshop.Util.Updater;
+import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.UpdateInfomation;
+import org.maxgamer.quickshop.utils.Updater;
 
 public class UpdateWatcher implements Listener {
   public static boolean hasNewUpdate = false;

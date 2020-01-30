@@ -31,7 +31,7 @@ import lombok.SneakyThrows;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.utils.Util;
 
 public class LogWatcher extends BukkitRunnable {
   private Queue<String> logs = new ConcurrentLinkedQueue<>();

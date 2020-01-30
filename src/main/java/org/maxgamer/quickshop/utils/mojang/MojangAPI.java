@@ -26,8 +26,8 @@ import java.net.URL;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.HttpRequest;
-import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.utils.HttpRequest;
+import org.maxgamer.quickshop.utils.Util;
 
 public class MojangAPI {
   final String versionManifestUrl = "https://launchermeta.mojang.com/mc/game/version_manifest.json";

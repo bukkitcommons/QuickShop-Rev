@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is QuickShop.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop;
 
 import java.io.File;
@@ -21,15 +5,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
 import org.bukkit.Bukkit;
@@ -43,40 +26,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Shop.ShopLoader;
-import org.maxgamer.quickshop.Shop.ShopManager;
-import org.maxgamer.quickshop.Util.Compatibility;
-import org.maxgamer.quickshop.Util.FunnyEasterEgg;
-import org.maxgamer.quickshop.Util.IncompatibleChecker;
-import org.maxgamer.quickshop.Util.IntegrationHelper;
-import org.maxgamer.quickshop.Util.ItemMatcher;
-import org.maxgamer.quickshop.Util.MsgUtil;
-import org.maxgamer.quickshop.Util.PermissionChecker;
-import org.maxgamer.quickshop.Util.ReflectFactory;
-import org.maxgamer.quickshop.Util.ReflectionUtil;
-import org.maxgamer.quickshop.Util.SentryErrorReporter;
-import org.maxgamer.quickshop.Util.Timer;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.command.CommandManager;
 import org.maxgamer.quickshop.configuration.ConfigurationManager;
-import org.maxgamer.quickshop.configuration.annotation.Configuration;
-import org.maxgamer.quickshop.configuration.annotation.Node;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.Database;
 import org.maxgamer.quickshop.database.DatabaseCore;
-import org.maxgamer.quickshop.database.DatabaseHelper;
-import org.maxgamer.quickshop.database.DatabaseManager;
-import org.maxgamer.quickshop.database.MySQLCore;
-import org.maxgamer.quickshop.database.SQLiteCore;
 import org.maxgamer.quickshop.database.Database.ConnectionException;
+import org.maxgamer.quickshop.database.impl.DatabaseHelper;
+import org.maxgamer.quickshop.database.impl.DatabaseManager;
+import org.maxgamer.quickshop.database.impl.MySQLCore;
+import org.maxgamer.quickshop.database.impl.SQLiteCore;
 import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.economy.EconomyType;
-import org.maxgamer.quickshop.economy.Economy_Reserve;
-import org.maxgamer.quickshop.economy.Economy_Vault;
+import org.maxgamer.quickshop.economy.impl.Economy_Reserve;
+import org.maxgamer.quickshop.economy.impl.Economy_Vault;
 import org.maxgamer.quickshop.integration.IntegrateStage;
-import org.maxgamer.quickshop.integration.impl.FactionsUUIDIntegration;
+import org.maxgamer.quickshop.integration.impl.FactionsIntegration;
 import org.maxgamer.quickshop.integration.impl.PlotSquaredIntegration;
 import org.maxgamer.quickshop.integration.impl.ResidenceIntegration;
 import org.maxgamer.quickshop.integration.impl.TownyIntegration;
@@ -93,7 +59,7 @@ import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.PlayerListener;
 import org.maxgamer.quickshop.listeners.ShopProtectionListener;
 import org.maxgamer.quickshop.listeners.WorldListener;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.scheduler.DisplayAutoDespawnWatcher;
 import org.maxgamer.quickshop.scheduler.DisplayWatcher;
 import org.maxgamer.quickshop.scheduler.LogWatcher;
@@ -102,15 +68,37 @@ import org.maxgamer.quickshop.scheduler.ShopContainerWatcher;
 import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
-import org.maxgamer.quickshop.utils.logger.QuickShopLogger;
-import org.maxgamer.quickshop.utils.wrappers.fork.BukkitWrapper;
-import org.maxgamer.quickshop.utils.wrappers.fork.PaperWrapper;
-import org.maxgamer.quickshop.utils.wrappers.fork.SpigotWrapper;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.utils.Compatibility;
+import org.maxgamer.quickshop.utils.FunnyEasterEgg;
+import org.maxgamer.quickshop.utils.IncompatibleChecker;
+import org.maxgamer.quickshop.utils.IntegrationHelper;
+import org.maxgamer.quickshop.utils.ItemMatcher;
+import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.PermissionChecker;
+import org.maxgamer.quickshop.utils.QuickShopLogger;
+import org.maxgamer.quickshop.utils.ReflectFactory;
+import org.maxgamer.quickshop.utils.ReflectionUtil;
+import org.maxgamer.quickshop.utils.SentryErrorReporter;
+import org.maxgamer.quickshop.utils.Timer;
+import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
+import org.maxgamer.quickshop.utils.wrappers.bukkit.impl.PaperWrapper;
+import org.maxgamer.quickshop.utils.wrappers.bukkit.impl.SpigotWrapper;
 
 @Getter
 public class QuickShop extends JavaPlugin {
   /** The active instance of QuickShop */
-  public static QuickShop instance;
+  @Deprecated public static QuickShop instance;
+  
+  private static QuickShop singleton;
+  
+  public static QuickShop instance() {
+    return singleton;
+  }
+  
   /** The manager to check permissions. */
   private static PermissionManager permissionManager;
 
@@ -355,10 +343,10 @@ public class QuickShop extends JavaPlugin {
     super.reloadConfig();
     // Load quick variables
     // this.display = this.getConfig().getBoolean("shop.display-items");
-    this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
-    this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
+    this.priceChangeRequiresFee = BaseConfig.priceModFee > 0;
+    this.displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
     language = new Language(this); // Init locale
-    if (this.getConfig().getBoolean("log-actions")) {
+    if (BaseConfig.logActions) {
       logWatcher = new LogWatcher(this, new File(getDataFolder(), "qs.log"));
     } else {
       logWatcher = null;
@@ -368,26 +356,26 @@ public class QuickShop extends JavaPlugin {
   /** Early than onEnable, make sure instance was loaded in first time. */
   @Override
   public void onLoad() {
-    instance = this;
+    singleton = instance = this;
     getDataFolder().mkdirs();
     replaceLogger();
 
     this.bootError = null;
     getLogger().info("Loading up integration modules.");
     this.integrationHelper = new IntegrationHelper();
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.onLoadBegin);
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
     if (getConfig().getBoolean("integration.worldguard.enable")) {
       Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
       Util.debugLogHeavy("Check WG plugin...");
       if (wg != null) {
         Util.debugLogHeavy("Loading WG modules.");
-        this.integrationHelper.register(new WorldGuardIntegration(this)); // WG require register
+        this.integrationHelper.register(new WorldGuardIntegration()); // WG require register
                                                                           // flags when onLoad
                                                                           // called.
       }
     }
 
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.onLoadAfter);
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_LOAD);
   }
 
   @Override
@@ -395,7 +383,7 @@ public class QuickShop extends JavaPlugin {
     if (noopDisable) {
       return;
     }
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.onUnloadBegin);
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.UNLOAD);
     getLogger().info("QuickShop is finishing remaining work, this may need a while...");
 
     Util.debugLog("Closing all GUIs...");
@@ -444,7 +432,7 @@ public class QuickShop extends JavaPlugin {
     }
     // this.reloadConfig();
     Util.debugLog("Calling integrations...");
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.onUnloadAfter);
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
     Util.debugLog("All shutdown work is finished.");
   }
 
@@ -453,7 +441,7 @@ public class QuickShop extends JavaPlugin {
     ConfigurationManager.getManager(this).load(QuickShop.class);
 
     Timer enableTimer = new Timer(true);
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.onEnableBegin);
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
     /* PreInit for BootError feature */
     commandManager = new CommandManager();
     // noinspection ConstantConditions
@@ -487,7 +475,7 @@ public class QuickShop extends JavaPlugin {
         UUID.fromString(getConfig().getString("server-uuid", String.valueOf(UUID.randomUUID())));
     sentryErrorReporter = new SentryErrorReporter(this);
     // loadEcon();
-    switch (getConfig().getInt("server-platform", 0)) {
+    switch (BaseConfig.serverPlatform) {
       case 1:
         bukkitAPIWrapper = new SpigotWrapper();
         getLogger().info(
@@ -638,7 +626,7 @@ public class QuickShop extends JavaPlugin {
           getConfig().getInt("shop.ongoing-fee.ticks"));
     }
     registerIntegrations();
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.onEnableAfter);
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_ENABLE);
     try {
       String[] easterEgg = new FunnyEasterEgg().getRandomEasterEgg();
       if (!(easterEgg == null)) {
@@ -658,26 +646,30 @@ public class QuickShop extends JavaPlugin {
     if (getConfig().getBoolean("integration.worldguard.enable")) {
       Plugin worldGuard = Bukkit.getPluginManager().getPlugin("WorldGuard");
       if (worldGuard != null && worldGuard.isEnabled()) {
-        this.integrationHelper.register(new WorldGuardIntegration(this));
+        this.integrationHelper.register(new WorldGuardIntegration());
       }
     }
     if (getConfig().getBoolean("integration.plotsquared.enable")) {
       Plugin plotSquared = Bukkit.getPluginManager().getPlugin("PlotSquared");
       if (plotSquared != null && plotSquared.isEnabled()) {
-        this.integrationHelper.register(new PlotSquaredIntegration(this));
+        this.integrationHelper.register(new PlotSquaredIntegration());
       }
     }
     if (getConfig().getBoolean("integration.residence.enable")) {
       Plugin residence = Bukkit.getPluginManager().getPlugin("Residence");
       if (residence != null && residence.isEnabled()) {
-        this.integrationHelper.register(new ResidenceIntegration(this));
+        this.integrationHelper.register(new ResidenceIntegration());
       }
     }
-    if (getConfig().getBoolean("integration.factions.enable")) {
+    
+    ConfigurationManager.getManager(this).load(FactionsIntegration.class);
+    if (FactionsIntegration.enabled) {
       Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
       if (factions != null && factions.isEnabled()) {
-        this.integrationHelper.register(new FactionsUUIDIntegration(this));
+        this.integrationHelper.register(new FactionsIntegration());
       }
+    } else {
+      ConfigurationManager.getManager(this).unload(FactionsIntegration.class);
     }
   }
 
@@ -714,7 +706,7 @@ public class QuickShop extends JavaPlugin {
       getLogger().severe("WARNING: Test version may destroy everything!");
       getLogger().severe(
           "WARNING: QSRR won't start without your confirmation, nothing will change before you turn on dev allowed.");
-      if (!getConfig().getBoolean("dev-mode")) {
+      if (!BaseConfig.developerMode) {
         getLogger().severe(
             "WARNING: Set dev-mode: true in config.yml to allow qs load in dev mode(You may need add this line to the config yourself).");
         noopDisable = true;
@@ -800,7 +792,7 @@ public class QuickShop extends JavaPlugin {
       }
       // Use internal Metric class not Maven for solve plugin name issues
       String display_Items;
-      if (getConfig().getBoolean("shop.display-items")) { // Maybe mod server use this plugin more?
+      if (BaseConfig.displayItems) { // Maybe mod server use this plugin more?
                                                           // Or have big
         // number items need disabled?
         display_Items = "Enabled";
@@ -820,16 +812,16 @@ public class QuickShop extends JavaPlugin {
       } else {
         sneak_action = "Disabled";
       }
-      String shop_find_distance = getConfig().getString("shop.find-distance");
+      String shop_find_distance = String.valueOf(BaseConfig.findDistance);
       String economyType = Economy.getNowUsing().name();
       String useDisplayAutoDespawn =
-          String.valueOf(getConfig().getBoolean("shop.display-auto-despawn"));
+          String.valueOf(BaseConfig.enableDespawner);
       String useEnhanceDisplayProtect =
-          String.valueOf(getConfig().getBoolean("shop.enchance-display-protect"));
+          String.valueOf(BaseConfig.enhancedDisplayProtection);
       String useEnhanceShopProtect =
-          String.valueOf(getConfig().getBoolean("shop.enchance-shop-protect"));
+          String.valueOf(BaseConfig.enhancedShopProtection);
       String useOngoingFee = String.valueOf(getConfig().getBoolean("shop.ongoing-fee.enable"));
-      String disableDebugLoggger = String.valueOf(getConfig().getBoolean("disable-debuglogger"));
+      String disableDebugLoggger = BaseConfig.debugLogger ? "Enabled" : "Disabled";
 
       // Version
       metrics.addCustomChart(new Metrics.SimplePie("server_version", () -> serverVer));
@@ -860,8 +852,8 @@ public class QuickShop extends JavaPlugin {
   private void updateConfig(int selectedVersion) {
     String serverUUID = getConfig().getString("server-uuid");
     if (serverUUID == null || serverUUID.isEmpty()) {
-      UUID uuid = UUID.randomUUID();
-      serverUUID = uuid.toString();
+      serverUUID = BaseConfig.uuid;
+      ConfigurationManager.getManager(this).save(BaseConfig.class);
       getConfig().set("server-uuid", serverUUID);
     }
     saveConfig();

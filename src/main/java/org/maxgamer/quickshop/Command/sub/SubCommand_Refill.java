@@ -25,9 +25,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.utils.MsgUtil;
 
 public class SubCommand_Refill implements CommandProcesser {
 

@@ -24,22 +24,15 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
+import org.maxgamer.quickshop.utils.Util;
 
-@SuppressWarnings("DuplicatedCode")
-@IntegrationStage(loadStage = IntegrateStage.onEnableAfter)
+@IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class PlotSquaredIntegration implements IntegratedPlugin {
   private BooleanFlag createFlag;
   private BooleanFlag tradeFlag;
-  private QuickShop plugin;
-
-  public PlotSquaredIntegration(QuickShop plugin) {
-    this.plugin = plugin;
-    // PlotAPI plotAPI = new PlotAPI();
-  }
 
   @Override
   public @NotNull String getName() {
@@ -72,7 +65,7 @@ public class PlotSquaredIntegration implements IntegratedPlugin {
     this.tradeFlag = new BooleanFlag("quickshop-trade");
     Flags.registerFlag(this.createFlag);
     Flags.registerFlag(this.tradeFlag);
-    plugin.getLogger().info(ChatColor.GREEN + getName() + " flags register successfully.");
+    QuickShop.instance().getLogger().info(ChatColor.GREEN + getName() + " flags register successfully.");
     Util.debugLog("Success register " + getName() + " flags.");
   }
 

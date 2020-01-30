@@ -29,7 +29,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.InventoryPreview;
+import org.maxgamer.quickshop.shop.InventoryPreview;
 
 @AllArgsConstructor
 public class CustomInventoryListener implements Listener {

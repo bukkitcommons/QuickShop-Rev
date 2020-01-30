@@ -35,12 +35,12 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.Info;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Shop.ShopAction;
-import org.maxgamer.quickshop.Util.MsgUtil;
-import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.Info;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopAction;
+import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.Util;
 
 @AllArgsConstructor
 public class BlockListener implements Listener {
@@ -162,7 +162,7 @@ public class BlockListener implements Listener {
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
   public void onInventoryMove(InventoryMoveItemEvent event) {
-    if (!plugin.getConfig().getBoolean("shop.update-sign-when-inventory-moving", true)) {
+    if (!BaseConfig.updateSignOnInvMove) {
       return;
     }
 

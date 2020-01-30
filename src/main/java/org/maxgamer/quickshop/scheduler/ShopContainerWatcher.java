@@ -21,8 +21,8 @@ import java.util.Queue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Shop.ContainerShop;
-import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.shop.ContainerShop;
+import org.maxgamer.quickshop.shop.Shop;
 
 /**
  * Check the shops after server booted up, make sure shop can correct self-deleted when container

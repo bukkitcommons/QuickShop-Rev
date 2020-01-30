@@ -22,21 +22,27 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.ConfigurationData;
+import org.maxgamer.quickshop.configuration.ConfigurationManager;
+import org.maxgamer.quickshop.configuration.annotation.Configuration;
 import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
 
-@SuppressWarnings("DuplicatedCode")
-@IntegrationStage(loadStage = IntegrateStage.onEnableAfter)
+@Configuration("integrations.yml")
+@IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class TownyIntegration implements IntegratedPlugin {
   private List<TownyFlags> createFlags;
   private List<TownyFlags> tradeFlags;
 
   public TownyIntegration(QuickShop plugin) {
+    ConfigurationData data =
+        ConfigurationManager.getManager(QuickShop.instance()).load(TownyIntegration.class);
+    
     createFlags =
-        TownyFlags.deserialize(plugin.getConfig().getStringList("integration.towny.create"));
+        TownyFlags.deserialize(data.conf().getStringList("integration.towny.create"));
     tradeFlags =
-        TownyFlags.deserialize(plugin.getConfig().getStringList("integration.towny.trade"));
+        TownyFlags.deserialize(data.conf().getStringList("integration.towny.trade"));
   }
 
   @Override

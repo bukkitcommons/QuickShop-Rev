@@ -31,26 +31,32 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.ConfigurationData;
+import org.maxgamer.quickshop.configuration.ConfigurationManager;
+import org.maxgamer.quickshop.configuration.annotation.Configuration;
 import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
+import org.maxgamer.quickshop.utils.Util;
 
-@IntegrationStage(loadStage = IntegrateStage.onLoadAfter)
+@Configuration("integrations.yml")
+@IntegrationStage(loadStage = IntegrateStage.POST_LOAD)
 public class WorldGuardIntegration implements IntegratedPlugin {
   private List<WorldGuardFlags> createFlags;
   private List<WorldGuardFlags> tradeFlags;
   private StateFlag createFlag = new StateFlag("quickshop-create", false);
   private StateFlag tradeFlag = new StateFlag("quickshop-trade", true);
-  private QuickShop plugin;
 
-  public WorldGuardIntegration(QuickShop plugin) {
-    this.plugin = plugin;
+  public WorldGuardIntegration() {
+    ConfigurationData data =
+        ConfigurationManager.getManager(QuickShop.instance()).load(WorldGuardIntegration.class);
+    
     createFlags = WorldGuardFlags
-        .deserialize(plugin.getConfig().getStringList("integration.worldguard.create"));
+        .deserialize(data.conf().getStringList("integration.worldguard.create"));
     tradeFlags = WorldGuardFlags
-        .deserialize(plugin.getConfig().getStringList("integration.worldguard.trade"));
+        .deserialize(data.conf().getStringList("integration.worldguard.trade"));
   }
 
   @Override
@@ -60,7 +66,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
       // create a flag with the name "my-custom-flag", defaulting to true
       registry.register(this.createFlag);
       registry.register(this.tradeFlag);
-      plugin.getLogger().info(ChatColor.GREEN + getName() + " flags register successfully.");
+      QuickShop.instance().getLogger().info(ChatColor.GREEN + getName() + " flags register successfully.");
       Util.debugLog("Success register " + getName() + " flags.");
     } catch (FlagConflictException e) {
       e.printStackTrace();

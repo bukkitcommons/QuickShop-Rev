@@ -19,9 +19,9 @@ package org.maxgamer.quickshop.event;
 import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.shop.Shop;
 
-public class ShopUpdateEvent extends QSEvent implements Cancellable {
+public class ShopUpdateEvent extends ShopEvent implements Cancellable {
 
   @NotNull
   @Getter

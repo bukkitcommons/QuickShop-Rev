@@ -19,10 +19,10 @@ package org.maxgamer.quickshop.event;
 import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.shop.Shop;
 
 /** Calling when shop price was changed, Can't cancel */
-public class ShopPriceChangeEvent extends QSEvent implements Cancellable {
+public class ShopPriceChangeEvent extends ShopEvent implements Cancellable {
 
   @Getter
   private final double newPrice;

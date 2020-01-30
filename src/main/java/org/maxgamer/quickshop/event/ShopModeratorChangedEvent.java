@@ -18,11 +18,11 @@ package org.maxgamer.quickshop.event;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.Shop;
-import org.maxgamer.quickshop.Shop.ShopModerator;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopModerator;
 
 /** Calling when moderator was changed, Can't cancel */
-public class ShopModeratorChangedEvent extends QSEvent {
+public class ShopModeratorChangedEvent extends ShopEvent {
 
   @Getter
   @NotNull

@@ -20,12 +20,12 @@ import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.DisplayItem;
-import org.maxgamer.quickshop.Shop.DisplayType;
-import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.hologram.DisplayItem;
+import org.maxgamer.quickshop.shop.hologram.DisplayType;
 
 /** This event is called before the shop display item created */
-public class ShopDisplayItemSpawnEvent extends QSEvent implements Cancellable {
+public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable {
 
   @Getter
   @NotNull
