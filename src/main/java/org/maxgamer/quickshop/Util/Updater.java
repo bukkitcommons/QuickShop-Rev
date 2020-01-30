@@ -32,10 +32,11 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.NonQuickShopStuffs.com.sk89q.worldedit.util.net.HttpRequest;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Github.GithubAPI;
-import org.maxgamer.quickshop.Util.Github.ReleaseJsonContainer;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.utils.github.GithubAPI;
+import org.maxgamer.quickshop.utils.github.ReleaseJsonContainer;
+import com.sk89q.worldedit.util.net.HttpRequest;
 
 public class Updater {
   /**
@@ -44,7 +45,7 @@ public class Updater {
    * @return True=Have a new update; False=No new update or check update failed.
    */
   public static UpdateInfomation checkUpdate() {
-    if (!QuickShop.instance.getConfig().getBoolean("updater")) {
+    if (!BaseConfig.enableUpdater) {
       return new UpdateInfomation(false, null);
     }
     try {

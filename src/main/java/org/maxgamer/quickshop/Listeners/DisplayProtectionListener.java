@@ -64,15 +64,15 @@ import org.maxgamer.quickshop.Shop.DisplayItem;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
-@SuppressWarnings("DuplicatedCode")
 public class DisplayProtectionListener implements Listener {
   private QuickShop plugin;
   private boolean useEnhanceProtection;
 
   public DisplayProtectionListener(QuickShop plugin) {
     this.plugin = plugin;
-    useEnhanceProtection = plugin.getConfig().getBoolean("shop.enchance-display-protect");
+    useEnhanceProtection = BaseConfig.enhancedDisplayProtection;
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
@@ -595,7 +595,7 @@ public class DisplayProtectionListener implements Listener {
   }
 
   private void sendAlert(@NotNull String msg) {
-    if (!plugin.getConfig().getBoolean("send-display-item-protection-alert")) {
+    if (!BaseConfig.enableAlert) {
       return;
     }
     MsgUtil.sendGlobalAlert(msg);

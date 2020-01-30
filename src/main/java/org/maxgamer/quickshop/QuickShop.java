@@ -59,7 +59,6 @@ import org.maxgamer.quickshop.Economy.EconomyCore;
 import org.maxgamer.quickshop.Economy.EconomyType;
 import org.maxgamer.quickshop.Economy.Economy_Reserve;
 import org.maxgamer.quickshop.Economy.Economy_Vault;
-import org.maxgamer.quickshop.InternalListener.InternalListener;
 import org.maxgamer.quickshop.Listeners.BlockListener;
 import org.maxgamer.quickshop.Listeners.ChatListener;
 import org.maxgamer.quickshop.Listeners.ChunkListener;
@@ -71,14 +70,6 @@ import org.maxgamer.quickshop.Listeners.LockListener;
 import org.maxgamer.quickshop.Listeners.PlayerListener;
 import org.maxgamer.quickshop.Listeners.ShopProtectionListener;
 import org.maxgamer.quickshop.Listeners.WorldListener;
-import org.maxgamer.quickshop.NonQuickShopStuffs.de.Keyle.MyPet.api.util.ReflectionUtil;
-import org.maxgamer.quickshop.Permission.PermissionManager;
-import org.maxgamer.quickshop.PluginsIntegration.FactionsUUID.FactionsUUIDIntegration;
-import org.maxgamer.quickshop.PluginsIntegration.IntegrateStage;
-import org.maxgamer.quickshop.PluginsIntegration.PlotSquared.PlotSquaredIntegration;
-import org.maxgamer.quickshop.PluginsIntegration.Residence.ResidenceIntegration;
-import org.maxgamer.quickshop.PluginsIntegration.Towny.TownyIntegration;
-import org.maxgamer.quickshop.PluginsIntegration.WorldGuard.WorldGuardIntegration;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Shop.ShopLoader;
 import org.maxgamer.quickshop.Shop.ShopManager;
@@ -87,14 +78,10 @@ import org.maxgamer.quickshop.Util.FunnyEasterEgg;
 import org.maxgamer.quickshop.Util.IncompatibleChecker;
 import org.maxgamer.quickshop.Util.IntegrationHelper;
 import org.maxgamer.quickshop.Util.ItemMatcher;
-import org.maxgamer.quickshop.Util.Logger.QuickShopLogger;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.PermissionChecker;
 import org.maxgamer.quickshop.Util.ReflectFactory;
 import org.maxgamer.quickshop.Util.SentryErrorReporter;
-import org.maxgamer.quickshop.Util.ServerForkWrapper.BukkitAPIWrapper;
-import org.maxgamer.quickshop.Util.ServerForkWrapper.PaperWrapper;
-import org.maxgamer.quickshop.Util.ServerForkWrapper.SpigotWrapper;
 import org.maxgamer.quickshop.Util.Timer;
 import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.Watcher.DisplayAutoDespawnWatcher;
@@ -106,6 +93,23 @@ import org.maxgamer.quickshop.Watcher.ShopContainerWatcher;
 import org.maxgamer.quickshop.Watcher.SignUpdateWatcher;
 import org.maxgamer.quickshop.Watcher.SyncTaskWatcher;
 import org.maxgamer.quickshop.Watcher.UpdateWatcher;
+import org.maxgamer.quickshop.configuration.ConfigurationManager;
+import org.maxgamer.quickshop.configuration.annotation.Configuration;
+import org.maxgamer.quickshop.configuration.annotation.Node;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.integration.IntegrateStage;
+import org.maxgamer.quickshop.integration.impl.FactionsUUIDIntegration;
+import org.maxgamer.quickshop.integration.impl.PlotSquaredIntegration;
+import org.maxgamer.quickshop.integration.impl.ResidenceIntegration;
+import org.maxgamer.quickshop.integration.impl.TownyIntegration;
+import org.maxgamer.quickshop.integration.impl.WorldGuardIntegration;
+import org.maxgamer.quickshop.internal.listener.InternalListener;
+import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.utils.logger.QuickShopLogger;
+import org.maxgamer.quickshop.utils.wrappers.fork.BukkitAPIWrapper;
+import org.maxgamer.quickshop.utils.wrappers.fork.PaperWrapper;
+import org.maxgamer.quickshop.utils.wrappers.fork.SpigotWrapper;
+import de.Keyle.MyPet.api.util.ReflectionUtil;
 
 @Getter
 public class QuickShop extends JavaPlugin {
@@ -133,10 +137,6 @@ public class QuickShop extends JavaPlugin {
   private DatabaseHelper databaseHelper;
   /** Queued database manager */
   private DatabaseManager databaseManager;
-  /** Default database prefix, can overwrite by config */
-  private String dbPrefix = "";
-  /** Whether we should use display items or not */
-  private boolean display = true;
 
   private DisplayBugFixListener displayBugFixListener;
   private int displayItemCheckTicks;
@@ -148,8 +148,10 @@ public class QuickShop extends JavaPlugin {
   private ItemMatcher itemMatcher;
   /** Language manager, to select which language will loaded. */
   private Language language;
+  
   /** Whether or not to limit players shop amounts */
   private boolean limit = false;
+  
   /** The shop limites. */
   private HashMap<String, Integer> limits = new HashMap<>();
 
@@ -254,7 +256,7 @@ public class QuickShop extends JavaPlugin {
         getLogger().info("Successfully loaded PlaceHolderAPI support!");
       }
     }
-    if (this.display) {
+    if (BaseConfig.displayItems) {
       if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
         try {
           Clearlag clearlag = (Clearlag) Bukkit.getPluginManager().getPlugin("ClearLag");
@@ -358,7 +360,7 @@ public class QuickShop extends JavaPlugin {
   public void reloadConfig() {
     super.reloadConfig();
     // Load quick variables
-    this.display = this.getConfig().getBoolean("shop.display-items");
+    //this.display = this.getConfig().getBoolean("shop.display-items");
     this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
     this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
     language = new Language(this); // Init locale
@@ -453,6 +455,7 @@ public class QuickShop extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    ConfigurationManager.getManager(this).load(QuickShop.class);
 
     Timer enableTimer = new Timer(true);
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.onEnableBegin);
@@ -543,7 +546,7 @@ public class QuickShop extends JavaPlugin {
     // Create the shop manager.
     permissionManager = new PermissionManager(this);
     // This should be inited before shop manager
-    if (this.display) {
+    if (BaseConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
         this.enabledAsyncDisplayDespawn = true;
         this.displayAutoDespawnWatcher = new DisplayAutoDespawnWatcher(this);
@@ -761,10 +764,10 @@ public class QuickShop extends JavaPlugin {
       DatabaseCore dbCore;
       if (Objects.requireNonNull(dbCfg).getBoolean("mysql")) {
         // MySQL database - Required database be created first.
-        dbPrefix = dbCfg.getString("prefix");
-        if (dbPrefix == null || "none".equals(dbPrefix)) {
-          dbPrefix = "";
-        }
+        //dbPrefix = dbCfg.getString("prefix");
+        //if (dbPrefix == null || "none".equals(dbPrefix)) {
+        //  dbPrefix = "";
+        //}
         String user = dbCfg.getString("user");
         String pass = dbCfg.getString("password");
         String host = dbCfg.getString("host");
@@ -879,7 +882,6 @@ public class QuickShop extends JavaPlugin {
     }
   }
 
-  @SuppressWarnings("UnusedAssignment")
   private void updateConfig(int selectedVersion) {
     String serverUUID = getConfig().getString("server-uuid");
     if (serverUUID == null || serverUUID.isEmpty()) {

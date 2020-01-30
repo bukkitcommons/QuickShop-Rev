@@ -44,6 +44,7 @@ import org.maxgamer.quickshop.Shop.InventoryPreview;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @AllArgsConstructor
 public class LockListener implements Listener {
@@ -114,8 +115,8 @@ public class LockListener implements Listener {
     if (b.getState() instanceof Sign) {
       final Sign sign = (Sign) b.getState();
 
-      if (sign.getLine(0).equals(plugin.getConfig().getString("lockette.private"))
-          || sign.getLine(0).equals(plugin.getConfig().getString("lockette.more_users"))) {
+      if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
+          || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
         // Ignore break lockette sign
         plugin
             .getLogger()
@@ -142,8 +143,8 @@ public class LockListener implements Listener {
       if (b instanceof Sign) {
         final Sign sign = (Sign) b;
 
-        if (sign.getLine(0).equals(plugin.getConfig().getString("lockette.private"))
-            || sign.getLine(0).equals(plugin.getConfig().getString("lockette.more_users"))) {
+        if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
+            || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
           // Ignore break lockette sign
           Util.debugLog("Skipped a dead-lock shop sign.(Lockette)");
           return;

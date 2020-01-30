@@ -79,12 +79,12 @@ public class SubCommand_Staff implements CommandProcesser {
     }
 
     if ("add".equals(cmdArg[0]) || "del".equals(cmdArg[0])) {
-      if (plugin.getConfig().getBoolean("include-offlineplayer-list")) {
+      if (false && plugin.getConfig().getBoolean("include-offlineplayer-list")) {
         // Include
         for (OfflinePlayer offlinePlayer : plugin.getServer().getOfflinePlayers()) {
           tabList.add(offlinePlayer.getName());
         }
-      } else {
+      } else if (false) {
         // Not Include
         for (OfflinePlayer offlinePlayer : plugin.getServer().getOnlinePlayers()) {
           tabList.add(offlinePlayer.getName());
@@ -95,7 +95,6 @@ public class SubCommand_Staff implements CommandProcesser {
     return tabList;
   }
 
-  @SuppressWarnings("DuplicateBranchesInSwitch")
   @Override
   public void onCommand(
       @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {

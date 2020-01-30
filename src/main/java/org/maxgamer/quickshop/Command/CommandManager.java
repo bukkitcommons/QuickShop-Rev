@@ -65,6 +65,7 @@ import org.maxgamer.quickshop.Command.SubCommands.SubCommand_Update;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @Data
 public class CommandManager implements TabCompleter, CommandExecutor {
@@ -296,7 +297,7 @@ public class CommandManager implements TabCompleter, CommandExecutor {
     }
 
     if (sender instanceof Player) {
-      if (QuickShop.instance.getConfig().getBoolean("effect.sound.ontabcomplete")) {
+      if (BaseConfig.tabCompleteSound) {
         Player player = (Player) sender;
         ((Player) sender)
             .playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 80.0F, 1.0F);
@@ -360,7 +361,7 @@ public class CommandManager implements TabCompleter, CommandExecutor {
       return null;
     }
     if (sender instanceof Player) {
-      if (QuickShop.instance.getConfig().getBoolean("effect.sound.ontabcomplete")) {
+      if (BaseConfig.tabCompleteSound) {
         Player player = (Player) sender;
         ((Player) sender).playSound(player.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.0F, 1.0F);
       }

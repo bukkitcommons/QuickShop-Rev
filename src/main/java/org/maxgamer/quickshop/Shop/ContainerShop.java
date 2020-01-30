@@ -45,16 +45,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.Event.ShopClickEvent;
-import org.maxgamer.quickshop.Event.ShopDeleteEvent;
-import org.maxgamer.quickshop.Event.ShopLoadEvent;
-import org.maxgamer.quickshop.Event.ShopModeratorChangedEvent;
-import org.maxgamer.quickshop.Event.ShopPriceChangeEvent;
-import org.maxgamer.quickshop.Event.ShopUnloadEvent;
-import org.maxgamer.quickshop.Event.ShopUpdateEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.event.ShopClickEvent;
+import org.maxgamer.quickshop.event.ShopDeleteEvent;
+import org.maxgamer.quickshop.event.ShopLoadEvent;
+import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
+import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
+import org.maxgamer.quickshop.event.ShopUnloadEvent;
+import org.maxgamer.quickshop.event.ShopUpdateEvent;
 
 /** ChestShop core */
 @EqualsAndHashCode
@@ -108,7 +109,7 @@ public class ContainerShop implements Shop {
     this.shopType = type;
     this.unlimited = unlimited;
 
-    if (plugin.isDisplay()) {
+    if (BaseConfig.displayItems) {
       DisplayData data = DisplayItem.getNowUsing(this.item);
       switch (data.type) {
         case UNKNOWN:
@@ -410,8 +411,8 @@ public class ContainerShop implements Shop {
     int z = this.getLocation().getBlockZ();
     String world = Objects.requireNonNull(this.getLocation().getWorld()).getName();
     // Refund if necessary
-    if (plugin.getConfig().getBoolean("shop.refund")) {
-      plugin.getEconomy().deposit(this.getOwner(), plugin.getConfig().getDouble("shop.cost"));
+    if (BaseConfig.refundable) {
+      plugin.getEconomy().deposit(this.getOwner(), BaseConfig.refundCost);
     }
     if (fromMemory) {
       // Delete it from memory
@@ -437,7 +438,7 @@ public class ContainerShop implements Shop {
   }
     
   public void checkDisplay0() {
-    if (!plugin.isDisplay() || !this.isLoaded) { // FIXME: Reinit scheduler on reloading config
+    if (!BaseConfig.displayItems || !this.isLoaded) { // FIXME: Reinit scheduler on reloading config
       return;
     }
     

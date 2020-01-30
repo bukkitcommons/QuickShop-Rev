@@ -52,6 +52,7 @@ import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Shop.ShopAction;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 // import com.griefcraft.lwc.LWC;
 // import com.griefcraft.lwc.LWCPlugin;
@@ -84,7 +85,7 @@ public class PlayerListener implements Listener {
             return;
           }
 
-          if (plugin.getConfig().getBoolean("effect.sound.onclick")) {
+          if (BaseConfig.clickSound) {
             e.getPlayer()
                 .playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
           }

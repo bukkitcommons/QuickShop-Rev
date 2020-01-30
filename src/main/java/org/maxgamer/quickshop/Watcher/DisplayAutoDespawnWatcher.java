@@ -25,6 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @AllArgsConstructor
 public class DisplayAutoDespawnWatcher extends BukkitRunnable {
@@ -32,7 +33,7 @@ public class DisplayAutoDespawnWatcher extends BukkitRunnable {
 
   @Override
   public void run() {
-    int range = plugin.getConfig().getInt("shop.display-despawn-range");
+    int range = BaseConfig.despawnerRange;
 
     plugin
         .getShopManager()

@@ -33,9 +33,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.Event.ShopInventoryPreviewEvent;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.event.ShopInventoryPreviewEvent;
 
 /** A class to create a GUI item preview quickly */
 @EqualsAndHashCode

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 /**
  * Check the shops after server booted up, make sure shop can correct self-deleted when container
@@ -44,7 +45,7 @@ public class ShopVaildWatcher extends BukkitRunnable {
   @Override
   public void run() {
     int checkedShops = 0;
-    int maxCheckShops = plugin.getConfig().getInt("shop.max-shops-checks-in-once");
+    int maxCheckShops = BaseConfig.maxShopsChecksInOnce;
     Shop shop = checkQueue.poll();
     while (shop != null) {
       if (shop.isLoaded() && !shop.isValid()) {

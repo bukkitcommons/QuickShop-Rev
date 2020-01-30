@@ -43,6 +43,7 @@ import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Shop.ShopAction;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @AllArgsConstructor
 public class BlockListener implements Listener {
@@ -76,9 +77,9 @@ public class BlockListener implements Listener {
 
     if (b.getState() instanceof Sign) {
       Sign sign = (Sign) b.getState();
-      if (plugin.getConfig().getBoolean("lockette.enable")
-              && sign.getLine(0).equals(plugin.getConfig().getString("lockette.private"))
-          || sign.getLine(0).equals(plugin.getConfig().getString("lockette.more_users"))) {
+      if (BaseConfig.locketteEnable
+              && sign.getLine(0).equals(BaseConfig.lockettePrivateText)
+          || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
         // Ignore break lockette sign
         plugin
             .getLogger()
@@ -133,8 +134,8 @@ public class BlockListener implements Listener {
     } else if (Util.isWallSign(b.getType())) {
       if (b instanceof Sign) {
         Sign sign = (Sign) b;
-        if (sign.getLine(0).equals(plugin.getConfig().getString("lockette.private"))
-            || sign.getLine(0).equals(plugin.getConfig().getString("lockette.more_users"))) {
+        if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
+            || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
           // Ignore break lockette sign
           return;
         }

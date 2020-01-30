@@ -51,13 +51,14 @@ import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.Economy.Economy;
-import org.maxgamer.quickshop.Event.ShopCreateEvent;
-import org.maxgamer.quickshop.Event.ShopPreCreateEvent;
-import org.maxgamer.quickshop.Event.ShopPurchaseEvent;
-import org.maxgamer.quickshop.Event.ShopSuccessPurchaseEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.event.ShopCreateEvent;
+import org.maxgamer.quickshop.event.ShopPreCreateEvent;
+import org.maxgamer.quickshop.event.ShopPurchaseEvent;
+import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
 
 /** Manage a lot of shops. */
 public class ShopManager {
@@ -833,7 +834,7 @@ public class ShopManager {
    * on plugin disable ONLY.
    */
   public void clear() {
-    if (plugin.isDisplay()) {
+    if (BaseConfig.displayItems) {
       for (World world : Bukkit.getWorlds()) {
         for (Chunk chunk : world.getLoadedChunks()) {
           HashMap<Location, Shop> inChunk = this.getShops(chunk);

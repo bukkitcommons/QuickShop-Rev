@@ -20,6 +20,7 @@
 package org.maxgamer.quickshop.Util;
 
 import com.google.common.io.Files;
+import de.Keyle.MyPet.api.util.Colorizer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,11 +75,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.Database.MySQLCore;
-import org.maxgamer.quickshop.NonQuickShopStuffs.de.Keyle.MyPet.api.util.Colorizer;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.DisplayItem;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Watcher.InventoryEditContainer;
+import org.maxgamer.quickshop.configuration.ConfigurationManager;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -274,7 +276,8 @@ public class Util {
       if (debugLogCost > 5) {
         tookLongTimeCostTimes++;
         if (tookLongTimeCostTimes > 15000) {
-          QuickShop.instance.getConfig().set("disable-debuglogger", true);
+          BaseConfig.debugLogger = false;
+          ConfigurationManager.getManager(plugin).save(BaseConfig.class);
           disableDebugLogger = true;
           QuickShop.instance.saveConfig();
           QuickShop.instance
@@ -442,15 +445,15 @@ public class Util {
    * @return The formatted string.
    */
   public static String format(double n) {
-    if (plugin.getConfig().getBoolean("shop.disable-vault-format")) {
-      return plugin.getConfig().getString("shop.alternate-currency-symbol") + n;
+    if (BaseConfig.disableVaultFormat) {
+      return BaseConfig.currencySymbol + n;
     }
     try {
       String formated = plugin.getEconomy().format(n);
       if (formated == null || formated.isEmpty()) {
         Util.debugLog(
             "Use alternate-currency-symbol to formatting, Cause economy plugin returned null");
-        return plugin.getConfig().getString("shop.alternate-currency-symbol") + n;
+        return BaseConfig.currencySymbol + n;
       } else {
         return formated;
       }
@@ -458,7 +461,7 @@ public class Util {
       Util.debugLog("format", e.getMessage());
       Util.debugLog(
           "format", "Use alternate-currency-symbol to formatting, Cause NumberFormatException");
-      return plugin.getConfig().getString("shop.alternate-currency-symbol") + n;
+      return BaseConfig.currencySymbol + n;
     }
   }
 
@@ -713,9 +716,9 @@ public class Util {
     restrictedPrices.clear();
     worldBlacklist.clear();
     plugin = QuickShop.instance;
-    devMode = plugin.getConfig().getBoolean("dev-mode");
+    devMode = BaseConfig.developerMode;
 
-    for (String s : plugin.getConfig().getStringList("shop-blocks")) {
+    for (String s : BaseConfig.blacklist) {
       Material mat = Material.matchMaterial(s.toUpperCase());
       if (mat == null) {
         mat = Material.matchMaterial(s);
@@ -726,7 +729,7 @@ public class Util {
         shoppables.add(mat);
       }
     }
-    List<String> configBlacklist = plugin.getConfig().getStringList("blacklist");
+    List<String> configBlacklist = BaseConfig.blacklist;
     for (String s : configBlacklist) {
       Material mat = Material.getMaterial(s.toUpperCase());
       if (mat == null) {
@@ -739,7 +742,7 @@ public class Util {
       blacklist.add(mat);
     }
 
-    for (String s : plugin.getConfig().getStringList("price-restriction")) {
+    for (String s : BaseConfig.priceRestriction) {
       String[] sp = s.split(";");
       if (sp.length == 3) {
         try {
@@ -760,8 +763,8 @@ public class Util {
         }
       }
     }
-    worldBlacklist = plugin.getConfig().getStringList("shop.blacklist-world");
-    disableDebugLogger = plugin.getConfig().getBoolean("disable-debuglogger", false);
+    worldBlacklist = BaseConfig.blacklistWorld;
+    disableDebugLogger = BaseConfig.debugLogger;
   }
 
   /**
@@ -1306,8 +1309,7 @@ public class Util {
   public static Material getSignMaterial() {
 
     Material signMaterial =
-        Material.matchMaterial(
-            Objects.requireNonNull(plugin.getConfig().getString("shop.sign-material")));
+        Material.matchMaterial(BaseConfig.signMaterial);
     if (signMaterial != null) {
       return signMaterial;
     }

@@ -59,10 +59,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.File.IFile;
-import org.maxgamer.quickshop.File.JSONFile;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.file.IFile;
+import org.maxgamer.quickshop.file.JSONFile;
 
 @SuppressWarnings("WeakerAccess")
 public class MsgUtil {

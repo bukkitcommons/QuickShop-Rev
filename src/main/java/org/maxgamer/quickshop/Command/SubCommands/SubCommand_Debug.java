@@ -34,6 +34,7 @@ import org.maxgamer.quickshop.Command.CommandProcesser;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class SubCommand_Debug implements CommandProcesser {
 
@@ -102,10 +103,8 @@ public class SubCommand_Debug implements CommandProcesser {
   }
 
   public void switchDebug(@NotNull CommandSender sender) {
-    final boolean debug = plugin.getConfig().getBoolean("dev-mode");
-
-    if (debug) {
-      plugin.getConfig().set("dev-mode", false);
+    if (BaseConfig.developerMode) {
+      BaseConfig.developerMode = false;
       plugin.saveConfig();
       plugin.getServer().getPluginManager().disablePlugin(plugin);
       plugin.getServer().getPluginManager().enablePlugin(plugin);
@@ -113,7 +112,7 @@ public class SubCommand_Debug implements CommandProcesser {
       return;
     }
 
-    plugin.getConfig().set("dev-mode", true);
+    BaseConfig.developerMode = true;
     plugin.saveConfig();
     plugin.getServer().getPluginManager().disablePlugin(plugin);
     plugin.getServer().getPluginManager().enablePlugin(plugin);

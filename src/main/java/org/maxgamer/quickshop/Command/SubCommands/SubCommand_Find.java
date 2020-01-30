@@ -34,6 +34,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class SubCommand_Find implements CommandProcesser {
 
@@ -68,7 +69,7 @@ public class SubCommand_Find implements CommandProcesser {
     final String lookFor = sb.toString().toLowerCase();
     final Player p = (Player) sender;
     final Location loc = p.getEyeLocation().clone();
-    final double minDistance = plugin.getConfig().getInt("shop.find-distance");
+    final double minDistance = BaseConfig.findDistance;
     double minDistanceSquared = minDistance * minDistance;
     final int chunkRadius = (int) minDistance / 16 + 1;
     Shop closest = null;

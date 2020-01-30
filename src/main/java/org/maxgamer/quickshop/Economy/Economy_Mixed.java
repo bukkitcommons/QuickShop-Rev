@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class Economy_Mixed implements EconomyCore {
   EconomyCore core;
@@ -40,7 +41,7 @@ public class Economy_Mixed implements EconomyCore {
     Bukkit.dispatchCommand(
         Bukkit.getConsoleSender(),
         MsgUtil.fillArgs(
-            QuickShop.instance.getConfig().getString("mixedeconomy.deposit"),
+            BaseConfig.mixedDepositCommand,
             Bukkit.getOfflinePlayer(name).getName(),
             String.valueOf(amount)));
     return true;
@@ -78,7 +79,7 @@ public class Economy_Mixed implements EconomyCore {
     Bukkit.dispatchCommand(
         Bukkit.getConsoleSender(),
         MsgUtil.fillArgs(
-            QuickShop.instance.getConfig().getString("mixedeconomy.withdraw"),
+            BaseConfig.mixedWithdrawCommand,
             Bukkit.getOfflinePlayer(name).getName(),
             String.valueOf(amount)));
     return true;

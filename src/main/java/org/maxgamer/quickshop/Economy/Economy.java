@@ -25,6 +25,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class Economy implements EconomyCore {
 
@@ -35,7 +36,7 @@ public class Economy implements EconomyCore {
   }
 
   public static EconomyType getNowUsing() {
-    return EconomyType.fromID(QuickShop.instance.getConfig().getInt("economy-type"));
+    return EconomyType.fromID(BaseConfig.economyType);
   }
 
   @Override

@@ -34,6 +34,7 @@ import org.maxgamer.quickshop.Shop.ContainerShop;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class SubCommand_Price implements CommandProcesser {
 
@@ -64,10 +65,10 @@ public class SubCommand_Price implements CommandProcesser {
     }
 
     final double price;
-    final double minPrice = plugin.getConfig().getDouble("shop.minimum-price");
+    final double minPrice = BaseConfig.minimumPrice;
 
     try {
-      if (plugin.getConfig().getBoolean("whole-number-prices-only")) {
+      if (BaseConfig.integerPriceOnly) {
         try {
           price = Long.parseLong(cmdArg[0]);
         } catch (NumberFormatException ex2) {
@@ -87,9 +88,9 @@ public class SubCommand_Price implements CommandProcesser {
       return;
     }
 
-    final boolean format = plugin.getConfig().getBoolean("use-decimal-format");
+    final boolean format = BaseConfig.decimalFormatPrice;
 
-    if (plugin.getConfig().getBoolean("shop.allow-free-shop")) {
+    if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
         p.sendMessage(
             MsgUtil.getMessage(
@@ -105,7 +106,7 @@ public class SubCommand_Price implements CommandProcesser {
       }
     }
 
-    final double price_limit = plugin.getConfig().getDouble("shop.maximum-price");
+    final double price_limit = BaseConfig.maximumPrice;
 
     if (price_limit != -1 && price > price_limit) {
       p.sendMessage(
@@ -119,7 +120,7 @@ public class SubCommand_Price implements CommandProcesser {
     double fee = 0;
 
     if (plugin.isPriceChangeRequiresFee()) {
-      fee = plugin.getConfig().getDouble("shop.fee-for-price-change");
+      fee = BaseConfig.priceModFee;
     }
 
     /*if (fee > 0 && plugin.getEconomy().getBalance(p.getUniqueId()) < fee) {
@@ -169,7 +170,7 @@ public class SubCommand_Price implements CommandProcesser {
                   plugin
                       .getServer()
                       .getOfflinePlayer(
-                          Objects.requireNonNull(plugin.getConfig().getString("tax-account")))
+                          BaseConfig.taxAccount)
                       .getUniqueId(),
                   fee);
         } catch (Exception e) {

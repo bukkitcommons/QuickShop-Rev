@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.DisplayItem;
 import org.maxgamer.quickshop.Shop.DisplayType;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @AllArgsConstructor
 public class DisplayBugFixListener implements Listener {
@@ -39,7 +40,7 @@ public class DisplayBugFixListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void canBuild(BlockCanBuildEvent e) {
-    if (!plugin.isDisplay()
+    if (!BaseConfig.displayItems
         //|| DisplayItem.getNowUsing(null) != DisplayType.ARMORSTAND
         || e.isBuildable()) {
       return;

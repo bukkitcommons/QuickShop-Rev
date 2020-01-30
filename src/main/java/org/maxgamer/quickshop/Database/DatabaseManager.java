@@ -32,6 +32,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.Timer;
 import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.Util.WarningSender;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 /** Queued database manager. Use queue to solve run SQL make server lagg issue. */
 public class DatabaseManager {
@@ -55,7 +56,7 @@ public class DatabaseManager {
     this.plugin = plugin;
     this.warningSender = new WarningSender(plugin, 600000);
     this.database = db;
-    this.useQueue = plugin.getConfig().getBoolean("database.queue");
+    this.useQueue = BaseConfig.databaseQueue;
     if (!useQueue) {
       return;
     }

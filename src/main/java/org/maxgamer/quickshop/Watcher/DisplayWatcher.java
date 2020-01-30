@@ -23,6 +23,7 @@ import lombok.Data;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @Data
 public class DisplayWatcher {
@@ -36,11 +37,11 @@ public class DisplayWatcher {
 
   private void registerTask() {
     plugin.getLogger().info("Registering DisplayCheck task....");
-    if (plugin.isDisplay() && plugin.getDisplayItemCheckTicks() > 0) {
+    if (BaseConfig.displayItems && plugin.getDisplayItemCheckTicks() > 0) {
       new BukkitRunnable() {
         @Override
         public void run() {
-          if (plugin.getConfig().getInt("shop.display-items-check-ticks") < 3000) {
+          if (BaseConfig.displayItemCheckTicks < 3000) {
             plugin
                 .getLogger()
                 .severe(

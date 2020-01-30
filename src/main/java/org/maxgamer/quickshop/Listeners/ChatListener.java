@@ -27,6 +27,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 /** @author Netherfoam */
 @AllArgsConstructor
@@ -37,7 +38,7 @@ public class ChatListener implements Listener {
   @EventHandler(priority = EventPriority.LOWEST)
   public void onChat(AsyncPlayerChatEvent e) {
 
-    if (e.isCancelled() && plugin.getConfig().getBoolean("shop.ignore-cancel-chat-event")) {
+    if (e.isCancelled() && BaseConfig.ignoreChatCancelling) {
       Util.debugLog("Ignored a chat event (Canceled by another plugin.)");
       return;
     }

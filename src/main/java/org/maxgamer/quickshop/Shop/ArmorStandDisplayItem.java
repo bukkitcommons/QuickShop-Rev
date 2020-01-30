@@ -36,10 +36,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.Event.ShopDisplayItemDespawnEvent;
-import org.maxgamer.quickshop.Event.ShopDisplayItemSpawnEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.event.ShopDisplayItemDespawnEvent;
+import org.maxgamer.quickshop.event.ShopDisplayItemSpawnEvent;
 import com.bekvon.bukkit.residence.commands.contract;
 
 @ToString

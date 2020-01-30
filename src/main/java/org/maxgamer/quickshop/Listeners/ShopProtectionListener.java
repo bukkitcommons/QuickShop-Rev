@@ -45,6 +45,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 @SuppressWarnings("DuplicatedCode")
 public class ShopProtectionListener implements Listener {
@@ -57,7 +58,7 @@ public class ShopProtectionListener implements Listener {
 
   public ShopProtectionListener(@NotNull QuickShop plugin) {
     this.plugin = plugin;
-    useEnhanceProtection = plugin.getConfig().getBoolean("shop.enchance-shop-protect");
+    useEnhanceProtection = BaseConfig.enhancedDisplayProtection;
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -68,7 +69,7 @@ public class ShopProtectionListener implements Listener {
       final Shop shop = plugin.getShopManager().getShopIncludeAttached(b.getLocation());
 
       if (shop != null) {
-        if (plugin.getConfig().getBoolean("protect.explode")) {
+        if (BaseConfig.explosionProtection) {
           e.setCancelled(true);
         } else {
           shop.delete();
@@ -145,7 +146,7 @@ public class ShopProtectionListener implements Listener {
       if (shop == null) {
         continue;
       }
-      if (plugin.getConfig().getBoolean("protect.explode")) {
+      if (BaseConfig.explosionProtection) {
         e.setCancelled(true);
       } else {
         shop.delete();
@@ -194,7 +195,7 @@ public class ShopProtectionListener implements Listener {
       MsgUtil.sendGlobalAlert("[DisplayGuard] Defened a item steal action at" + location);
     }
   }
-  private boolean sendProtectionAlert = QuickShop.instance.getConfig().getBoolean("send-shop-protection-alert",false);
+  private boolean sendProtectionAlert = BaseConfig.enableAlert;
 
   // Protect Entity pickup shop
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -210,7 +211,7 @@ public class ShopProtectionListener implements Listener {
       return;
     }
 
-    if (plugin.getConfig().getBoolean("protect.entity")) {
+    if (BaseConfig.entityProtection) {
       event.setCancelled(true);
       return;
     }

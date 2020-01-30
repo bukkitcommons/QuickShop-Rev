@@ -29,6 +29,7 @@ import net.tnemc.core.economy.EconomyAPI;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 /** @author creatorfromhell */
 public class Economy_Reserve implements EconomyCore {
@@ -46,7 +47,7 @@ public class Economy_Reserve implements EconomyCore {
 
   private String formatInternal(double balance) {
     try {
-      return QuickShop.instance.getConfig().getString("shop.alternate-currency-symbol") + balance;
+      return BaseConfig.currencySymbol + balance;
     } catch (Exception e) {
       return String.valueOf('$' + balance);
     }
@@ -120,7 +121,7 @@ public class Economy_Reserve implements EconomyCore {
   @Override
   public boolean withdraw(UUID name, double amount) {
     try {
-      if (!plugin.getConfig().getBoolean("shop.allow-economy-loan")) {
+      if (!BaseConfig.allowLoan) {
         if (getBalance(name) < amount) {
           return false;
         }

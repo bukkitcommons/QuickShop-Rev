@@ -5,9 +5,11 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.maxgamer.quickshop.Mock.MckFileConfiguration;
 import org.maxgamer.quickshop.QuickShopTest;
-
+import org.maxgamer.quickshop.file.IFile;
+import org.maxgamer.quickshop.file.JSONFile;
+import org.maxgamer.quickshop.file.YAMLFile;
+import org.maxgamer.quickshop.mock.MckFileConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

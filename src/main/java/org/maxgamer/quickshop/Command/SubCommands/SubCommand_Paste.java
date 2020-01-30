@@ -30,8 +30,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.Command.CommandProcesser;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Paste.Paste;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.utils.paste.Paste;
 
 public class SubCommand_Paste implements CommandProcesser {
 

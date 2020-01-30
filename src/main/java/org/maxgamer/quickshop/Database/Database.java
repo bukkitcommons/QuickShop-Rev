@@ -83,7 +83,7 @@ public class Database {
   //        rs.close();
   //        core.flush();
   //        // For each table
-  //        String prefix = plugin.getConfig().getString("database.prefix");
+  //        String prefix = plugin.().getString("database.prefix");
   //        for (String table : tables) {
   //            if (table.contains("schedule")) {
   //                return; // go way!

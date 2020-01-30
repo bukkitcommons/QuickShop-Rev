@@ -25,8 +25,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Event.ProtectionCheckStatus;
-import org.maxgamer.quickshop.Event.ShopProtectionCheckEvent;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.event.ProtectionCheckStatus;
+import org.maxgamer.quickshop.event.ShopProtectionCheckEvent;
 import org.maxgamer.quickshop.QuickShop;
 
 public class PermissionChecker {
@@ -35,7 +36,7 @@ public class PermissionChecker {
 
   public PermissionChecker(@NotNull QuickShop plugin) {
     this.plugin = plugin;
-    usePermissionChecker = this.plugin.getConfig().getBoolean("shop.protection-checking");
+    usePermissionChecker = BaseConfig.enableProtection;
   }
 
   /**

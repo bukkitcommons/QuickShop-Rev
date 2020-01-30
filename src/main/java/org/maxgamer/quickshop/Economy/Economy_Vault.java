@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class Economy_Vault implements EconomyCore, Listener {
 
@@ -61,7 +62,7 @@ public class Economy_Vault implements EconomyCore, Listener {
       return "Error";
     }
     try {
-      return QuickShop.instance.getConfig().getString("shop.alternate-currency-symbol") + balance;
+      return BaseConfig.currencySymbol + balance;
     } catch (Exception e) {
       return String.valueOf('$' + balance);
     }
@@ -174,7 +175,7 @@ public class Economy_Vault implements EconomyCore, Listener {
     }
     OfflinePlayer p = Bukkit.getOfflinePlayer(name);
     try {
-      if (!plugin.getConfig().getBoolean("shop.allow-economy-loan")) {
+      if (!BaseConfig.allowLoan) {
         if (getBalance(name) < amount) {
           return false;
         }

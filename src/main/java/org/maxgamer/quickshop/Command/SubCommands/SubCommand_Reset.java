@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.Command.CommandProcesser;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.MsgUtil;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 public class SubCommand_Reset implements CommandProcesser {
 
@@ -64,7 +65,7 @@ public class SubCommand_Reset implements CommandProcesser {
         item.delete();
         ench.delete();
         potion.delete();
-        MsgUtil.loadGameLanguage(Objects.requireNonNull(plugin.getConfig().getString("game-language", "default")));
+        MsgUtil.loadGameLanguage(BaseConfig.language);
         MsgUtil.loadItemi18n();
         MsgUtil.loadEnchi18n();
         MsgUtil.loadPotioni18n();

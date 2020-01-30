@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Shop.Shop;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 /**
  * Check the shops after server booted up, make sure shop can correct self-deleted when container
@@ -50,9 +51,9 @@ public class OngoingFeeWatcher extends BukkitRunnable {
       Util.debugLog("Economy hadn't get ready.");
       return;
     }
-    int cost = plugin.getConfig().getInt("shop.ongoing-fee.cost-per-shop");
-    boolean allowLoan = plugin.getConfig().getBoolean("shop.allow-economy-loan");
-    boolean ignoreUnlimited = plugin.getConfig().getBoolean("shop.ongoing-fee.ignore-unlimited");
+    int cost = BaseConfig.ongoingFeeCostPerShop;
+    boolean allowLoan = BaseConfig.allowLoan;
+    boolean ignoreUnlimited = BaseConfig.ongoingFeeIgnoreUnlimited;
     int perTaskFlow = 0;
     int parallelTasks = 0;
     for (Shop shop : plugin.getShopManager().getAllShops()) {
@@ -79,7 +80,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
               plugin
                   .getEconomy()
                   .deposit(
-                      Bukkit.getOfflinePlayer(plugin.getConfig().getString("tax")).getUniqueId(), cost);
+                      Bukkit.getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), cost);
             } catch (Exception ignored) {
             }
           }

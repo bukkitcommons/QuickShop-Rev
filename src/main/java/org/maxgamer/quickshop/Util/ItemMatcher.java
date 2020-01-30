@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 
 /** A util allow quickshop check item matches easy and quick. */
 public class ItemMatcher {
@@ -33,8 +34,7 @@ public class ItemMatcher {
 
   public ItemMatcher(QuickShop plugin) {
     this.plugin = plugin;
-    itemMetaMatcher = new ItemMetaMatcher(
-        Objects.requireNonNull(plugin.getConfig().getConfigurationSection("matcher.item")));
+    itemMetaMatcher = new ItemMetaMatcher();
   }
 
   /**
@@ -68,7 +68,7 @@ public class ItemMatcher {
     // if(plugin.getConfig().getBoolean("matcher.use-bukkit-matcher")){
     // return givenStack.isSimilar(requireStack);
     // }
-    switch (plugin.getConfig().getInt("matcher.work-type")) {
+    switch (BaseConfig.matcherWorkMode) {
       case 1:
       case 2:
         return requireStack.isSimilar(givenStack);
@@ -98,16 +98,16 @@ class ItemMetaMatcher {
   private boolean potions;
   private boolean bukkit;
 
-  public ItemMetaMatcher(ConfigurationSection itemMatcherConfig) {
-    this.damage = itemMatcherConfig.getBoolean("damage");
-    this.repaircost = itemMatcherConfig.getBoolean("repaircost");
-    this.displayname = itemMatcherConfig.getBoolean("displayname");
-    this.lores = itemMatcherConfig.getBoolean("lores");
-    this.enchs = itemMatcherConfig.getBoolean("enchs");
-    this.potions = itemMatcherConfig.getBoolean("potions");
-    this.attributes = itemMatcherConfig.getBoolean("attributes");
-    this.itemflags = itemMatcherConfig.getBoolean("itemflags");
-    this.custommodeldata = itemMatcherConfig.getBoolean("custommodeldata");
+  public ItemMetaMatcher() {
+    this.damage = BaseConfig.damage;
+    this.repaircost = BaseConfig.repairCost;
+    this.displayname = BaseConfig.displayName;
+    this.lores = BaseConfig.lore;
+    this.enchs = BaseConfig.enchant;
+    this.potions = BaseConfig.potion;
+    this.attributes = BaseConfig.attribute;
+    this.itemflags = BaseConfig.flag;
+    this.custommodeldata = BaseConfig.customModelData;
 
     this.bukkit = damage && repaircost && displayname && lores && enchs && potions && attributes
         && itemflags && custommodeldata;

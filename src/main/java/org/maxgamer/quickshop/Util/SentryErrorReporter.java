@@ -41,8 +41,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.Paste.Paste;
 import org.maxgamer.quickshop.Watcher.UpdateWatcher;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.utils.paste.Paste;
 
 /** Auto report errors to qs's sentry. */
 public class SentryErrorReporter {
@@ -106,7 +107,7 @@ public class SentryErrorReporter {
 
     Util.debugLog("Sentry error reporter success loaded.");
     enabled = true;
-    if (!plugin.getConfig().getBoolean("auto-report-errors")) {
+    if (!BaseConfig.eanbleErrorReporter) {
       Util.debugLog("Sentry error report was disabled, unloading...");
       unit();
       return;

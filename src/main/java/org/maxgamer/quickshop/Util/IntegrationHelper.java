@@ -25,9 +25,9 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.PluginsIntegration.IntegrateStage;
-import org.maxgamer.quickshop.PluginsIntegration.IntegratedPlugin;
-import org.maxgamer.quickshop.PluginsIntegration.IntegrationStage;
+import org.maxgamer.quickshop.integration.IntegrateStage;
+import org.maxgamer.quickshop.integration.IntegratedPlugin;
+import org.maxgamer.quickshop.integration.IntegrationStage;
 
 @Getter
 public class IntegrationHelper {

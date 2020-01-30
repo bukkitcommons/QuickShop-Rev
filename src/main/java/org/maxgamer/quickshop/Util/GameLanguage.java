@@ -36,8 +36,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.Util.MojangAPI.AssetJson;
-import org.maxgamer.quickshop.Util.MojangAPI.MojangAPI;
+import org.maxgamer.quickshop.utils.mojang.AssetJson;
+import org.maxgamer.quickshop.utils.mojang.MojangAPI;
 
 public class GameLanguage extends Thread {
   private @Nullable JsonObject lang;
