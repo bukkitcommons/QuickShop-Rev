@@ -24,10 +24,9 @@ import org.jetbrains.annotations.NotNull;
 public class EngineHubPaster implements PasteInterface {
   @Override
   public String pasteTheText(@NotNull String text) throws Exception {
-    com.sk89q.worldedit.util.paste.EngineHubPaster
+    org.maxgamer.quickshop.Util.EngineHubPaster
         paster =
-            new com.sk89q.worldedit.util.paste
-                .EngineHubPaster();
+            new org.maxgamer.quickshop.Util.EngineHubPaster();
     return paster.paste(text).call().toString();
   }
 }

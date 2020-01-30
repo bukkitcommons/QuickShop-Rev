@@ -81,6 +81,7 @@ import org.maxgamer.quickshop.Util.ItemMatcher;
 import org.maxgamer.quickshop.Util.MsgUtil;
 import org.maxgamer.quickshop.Util.PermissionChecker;
 import org.maxgamer.quickshop.Util.ReflectFactory;
+import org.maxgamer.quickshop.Util.ReflectionUtil;
 import org.maxgamer.quickshop.Util.SentryErrorReporter;
 import org.maxgamer.quickshop.Util.Timer;
 import org.maxgamer.quickshop.Util.Util;
@@ -109,7 +110,6 @@ import org.maxgamer.quickshop.utils.logger.QuickShopLogger;
 import org.maxgamer.quickshop.utils.wrappers.fork.BukkitAPIWrapper;
 import org.maxgamer.quickshop.utils.wrappers.fork.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.fork.SpigotWrapper;
-import de.Keyle.MyPet.api.util.ReflectionUtil;
 
 @Getter
 public class QuickShop extends JavaPlugin {

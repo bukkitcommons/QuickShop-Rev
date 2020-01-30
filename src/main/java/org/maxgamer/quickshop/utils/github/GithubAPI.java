@@ -21,9 +21,9 @@ package org.maxgamer.quickshop.utils.github;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sk89q.worldedit.util.net.HttpRequest;
 import java.net.URL;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.Util.HttpRequest;
 
 public class GithubAPI {
   private Gson gson = new GsonBuilder().disableHtmlEscaping().create();

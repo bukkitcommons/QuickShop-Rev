@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.Keyle.MyPet.api.util;
+package org.maxgamer.quickshop.Util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

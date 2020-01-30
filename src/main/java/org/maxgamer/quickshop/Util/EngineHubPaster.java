@@ -1,8 +1,7 @@
-package com.sk89q.worldedit.util.paste;
+package org.maxgamer.quickshop.Util;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.sk89q.worldedit.util.net.HttpRequest;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;

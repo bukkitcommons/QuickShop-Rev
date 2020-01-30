@@ -36,7 +36,6 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.utils.github.GithubAPI;
 import org.maxgamer.quickshop.utils.github.ReleaseJsonContainer;
-import com.sk89q.worldedit.util.net.HttpRequest;
 
 public class Updater {
   /**

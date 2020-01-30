@@ -20,7 +20,6 @@
 package org.maxgamer.quickshop.Util;
 
 import com.google.common.io.Files;
-import de.Keyle.MyPet.api.util.Colorizer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;

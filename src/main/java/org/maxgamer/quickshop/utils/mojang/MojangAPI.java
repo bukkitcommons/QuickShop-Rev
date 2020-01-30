@@ -23,13 +23,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
-import com.sk89q.worldedit.util.net.HttpRequest;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.Util.HttpRequest;
 import org.maxgamer.quickshop.Util.Util;
 
 public class MojangAPI {

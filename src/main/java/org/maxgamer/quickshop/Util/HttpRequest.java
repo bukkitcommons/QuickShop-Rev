@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.util.net;
+package org.maxgamer.quickshop.Util;
 /*
  * WorldEdit, a Minecraft world manipulation toolkit
  * Copyright (C) sk89q <http://www.sk89q.com>

@@ -1,4 +1,4 @@
-package com.dumbtruckman.JsonConfiguration;
+package org.maxgamer.quickshop.utils.json;
 
 import java.util.ArrayList;
 import java.util.Collection;

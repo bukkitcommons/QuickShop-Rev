@@ -1,4 +1,4 @@
-package com.dumbtruckman.JsonConfiguration;
+package org.maxgamer.quickshop.utils.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

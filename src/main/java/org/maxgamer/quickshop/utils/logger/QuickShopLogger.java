@@ -55,10 +55,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.Util.ReflectionUtil;
 import org.maxgamer.quickshop.Util.Util;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import com.google.common.collect.Maps;
-import de.Keyle.MyPet.api.util.ReflectionUtil;
 
 /*
  * Originally take from Mypet which is a awesome project, extends PluginLogger in order to replace
