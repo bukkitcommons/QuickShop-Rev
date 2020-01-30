@@ -32,11 +32,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.Economy.Economy;
-import org.maxgamer.quickshop.Economy.EconomyCore;
-import org.maxgamer.quickshop.Economy.Economy_Vault;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.Util.Util;
+import org.maxgamer.quickshop.economy.Economy;
+import org.maxgamer.quickshop.economy.EconomyCore;
+import org.maxgamer.quickshop.economy.Economy_Vault;
 
 /** A util to generate a paste report and upload it to EngineHub/Ubuntu Paste */
 @AllArgsConstructor

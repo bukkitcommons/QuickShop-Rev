@@ -1,6 +1,6 @@
 /*
- * This file is a part of project QuickShop, the name is CommandContainer.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is DatabaseCore.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
@@ -14,19 +14,17 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.command;
+package org.maxgamer.quickshop.database;
 
-import java.util.List;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import java.sql.Connection;
 
-@Data
-@Builder
-public class CommandContainer {
-  private CommandProcesser executor;
-  private boolean hidden; // Hide from help, tabcomplete
-  @Singular
-  private List<String> permissions; // E.g quickshop.unlimited
-  private String prefix; // E.g /qs <prefix>
+public interface DatabaseCore {
+
+  void close();
+
+  void flush();
+
+  void queue(BufferStatement bs);
+
+  Connection getConnection();
 }

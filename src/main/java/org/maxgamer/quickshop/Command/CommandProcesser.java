@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.Command;
+package org.maxgamer.quickshop.command;
 
 import java.util.List;
 import org.bukkit.command.CommandSender;
