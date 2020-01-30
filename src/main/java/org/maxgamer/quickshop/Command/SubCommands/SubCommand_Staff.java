@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is SubCommand_Staff.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is SubCommand_Staff.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Command.SubCommands;
@@ -43,8 +40,8 @@ public class SubCommand_Staff implements CommandProcesser {
 
   @NotNull
   @Override
-  public List<String> onTabComplete(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     final ArrayList<String> tabList = new ArrayList<>();
 
     Util.debugLog(Util.array2String(cmdArg));
@@ -96,8 +93,8 @@ public class SubCommand_Staff implements CommandProcesser {
   }
 
   @Override
-  public void onCommand(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     Util.debugLog(Util.array2String(cmdArg));
     if (!(sender instanceof Player)) {
       sender.sendMessage("Only player can execute this command.");
@@ -139,17 +136,14 @@ public class SubCommand_Staff implements CommandProcesser {
               final List<UUID> staffs = shop.getStaffs();
 
               if (staffs.isEmpty()) {
-                sender.sendMessage(
-                    ChatColor.GREEN
-                        + MsgUtil.getMessage("tableformat.left_begin", sender)
-                        + "Empty");
+                sender.sendMessage(ChatColor.GREEN
+                    + MsgUtil.getMessage("tableformat.left_begin", sender) + "Empty");
                 return;
               }
 
               for (UUID uuid : staffs) {
                 sender.sendMessage(
-                    ChatColor.GREEN
-                        + MsgUtil.getMessage("tableformat.left_begin", sender)
+                    ChatColor.GREEN + MsgUtil.getMessage("tableformat.left_begin", sender)
                         + Bukkit.getOfflinePlayer(uuid).getName());
               }
 
@@ -173,8 +167,8 @@ public class SubCommand_Staff implements CommandProcesser {
               sender.sendMessage(MsgUtil.getMessage("shop-staff-added", sender, offlinePlayerName));
               return;
             case "del":
-              sender.sendMessage(
-                  MsgUtil.getMessage("shop-staff-deleted", sender, offlinePlayerName));
+              sender
+                  .sendMessage(MsgUtil.getMessage("shop-staff-deleted", sender, offlinePlayerName));
               return;
             default:
               sender.sendMessage(MsgUtil.getMessage("command.wrong-args", sender));

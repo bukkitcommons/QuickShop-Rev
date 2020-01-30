@@ -90,11 +90,8 @@ public final class JSONConfiguration extends FileConfiguration {
 
     try {
       final Gson gson =
-          new GsonBuilder()
-              .registerTypeAdapter(
-                  new TypeToken<Map<String, Object>>() {}.getType(),
-                  new MapDeserializerDoubleAsIntFix())
-              .create();
+          new GsonBuilder().registerTypeAdapter(new TypeToken<Map<String, Object>>() {}.getType(),
+              new MapDeserializerDoubleAsIntFix()).create();
       input = gson.fromJson(contents, new TypeToken<Map<String, Object>>() {}.getType());
     } catch (JsonSyntaxException e) {
       throw new InvalidConfigurationException("Invalid JSON detected.", e);
@@ -116,8 +113,8 @@ public final class JSONConfiguration extends FileConfiguration {
     return "";
   }
 
-  protected void convertMapsToSections(
-      @NotNull Map<?, ?> input, @NotNull ConfigurationSection section) {
+  protected void convertMapsToSections(@NotNull Map<?, ?> input,
+      @NotNull ConfigurationSection section) {
     final Object result = SerializationHelper.deserialize(input);
 
     if (result instanceof Map) {
@@ -153,9 +150,8 @@ public final class JSONConfiguration extends FileConfiguration {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> deserialize(
-        JsonElement json, Type typeOfT, JsonDeserializationContext context)
-        throws JsonParseException {
+    public Map<String, Object> deserialize(JsonElement json, Type typeOfT,
+        JsonDeserializationContext context) throws JsonParseException {
       return (Map<String, Object>) read(json);
     }
 
@@ -187,7 +183,8 @@ public final class JSONConfiguration extends FileConfiguration {
           // here you can handle double int/long values
           // and return any type you want
           // this solution will transform 3.0 float to long values
-          if (Math.ceil(num.doubleValue()) == num.longValue()) return num.longValue();
+          if (Math.ceil(num.doubleValue()) == num.longValue())
+            return num.longValue();
           else {
             return num.doubleValue();
           }

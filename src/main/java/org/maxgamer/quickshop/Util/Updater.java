@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is Updater.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is Updater.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Util;
@@ -52,28 +49,23 @@ public class Updater {
       String localPluginVersion = QuickShop.instance.getDescription().getVersion();
       String spigotPluginVersion =
           HttpRequest.get(new URL("https://api.spigotmc.org/legacy/update.php?resource=62575"))
-              .execute()
-              .expectResponseCode(200)
-              .returnContent()
-              .asString("UTF-8")
-              .trim();
+              .execute().expectResponseCode(200).returnContent().asString("UTF-8").trim();
       if (!spigotPluginVersion.isEmpty() && !spigotPluginVersion.equals(localPluginVersion)) {
         Util.debugLog(spigotPluginVersion);
-        return new UpdateInfomation(
-            spigotPluginVersion.toLowerCase().contains("beta"), spigotPluginVersion);
+        return new UpdateInfomation(spigotPluginVersion.toLowerCase().contains("beta"),
+            spigotPluginVersion);
       }
       return new UpdateInfomation(false, spigotPluginVersion);
     } catch (IOException e) {
-      Bukkit.getConsoleSender()
-          .sendMessage(
-              ChatColor.RED
-                  + "[QuickShop] Failed to check for an update on SpigotMC.org! It might be an internet issue or the SpigotMC host is down. If you want disable the update checker, you can disable in config.yml, but we still high-recommend check for updates on SpigotMC.org often.");
+      Bukkit.getConsoleSender().sendMessage(ChatColor.RED
+          + "[QuickShop] Failed to check for an update on SpigotMC.org! It might be an internet issue or the SpigotMC host is down. If you want disable the update checker, you can disable in config.yml, but we still high-recommend check for updates on SpigotMC.org often.");
       return new UpdateInfomation(false, null);
     }
   }
 
   public static byte[] downloadUpdatedJar() throws IOException {
-    @Nullable String uurl;
+    @Nullable
+    String uurl;
     long uurlSize;
     try {
       ReleaseJsonContainer.AssetsBean bean =
@@ -88,11 +80,9 @@ public class Updater {
       throw new IOException("Failed read the URL, cause it is empty.");
     }
     Util.debugLog("Downloading from " + uurl);
-    InputStream is =
-        HttpRequest.get(new URL(uurl))
-            .header("User-Agent", "QuickShop-Reremake " + QuickShop.getVersion())
-            .execute()
-            .getInputStream();
+    InputStream is = HttpRequest.get(new URL(uurl))
+        .header("User-Agent", "QuickShop-Reremake " + QuickShop.getVersion()).execute()
+        .getInputStream();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     byte[] buff = new byte[1024];
     int len;

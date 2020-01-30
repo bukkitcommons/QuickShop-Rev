@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is DisplayItem.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is DisplayItem.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Shop;
@@ -47,7 +44,7 @@ import org.maxgamer.quickshop.Util.Util;
 
 /**
  * @author Netherfoam A display item, that spawns a block above the chest and cannot be interacted
- *     with.
+ *         with.
  */
 public interface DisplayItem {
   Gson gson = new Gson();
@@ -62,8 +59,8 @@ public interface DisplayItem {
     if (itemStack == null) {
       return false;
     }
-    //    itemStack = itemStack.clone();
-    //    itemStack.setAmount(1);
+    // itemStack = itemStack.clone();
+    // itemStack.setAmount(1);
     if (!itemStack.hasItemMeta()) {
       return false;
     }
@@ -72,7 +69,7 @@ public interface DisplayItem {
       return false;
     }
     String defaultMark = ShopProtectionFlag.getDefaultMark();
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
     for (String lore : iMeta.getLore()) {
       try {
         if (!lore.startsWith("{")) {
@@ -116,7 +113,7 @@ public interface DisplayItem {
     }
     String defaultMark = ShopProtectionFlag.getDefaultMark();
     String shopLocation = shop.getLocation().toString();
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
     for (String lore : iMeta.getLore()) {
       try {
         if (!lore.startsWith("{")) {
@@ -163,8 +160,8 @@ public interface DisplayItem {
     ShopProtectionFlag shopProtectionFlag = createShopProtectionFlag(itemStack, shop);
     String protectFlag = gson.toJson(shopProtectionFlag);
     for (int i = 0; i < 21; i++) {
-      lore.add(
-          protectFlag); // Create 20 lines lore to make sure no stupid plugin accident remove mark.
+      lore.add(protectFlag); // Create 20 lines lore to make sure no stupid plugin accident remove
+                             // mark.
     }
     iMeta.setLore(lore);
     itemStack.setItemMeta(iMeta);
@@ -178,8 +175,8 @@ public interface DisplayItem {
    * @param shop The shop
    * @return ShopProtectionFlag obj
    */
-  static ShopProtectionFlag createShopProtectionFlag(
-      @NotNull ItemStack itemStack, @NotNull Shop shop) {
+  static ShopProtectionFlag createShopProtectionFlag(@NotNull ItemStack itemStack,
+      @NotNull Shop shop) {
     return new ShopProtectionFlag(shop.getLocation().toString(), Util.serialize(itemStack));
   }
 
@@ -191,74 +188,40 @@ public interface DisplayItem {
   static DisplayData getNowUsing(@Nullable ItemStack item) {
     try {
       /*
-       * Nest structure as:
-       *   armor-stand:
-       *     - myStick:
-       *       type: DEBUG_STICK
-       *       lore:
-       *         - mysterious item
-       *         - gift
-       *       strict: true
-       *       attribute:
-       *         yaw: 180
-       *         pitch: 0
-       *         small: false
-       *         item-slot: HELMET
-       *         offset:
-       *           x: 1
-       *           y: 0.1
-       *           z: -1.1
-       *         pose-head:
-       *           x: 1
-       *         pose-body:
-       *           y: 0.2
-       *         pose-arm:
-       *           left:
-       *             z: 0.5
-       *         pose-leg:
-       *           left:
-       *             x: 0.14
-       *           right:
-       *             x: 0.3
-       *             y: 0.1
-       *             z: 0.3
-       *     - grasses:
-       *       type:
-       *         - GLASS
-       *         - GRASS
-       *         - GRASS_BLOCK
-       *   real-item:
-       *     - 0:
-       *       type: BOW
-       *       lore: common mark
+       * Nest structure as: armor-stand: - myStick: type: DEBUG_STICK lore: - mysterious item - gift
+       * strict: true attribute: yaw: 180 pitch: 0 small: false item-slot: HELMET offset: x: 1 y:
+       * 0.1 z: -1.1 pose-head: x: 1 pose-body: y: 0.2 pose-arm: left: z: 0.5 pose-leg: left: x:
+       * 0.14 right: x: 0.3 y: 0.1 z: 0.3 - grasses: type: - GLASS - GRASS - GRASS_BLOCK real-item:
+       * - 0: type: BOW lore: common mark
        */
-      
+
       DisplayData def = new DisplayData(
-          DisplayType.fromID(QuickShop.instance.getConfig().getInt("shop.display-type")), false, false);
-      
+          DisplayType.fromID(QuickShop.instance.getConfig().getInt("shop.display-type")), false,
+          false);
+
       if (item != null) {
         ConfigurationSection conf =
             QuickShop.instance.getConfig().getConfigurationSection("shop.display-type-specifics");
-        
+
         if (conf != null) {
           DisplayData dataArmourStand = matchData(conf, "armor-stand", item, true);
           if (dataArmourStand != null && !dataArmourStand.needVaildate)
-            return dataArmourStand.fixer ?
-                (def.type == dataArmourStand.type ?
-                    dataArmourStand : def) : dataArmourStand;
-          
+            return dataArmourStand.fixer
+                ? (def.type == dataArmourStand.type ? dataArmourStand : def)
+                : dataArmourStand;
+
           DisplayData dataDroppedItem = matchData(conf, "dropped-item", item, false);
           if (dataDroppedItem != null)
-            return dataDroppedItem.fixer ?
-                (def.type == dataDroppedItem.type ?
-                    dataDroppedItem : def) : dataDroppedItem;
+            return dataDroppedItem.fixer
+                ? (def.type == dataDroppedItem.type ? dataDroppedItem : def)
+                : dataDroppedItem;
           else if (dataArmourStand != null)
-            return dataArmourStand.fixer ?
-                (def.type == dataArmourStand.type ?
-                    dataArmourStand : def) : dataArmourStand;
+            return dataArmourStand.fixer
+                ? (def.type == dataArmourStand.type ? dataArmourStand : def)
+                : dataArmourStand;
         }
       }
-      
+
       return def;
     } catch (Throwable e) {
       e.printStackTrace();
@@ -267,20 +230,22 @@ public interface DisplayItem {
   }
 
   @Nullable
-  static DisplayData matchData(@NotNull ConfigurationSection conf, @NotNull String rootType, @NotNull ItemStack item, boolean armorStand) {
+  static DisplayData matchData(@NotNull ConfigurationSection conf, @NotNull String rootType,
+      @NotNull ItemStack item, boolean armorStand) {
     List<?> specifics = conf.getList(rootType);
-    //  <Map>
+    // <Map>
     // Value: Specific Map
-    
+
     if (specifics instanceof List) {
       return matchData0(specifics, item, armorStand);
     }
     Util.debugLog("Specifics Is Not A List: " + specifics);
     return null;
   }
-  
+
   @Nullable
-  static DisplayData matchData0(@NotNull List<?> specifics, @NotNull ItemStack item, boolean armorStand) {
+  static DisplayData matchData0(@NotNull List<?> specifics, @NotNull ItemStack item,
+      boolean armorStand) {
     DisplayData vaildateData = null;
     boolean needVaildate = false;
     for (Object o : specifics) {
@@ -288,16 +253,16 @@ public interface DisplayItem {
       if (o instanceof Map) {
         Map<?, ?> specificMap = Map.class.cast(o);
         // <String, Map<String, ?>>
-        // Key:   Custom name of Specific
+        // Key: Custom name of Specific
         // Value: Attribute Map
-        
+
         for (Object o_ : specificMap.values()) {
           Map<?, ?> attrMap = Map.class.cast(o_);
-          
+
           // Mode
           Object temp = attrMap.get("fixer");
           Object fixer = temp == null ? false : true;
-          
+
           // Type matcher
           temp = attrMap.get("type");
           Object type = temp == null ? "TAG:ANY" : temp;
@@ -306,7 +271,7 @@ public interface DisplayItem {
             if (type instanceof Collection) {
               Collection<?> c = Collection.class.cast(type);
               boolean containsType = c.contains(item.getType().name());
-              
+
               if (c.contains("TYPE:!".concat(item.getType().name()))) {
                 continue;
               }
@@ -346,7 +311,7 @@ public interface DisplayItem {
                 needVaildate = true;
                 break;
               }
-              
+
               if (!item.getType().name().equals((type))) {
                 continue;
               }
@@ -354,11 +319,11 @@ public interface DisplayItem {
           } else {
             needVaildate = true;
           }
-          
+
           // Custom Model Data matcher
           temp = attrMap.get("strict");
           boolean strict = temp == null ? false : (boolean) temp;
-          
+
           temp = attrMap.get("model-data");
           if (temp != null) {
             if (item.hasItemMeta() && item.getItemMeta().hasCustomModelData()) {
@@ -386,13 +351,12 @@ public interface DisplayItem {
               } else {
                 boolean hasAny = false;
 
-                LOOP_LORE:
-                  for (String s : item.getLore()) {
-                    if (specificLore.contains(s)) {
-                      hasAny = true;
-                      break LOOP_LORE;
-                    }
+                LOOP_LORE: for (String s : item.getLore()) {
+                  if (specificLore.contains(s)) {
+                    hasAny = true;
+                    break LOOP_LORE;
                   }
+                }
 
                 if (!hasAny) {
                   continue;
@@ -417,34 +381,33 @@ public interface DisplayItem {
             needVaildate = true;
           }
 
-          DisplayData data = new DisplayData(
-              armorStand ? DisplayType.ARMORSTAND : DisplayType.REALITEM, needVaildate, (boolean) fixer);
+          DisplayData data =
+              new DisplayData(armorStand ? DisplayType.ARMORSTAND : DisplayType.REALITEM,
+                  needVaildate, (boolean) fixer);
           if (armorStand) {
             Map<?, ?> attributes = Map.class.cast(attrMap.get("attribute"));
-            
+
             if (attributes instanceof Map) {
               for (DisplayAttribute attr : DisplayAttribute.values()) {
                 String[] attrKeys = attr.name().split("_");
                 String rootKey = attrKeys[0].toLowerCase(Locale.ROOT);
-                
+
                 if (attrKeys.length == 1) {
                   temp = Map.class.cast(attributes).get(rootKey);
-                  data.attribute.put(attr,
-                      temp == null ? ObjectUtils.NULL : temp);
+                  data.attribute.put(attr, temp == null ? ObjectUtils.NULL : temp);
                 } else {
                   // Nested Map
                   if ((temp = Map.class.cast(attributes).get(rootKey)) instanceof Map) {
                     String subKey = attrKeys[1].toLowerCase(Locale.ROOT);
                     Object value = Map.class.cast(temp).get(subKey);
 
-                    data.attribute.put(attr,
-                        value == null ? ObjectUtils.NULL : value);
+                    data.attribute.put(attr, value == null ? ObjectUtils.NULL : value);
                   }
                 }
               }
             }
           }
-          
+
           if (needVaildate)
             vaildateData = data;
           else
@@ -452,7 +415,7 @@ public interface DisplayItem {
         }
       }
     }
-    
+
     return vaildateData;
   }
 

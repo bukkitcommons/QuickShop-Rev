@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is ShopProtectionListener.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is ShopProtectionListener.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Listeners;
@@ -50,7 +47,8 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 @SuppressWarnings("DuplicatedCode")
 public class ShopProtectionListener implements Listener {
 
-  @NotNull private final QuickShop plugin;
+  @NotNull
+  private final QuickShop plugin;
   private final boolean useEnhanceProtection;
   // Protect Minecart steal shop
   Map.Entry<Location, Boolean> lastInventoryMoveItemCheck =
@@ -122,10 +120,8 @@ public class ShopProtectionListener implements Listener {
     final Block newBlock = e.getNewState().getBlock();
     final Shop thisBlockShop =
         plugin.getShopManager().getShopIncludeAttached(newBlock.getLocation());
-    final Shop underBlockShop =
-        plugin
-            .getShopManager()
-            .getShopIncludeAttached(newBlock.getRelative(BlockFace.DOWN).getLocation());
+    final Shop underBlockShop = plugin.getShopManager()
+        .getShopIncludeAttached(newBlock.getRelative(BlockFace.DOWN).getLocation());
 
     if (thisBlockShop == null && underBlockShop == null) {
       return;
@@ -195,6 +191,7 @@ public class ShopProtectionListener implements Listener {
       MsgUtil.sendGlobalAlert("[DisplayGuard] Defened a item steal action at" + location);
     }
   }
+
   private boolean sendProtectionAlert = BaseConfig.enableAlert;
 
   // Protect Entity pickup shop

@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is ContainerShop.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is ContainerShop.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Shop;
@@ -60,10 +57,14 @@ import org.maxgamer.quickshop.event.ShopUpdateEvent;
 /** ChestShop core */
 @EqualsAndHashCode
 public class ContainerShop implements Shop {
-  @NotNull private final ItemStack item;
-  @NotNull private final Location location;
-  @Nullable private DisplayItem displayItem;
-  @EqualsAndHashCode.Exclude private boolean isLoaded = false;
+  @NotNull
+  private final ItemStack item;
+  @NotNull
+  private final Location location;
+  @Nullable
+  private DisplayItem displayItem;
+  @EqualsAndHashCode.Exclude
+  private boolean isLoaded = false;
   private ShopModerator moderator;
   private QuickShop plugin;
   private double price;
@@ -88,18 +89,13 @@ public class ContainerShop implements Shop {
    * @param location The location of the chest block
    * @param price The cost per item
    * @param item The itemstack with the properties we want. This is .cloned, no need to worry about
-   *     references
+   *        references
    * @param moderator The modertators
    * @param type The shop type
    * @param unlimited The unlimited
    */
-  public ContainerShop(
-      @NotNull Location location,
-      double price,
-      @NotNull ItemStack item,
-      @NotNull ShopModerator moderator,
-      boolean unlimited,
-      @NotNull ShopType type) {
+  public ContainerShop(@NotNull Location location, double price, @NotNull ItemStack item,
+      @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
     this.location = location;
     this.price = price;
     this.moderator = moderator;
@@ -237,25 +233,12 @@ public class ContainerShop implements Shop {
     String world = Objects.requireNonNull(this.getLocation().getWorld()).getName();
     int unlimited = this.isUnlimited() ? 1 : 0;
     try {
-      plugin
-          .getDatabaseHelper()
-          .updateShop(
-              ShopModerator.serialize(this.moderator.clone()),
-              this.getItem(),
-              unlimited,
-              shopType.toID(),
-              this.getPrice(),
-              x,
-              y,
-              z,
-              world);
+      plugin.getDatabaseHelper().updateShop(ShopModerator.serialize(this.moderator.clone()),
+          this.getItem(), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
     } catch (Exception e) {
       e.printStackTrace();
-      plugin
-          .getLogger()
-          .log(
-              Level.WARNING,
-              "Could not update a shop in the database! Changes will revert after a reboot!");
+      plugin.getLogger().log(Level.WARNING,
+          "Could not update a shop in the database! Changes will revert after a reboot!");
     }
   }
 
@@ -330,17 +313,10 @@ public class ContainerShop implements Shop {
       this.setSignText();
       // This should not happen.
       if (amount1 > 0) {
-        plugin
-            .getLogger()
-            .log(
-                Level.WARNING,
-                "Could not take all items from a players inventory on purchase! "
-                    + p.getName()
-                    + ", missing: "
-                    + amount1
-                    + ", item: "
-                    + Util.getItemStackName(this.getItem())
-                    + "!");
+        plugin.getLogger().log(Level.WARNING,
+            "Could not take all items from a players inventory on purchase! " + p.getName()
+                + ", missing: " + amount1 + ", item: " + Util.getItemStackName(this.getItem())
+                + "!");
       }
     } else {
       ItemStack[] playerContents = p.getInventory().getContents();
@@ -384,7 +360,7 @@ public class ContainerShop implements Shop {
    * Deletes the shop from the list of shops and queues it for database deletion
    *
    * @param fromMemory True if you are *NOT* iterating over this currently, *false if you are
-   *     iterating*
+   *        iterating*
    */
   @Override
   public void delete(boolean fromMemory) {
@@ -436,24 +412,20 @@ public class ContainerShop implements Shop {
       t.printStackTrace();
     }
   }
-    
+
   public void checkDisplay0() {
     if (!BaseConfig.displayItems || !this.isLoaded) { // FIXME: Reinit scheduler on reloading config
       return;
     }
-    
+
     if (this.displayItem == null) {
       Util.debugLog("Warning: DisplayItem is null, this shouldn't happend...");
-      Util.debugLog(
-          "Call from: "
-              + Thread.currentThread().getStackTrace()[2].getClassName()
-              + "#"
-              + Thread.currentThread().getStackTrace()[2].getMethodName()
-              + "%"
-              + Thread.currentThread().getStackTrace()[2].getLineNumber());
+      Util.debugLog("Call from: " + Thread.currentThread().getStackTrace()[2].getClassName() + "#"
+          + Thread.currentThread().getStackTrace()[2].getMethodName() + "%"
+          + Thread.currentThread().getStackTrace()[2].getLineNumber());
       return;
     }
-    
+
     if (!this.displayItem.isSpawned()) {
       /* Not spawned yet. */
       Util.debugLog("Target item not spawned, spawning...");
@@ -463,13 +435,13 @@ public class ContainerShop implements Shop {
       if (this.displayItem.checkDisplayNeedRegen()) {
         this.displayItem.fixDisplayNeedRegen();
       } else {
-          /* If display was regened, we didn't need check it moved, performance! */
+        /* If display was regened, we didn't need check it moved, performance! */
         if (this.displayItem.checkDisplayIsMoved()) {
           this.displayItem.fixDisplayMoved();
         }
       }
     }
-    
+
     /* Dupe is always need check, if enabled display */
     this.displayItem.removeDupe();
     // plugin.getDisplayDupeRemoverWatcher().add(this.displayItem);
@@ -515,7 +487,8 @@ public class ContainerShop implements Shop {
    * Returns a clone of this shop. References to the same display item, itemstack, location and
    * owner as this shop does. Do not modify them or you will modify this shop.
    *
-   * <p>**NOT A DEEP CLONE**
+   * <p>
+   * **NOT A DEEP CLONE**
    */
   @Override
   public @NotNull ContainerShop clone() {
@@ -579,7 +552,7 @@ public class ContainerShop implements Shop {
    * Returns the shop that shares it's inventory with this one.
    *
    * @return the shop that shares it's inventory with this one. Will return null if this shop is not
-   *     attached to another.
+   *         attached to another.
    */
   public @Nullable ContainerShop getAttachedShop() {
     Block c = Util.getSecondHalf(this.getLocation().getBlock());
@@ -611,12 +584,10 @@ public class ContainerShop implements Shop {
       if (location.getBlock().getState().getType() == Material.ENDER_CHEST
           && plugin.getOpenInvPlugin() != null) {
         OpenInv openInv = ((OpenInv) plugin.getOpenInvPlugin());
-        return openInv
-            .getSpecialEnderChest(
-                Objects.requireNonNull(
-                    openInv.loadPlayer(Bukkit.getOfflinePlayer(this.moderator.getOwner()))),
-                Bukkit.getOfflinePlayer((this.moderator.getOwner())).isOnline())
-            .getBukkitInventory();
+        return openInv.getSpecialEnderChest(
+            Objects.requireNonNull(
+                openInv.loadPlayer(Bukkit.getOfflinePlayer(this.moderator.getOwner()))),
+            Bukkit.getOfflinePlayer((this.moderator.getOwner())).isOnline()).getBukkitInventory();
       }
     } catch (Exception e) {
       Util.debugLog(e.getMessage());
@@ -708,11 +679,8 @@ public class ContainerShop implements Shop {
     lines[0] = MsgUtil.getMessageOfflinePlayer("signs.header", player, this.ownerName());
     if (this.isSelling()) {
       if (this.getRemainingStock() == -1) {
-        lines[1] =
-            MsgUtil.getMessageOfflinePlayer(
-                "signs.selling",
-                player,
-                "" + MsgUtil.getMessageOfflinePlayer("signs.unlimited", player));
+        lines[1] = MsgUtil.getMessageOfflinePlayer("signs.selling", player,
+            "" + MsgUtil.getMessageOfflinePlayer("signs.unlimited", player));
       } else {
         lines[1] =
             MsgUtil.getMessageOfflinePlayer("signs.selling", player, "" + this.getRemainingStock());
@@ -720,37 +688,25 @@ public class ContainerShop implements Shop {
 
     } else if (this.isBuying()) {
       if (this.getRemainingSpace() == -1) {
-        lines[1] =
-            MsgUtil.getMessageOfflinePlayer(
-                "signs.buying",
-                player,
-                "" + MsgUtil.getMessageOfflinePlayer("signs.unlimited", player));
+        lines[1] = MsgUtil.getMessageOfflinePlayer("signs.buying", player,
+            "" + MsgUtil.getMessageOfflinePlayer("signs.unlimited", player));
 
       } else {
         lines[1] =
             MsgUtil.getMessageOfflinePlayer("signs.buying", player, "" + this.getRemainingSpace());
       }
     }
-    lines[2] =
-        MsgUtil.getMessageOfflinePlayer(
-            "signs.item", player, Util.getItemStackName(this.getItem()));
+    lines[2] = MsgUtil.getMessageOfflinePlayer("signs.item", player,
+        Util.getItemStackName(this.getItem()));
     lines[3] = MsgUtil.getMessageOfflinePlayer("signs.price", player, Util.format(this.getPrice()));
     this.setSignText(lines);
   }
 
   @Override
   public String toString() {
-    StringBuilder sb =
-        new StringBuilder(
-            "Shop "
-                + (location.getWorld() == null ? "unloaded world" : location.getWorld().getName())
-                + "("
-                + location.getBlockX()
-                + ", "
-                + location.getBlockY()
-                + ", "
-                + location.getBlockZ()
-                + ")");
+    StringBuilder sb = new StringBuilder("Shop "
+        + (location.getWorld() == null ? "unloaded world" : location.getWorld().getName()) + "("
+        + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ() + ")");
     sb.append(" Owner: ").append(this.ownerName()).append(" - ").append(getOwner());
     if (isUnlimited()) {
       sb.append(" Unlimited: true");
@@ -811,21 +767,21 @@ public class ContainerShop implements Shop {
       }
       signs.add(sign);
     }
-    //            if (currentLine.contains(signHeader) || currentLine.isEmpty()) {
-    //                signs.add(sign);
-    //            } else {
-    //                boolean text = false;
-    //                for (String s : sign.getLines()) {
-    //                    if (!s.isEmpty()) {
-    //                        text = true;
-    //                        break;
-    //                    }
-    //                }
-    //                if (!text) {
-    //                    signs.add(sign);
-    //                }
-    //            }
-    //        }
+    // if (currentLine.contains(signHeader) || currentLine.isEmpty()) {
+    // signs.add(sign);
+    // } else {
+    // boolean text = false;
+    // for (String s : sign.getLines()) {
+    // if (!s.isEmpty()) {
+    // text = true;
+    // break;
+    // }
+    // }
+    // if (!text) {
+    // signs.add(sign);
+    // }
+    // }
+    // }
     return signs;
   }
 
@@ -845,7 +801,7 @@ public class ContainerShop implements Shop {
    * this is buying/selling.
    *
    * @return true if this shop is a double chest, and the other half is selling/buying the same as
-   *     this is buying/selling.
+   *         this is buying/selling.
    */
   public boolean isDoubleShop() {
     ContainerShop nextTo = this.getAttachedShop();
@@ -961,13 +917,13 @@ public class ContainerShop implements Shop {
   @Override
   public @NotNull String ownerName() {
     if (this.isUnlimited()) {
-      return MsgUtil.getMessageOfflinePlayer(
-          "admin-shop", Bukkit.getOfflinePlayer(this.getOwner()));
+      return MsgUtil.getMessageOfflinePlayer("admin-shop",
+          Bukkit.getOfflinePlayer(this.getOwner()));
     }
     String name = Bukkit.getOfflinePlayer(this.getOwner()).getName();
     if (name == null || name.isEmpty()) {
-      return MsgUtil.getMessageOfflinePlayer(
-          "unknown-owner", Bukkit.getOfflinePlayer(this.getOwner()));
+      return MsgUtil.getMessageOfflinePlayer("unknown-owner",
+          Bukkit.getOfflinePlayer(this.getOwner()));
     }
     return name;
   }

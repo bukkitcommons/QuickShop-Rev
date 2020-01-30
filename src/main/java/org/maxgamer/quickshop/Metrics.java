@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is Metrics.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is Metrics.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop;
@@ -53,9 +50,11 @@ import org.json.simple.JSONObject;
 /**
  * bStats collects some data for plugin authors.
  *
- * <p>Check out https://bStats.org/ to learn more about bStats!
+ * <p>
+ * Check out https://bStats.org/ to learn more about bStats!
  *
- * <p>Edit by QSRR, Don't removed, we customed somethings!
+ * <p>
+ * Edit by QSRR, Don't removed, we customed somethings!
  */
 public class Metrics {
 
@@ -74,6 +73,7 @@ public class Metrics {
   private final List<CustomChart> charts = new ArrayList<>();
   // The plugin
   private final JavaPlugin plugin;
+
   /**
    * Class constructor.
    *
@@ -102,13 +102,11 @@ public class Metrics {
       config.addDefault("logFailedRequests", false);
 
       // Inform the server owners about bStats
-      config
-          .options()
-          .header(
-              "bStats collects some data for plugin authors like how many servers are using their plugins.\n"
-                  + "To honor their work, you should not disable it.\n"
-                  + "This has nearly no effect on the server performance!\n"
-                  + "Check out https://bStats.org/ to learn more :)")
+      config.options().header(
+          "bStats collects some data for plugin authors like how many servers are using their plugins.\n"
+              + "To honor their work, you should not disable it.\n"
+              + "This has nearly no effect on the server performance!\n"
+              + "Check out https://bStats.org/ to learn more :)")
           .copyDefaults(true);
       try {
         config.save(configFile);
@@ -194,10 +192,10 @@ public class Metrics {
     connection.addRequestProperty("Accept", "application/json");
     connection.addRequestProperty("Connection", "close");
     connection.addRequestProperty("Content-Encoding", "gzip"); // We gzip our request
-    connection.addRequestProperty(
-        "Content-Length", String.valueOf(Objects.requireNonNull(compressedData).length));
-    connection.setRequestProperty(
-        "Content-Type", "application/json"); // We send our data in JSON format
+    connection.addRequestProperty("Content-Length",
+        String.valueOf(Objects.requireNonNull(compressedData).length));
+    connection.setRequestProperty("Content-Type", "application/json"); // We send our data in JSON
+                                                                       // format
     connection.setRequestProperty("User-Agent", "MC-Server/" + B_STATS_VERSION);
     connection.setConnectTimeout(300000);
     connection.setReadTimeout(300000);
@@ -214,25 +212,22 @@ public class Metrics {
 
   /** Starts the Scheduler which submits our data every 30 minutes. */
   private void startSubmitting() {
-    final Timer timer =
-        new Timer(true); // We use a timer cause the Bukkit scheduler is affected by server lags
-    timer.scheduleAtFixedRate(
-        new TimerTask() {
-          @Override
-          public void run() {
-            if (!plugin.isEnabled()) { // Plugin was disabled
-              timer.cancel();
-              return;
-            }
-            // Nevertheless we want our code to run in the Bukkit main thread, so we have to use the
-            // Bukkit scheduler
-            // Don't be afraid! The connection to the bStats server is still async, only the stats
-            // collection is sync ;)
-            Bukkit.getScheduler().runTask(plugin, () -> submitData());
-          }
-        },
-        1000 * 60 * 5,
-        1000 * 60 * 30);
+    final Timer timer = new Timer(true); // We use a timer cause the Bukkit scheduler is affected by
+                                         // server lags
+    timer.scheduleAtFixedRate(new TimerTask() {
+      @Override
+      public void run() {
+        if (!plugin.isEnabled()) { // Plugin was disabled
+          timer.cancel();
+          return;
+        }
+        // Nevertheless we want our code to run in the Bukkit main thread, so we have to use the
+        // Bukkit scheduler
+        // Don't be afraid! The connection to the bStats server is still async, only the stats
+        // collection is sync ;)
+        Bukkit.getScheduler().runTask(plugin, () -> submitData());
+      }
+    }, 1000 * 60 * 5, 1000 * 60 * 30);
     // Submit the data every 30 minutes, first time after 5 minutes to give other plugins enough
     // time to start
     // WARNING: Changing the frequency has no effect but your plugin WILL be blocked/deleted!
@@ -249,8 +244,8 @@ public class Metrics {
     for (Class<?> service : Bukkit.getServicesManager().getKnownServices()) {
       try {
         service.getField("B_STATS_VERSION"); // Our identifier :)
-        for (RegisteredServiceProvider<?> provider :
-            Bukkit.getServicesManager().getRegistrations(service)) {
+        for (RegisteredServiceProvider<?> provider : Bukkit.getServicesManager()
+            .getRegistrations(service)) {
           try {
             pluginData.add(
                 provider.getService().getMethod("getPluginData").invoke(provider.getProvider()));
@@ -264,17 +259,15 @@ public class Metrics {
     data.put("plugins", pluginData);
 
     // Create a new thread for the connection to the bStats server
-    new Thread(
-            () -> {
-              try {
-                // Send the data
-                plugin.getLogger().info("Sending stats data...");
-                sendData(data);
-              } catch (Throwable e) {
-                /*Ignore*/
-              }
-            })
-        .start();
+    new Thread(() -> {
+      try {
+        // Send the data
+        plugin.getLogger().info("Sending stats data...");
+        sendData(data);
+      } catch (Throwable e) {
+        /* Ignore */
+      }
+    }).start();
   }
 
   /**
@@ -285,7 +278,7 @@ public class Metrics {
   public JSONObject getPluginData() {
     JSONObject data = new JSONObject();
 
-    String pluginName = "QuickShop-Reremake";
+    String pluginName = "QuickShop-Rev";
     String pluginVersion = plugin.getDescription().getVersion();
 
     data.put("pluginName", pluginName); // Append the name of the plugin
@@ -317,13 +310,12 @@ public class Metrics {
       // This fixes java.lang.NoSuchMethodError:
       // org.bukkit.Bukkit.getOnlinePlayers()Ljava/util/Collection;
       Method onlinePlayersMethod = Class.forName("org.bukkit.Server").getMethod("getOnlinePlayers");
-      playerAmount =
-          onlinePlayersMethod.getReturnType().equals(Collection.class)
-              ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
-              : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
+      playerAmount = onlinePlayersMethod.getReturnType().equals(Collection.class)
+          ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
+          : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
     } catch (Exception e) {
-      playerAmount =
-          Bukkit.getOnlinePlayers().size(); // Just use the new method if the Reflection failed
+      playerAmount = Bukkit.getOnlinePlayers().size(); // Just use the new method if the Reflection
+                                                       // failed
     }
     int onlineMode = Bukkit.getOnlineMode() ? 1 : 0;
     String bukkitVersion = org.bukkit.Bukkit.getVersion();
@@ -477,8 +469,8 @@ public class Metrics {
         chart.put("data", data);
       } catch (Throwable t) {
         if (logFailedRequests) {
-          Bukkit.getLogger()
-              .log(Level.WARNING, "Failed to get data for custom chart with id " + chartId, t);
+          Bukkit.getLogger().log(Level.WARNING,
+              "Failed to get data for custom chart with id " + chartId, t);
         }
         return null;
       }

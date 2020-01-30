@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is SubCommand_Price.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is SubCommand_Price.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Command.SubCommands;
@@ -42,16 +39,16 @@ public class SubCommand_Price implements CommandProcesser {
 
   @NotNull
   @Override
-  public List<String> onTabComplete(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     ArrayList<String> list = new ArrayList<>();
     list.add(MsgUtil.getMessage("tabcomplete.price", sender));
     return list;
   }
 
   @Override
-  public void onCommand(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
       sender.sendMessage("Can't run this command by Console");
       return;
@@ -92,16 +89,14 @@ public class SubCommand_Price implements CommandProcesser {
 
     if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
-        p.sendMessage(
-            MsgUtil.getMessage(
-                "price-too-cheap", p, (format) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
+        p.sendMessage(MsgUtil.getMessage("price-too-cheap", p,
+            (format) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
         return;
       }
     } else {
       if (price < minPrice) {
-        p.sendMessage(
-            MsgUtil.getMessage(
-                "price-too-cheap", p, (format) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
+        p.sendMessage(MsgUtil.getMessage("price-too-cheap", p,
+            (format) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
         return;
       }
     }
@@ -109,11 +104,8 @@ public class SubCommand_Price implements CommandProcesser {
     final double price_limit = BaseConfig.maximumPrice;
 
     if (price_limit != -1 && price > price_limit) {
-      p.sendMessage(
-          MsgUtil.getMessage(
-              "price-too-high",
-              p,
-              (format) ? MsgUtil.decimalFormat(price_limit) : "" + price_limit));
+      p.sendMessage(MsgUtil.getMessage("price-too-high", p,
+          (format) ? MsgUtil.decimalFormat(price_limit) : "" + price_limit));
       return;
     }
 
@@ -123,11 +115,11 @@ public class SubCommand_Price implements CommandProcesser {
       fee = BaseConfig.priceModFee;
     }
 
-    /*if (fee > 0 && plugin.getEconomy().getBalance(p.getUniqueId()) < fee) {
-        sender.sendMessage(
-            MsgUtil.getMessage("you-cant-afford-to-change-price", plugin.getEconomy().format(fee)));
-        return;
-    }*/
+    /*
+     * if (fee > 0 && plugin.getEconomy().getBalance(p.getUniqueId()) < fee) { sender.sendMessage(
+     * MsgUtil.getMessage("you-cant-afford-to-change-price", plugin.getEconomy().format(fee)));
+     * return; }
+     */
     final BlockIterator bIt = new BlockIterator(p, 10);
     // Loop through every block they're looking at upto 10 blocks away
     if (!bIt.hasNext()) {
@@ -139,10 +131,8 @@ public class SubCommand_Price implements CommandProcesser {
       final Block b = bIt.next();
       final Shop shop = plugin.getShopManager().getShop(b.getLocation());
 
-      if (shop == null
-          || (!shop.getModerator().isModerator(((Player) sender).getUniqueId())
-              && !QuickShop.getPermissionManager()
-                  .hasPermission(sender, "quickshop.other.price"))) {
+      if (shop == null || (!shop.getModerator().isModerator(((Player) sender).getUniqueId())
+          && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.price"))) {
         continue;
       }
 
@@ -153,33 +143,21 @@ public class SubCommand_Price implements CommandProcesser {
       }
 
       if (fee > 0 && !plugin.getEconomy().withdraw(p.getUniqueId(), fee)) {
-        sender.sendMessage(
-            MsgUtil.getMessage(
-                "you-cant-afford-to-change-price", sender, plugin.getEconomy().format(fee)));
+        sender.sendMessage(MsgUtil.getMessage("you-cant-afford-to-change-price", sender,
+            plugin.getEconomy().format(fee)));
         return;
       }
 
       if (fee > 0) {
-        sender.sendMessage(
-            MsgUtil.getMessage(
-                "fee-charged-for-price-change", sender, plugin.getEconomy().format(fee)));
+        sender.sendMessage(MsgUtil.getMessage("fee-charged-for-price-change", sender,
+            plugin.getEconomy().format(fee)));
         try {
-          plugin
-              .getEconomy()
-              .deposit(
-                  plugin
-                      .getServer()
-                      .getOfflinePlayer(
-                          BaseConfig.taxAccount)
-                      .getUniqueId(),
-                  fee);
+          plugin.getEconomy().deposit(
+              plugin.getServer().getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), fee);
         } catch (Exception e) {
           e.getMessage();
-          plugin
-              .getLogger()
-              .log(
-                  Level.WARNING,
-                  "QuickShop can't pay tax to the account in config.yml, please set the tax account name to an existing player!");
+          plugin.getLogger().log(Level.WARNING,
+              "QuickShop can't pay tax to the account in config.yml, please set the tax account name to an existing player!");
         }
       }
       // Update the shop

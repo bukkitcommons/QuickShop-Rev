@@ -86,8 +86,9 @@ public interface IFile {
   /**
    * Pattern:
    *
-   * <p>path: (material): 'DIAMOND' [amount]: 1 [data]: 0 [display-name]: 'Diamond Sword'
-   * [enchants]: DAMAGE_ALL: 10 FIRE_ASPECT: 2 [lore]: - 'Lore 1' - 'Lore 2'
+   * <p>
+   * path: (material): 'DIAMOND' [amount]: 1 [data]: 0 [display-name]: 'Diamond Sword' [enchants]:
+   * DAMAGE_ALL: 10 FIRE_ASPECT: 2 [lore]: - 'Lore 1' - 'Lore 2'
    *
    * @param path itemstack path to get
    * @return {@link ItemStack}

@@ -56,10 +56,10 @@ public class ItemMatcher {
       return false; // One of them is null (Can't be both, see above)
     }
 
-    //requireStack = requireStack.clone();
-    //requireStack.setAmount(1);
-    //givenStack = givenStack.clone();
-    //givenStack.setAmount(1);
+    // requireStack = requireStack.clone();
+    // requireStack.setAmount(1);
+    // givenStack = givenStack.clone();
+    // givenStack.setAmount(1);
 
     // if (plugin.getConfig().getBoolean("shop.strict-matches-check")) {
     // Util.debugLog("Execute strict match check...");
@@ -73,8 +73,7 @@ public class ItemMatcher {
       case 2:
         return requireStack.isSimilar(givenStack);
       case 0:
-      default:
-        ;
+      default:;
     }
 
     if (requireStack.getType() != givenStack.getType()) {
@@ -85,6 +84,7 @@ public class ItemMatcher {
     return itemMetaMatcher.matches(requireStack, givenStack);
   }
 }
+
 
 class ItemMetaMatcher {
   private boolean repaircost;
@@ -128,10 +128,9 @@ class ItemMetaMatcher {
     Util.debugLog("Matching: Custom Model Data");
     boolean requiredHas = required.hasCustomModelData();
     return custommodeldata ? (canMatches(requiredHas, test.hasCustomModelData()) ?
-            
-        (requiredHas ?
-            required.getCustomModelData() == test.getCustomModelData() : true) :
-              
+
+        (requiredHas ? required.getCustomModelData() == test.getCustomModelData() : true) :
+
         false) : true;
   }
 
@@ -191,16 +190,16 @@ class ItemMetaMatcher {
     } else if (!repaircost || !requiredIs) {
       return true;
     }
-    
+
     boolean requiredHas = requiredIs && ((Repairable) required).hasRepairCost();
     return canMatches(requiredHas, ((Repairable) test).hasRepairCost()) ?
 
-            (requiredHas
-                ? ((Repairable) required).getRepairCost() == ((Repairable) test).getRepairCost()
-                : true)
-            :
+        (requiredHas
+            ? ((Repairable) required).getRepairCost() == ((Repairable) test).getRepairCost()
+            : true)
+        :
 
-            false;
+        false;
   }
 
   private boolean potionMatches(ItemMeta required, ItemMeta test) {
@@ -211,7 +210,7 @@ class ItemMetaMatcher {
     } else if (!potions || !requiredIs) {
       return true;
     }
-    
+
     boolean requiredHasColor = requiredIs && ((PotionMeta) required).hasColor();
     boolean requiredHasCustomEffects = requiredIs && ((PotionMeta) required).hasCustomEffects();
 
@@ -238,13 +237,13 @@ class ItemMetaMatcher {
     String method = bukkit ? "Bukkit" : "QuickShop";
     Util.debugLog("Matching item by method " + method + " @ " + requiredStack.getType() + ", "
         + testStack.getType());
-    
+
     if (bukkit) {
       boolean bukkitResult = requiredStack.isSimilar(testStack);
       Util.debugLog("Matches result (Bukkit): " + String.valueOf(bukkitResult).toUpperCase());
       return bukkitResult;
     }
-    
+
     return matches0(requiredStack, testStack);
   }
 
@@ -261,15 +260,12 @@ class ItemMetaMatcher {
     ItemMeta requiredMeta = requiredStack.getItemMeta();
     ItemMeta testMeta = testStack.getItemMeta();
 
-    if (!damageMatches(requiredMeta, testMeta) ||
-        !repairCostMatches(requiredMeta, testMeta) ||
-        !displayNameMatches(requiredMeta, testMeta) ||
-        !loreMatches(requiredMeta, testMeta) ||
-        !enchantsMatches(requiredMeta, testMeta) ||
-        !potionMatches(requiredMeta, testMeta) ||
-        !attributeModifiersMatches(requiredMeta, testMeta) ||
-        !itemFlagsMatches(requiredMeta, testMeta)) {
-      
+    if (!damageMatches(requiredMeta, testMeta) || !repairCostMatches(requiredMeta, testMeta)
+        || !displayNameMatches(requiredMeta, testMeta) || !loreMatches(requiredMeta, testMeta)
+        || !enchantsMatches(requiredMeta, testMeta) || !potionMatches(requiredMeta, testMeta)
+        || !attributeModifiersMatches(requiredMeta, testMeta)
+        || !itemFlagsMatches(requiredMeta, testMeta)) {
+
       Util.debugLog("Match failed: Recent");
       return false;
     }

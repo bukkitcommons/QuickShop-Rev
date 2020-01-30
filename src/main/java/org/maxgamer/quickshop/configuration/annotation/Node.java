@@ -11,6 +11,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Node {
   String value();
-  
+
   boolean rewrite() default false;
 }

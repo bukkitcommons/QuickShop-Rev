@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is Database.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is Database.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Database;
@@ -30,14 +27,16 @@ import org.maxgamer.quickshop.Util.Util;
 
 public class Database {
 
-  @NotNull private final DatabaseCore core;
+  @NotNull
+  private final DatabaseCore core;
   // Fix null pointer...
   private final QuickShop plugin = QuickShop.instance;
 
   /**
    * Creates a new database and validates its connection.
    *
-   * <p>If the connection is invalid, this will throw a ConnectionException.
+   * <p>
+   * If the connection is invalid, this will throw a ConnectionException.
    *
    * @param core The core for the database, either MySQL or SQLite.
    * @throws ConnectionException If the connection was invalid
@@ -62,81 +61,81 @@ public class Database {
     this.core.close();
   }
 
-  //    /**
-  //     * Copies the contents of this database into the given database. Does not
-  //     * delete the contents of this database, or change any settings. This may
-  //     * take a long time, and will print out progress reports to System.out
-  //     * <p>
-  //     * This method does not create the tables in the new database. You need to
-  //     * do that yourself.
-  //     *
-  //     * @param db The database to copy data to
-  //     * @throws SQLException if an error occurs.
-  //     */
-  //    @Deprecated /* Buggy, owner pls use Database Tools to migrate */
-  //    public void copyTo(@NotNull Database db) throws SQLException {
-  //        ResultSet rs = getConnection().getMetaData().getTables(null, null, "%", null);
-  //        List<String> tables = new LinkedList<>();
-  //        while (rs.next()) {
-  //            tables.add(rs.getString("TABLE_NAME"));
-  //        }
-  //        rs.close();
-  //        core.flush();
-  //        // For each table
-  //        String prefix = plugin.().getString("database.prefix");
-  //        for (String table : tables) {
-  //            if (table.contains("schedule")) {
-  //                return; // go way!
-  //            }
-  //            String finalTable;
-  //            if (table.startsWith(Objects.requireNonNull(prefix))) {
-  //                finalTable = table;
-  //            } else {
-  //                finalTable = prefix + table;
-  //                plugin.getLogger().info("CovertHelper: Fixed table name from SQLite " + table +
+  // /**
+  // * Copies the contents of this database into the given database. Does not
+  // * delete the contents of this database, or change any settings. This may
+  // * take a long time, and will print out progress reports to System.out
+  // * <p>
+  // * This method does not create the tables in the new database. You need to
+  // * do that yourself.
+  // *
+  // * @param db The database to copy data to
+  // * @throws SQLException if an error occurs.
+  // */
+  // @Deprecated /* Buggy, owner pls use Database Tools to migrate */
+  // public void copyTo(@NotNull Database db) throws SQLException {
+  // ResultSet rs = getConnection().getMetaData().getTables(null, null, "%", null);
+  // List<String> tables = new LinkedList<>();
+  // while (rs.next()) {
+  // tables.add(rs.getString("TABLE_NAME"));
+  // }
+  // rs.close();
+  // core.flush();
+  // // For each table
+  // String prefix = plugin.().getString("database.prefix");
+  // for (String table : tables) {
+  // if (table.contains("schedule")) {
+  // return; // go way!
+  // }
+  // String finalTable;
+  // if (table.startsWith(Objects.requireNonNull(prefix))) {
+  // finalTable = table;
+  // } else {
+  // finalTable = prefix + table;
+  // plugin.getLogger().info("CovertHelper: Fixed table name from SQLite " + table +
   // " to MySQL " + finalTable);
-  //            }
+  // }
   //
-  //            if (table.toLowerCase().startsWith("sqlite_autoindex_")) {
-  //                continue;
-  //            }
-  //            plugin.getLogger().log(Level.WARNING, "Copying " + table + " to " + finalTable);
-  //            // Wipe the old records
-  //            db.getConnection().prepareStatement("DELETE FROM " + finalTable).execute();
-  //            // Fetch all the data from the existing database
-  //            rs = getConnection().prepareStatement("SELECT * FROM " + table).executeQuery();
-  //            int n = 0;
-  //            // Build the query
-  //            StringBuilder query = new StringBuilder("INSERT INTO " + finalTable + " VALUES (");
-  //            // Append another placeholder for the value
-  //            query.append("?");
-  //            for (int i = 2; i <= rs.getMetaData().getColumnCount(); i++) {
-  //                // Add the rest of the placeholders and values. This is so we
-  //                // have (?, ?, ?) and not (?, ?, ?, ).
-  //                query.append(", ?");
-  //            }
-  //            // End the query
-  //            query.append(")");
-  //            PreparedStatement ps = db.getConnection().prepareStatement(query.toString());
-  //            while (rs.next()) {
-  //                n++;
-  //                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-  //                    ps.setObject(i, rs.getObject(i));
-  //                }
-  //                ps.addBatch();
-  //                if (n % 100 == 0) {
-  //                    ps.executeBatch();
-  //                    plugin.getLogger().log(Level.WARNING, n + " records copied...");
-  //                }
-  //            }
-  //            ps.executeBatch();
-  //            // Close the resultset of that table
-  //            rs.close();
-  //        }
-  //        // Success!
-  //        db.getConnection().close();
-  //        this.getConnection().close();
-  //    }
+  // if (table.toLowerCase().startsWith("sqlite_autoindex_")) {
+  // continue;
+  // }
+  // plugin.getLogger().log(Level.WARNING, "Copying " + table + " to " + finalTable);
+  // // Wipe the old records
+  // db.getConnection().prepareStatement("DELETE FROM " + finalTable).execute();
+  // // Fetch all the data from the existing database
+  // rs = getConnection().prepareStatement("SELECT * FROM " + table).executeQuery();
+  // int n = 0;
+  // // Build the query
+  // StringBuilder query = new StringBuilder("INSERT INTO " + finalTable + " VALUES (");
+  // // Append another placeholder for the value
+  // query.append("?");
+  // for (int i = 2; i <= rs.getMetaData().getColumnCount(); i++) {
+  // // Add the rest of the placeholders and values. This is so we
+  // // have (?, ?, ?) and not (?, ?, ?, ).
+  // query.append(", ?");
+  // }
+  // // End the query
+  // query.append(")");
+  // PreparedStatement ps = db.getConnection().prepareStatement(query.toString());
+  // while (rs.next()) {
+  // n++;
+  // for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+  // ps.setObject(i, rs.getObject(i));
+  // }
+  // ps.addBatch();
+  // if (n % 100 == 0) {
+  // ps.executeBatch();
+  // plugin.getLogger().log(Level.WARNING, n + " records copied...");
+  // }
+  // }
+  // ps.executeBatch();
+  // // Close the resultset of that table
+  // rs.close();
+  // }
+  // // Success!
+  // db.getConnection().close();
+  // this.getConnection().close();
+  // }
 
   /**
    * Executes the given statement either immediately, or soon.
@@ -164,7 +163,8 @@ public class Database {
     }
     String query = "SELECT * FROM " + table + " LIMIT 0,1";
     try {
-      @Cleanup PreparedStatement ps = this.getConnection().prepareStatement(query);
+      @Cleanup
+      PreparedStatement ps = this.getConnection().prepareStatement(query);
       ResultSet rs = ps.executeQuery();
       while (rs.next()) {
         if (rs.getString(column) != null) {

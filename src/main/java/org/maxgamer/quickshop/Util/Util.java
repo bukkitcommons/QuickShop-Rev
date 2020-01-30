@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is Util.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is Util.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Util;
@@ -88,7 +85,8 @@ import org.yaml.snakeyaml.Yaml;
 public class Util {
   static short tookLongTimeCostTimes;
   private static EnumSet<Material> blacklist = EnumSet.noneOf(Material.class);
-  @Getter private static List<String> debugLogs = new LinkedList<>();
+  @Getter
+  private static List<String> debugLogs = new LinkedList<>();
   private static boolean devMode = false;
   private static QuickShop plugin;
   private static EnumMap<Material, Entry<Double, Double>> restrictedPrices =
@@ -153,15 +151,15 @@ public class Util {
     if (!isShoppables(b.getType())) {
       return false;
     }
-    
+
     if (isBlacklistWorld(b.getWorld())) {
       return false;
     }
-    
+
     if (bs instanceof EnderChest) { // BlockState for Mod supporting
       return plugin.getOpenInvPlugin() != null;
     }
-    
+
     return bs instanceof InventoryHolder;
   }
 
@@ -179,7 +177,7 @@ public class Util {
     }
     int items = 0;
     for (ItemStack iStack : inv.getStorageContents()) {
-      //noinspection ConstantConditions
+      // noinspection ConstantConditions
       if (iStack == null || iStack.getType() == Material.AIR) {
         continue;
       }
@@ -195,7 +193,7 @@ public class Util {
    *
    * @param inv The inventory to count
    * @param item The item prototype. Material, durabiltiy and enchants must match for 'stackability'
-   *     to occur.
+   *        to occur.
    * @return The number of items that can be given to the inventory safely.
    */
   public static int countSpace(@Nullable Inventory inv, @NotNull ItemStack item) {
@@ -242,26 +240,17 @@ public class Util {
     int codeLine = stackTraceElement.getLineNumber();
 
     for (String log : logs) {
-      String text =
-          "["
-              //+ ChatColor.DARK_GREEN
-              //+ ChatColor.BOLD
-              //+ "DEBUG"
-              //+ ChatColor.RESET
-              //+ "] ["
-              + ChatColor.DARK_GREEN
-              + className
-              + ChatColor.RESET
-              + "] ("
-              /*+ " ["
-              + ChatColor.DARK_GREEN
-              + methodName
-              + ChatColor.RESET*/
-              + ChatColor.DARK_GREEN
-              + codeLine
-              + ChatColor.RESET
-              + ") "
-              + log;
+      String text = "["
+          // + ChatColor.DARK_GREEN
+          // + ChatColor.BOLD
+          // + "DEBUG"
+          // + ChatColor.RESET
+          // + "] ["
+          + ChatColor.DARK_GREEN + className + ChatColor.RESET + "] ("
+          /*
+           * + " [" + ChatColor.DARK_GREEN + methodName + ChatColor.RESET
+           */
+          + ChatColor.DARK_GREEN + codeLine + ChatColor.RESET + ") " + log;
       debugLogs.add(Colorizer.stripColors(text));
       if (debugLogs.size() > 500000) /* Keep debugLogs max can have 500k lines. */ {
         debugLogs.remove(0);
@@ -279,10 +268,8 @@ public class Util {
           ConfigurationManager.getManager(plugin).save(BaseConfig.class);
           disableDebugLogger = true;
           QuickShop.instance.saveConfig();
-          QuickShop.instance
-              .getLogger()
-              .warning(
-                  "Detected the debug logger tooked time keep too lang, QuickShop already auto-disable debug logger, your server performance should back to normal. But you must re-enable it if you want to report any bugs.");
+          QuickShop.instance.getLogger().warning(
+              "Detected the debug logger tooked time keep too lang, QuickShop already auto-disable debug logger, your server performance should back to normal. But you must re-enable it if you want to report any bugs.");
         }
       }
     }
@@ -295,55 +282,55 @@ public class Util {
    */
   public static void debugLogHeavy(@NotNull String... logs) {
     debugLog(logs);
-//    if (!QuickShop.instance.getConfig().getBoolean("dev-mode")) {
-//      return;
-//    }
-//    long startTime = System.currentTimeMillis();
-//    StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
-//    String className = stackTraceElement.getClassName();
-//    try {
-//      Class<?> c = Class.forName(className);
-//      className = c.getSimpleName();
-//      if (!c.getSimpleName().isEmpty()) {
-//        className = c.getSimpleName();
-//      }
-//    } catch (ClassNotFoundException e) {
-//      // Ignore
-//    }
-//    String methodName = stackTraceElement.getMethodName();
-//    int codeLine = stackTraceElement.getLineNumber();
-//
-//    for (String log : logs) {
-//      String text =
-//          "["
-//              + ChatColor.DARK_GREEN
-//              + ChatColor.BOLD
-//              + "DEBUG"
-//              + ChatColor.RESET
-//              + "] ["
-//              + ChatColor.DARK_GREEN
-//              + className
-//              + ChatColor.RESET
-//              + "]"
-//              + " ["
-//              + ChatColor.DARK_GREEN
-//              + methodName
-//              + ChatColor.RESET
-//              + "] ("
-//              + ChatColor.DARK_GREEN
-//              + codeLine
-//              + ChatColor.RESET
-//              + ") "
-//              + log;
-//      debugLogs.add(Colorizer.stripColors(text));
-//      if (debugLogs.size() > 500000) /* Keep debugLogs max can have 500k lines. */ {
-//        debugLogs.remove(0);
-//      }
-//      if (QuickShop.instance.getConfig().getBoolean("dev-mode")) {
-//        QuickShop.instance.getLogger().info(text);
-//      }
-//    }
-//    long debugLogCost = System.currentTimeMillis() - startTime;
+    // if (!QuickShop.instance.getConfig().getBoolean("dev-mode")) {
+    // return;
+    // }
+    // long startTime = System.currentTimeMillis();
+    // StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
+    // String className = stackTraceElement.getClassName();
+    // try {
+    // Class<?> c = Class.forName(className);
+    // className = c.getSimpleName();
+    // if (!c.getSimpleName().isEmpty()) {
+    // className = c.getSimpleName();
+    // }
+    // } catch (ClassNotFoundException e) {
+    // // Ignore
+    // }
+    // String methodName = stackTraceElement.getMethodName();
+    // int codeLine = stackTraceElement.getLineNumber();
+    //
+    // for (String log : logs) {
+    // String text =
+    // "["
+    // + ChatColor.DARK_GREEN
+    // + ChatColor.BOLD
+    // + "DEBUG"
+    // + ChatColor.RESET
+    // + "] ["
+    // + ChatColor.DARK_GREEN
+    // + className
+    // + ChatColor.RESET
+    // + "]"
+    // + " ["
+    // + ChatColor.DARK_GREEN
+    // + methodName
+    // + ChatColor.RESET
+    // + "] ("
+    // + ChatColor.DARK_GREEN
+    // + codeLine
+    // + ChatColor.RESET
+    // + ") "
+    // + log;
+    // debugLogs.add(Colorizer.stripColors(text));
+    // if (debugLogs.size() > 500000) /* Keep debugLogs max can have 500k lines. */ {
+    // debugLogs.remove(0);
+    // }
+    // if (QuickShop.instance.getConfig().getBoolean("dev-mode")) {
+    // QuickShop.instance.getLogger().info(text);
+    // }
+    // }
+    // long debugLogCost = System.currentTimeMillis() - startTime;
   }
 
   /**
@@ -361,12 +348,12 @@ public class Util {
     Yaml yaml = new Yaml(yamlOptions);
     YamlConfiguration yamlConfiguration = new YamlConfiguration();
     Map<Object, Object> root = yaml.load(config);
-    //noinspection unchecked
+    // noinspection unchecked
     Map<String, Object> item = (Map<String, Object>) root.get("item");
     int itemDataVersion = Integer.parseInt(String.valueOf(item.get("v")));
     try {
       // Try load the itemDataVersion to do some checks.
-      //noinspection deprecation
+      // noinspection deprecation
       if (itemDataVersion > Bukkit.getUnsafe().getDataVersion()) {
         Util.debugLog("WARNING: DataVersion not matched with ItemStack: " + config);
         // okay we need some things to do
@@ -374,10 +361,10 @@ public class Util {
           // okay it enabled
           Util.debugLog("QuickShop is trying force loading " + config);
           if (plugin.getConfig().getInt("shop.force-load-downgrade-items.method") == 0) { // Mode 0
-            //noinspection deprecation
+            // noinspection deprecation
             item.put("v", Bukkit.getUnsafe().getDataVersion() - 1);
           } else { // Mode other
-            //noinspection deprecation
+            // noinspection deprecation
             item.put("v", Bukkit.getUnsafe().getDataVersion());
           }
           // Okay we have hacked the dataVersion, now put it back
@@ -386,16 +373,10 @@ public class Util {
 
           Util.debugLog("Updated, we will try load as hacked ItemStack: " + config);
         } else {
-          plugin
-              .getLogger()
-              .warning(
-                  "Cannot load ItemStack "
-                      + config
-                      + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
-          plugin
-              .getLogger()
-              .warning(
-                  "You can try force load this ItemStack by our hacked ItemStack read util(shop.force-load-downgrade-items), but beware, the data may damaged if you load on this lower Minecraft server version, Please backup your world and database before enable!");
+          plugin.getLogger().warning("Cannot load ItemStack " + config
+              + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
+          plugin.getLogger().warning(
+              "You can try force load this ItemStack by our hacked ItemStack read util(shop.force-load-downgrade-items), but beware, the data may damaged if you load on this lower Minecraft server version, Please backup your world and database before enable!");
         }
       }
       yamlConfiguration.loadFromString(config);
@@ -415,11 +396,8 @@ public class Util {
    * @return Equals or not.
    */
   private static boolean equalsBlockStateLocation(@NotNull Location b1, @NotNull Location b2) {
-    return (b1.getBlockX() == b2.getBlockX())
-        && (b1.getBlockY() == b2.getBlockY())
-        && (b1.getBlockZ() == b2.getBlockZ())
-        && (Objects.requireNonNull(b1.getWorld())
-            .getName()
+    return (b1.getBlockX() == b2.getBlockX()) && (b1.getBlockY() == b2.getBlockY())
+        && (b1.getBlockZ() == b2.getBlockZ()) && (Objects.requireNonNull(b1.getWorld()).getName()
             .equals(Objects.requireNonNull(b2.getWorld()).getName()));
   }
 
@@ -458,8 +436,8 @@ public class Util {
       }
     } catch (NumberFormatException e) {
       Util.debugLog("format", e.getMessage());
-      Util.debugLog(
-          "format", "Use alternate-currency-symbol to formatting, Cause NumberFormatException");
+      Util.debugLog("format",
+          "Use alternate-currency-symbol to formatting, Cause NumberFormatException");
       return BaseConfig.currencySymbol + n;
     }
   }
@@ -538,8 +516,7 @@ public class Util {
    */
   @Nullable
   public static String getPotiondata(@NotNull ItemStack iStack) {
-    if ((iStack.getType() != Material.POTION)
-        && (iStack.getType() != Material.LINGERING_POTION)
+    if ((iStack.getType() != Material.POTION) && (iStack.getType() != Material.LINGERING_POTION)
         && (iStack.getType() != Material.SPLASH_POTION)) {
       return null;
     }
@@ -550,13 +527,11 @@ public class Util {
     PotionMeta pMeta = (PotionMeta) iStack.getItemMeta();
     // if (pMeta.getBasePotionData().getType() != null) {
     if (!(pMeta.getBasePotionData().isUpgraded())) {
-      pEffects.add(
-          ChatColor.BLUE
-              + MsgUtil.getPotioni18n(
-                  Objects.requireNonNull(pMeta.getBasePotionData().getType().getEffectType())));
+      pEffects.add(ChatColor.BLUE + MsgUtil.getPotioni18n(
+          Objects.requireNonNull(pMeta.getBasePotionData().getType().getEffectType())));
     } else {
-      pEffects.add(
-          ChatColor.BLUE
+      pEffects
+          .add(ChatColor.BLUE
               + MsgUtil.getPotioni18n(
                   Objects.requireNonNull(pMeta.getBasePotionData().getType().getEffectType()))
               + " II");
@@ -566,10 +541,8 @@ public class Util {
     if (pMeta.hasCustomEffects()) {
       List<PotionEffect> cEffects = pMeta.getCustomEffects();
       for (PotionEffect potionEffect : cEffects) {
-        pEffects.add(
-            MsgUtil.getPotioni18n(potionEffect.getType())
-                + " "
-                + RomanNumber.toRoman(potionEffect.getAmplifier()));
+        pEffects.add(MsgUtil.getPotioni18n(potionEffect.getType()) + " "
+            + RomanNumber.toRoman(potionEffect.getAmplifier()));
       }
     }
     if (!pEffects.isEmpty()) {
@@ -613,12 +586,12 @@ public class Util {
       InventoryHolder right = doubleChest.getRightSide();
       Chest leftC = (Chest) left;
       Chest rightC = (Chest) right;
-      if (equalsBlockStateLocation(
-          oneSideOfChest.getLocation(), Objects.requireNonNull(rightC).getLocation())) {
+      if (equalsBlockStateLocation(oneSideOfChest.getLocation(),
+          Objects.requireNonNull(rightC).getLocation())) {
         return Objects.requireNonNull(leftC).getBlock();
       }
-      if (equalsBlockStateLocation(
-          oneSideOfChest.getLocation(), Objects.requireNonNull(leftC).getLocation())) {
+      if (equalsBlockStateLocation(oneSideOfChest.getLocation(),
+          Objects.requireNonNull(leftC).getLocation())) {
         return rightC.getBlock();
       }
     }
@@ -636,7 +609,7 @@ public class Util {
   @Deprecated
   public static Block getSecondHalf_old(@NotNull Block b) {
     // if (b.getType() != Material.CHEST && b.getType() != Material.TRAPPED_CHEST)
-    //         //     return null;
+    // // return null;
     if (!isDoubleChest(b)) {
       return null;
     }
@@ -747,16 +720,12 @@ public class Util {
         try {
           Material mat = Material.matchMaterial(sp[0]);
           if (mat == null) {
-            plugin
-                .getLogger()
-                .warning(
-                    "Material "
-                        + sp[0]
-                        + " in config.yml can't match with a valid Materials, check your config.yml!");
+            plugin.getLogger().warning("Material " + sp[0]
+                + " in config.yml can't match with a valid Materials, check your config.yml!");
             continue;
           }
-          restrictedPrices.put(
-              mat, new SimpleEntry<>(Double.valueOf(sp[1]), Double.valueOf(sp[2])));
+          restrictedPrices.put(mat,
+              new SimpleEntry<>(Double.valueOf(sp[1]), Double.valueOf(sp[2])));
         } catch (Exception e) {
           plugin.getLogger().warning("Invalid price restricted material: " + s);
         }
@@ -829,16 +798,11 @@ public class Util {
               if (location == null) {
                 return; // Virtual GUI
               }
-              plugin
-                  .getSyncTaskWatcher()
-                  .getInventoryEditQueue()
+              plugin.getSyncTaskWatcher().getInventoryEditQueue()
                   .offer(new InventoryEditContainer(inv, i, new ItemStack(Material.AIR)));
               Util.debugLog("Found a displayitem in an inventory, Scheduling to removal...");
-              MsgUtil.sendGlobalAlert(
-                  "[InventoryCheck] Found displayItem in inventory at "
-                      + location
-                      + ", Item is "
-                      + itemStack.getType().name());
+              MsgUtil.sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
+                  + location + ", Item is " + itemStack.getType().name());
             }
           }
         } catch (Throwable t) {
@@ -1005,7 +969,7 @@ public class Util {
       return false;
     }
     try {
-      //noinspection ResultOfMethodCallIgnored
+      // noinspection ResultOfMethodCallIgnored
       UUID.fromString(string);
       return true;
     } catch (IllegalArgumentException e) {
@@ -1053,7 +1017,7 @@ public class Util {
    * @param loc The location a players head is
    * @param lookat The location they should be looking
    * @return The location the player should be facing to have their crosshairs on the location
-   *     lookAt Kudos to bergerkiller for most of this function
+   *         lookAt Kudos to bergerkiller for most of this function
    */
   public static Location lookAt(Location loc, Location lookat) {
     // Clone the loc to prevent applied changes to the input loc
@@ -1230,24 +1194,14 @@ public class Util {
 
   /** Send warning message when some plugin calling deprecated method... With the trace. */
   public static void sendDeprecatedMethodWarn() {
-    QuickShop.instance
-        .getLogger()
-        .warning(
-            "Some plugin is calling a Deprecated method, Please contact the author to tell them to use the new api!");
+    QuickShop.instance.getLogger().warning(
+        "Some plugin is calling a Deprecated method, Please contact the author to tell them to use the new api!");
     StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
     for (StackTraceElement stackTraceElement : stackTraceElements) {
-      QuickShop.instance
-          .getLogger()
-          .warning(
-              "at "
-                  + stackTraceElement.getClassName()
-                  + "#"
-                  + stackTraceElement.getMethodName()
-                  + " ("
-                  + stackTraceElement.getFileName()
-                  + ":"
-                  + stackTraceElement.getLineNumber()
-                  + ")");
+      QuickShop.instance.getLogger()
+          .warning("at " + stackTraceElement.getClassName() + "#"
+              + stackTraceElement.getMethodName() + " (" + stackTraceElement.getFileName() + ":"
+              + stackTraceElement.getLineNumber() + ")");
     }
   }
 
@@ -1307,8 +1261,7 @@ public class Util {
    */
   public static Material getSignMaterial() {
 
-    Material signMaterial =
-        Material.matchMaterial(BaseConfig.signMaterial);
+    Material signMaterial = Material.matchMaterial(BaseConfig.signMaterial);
     if (signMaterial != null) {
       return signMaterial;
     }
@@ -1321,10 +1274,8 @@ public class Util {
       return signMaterial;
     }
     // What the fuck!?
-    plugin
-        .getLogger()
-        .warning(
-            "QuickShop can't found any useable sign material, we will use default Sign Material.");
+    plugin.getLogger().warning(
+        "QuickShop can't found any useable sign material, we will use default Sign Material.");
     try {
       return Material.OAK_WALL_SIGN;
     } catch (Throwable e) {
@@ -1341,12 +1292,8 @@ public class Util {
     try {
       serverInstance = getNMSClass("MinecraftServer").getMethod("getServer").invoke(null);
       tpsField = serverInstance.getClass().getField("recentTps");
-    } catch (NoSuchFieldException
-        | SecurityException
-        | IllegalAccessException
-        | IllegalArgumentException
-        | InvocationTargetException
-        | NoSuchMethodException e) {
+    } catch (NoSuchFieldException | SecurityException | IllegalAccessException
+        | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
       e.printStackTrace();
     }
     try {
@@ -1358,11 +1305,11 @@ public class Util {
   }
   //
   // public static void shoppablesCheck(@NotNull Shop shop) {
-  //     if (!Util.canBeShop(shop.getLocation().getBlock())) {
-  //         Util.debugLog("This shopblock can't be a shop, deleting...");
-  //         shop.onUnload();
-  //         shop.delete();
-  //     }
+  // if (!Util.canBeShop(shop.getLocation().getBlock())) {
+  // Util.debugLog("This shopblock can't be a shop, deleting...");
+  // shop.onUnload();
+  // shop.delete();
+  // }
   // }
 
   /**
@@ -1372,12 +1319,8 @@ public class Util {
    */
   public static boolean isDevEdition() {
     String version = QuickShop.instance.getDescription().getVersion().toLowerCase();
-    return (version.contains("dev")
-        || version.contains("develop")
-        || version.contains("alpha")
-        || version.contains("beta")
-        || version.contains("test")
-        || version.contains("snapshot")
+    return (version.contains("dev") || version.contains("develop") || version.contains("alpha")
+        || version.contains("beta") || version.contains("test") || version.contains("snapshot")
         || version.contains("preview"));
   }
 

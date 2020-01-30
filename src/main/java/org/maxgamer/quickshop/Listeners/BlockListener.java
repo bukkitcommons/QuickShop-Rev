@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is BlockListener.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is BlockListener.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Listeners;
@@ -48,7 +45,8 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 @AllArgsConstructor
 public class BlockListener implements Listener {
 
-  @NotNull private final QuickShop plugin;
+  @NotNull
+  private final QuickShop plugin;
 
   /**
    * Gets the shop a sign is attached to
@@ -77,12 +75,10 @@ public class BlockListener implements Listener {
 
     if (b.getState() instanceof Sign) {
       Sign sign = (Sign) b.getState();
-      if (BaseConfig.locketteEnable
-              && sign.getLine(0).equals(BaseConfig.lockettePrivateText)
+      if (BaseConfig.locketteEnable && sign.getLine(0).equals(BaseConfig.lockettePrivateText)
           || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
         // Ignore break lockette sign
-        plugin
-            .getLogger()
+        plugin.getLogger()
             .info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
         return;
       }
@@ -103,9 +99,8 @@ public class BlockListener implements Listener {
           return;
         }
         e.setCancelled(true);
-        p.sendMessage(
-            MsgUtil.getMessage(
-                "no-creative-break", p, MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
+        p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
+            MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
         return;
       }
 
@@ -156,9 +151,8 @@ public class BlockListener implements Listener {
           return;
         }
         e.setCancelled(true);
-        p.sendMessage(
-            MsgUtil.getMessage(
-                "no-creative-break", p, MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
+        p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
+            MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
       }
 
       Util.debugLog("Cannot break the sign.");
@@ -202,8 +196,7 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     final Block chest = Util.getSecondHalf(b);
 
-    if (chest != null
-        && plugin.getShopManager().getShop(chest.getLocation()) != null
+    if (chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null
         && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
       e.setCancelled(true);
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));

@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is DatabaseManager.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is DatabaseManager.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Database;
@@ -39,11 +36,15 @@ public class DatabaseManager {
 
   private final Queue<PreparedStatement> sqlQueue = new LinkedBlockingQueue<>();
 
-  @NotNull private final Database database;
+  @NotNull
+  private final Database database;
 
-  @NotNull private final QuickShop plugin;
-  @NotNull private final WarningSender warningSender;
-  @Nullable private BukkitTask task;
+  @NotNull
+  private final QuickShop plugin;
+  @NotNull
+  private final WarningSender warningSender;
+  @Nullable
+  private BukkitTask task;
   private boolean useQueue;
 
   /**
@@ -61,13 +62,12 @@ public class DatabaseManager {
       return;
     }
     try {
-      task =
-          new BukkitRunnable() {
-            @Override
-            public void run() {
-              plugin.getDatabaseManager().runTask();
-            }
-          }.runTaskTimerAsynchronously(plugin, 1, 200);
+      task = new BukkitRunnable() {
+        @Override
+        public void run() {
+          plugin.getDatabaseManager().runTask();
+        }
+      }.runTaskTimerAsynchronously(plugin, 1, 200);
     } catch (IllegalPluginAccessException e) {
       Util.debugLog("Plugin is disabled but trying create database task, move to Main Thread...");
       plugin.getDatabaseManager().runTask();
@@ -97,10 +97,8 @@ public class DatabaseManager {
       Timer timer = new Timer(true);
       try {
         if (!this.database.getConnection().isValid(3000)) {
-          this.plugin
-              .getLogger()
-              .warning(
-                  "Database connection may lost, we are trying reconnecting, if this message appear too many times, you should check your database file(sqlite) and internet connection(mysql).");
+          this.plugin.getLogger().warning(
+              "Database connection may lost, we are trying reconnecting, if this message appear too many times, you should check your database file(sqlite) and internet connection(mysql).");
           break; // Waiting next crycle and hope it success reconnected.
         }
       } catch (SQLException sqle) {
@@ -127,10 +125,8 @@ public class DatabaseManager {
       }
       long tookTime = timer.endTimer();
       if (tookTime > 5000) {
-        warningSender.sendWarn(
-            "Database performance warning: It took too long time ("
-                + tookTime
-                + "ms) to execute the task, it may cause the network connection with MySQL server or just MySQL server too slow, change to a better MySQL server or switch to a local SQLite database!");
+        warningSender.sendWarn("Database performance warning: It took too long time (" + tookTime
+            + "ms) to execute the task, it may cause the network connection with MySQL server or just MySQL server too slow, change to a better MySQL server or switch to a local SQLite database!");
       }
     }
     try {

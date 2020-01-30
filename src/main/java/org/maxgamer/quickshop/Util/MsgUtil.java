@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is MsgUtil.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is MsgUtil.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Util;
@@ -67,9 +64,8 @@ import org.maxgamer.quickshop.file.JSONFile;
 @SuppressWarnings("WeakerAccess")
 public class MsgUtil {
   public static String invaildMsg = "Invaild message";
-  private static YamlConfiguration builtInDefaultLanguage =
-      YamlConfiguration.loadConfiguration(
-          new InputStreamReader(QuickShop.instance.getLanguage().getFile("en", "messages")));
+  private static YamlConfiguration builtInDefaultLanguage = YamlConfiguration.loadConfiguration(
+      new InputStreamReader(QuickShop.instance.getLanguage().getFile("en", "messages")));
   private static YamlConfiguration enchi18n;
   private static boolean inited;
   private static YamlConfiguration itemi18n;
@@ -97,8 +93,7 @@ public class MsgUtil {
 
   /** Deletes any messages that are older than a week in the database, to save on space. */
   public static void clean() {
-    plugin
-        .getLogger()
+    plugin.getLogger()
         .info("Cleaning purchase messages from the database that are over a week old...");
     // 604800,000 msec = 1 week.
     long weekAgo = System.currentTimeMillis() - 604800000;
@@ -212,15 +207,12 @@ public class MsgUtil {
    * @param player The sender will send the message to
    * @return message
    */
-  public static String getMessage(
-      @NotNull String loc, @Nullable CommandSender player, @NotNull String... args) {
+  public static String getMessage(@NotNull String loc, @Nullable CommandSender player,
+      @NotNull String... args) {
     Optional<String> raw = messagei18n.getString(loc);
     if (!raw.isPresent()) {
-      Util.debugLog(
-          "ERR: MsgUtil cannot find the the phrase at "
-              + loc
-              + ", printing the all readed datas: "
-              + messagei18n);
+      Util.debugLog("ERR: MsgUtil cannot find the the phrase at " + loc
+          + ", printing the all readed datas: " + messagei18n);
 
       return invaildMsg + ": " + loc;
     }
@@ -251,8 +243,8 @@ public class MsgUtil {
    * @param args args
    * @return message
    */
-  public static String getMessageOfflinePlayer(
-      @NotNull String loc, @Nullable OfflinePlayer player, @NotNull String... args) {
+  public static String getMessageOfflinePlayer(@NotNull String loc, @Nullable OfflinePlayer player,
+      @NotNull String... args) {
     Optional<String> raw = messagei18n.getString(loc);
     if (!raw.isPresent()) {
       return invaildMsg + ": " + loc;
@@ -293,22 +285,17 @@ public class MsgUtil {
     /* Check & Load & Create default messages.yml */
     // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
     String languageCode = plugin.getConfig().getString("language", "en");
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
 
     loadGameLanguage(plugin.getConfig().getString("game-language", "default"));
     // Init nJson
     IFile nJson;
     if (plugin.getResource("messages/" + languageCode + ".json") == null) {
-      nJson =
-          new JSONFile(
-              plugin, new File(plugin.getDataFolder(), "messages.json"), "messages/en.json", true);
+      nJson = new JSONFile(plugin, new File(plugin.getDataFolder(), "messages.json"),
+          "messages/en.json", true);
     } else {
-      nJson =
-          new JSONFile(
-              plugin,
-              new File(plugin.getDataFolder(), "messages.json"),
-              "messages/" + languageCode + ".json",
-              true);
+      nJson = new JSONFile(plugin, new File(plugin.getDataFolder(), "messages.json"),
+          "messages/" + languageCode + ".json", true);
     }
 
     nJson.create();
@@ -323,8 +310,8 @@ public class MsgUtil {
       }
       nJson.save();
       try {
-        Files.move(
-            oldMsgFile.toPath(), new File(plugin.getDataFolder(), "messages.yml.bak").toPath());
+        Files.move(oldMsgFile.toPath(),
+            new File(plugin.getDataFolder(), "messages.yml.bak").toPath());
       } catch (IOException ignore) {
       }
       if (oldMsgFile.exists()) {
@@ -347,7 +334,7 @@ public class MsgUtil {
     updateMessages(messagei18n.getInt("language-version"));
     messagei18n.loadFromString(Util.parseColours(messagei18n.saveToString()));
 
-    /* Print to console this language file's author, contributors, and region*/
+    /* Print to console this language file's author, contributors, and region */
     if (!inited) {
       plugin.getLogger().info(getMessage("translation-author", null));
       plugin.getLogger().info(getMessage("translation-contributors", null));
@@ -369,9 +356,8 @@ public class MsgUtil {
     // Store it
     enchi18n = YamlConfiguration.loadConfiguration(enchi18nFile);
     enchi18n.options().copyDefaults(false);
-    YamlConfiguration enchi18nYAML =
-        YamlConfiguration.loadConfiguration(
-            new InputStreamReader(Objects.requireNonNull(plugin.getResource("enchi18n.yml"))));
+    YamlConfiguration enchi18nYAML = YamlConfiguration.loadConfiguration(
+        new InputStreamReader(Objects.requireNonNull(plugin.getResource("enchi18n.yml"))));
     enchi18n.setDefaults(enchi18nYAML);
     Util.parseColours(enchi18n);
     Enchantment[] enchsi18n = Enchantment.values();
@@ -388,11 +374,8 @@ public class MsgUtil {
       enchi18n.save(enchi18nFile);
     } catch (IOException e) {
       e.printStackTrace();
-      plugin
-          .getLogger()
-          .log(
-              Level.WARNING,
-              "Could not load/save transaction enchname from enchi18n.yml. Skipping.");
+      plugin.getLogger().log(Level.WARNING,
+          "Could not load/save transaction enchname from enchi18n.yml. Skipping.");
     }
     plugin.getLogger().info("Complete to load enchname i18n.");
   }
@@ -407,9 +390,8 @@ public class MsgUtil {
     // Store it
     itemi18n = YamlConfiguration.loadConfiguration(itemi18nFile);
     itemi18n.options().copyDefaults(false);
-    YamlConfiguration itemi18nYAML =
-        YamlConfiguration.loadConfiguration(
-            new InputStreamReader(Objects.requireNonNull(plugin.getResource("itemi18n.yml"))));
+    YamlConfiguration itemi18nYAML = YamlConfiguration.loadConfiguration(
+        new InputStreamReader(Objects.requireNonNull(plugin.getResource("itemi18n.yml"))));
     itemi18n.setDefaults(itemi18nYAML);
     Util.parseColours(itemi18n);
     Material[] itemsi18n = Material.values();
@@ -420,19 +402,15 @@ public class MsgUtil {
       }
       String itemName = gameLanguage.getItem(material);
       itemi18n.set("itemi18n." + material.name(), itemName);
-      plugin
-          .getLogger()
+      plugin.getLogger()
           .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
     }
     try {
       itemi18n.save(itemi18nFile);
     } catch (IOException e) {
       e.printStackTrace();
-      plugin
-          .getLogger()
-          .log(
-              Level.WARNING,
-              "Could not load/save transaction itemname from itemi18n.yml. Skipping.");
+      plugin.getLogger().log(Level.WARNING,
+          "Could not load/save transaction itemname from itemi18n.yml. Skipping.");
     }
     plugin.getLogger().info("Complete to load Itemname i18n.");
   }
@@ -447,9 +425,8 @@ public class MsgUtil {
     // Store it
     potioni18n = YamlConfiguration.loadConfiguration(potioni18nFile);
     potioni18n.options().copyDefaults(false);
-    YamlConfiguration potioni18nYAML =
-        YamlConfiguration.loadConfiguration(
-            new InputStreamReader(Objects.requireNonNull(plugin.getResource("potioni18n.yml"))));
+    YamlConfiguration potioni18nYAML = YamlConfiguration.loadConfiguration(
+        new InputStreamReader(Objects.requireNonNull(plugin.getResource("potioni18n.yml"))));
     potioni18n.setDefaults(potioni18nYAML);
     Util.parseColours(potioni18n);
     for (PotionEffectType potion : PotionEffectType.values()) {
@@ -465,11 +442,8 @@ public class MsgUtil {
       potioni18n.save(potioni18nFile);
     } catch (IOException e) {
       e.printStackTrace();
-      plugin
-          .getLogger()
-          .log(
-              Level.WARNING,
-              "Could not load/save transaction potionname from potioni18n.yml. Skipping.");
+      plugin.getLogger().log(Level.WARNING,
+          "Could not load/save transaction potionname from potioni18n.yml. Skipping.");
     }
     plugin.getLogger().info("Complete to load potionname i18n.");
   }
@@ -494,16 +468,15 @@ public class MsgUtil {
       }
     } catch (SQLException e) {
       e.printStackTrace();
-      plugin
-          .getLogger()
-          .log(Level.WARNING, "Could not load transaction messages from database. Skipping.");
+      plugin.getLogger().log(Level.WARNING,
+          "Could not load transaction messages from database. Skipping.");
     }
   }
 
   /**
    * @param player The name of the player to message
    * @param message The message to send them Sends the given player a message if they're online.
-   *     Else, if they're not online, queues it for them in the database.
+   *        Else, if they're not online, queues it for them in the database.
    * @param isUnlimited The shop is or unlimited
    */
   public static void send(@NotNull UUID player, @NotNull String message, boolean isUnlimited) {
@@ -541,11 +514,8 @@ public class MsgUtil {
   }
 
   @SneakyThrows
-  public static void sendItemholochat(
-      @NotNull Player player,
-      @NotNull String left,
-      @NotNull ItemStack itemStack,
-      @NotNull String right) {
+  public static void sendItemholochat(@NotNull Player player, @NotNull String left,
+      @NotNull ItemStack itemStack, @NotNull String right) {
     String json = ItemNMS.saveJsonfromNMS(itemStack);
     if (json == null) {
       return;
@@ -559,8 +529,8 @@ public class MsgUtil {
     player.spigot().sendMessage(centerItem);
   }
 
-  public static @NotNull String getSubString(
-      @NotNull String text, @NotNull String left, @NotNull String right) {
+  public static @NotNull String getSubString(@NotNull String text, @NotNull String left,
+      @NotNull String right) {
     String result;
     int zLen;
     if (left.isEmpty()) {
@@ -606,17 +576,15 @@ public class MsgUtil {
     if (!QuickShop.getPermissionManager().hasPermission(sender, "quickshop.setowner")) {
       chatSheetPrinter.printLine(MsgUtil.getMessage("menu.owner", sender, shop.ownerName()));
     } else {
-      chatSheetPrinter.printSuggestableCmdLine(
-          MsgUtil.getMessage(
-              "controlpanel.setowner",
-              sender,
-              shop.ownerName()
-                  + ((plugin.getConfig().getBoolean("shop.show-owner-uuid-in-controlpanel-if-op")
-                          && shop.isUnlimited())
-                      ? (" (" + shop.getOwner() + ")")
-                      : "")),
-          MsgUtil.getMessage("controlpanel.setowner-hover", sender),
-          MsgUtil.getMessage("controlpanel.commands.setowner", sender));
+      chatSheetPrinter
+          .printSuggestableCmdLine(
+              MsgUtil.getMessage("controlpanel.setowner", sender,
+                  shop.ownerName() + ((plugin.getConfig().getBoolean(
+                      "shop.show-owner-uuid-in-controlpanel-if-op") && shop.isUnlimited())
+                          ? (" (" + shop.getOwner() + ")")
+                          : "")),
+              MsgUtil.getMessage("controlpanel.setowner-hover", sender),
+              MsgUtil.getMessage("controlpanel.commands.setowner", sender));
     }
 
     // Unlimited
@@ -624,14 +592,11 @@ public class MsgUtil {
       String text =
           MsgUtil.getMessage("controlpanel.unlimited", sender, bool2String(shop.isUnlimited()));
       String hoverText = MsgUtil.getMessage("controlpanel.unlimited-hover", sender);
-      String clickCommand =
-          MsgUtil.getMessage(
-              "controlpanel.commands.unlimited",
-              sender,
-              Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-              String.valueOf(shop.getLocation().getBlockX()),
-              String.valueOf(shop.getLocation().getBlockY()),
-              String.valueOf(shop.getLocation().getBlockZ()));
+      String clickCommand = MsgUtil.getMessage("controlpanel.commands.unlimited", sender,
+          Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
+          String.valueOf(shop.getLocation().getBlockX()),
+          String.valueOf(shop.getLocation().getBlockY()),
+          String.valueOf(shop.getLocation().getBlockZ()));
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Buying/Selling Mode
@@ -640,39 +605,29 @@ public class MsgUtil {
       if (shop.isSelling()) {
         String text = MsgUtil.getMessage("controlpanel.mode-selling", sender);
         String hoverText = MsgUtil.getMessage("controlpanel.mode-selling-hover", sender);
-        String clickCommand =
-            MsgUtil.getMessage(
-                "controlpanel.commands.buy",
-                sender,
-                Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-                String.valueOf(shop.getLocation().getBlockX()),
-                String.valueOf(shop.getLocation().getBlockY()),
-                String.valueOf(shop.getLocation().getBlockZ()));
+        String clickCommand = MsgUtil.getMessage("controlpanel.commands.buy", sender,
+            Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
+            String.valueOf(shop.getLocation().getBlockX()),
+            String.valueOf(shop.getLocation().getBlockY()),
+            String.valueOf(shop.getLocation().getBlockZ()));
         chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
       } else if (shop.isBuying()) {
         String text = MsgUtil.getMessage("controlpanel.mode-buying", sender);
         String hoverText = MsgUtil.getMessage("controlpanel.mode-buying-hover", sender);
-        String clickCommand =
-            MsgUtil.getMessage(
-                "controlpanel.commands.sell",
-                sender,
-                Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-                String.valueOf(shop.getLocation().getBlockX()),
-                String.valueOf(shop.getLocation().getBlockY()),
-                String.valueOf(shop.getLocation().getBlockZ()));
+        String clickCommand = MsgUtil.getMessage("controlpanel.commands.sell", sender,
+            Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
+            String.valueOf(shop.getLocation().getBlockX()),
+            String.valueOf(shop.getLocation().getBlockY()),
+            String.valueOf(shop.getLocation().getBlockZ()));
         chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
       }
     }
     // Set Price
     if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.price")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
-      String text =
-          MsgUtil.getMessage(
-              "controlpanel.price",
-              sender,
-              (plugin.getConfig().getBoolean("use-decimal-format"))
-                  ? decimalFormat(shop.getPrice())
-                  : "" + shop.getPrice());
+      String text = MsgUtil.getMessage("controlpanel.price", sender,
+          (plugin.getConfig().getBoolean("use-decimal-format")) ? decimalFormat(shop.getPrice())
+              : "" + shop.getPrice());
       String hoverText = MsgUtil.getMessage("controlpanel.price-hover", sender);
       String clickCommand = MsgUtil.getMessage("controlpanel.commands.price", sender);
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
@@ -690,14 +645,11 @@ public class MsgUtil {
       String text =
           MsgUtil.getMessage("controlpanel.empty", sender, String.valueOf(shop.getPrice()));
       String hoverText = MsgUtil.getMessage("controlpanel.empty-hover", sender);
-      String clickCommand =
-          MsgUtil.getMessage(
-              "controlpanel.commands.empty",
-              sender,
-              Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-              String.valueOf(shop.getLocation().getBlockX()),
-              String.valueOf(shop.getLocation().getBlockY()),
-              String.valueOf(shop.getLocation().getBlockZ()));
+      String clickCommand = MsgUtil.getMessage("controlpanel.commands.empty", sender,
+          Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
+          String.valueOf(shop.getLocation().getBlockX()),
+          String.valueOf(shop.getLocation().getBlockY()),
+          String.valueOf(shop.getLocation().getBlockZ()));
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Remove
@@ -706,14 +658,11 @@ public class MsgUtil {
       String text =
           MsgUtil.getMessage("controlpanel.remove", sender, String.valueOf(shop.getPrice()));
       String hoverText = MsgUtil.getMessage("controlpanel.remove-hover", sender);
-      String clickCommand =
-          MsgUtil.getMessage(
-              "controlpanel.commands.remove",
-              sender,
-              Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-              String.valueOf(shop.getLocation().getBlockX()),
-              String.valueOf(shop.getLocation().getBlockY()),
-              String.valueOf(shop.getLocation().getBlockZ()));
+      String clickCommand = MsgUtil.getMessage("controlpanel.commands.remove", sender,
+          Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
+          String.valueOf(shop.getLocation().getBlockX()),
+          String.valueOf(shop.getLocation().getBlockY()),
+          String.valueOf(shop.getLocation().getBlockZ()));
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
 
@@ -747,11 +696,8 @@ public class MsgUtil {
    * @param player Target player
    * @param normalText The text you will see
    */
-  public static void sendItemholochat(
-      @NotNull Shop shop,
-      @NotNull ItemStack itemStack,
-      @NotNull Player player,
-      @NotNull String normalText) {
+  public static void sendItemholochat(@NotNull Shop shop, @NotNull ItemStack itemStack,
+      @NotNull Player player, @NotNull String normalText) {
     try {
       String json = ItemNMS.saveJsonfromNMS(itemStack);
       if (json == null) {
@@ -761,16 +707,12 @@ public class MsgUtil {
           new TextComponent(normalText + "   " + MsgUtil.getMessage("menu.preview", player));
       ComponentBuilder cBuilder = new ComponentBuilder(json);
       if (QuickShop.getPermissionManager().hasPermission(player, "quickshop.preview")) {
-        normalmessage.setClickEvent(
-            new ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                MsgUtil.getMessage(
-                    "menu.commands.preview",
-                    player,
-                    Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-                    String.valueOf(shop.getLocation().getBlockX()),
-                    String.valueOf(shop.getLocation().getBlockY()),
-                    String.valueOf(shop.getLocation().getBlockZ()))));
+        normalmessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+            MsgUtil.getMessage("menu.commands.preview", player,
+                Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
+                String.valueOf(shop.getLocation().getBlockX()),
+                String.valueOf(shop.getLocation().getBlockY()),
+                String.valueOf(shop.getLocation().getBlockZ()))));
       }
       normalmessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, cBuilder.create()));
       player.spigot().sendMessage(normalmessage);
@@ -809,13 +751,8 @@ public class MsgUtil {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.successful-purchase", p));
-    chatSheetPrinter.printLine(
-        MsgUtil.getMessage(
-            "menu.item-name-and-price",
-            p,
-            "" + amount,
-            Util.getItemStackName(shop.getItem()),
-            Util.format((amount * shop.getPrice()))));
+    chatSheetPrinter.printLine(MsgUtil.getMessage("menu.item-name-and-price", p, "" + amount,
+        Util.getItemStackName(shop.getItem()), Util.format((amount * shop.getPrice()))));
     Map<Enchantment, Integer> enchs = new HashMap<>();
     if (shop.getItem().hasItemMeta()
         && Objects.requireNonNull(shop.getItem().getItemMeta()).hasEnchants()) {
@@ -852,20 +789,15 @@ public class MsgUtil {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.successfully-sold", p));
-    chatSheetPrinter.printLine(
-        MsgUtil.getMessage(
-            "menu.item-name-and-price",
-            p,
-            "" + amount,
-            Util.getItemStackName(shop.getItem()),
-            Util.format((amount * shop.getPrice()))));
+    chatSheetPrinter.printLine(MsgUtil.getMessage("menu.item-name-and-price", p, "" + amount,
+        Util.getItemStackName(shop.getItem()), Util.format((amount * shop.getPrice()))));
     if (plugin.getConfig().getBoolean("show-tax")) {
       double tax = plugin.getConfig().getDouble("tax");
       double total = amount * shop.getPrice();
       if (tax != 0) {
         if (!p.getUniqueId().equals(shop.getOwner())) {
-          chatSheetPrinter.printLine(
-              MsgUtil.getMessage("menu.sell-tax", p, Util.format((tax * total))));
+          chatSheetPrinter
+              .printLine(MsgUtil.getMessage("menu.sell-tax", p, Util.format((tax * total))));
         } else {
           chatSheetPrinter.printLine(MsgUtil.getMessage("menu.sell-tax-self", p));
         }
@@ -910,13 +842,8 @@ public class MsgUtil {
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.shop-information", p));
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.owner", p, shop.ownerName()));
     // Enabled
-    sendItemholochat(
-        shop,
-        items,
-        p,
-        ChatColor.DARK_PURPLE
-            + MsgUtil.getMessage("tableformat.left_begin", p)
-            + " "
+    sendItemholochat(shop, items, p,
+        ChatColor.DARK_PURPLE + MsgUtil.getMessage("tableformat.left_begin", p) + " "
             + MsgUtil.getMessage("menu.item", p, Util.getItemStackName(items)));
     if (Util.isTool(items.getType())) {
       chatSheetPrinter.printLine(
@@ -927,24 +854,20 @@ public class MsgUtil {
         chatSheetPrinter.printLine(
             MsgUtil.getMessage("menu.stock", p, "" + MsgUtil.getMessage("signs.unlimited", p)));
       } else {
-        chatSheetPrinter.printLine(
-            MsgUtil.getMessage("menu.stock", p, "" + shop.getRemainingStock()));
+        chatSheetPrinter
+            .printLine(MsgUtil.getMessage("menu.stock", p, "" + shop.getRemainingStock()));
       }
     } else {
       if (shop.getRemainingSpace() == -1) {
         chatSheetPrinter.printLine(
             MsgUtil.getMessage("menu.space", p, "" + MsgUtil.getMessage("signs.unlimited", p)));
       } else {
-        chatSheetPrinter.printLine(
-            MsgUtil.getMessage("menu.space", p, "" + shop.getRemainingSpace()));
+        chatSheetPrinter
+            .printLine(MsgUtil.getMessage("menu.space", p, "" + shop.getRemainingSpace()));
       }
     }
-    chatSheetPrinter.printLine(
-        MsgUtil.getMessage(
-            "menu.price-per",
-            p,
-            Util.getItemStackName(shop.getItem()),
-            Util.format(shop.getPrice())));
+    chatSheetPrinter.printLine(MsgUtil.getMessage("menu.price-per", p,
+        Util.getItemStackName(shop.getItem()), Util.format(shop.getPrice())));
     if (shop.isBuying()) {
       chatSheetPrinter.printLine(MsgUtil.getMessage("menu.this-shop-is-buying", p));
     } else {
@@ -979,12 +902,8 @@ public class MsgUtil {
         chatSheetPrinter.printLine(MsgUtil.getMessage("menu.effects", p));
         chatSheetPrinter.printLine(ChatColor.YELLOW + MsgUtil.getPotioni18n(potionEffectType));
       }
-      potionMeta
-          .getCustomEffects()
-          .forEach(
-              (potionEffect ->
-                  chatSheetPrinter.printLine(
-                      ChatColor.YELLOW + MsgUtil.getPotioni18n(potionEffect.getType()))));
+      potionMeta.getCustomEffects().forEach((potionEffect -> chatSheetPrinter
+          .printLine(ChatColor.YELLOW + MsgUtil.getPotioni18n(potionEffect.getType()))));
     }
     chatSheetPrinter.printFooter();
   }
@@ -1011,31 +930,26 @@ public class MsgUtil {
       setAndUpdate("shop-not-exist", "&cThere had no shop.");
       setAndUpdate("controlpanel.infomation", "&aShop Control Panel:");
       setAndUpdate("controlpanel.setowner", "&aOwner: &b{0} &e[&d&lChange&e]");
-      setAndUpdate(
-          "controlpanel.setowner-hover",
+      setAndUpdate("controlpanel.setowner-hover",
           "&eLooking you want changing shop and click to switch owner.");
       setAndUpdate("controlpanel.unlimited", "&aUnlimited: {0} &e[&d&lSwitch&e]");
-      messagei18n.set(
-          "controlpanel.unlimited-hover",
+      messagei18n.set("controlpanel.unlimited-hover",
           "&eLooking you want changing shop and click to switch enabled or disabled.");
       setAndUpdate("controlpanel.mode-selling", "&aShop mode: &bSelling &e[&d&lSwitch&e]");
-      messagei18n.set(
-          "controlpanel.mode-selling-hover",
+      messagei18n.set("controlpanel.mode-selling-hover",
           "&eLooking you want changing shop and click to switch enabled or disabled.");
       setAndUpdate("controlpanel.mode-buying", "&aShop mode: &bBuying &e[&d&lSwitch&e]");
-      messagei18n.set(
-          "controlpanel.mode-buying-hover",
+      messagei18n.set("controlpanel.mode-buying-hover",
           "&eLooking you want changing shop and click to switch enabled or disabled.");
       setAndUpdate("controlpanel.price", "&aPrice: &b{0} &e[&d&lSet&e]");
-      setAndUpdate(
-          "controlpanel.price-hover",
+      setAndUpdate("controlpanel.price-hover",
           "&eLooking you want changing shop and click to set new price.");
       setAndUpdate("controlpanel.refill", "&aRefill: Refill the shop items &e[&d&lOK&e]");
-      setAndUpdate(
-          "controlpanel.refill-hover", "&eLooking you want changing shop and click to refill.");
+      setAndUpdate("controlpanel.refill-hover",
+          "&eLooking you want changing shop and click to refill.");
       setAndUpdate("controlpanel.empty", "&aEmpty: Remove shop all items &e[&d&lOK&e]");
-      setAndUpdate(
-          "controlpanel.empty-hover", "&eLooking you want changing shop and click to clear.");
+      setAndUpdate("controlpanel.empty-hover",
+          "&eLooking you want changing shop and click to clear.");
       setAndUpdate("controlpanel.remove", "&c&l[Remove Shop]");
       setAndUpdate("controlpanel.remove-hover", "&eClick to remove this shop.");
       setAndUpdate("language-version", 2);
@@ -1044,8 +958,7 @@ public class MsgUtil {
     if (selectedVersion == 2) {
       setAndUpdate("command.no-target-given", "&cUsage: /qs export mysql|sqlite");
       setAndUpdate("command.description.debug", "&ePrint debug infomation");
-      messagei18n.set(
-          "no-permission-remove-shop",
+      messagei18n.set("no-permission-remove-shop",
           "&cYou do not have permission to use that command. Try break the shop instead?");
       setAndUpdate("language-version", 3);
       selectedVersion = 3;
@@ -1083,30 +996,25 @@ public class MsgUtil {
       setAndUpdate("command.description.info", "&eShow QuickShop Statistics");
       setAndUpdate("command.description.debug", "&eSwitch to developer mode");
       setAndUpdate("break-shop-use-supertool", "&eYou break the shop by use SuperTool.");
-      messagei18n.set(
-          "no-creative-break",
+      messagei18n.set("no-creative-break",
           "&cYou cannot break other players shops in creative mode.  Use survival instead or use SuperTool ({0}).");
-      setAndUpdate(
-          "command.now-debuging",
+      setAndUpdate("command.now-debuging",
           "&aSuccessfully switch to developer mode, Reloading QuickShop...");
-      setAndUpdate(
-          "command.now-nolonger-debuging",
+      setAndUpdate("command.now-nolonger-debuging",
           "&aSuccessfully switch to production mode, Reloading QuickShop...");
       setAndUpdate("language-version", 7);
       selectedVersion = 7;
     }
     if (selectedVersion == 7) {
-      setAndUpdate(
-          "failed-to-put-sign", "&cNo enough space around the shop to place infomation sign.");
+      setAndUpdate("failed-to-put-sign",
+          "&cNo enough space around the shop to place infomation sign.");
       setAndUpdate("language-version", 8);
       selectedVersion = 8;
     }
     if (selectedVersion == 8) {
-      messagei18n.set(
-          "failed-to-paste",
+      messagei18n.set("failed-to-paste",
           "&cFailed upload data to Pastebin, Check the internet and try again. (See console for details)");
-      messagei18n.set(
-          "warn-to-paste",
+      messagei18n.set("warn-to-paste",
           "&eCollecting data and upload to Pastebin, this may need a while. &c&lWarning&c, The data is keep public one week, it may leak your server configuration, make sure you only send it to your &ltrusted staff/developer.");
       setAndUpdate("command.description.paste", "&eAuto upload server data to Pastebin");
       setAndUpdate("language-version", 9);
@@ -1121,8 +1029,8 @@ public class MsgUtil {
       setAndUpdate("controlpanel.commands.refill", "/qs refill [Amount]");
       setAndUpdate("controlpanel.commands.empty", "/qs silentempty {0} {1} {2} {3}");
       setAndUpdate("controlpanel.commands.remove", "/qs silentremove {0} {1} {2} {3}");
-      setAndUpdate(
-          "tableformat.full_line", "+---------------------------------------------------+");
+      setAndUpdate("tableformat.full_line",
+          "+---------------------------------------------------+");
       setAndUpdate("tableformat.left_half_line", "+--------------------");
       setAndUpdate("tableformat.right_half_line", "--------------------+");
       setAndUpdate("tableformat.left_begin", "| ");
@@ -1132,21 +1040,21 @@ public class MsgUtil {
       selectedVersion = 10;
     }
     if (selectedVersion == 10) {
-      setAndUpdate(
-          "price-too-high", "&cShop price too high! You can't create price higher than {0} shop.");
+      setAndUpdate("price-too-high",
+          "&cShop price too high! You can't create price higher than {0} shop.");
       setAndUpdate("language-version", 11);
       selectedVersion = 11;
     }
     if (selectedVersion == 11) {
-      setAndUpdate(
-          "unknown-player", "&cTarget player not exist, please check username your typed.");
+      setAndUpdate("unknown-player",
+          "&cTarget player not exist, please check username your typed.");
       setAndUpdate("shop-staff-cleared", "&aSuccessfully remove all staff for your shop.");
       setAndUpdate("shop-staff-added", "&aSuccessfully add {0} to your shop staffs.");
       setAndUpdate("shop-staff-deleted", "&aSuccessfully remove {0} to your shop staffs.");
       setAndUpdate("command.wrong-args", "&cParameters not matched, use /qs help to check help");
       setAndUpdate("command.description.staff", "&eManage your shop staffs.");
-      setAndUpdate(
-          "unknown-player", "&cTarget player not exist, please check username your typed.");
+      setAndUpdate("unknown-player",
+          "&cTarget player not exist, please check username your typed.");
       setAndUpdate("language-version", 12);
       selectedVersion = 12;
     }
@@ -1157,8 +1065,8 @@ public class MsgUtil {
       setAndUpdate("shop-staff-deleted", "&aSuccessfully remove {0} to your shop staffs.");
       setAndUpdate("command.wrong-args", "&cParameters not matched, use /qs help to check help");
       setAndUpdate("command.description.staff", "&eManage your shop staffs.");
-      setAndUpdate(
-          "unknown-player", "&cTarget player not exist, please check username your typed.");
+      setAndUpdate("unknown-player",
+          "&cTarget player not exist, please check username your typed.");
       setAndUpdate("language-version", 13);
       selectedVersion = 13;
     }
@@ -1193,8 +1101,7 @@ public class MsgUtil {
       selectedVersion = 15;
     }
     if (selectedVersion == 15) {
-      setAndUpdate(
-          "purchase-failed",
+      setAndUpdate("purchase-failed",
           "&cPurchase failed: Internal Error, please contact the server administrator..");
       setAndUpdate("language-version", 16);
       selectedVersion = 16;
@@ -1202,8 +1109,7 @@ public class MsgUtil {
     if (selectedVersion == 16) {
       setAndUpdate("command.description.owner", "&eChanges who owns a shop");
       setAndUpdate("command.description.remove", "&eRemove your looking the shop");
-      setAndUpdate(
-          "command.description.amount",
+      setAndUpdate("command.description.amount",
           "&eExecute for your actions with amount(For chat plugin issue)");
       setAndUpdate("command.description.about", "&eShow QuickShop abouts");
       setAndUpdate("command.description.help", "&eShow QuickShop helps");
@@ -1217,25 +1123,22 @@ public class MsgUtil {
       selectedVersion = 18;
     }
     if (selectedVersion == 18) {
-      setAndUpdate(
-          "command.description.supercreate", "&eCreate a shop bypass all protection checks");
+      setAndUpdate("command.description.supercreate",
+          "&eCreate a shop bypass all protection checks");
       setAndUpdate("language-version", 19);
       selectedVersion = 19;
     }
     if (selectedVersion == 19) {
       setAndUpdate("permission-denied-3rd-party", "&cPermission denied: 3rd party plugin [{0}].");
-      setAndUpdate(
-          "updatenotify.remote-disable-warning",
+      setAndUpdate("updatenotify.remote-disable-warning",
           "&cThis version of QuickShop is marked disabled by remote server, that mean this version may have serious problem, get details from our SpigotMC page: {0}. This warning will appear and spam your console until you use other not disabled version to replace this one, doesn't effect your server running.");
       setAndUpdate("language-version", 20);
       selectedVersion = 20;
     }
     if (selectedVersion == 20) {
-      setAndUpdate(
-          "how-many-buy",
+      setAndUpdate("how-many-buy",
           "&aEnter how many you wish to &bBUY&a in chat. Enter &ball&a to buy them all.");
-      setAndUpdate(
-          "how-many-sell",
+      setAndUpdate("how-many-sell",
           "&aEnter how many you wish to &dSELL&a in chat. You have &e{0}&a available. Enter &ball&a to sell them all.");
       setAndUpdate("updatenotify.label.unstable", "[Unstable]");
       setAndUpdate("updatenotify.label.stable", "[Stable]");
@@ -1248,8 +1151,7 @@ public class MsgUtil {
       selectedVersion = 21;
     }
     if (selectedVersion == 21) {
-      setAndUpdate(
-          "shop-removed-cause-ongoing-fee",
+      setAndUpdate("shop-removed-cause-ongoing-fee",
           "&cYou shop at {0} was removed cause you had no enough money to keep it!");
       setAndUpdate("language-version", 22);
       selectedVersion = 22;
@@ -1267,8 +1169,7 @@ public class MsgUtil {
       selectedVersion = 24;
     }
     if (selectedVersion == 24) {
-      setAndUpdate(
-          "digits-reach-the-limit",
+      setAndUpdate("digits-reach-the-limit",
           "&cYou have reach the limit of the digits after the dot in price.");
       setAndUpdate("language-version", 25);
       selectedVersion = 25;
@@ -1292,8 +1193,8 @@ public class MsgUtil {
     }
     Object objFromBuiltIn = builtInDefaultLanguage.get(path); // Apply english default
     if (objFromBuiltIn == null) {
-      objFromBuiltIn =
-          object; // Apply hard-code default, maybe a language file i forgotten update??
+      objFromBuiltIn = object; // Apply hard-code default, maybe a language file i forgotten
+                               // update??
     }
     messagei18n.set(path, objFromBuiltIn);
   }

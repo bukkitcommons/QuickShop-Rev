@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is LockListener.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is LockListener.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Listeners;
@@ -49,7 +46,8 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 @AllArgsConstructor
 public class LockListener implements Listener {
 
-  @NotNull private final QuickShop plugin;
+  @NotNull
+  private final QuickShop plugin;
 
   @EventHandler(ignoreCancelled = true)
   public void invEvent(InventoryMoveItemEvent e) {
@@ -118,8 +116,7 @@ public class LockListener implements Listener {
       if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
           || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
         // Ignore break lockette sign
-        plugin
-            .getLogger()
+        plugin.getLogger()
             .info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
         return;
       }
@@ -205,27 +202,16 @@ public class LockListener implements Listener {
       e.setCancelled(true);
     }
   }
-  /* Moved to ShopProtectionListener
-   * Handles shops breaking through explosions
-  @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-  public void onExplode(EntityExplodeEvent e) {
-      for (int i = 0; i < e.blockList().size(); i++) {
-          Block b = e.blockList().get(i);
-          Shop shop = plugin.getShopManager().getShop(b.getLocation());
-          if (shop != null) {
-              e.blockList().remove(b); //Protect shop
-          }
-          if (Util.isWallSign(b.getType())) {
-              Block block = Util.getAttached(b);
-              if (block != null) {
-                  shop = plugin.getShopManager().getShop(block.getLocation());
-                  if (shop != null) {
-                      e.blockList().remove(b); //Protect shop
-                  }
-              }
-          }
-      }
-  }
+  /*
+   * Moved to ShopProtectionListener Handles shops breaking through explosions
+   * 
+   * @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true) public void
+   * onExplode(EntityExplodeEvent e) { for (int i = 0; i < e.blockList().size(); i++) { Block b =
+   * e.blockList().get(i); Shop shop = plugin.getShopManager().getShop(b.getLocation()); if (shop !=
+   * null) { e.blockList().remove(b); //Protect shop } if (Util.isWallSign(b.getType())) { Block
+   * block = Util.getAttached(b); if (block != null) { shop =
+   * plugin.getShopManager().getShop(block.getLocation()); if (shop != null) {
+   * e.blockList().remove(b); //Protect shop } } } } }
    */
 
   /*

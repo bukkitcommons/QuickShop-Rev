@@ -7,9 +7,11 @@ import org.jetbrains.annotations.NotNull;
 
 public final class StringOf {
 
-  @NotNull private final Location location;
+  @NotNull
+  private final Location location;
 
-  @NotNull private final World world;
+  @NotNull
+  private final World world;
 
   public StringOf(@NotNull Location location) {
     if (location.getWorld() == null) {
@@ -24,9 +26,8 @@ public final class StringOf {
   public String asString() {
     String s = world.getName() + ":";
 
-    s +=
-        String.format(
-            Locale.ENGLISH, "%.2f,%.2f,%.2f", location.getX(), location.getY(), location.getZ());
+    s += String.format(Locale.ENGLISH, "%.2f,%.2f,%.2f", location.getX(), location.getY(),
+        location.getZ());
 
     if (location.getYaw() != 0f || location.getPitch() != 0f) {
       s += String.format(Locale.ENGLISH, ":%.2f:%.2f", location.getYaw(), location.getPitch());

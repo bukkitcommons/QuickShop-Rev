@@ -8,35 +8,25 @@ import org.jetbrains.annotations.NotNull;
 
 public final class YAMLFile extends FileEnvelope {
 
-  public YAMLFile(
-      @NotNull final Plugin plugin,
-      @NotNull final File file,
-      @NotNull final String resourcePath,
-      boolean loadDefault) {
-    super(
-        plugin,
-        file,
-        resourcePath.endsWith(".yml") ? resourcePath : resourcePath + ".yml",
+  public YAMLFile(@NotNull final Plugin plugin, @NotNull final File file,
+      @NotNull final String resourcePath, boolean loadDefault) {
+    super(plugin, file, resourcePath.endsWith(".yml") ? resourcePath : resourcePath + ".yml",
         loadDefault);
   }
 
-  public YAMLFile(
-      @NotNull final Plugin plugin, @NotNull final File file, @NotNull final String resourcePath) {
+  public YAMLFile(@NotNull final Plugin plugin, @NotNull final File file,
+      @NotNull final String resourcePath) {
     super(plugin, file, resourcePath.endsWith(".yml") ? resourcePath : resourcePath + ".yml", true);
   }
 
-  public YAMLFile(
-      @NotNull final Plugin plugin,
-      @NotNull final String resourcePath,
+  public YAMLFile(@NotNull final Plugin plugin, @NotNull final String resourcePath,
       @NotNull final String fileName) {
-    this(
-        plugin,
+    this(plugin,
         new File(
             plugin.getDataFolder().getAbsolutePath()
                 + (resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath),
             fileName.endsWith(".yml") ? fileName : fileName + ".yml"),
-        resourcePath.isEmpty()
-            ? fileName
+        resourcePath.isEmpty() ? fileName
             : resourcePath.endsWith("/") ? resourcePath + fileName : resourcePath + "/" + fileName);
   }
 

@@ -20,7 +20,8 @@ import org.jetbrains.annotations.NotNull;
 @SerializableAs("set")
 public class SerializableSet implements Set, ConfigurationSerializable {
 
-  @NotNull private final Set backingSet;
+  @NotNull
+  private final Set backingSet;
 
   public SerializableSet(@NotNull Set backingSet) {
     this.backingSet = backingSet;

@@ -9,36 +9,26 @@ import org.maxgamer.quickshop.utils.json.JSONConfiguration;
 
 public final class JSONFile extends FileEnvelope {
 
-  public JSONFile(
-      @NotNull final Plugin plugin,
-      @NotNull final File file,
-      @NotNull final String resourcePath,
-      boolean loadDefault) {
-    super(
-        plugin,
-        file,
-        resourcePath.endsWith(".json") ? resourcePath : resourcePath + ".json",
+  public JSONFile(@NotNull final Plugin plugin, @NotNull final File file,
+      @NotNull final String resourcePath, boolean loadDefault) {
+    super(plugin, file, resourcePath.endsWith(".json") ? resourcePath : resourcePath + ".json",
         loadDefault);
   }
 
-  public JSONFile(
-      @NotNull final Plugin plugin, @NotNull final File file, @NotNull final String resourcePath) {
-    super(
-        plugin, file, resourcePath.endsWith(".json") ? resourcePath : resourcePath + ".json", true);
+  public JSONFile(@NotNull final Plugin plugin, @NotNull final File file,
+      @NotNull final String resourcePath) {
+    super(plugin, file, resourcePath.endsWith(".json") ? resourcePath : resourcePath + ".json",
+        true);
   }
 
-  public JSONFile(
-      @NotNull final Plugin plugin,
-      @NotNull final String resourcePath,
+  public JSONFile(@NotNull final Plugin plugin, @NotNull final String resourcePath,
       @NotNull final String fileName) {
-    this(
-        plugin,
+    this(plugin,
         new File(
             plugin.getDataFolder().getAbsolutePath()
                 + (resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath),
             fileName.endsWith(".json") ? fileName : fileName + ".json"),
-        resourcePath.isEmpty()
-            ? fileName
+        resourcePath.isEmpty() ? fileName
             : resourcePath.endsWith("/") ? resourcePath + fileName : resourcePath + "/" + fileName);
   }
 
@@ -50,9 +40,8 @@ public final class JSONFile extends FileEnvelope {
   public void reload() {
     fileConfiguration = JSONConfiguration.loadConfiguration(file);
     if (loadDefault) {
-      fileConfiguration.setDefaults(
-          JSONConfiguration.loadConfiguration(
-              new InputStreamReader(getInputStream(), StandardCharsets.UTF_8)));
+      fileConfiguration.setDefaults(JSONConfiguration
+          .loadConfiguration(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8)));
     }
   }
 }

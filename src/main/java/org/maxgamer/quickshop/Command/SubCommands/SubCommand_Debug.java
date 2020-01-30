@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is SubCommand_Debug.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is SubCommand_Debug.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Command.SubCommands;
@@ -42,8 +39,8 @@ public class SubCommand_Debug implements CommandProcesser {
 
   @NotNull
   @Override
-  public List<String> onTabComplete(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
     list.add("debug");
@@ -56,8 +53,8 @@ public class SubCommand_Debug implements CommandProcesser {
   }
 
   @Override
-  public void onCommand(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     if (cmdArg.length < 1) {
       switchDebug(sender);
       return;
@@ -84,17 +81,17 @@ public class SubCommand_Debug implements CommandProcesser {
         sender.sendMessage(
             ChatColor.GOLD + "Arguments: " + ChatColor.AQUA + Util.list2String(arguments));
         sender.sendMessage(ChatColor.GOLD + "Name: " + ChatColor.AQUA + runtimeMxBean.getName());
-        sender.sendMessage(
-            ChatColor.GOLD + "VM Name: " + ChatColor.AQUA + runtimeMxBean.getVmName());
-        sender.sendMessage(
-            ChatColor.GOLD + "Uptime: " + ChatColor.AQUA + runtimeMxBean.getUptime());
+        sender
+            .sendMessage(ChatColor.GOLD + "VM Name: " + ChatColor.AQUA + runtimeMxBean.getVmName());
+        sender
+            .sendMessage(ChatColor.GOLD + "Uptime: " + ChatColor.AQUA + runtimeMxBean.getUptime());
         sender.sendMessage(
             ChatColor.GOLD + "JVM Ver: " + ChatColor.AQUA + runtimeMxBean.getVmVersion());
         Map<String, String> sys = runtimeMxBean.getSystemProperties();
         List<String> sysData = new ArrayList<>();
         sys.keySet().forEach(key -> sysData.add(key + "=" + sys.get(key)));
-        sender.sendMessage(
-            ChatColor.GOLD + "Sys Pro: " + ChatColor.AQUA + Util.list2String(sysData));
+        sender
+            .sendMessage(ChatColor.GOLD + "Sys Pro: " + ChatColor.AQUA + Util.list2String(sysData));
         break;
       default:
         sender.sendMessage("Error, no correct args given.");
@@ -127,13 +124,8 @@ public class SubCommand_Debug implements CommandProcesser {
       final HandlerList list = (HandlerList) method.invoke(null, obj);
 
       for (RegisteredListener listener1 : list.getRegisteredListeners()) {
-        sender.sendMessage(
-            ChatColor.AQUA
-                + listener1.getPlugin().getName()
-                + ChatColor.YELLOW
-                + " # "
-                + ChatColor.GREEN
-                + listener1.getListener().getClass().getCanonicalName());
+        sender.sendMessage(ChatColor.AQUA + listener1.getPlugin().getName() + ChatColor.YELLOW
+            + " # " + ChatColor.GREEN + listener1.getListener().getClass().getCanonicalName());
       }
     } catch (Throwable th) {
       sender.sendMessage("ERR " + th.getMessage());

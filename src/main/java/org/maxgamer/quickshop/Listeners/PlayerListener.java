@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is PlayerListener.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is PlayerListener.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Listeners;
@@ -59,7 +56,8 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 @AllArgsConstructor
 public class PlayerListener implements Listener {
 
-  @NotNull private final QuickShop plugin;
+  @NotNull
+  private final QuickShop plugin;
 
   @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
   public void onClick(PlayerInteractEvent e) {
@@ -77,21 +75,18 @@ public class PlayerListener implements Listener {
 
         if (plugin.getShopManager().getShop(Objects.requireNonNull(block).getLocation()) != null
             && (Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation()))
-                    .getOwner()
-                    .equals(e.getPlayer().getUniqueId())
-                || e.getPlayer().isOp())) {
+                .getOwner().equals(e.getPlayer().getUniqueId()) || e.getPlayer().isOp())) {
           if (plugin.getConfig().getBoolean("shop.sneak-to-control")
               && !e.getPlayer().isSneaking()) {
             return;
           }
 
           if (BaseConfig.clickSound) {
-            e.getPlayer()
-                .playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
+            e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f,
+                1.0f);
           }
 
-          MsgUtil.sendControlPanelInfo(
-              e.getPlayer(),
+          MsgUtil.sendControlPanelInfo(e.getPlayer(),
               Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation())));
           Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation()))
               .setSignText();
@@ -149,8 +144,8 @@ public class PlayerListener implements Listener {
       shop.onClick();
 
       if (plugin.getConfig().getBoolean("effect.sound.onclick")) {
-        e.getPlayer()
-            .playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
+        e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f,
+            1.0f);
       }
       // Text menu
       MsgUtil.sendShopInfo(p, shop);
@@ -161,9 +156,8 @@ public class PlayerListener implements Listener {
       final double money = plugin.getEconomy().getBalance(p.getUniqueId());
 
       if (shop.isSelling()) {
-        int itemAmount =
-            Math.min(
-                Util.countSpace(p.getInventory(), shop.getItem()), (int) Math.floor(money / price));
+        int itemAmount = Math.min(Util.countSpace(p.getInventory(), shop.getItem()),
+            (int) Math.floor(money / price));
 
         if (!shop.isUnlimited()) {
           itemAmount = Math.min(itemAmount, shop.getRemainingStock());
@@ -203,9 +197,7 @@ public class PlayerListener implements Listener {
       actions.put(p.getUniqueId(), info);
     }
     // Handles creating shops
-    else if (e.useInteractedBlock() == Result.ALLOW
-        && shop == null
-        && item != null
+    else if (e.useInteractedBlock() == Result.ALLOW && shop == null && item != null
         && item.getType() != Material.AIR
         && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.sell")
         && p.getGameMode() != GameMode.CREATIVE) {
@@ -224,9 +216,8 @@ public class PlayerListener implements Listener {
         return;
       }
 
-      if (Util.isBlacklisted(item)
-          && !QuickShop.getPermissionManager()
-              .hasPermission(p, "quickshop.bypass." + item.getType().name())) {
+      if (Util.isBlacklisted(item) && !QuickShop.getPermissionManager().hasPermission(p,
+          "quickshop.bypass." + item.getType().name())) {
         p.sendMessage(MsgUtil.getMessage("blacklisted-item", p));
         return;
       }
@@ -235,11 +226,10 @@ public class PlayerListener implements Listener {
           && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.enderchest")) {
         return;
       }
-      /*if (!Util.canBeShop(b)) {
-          Util.debugLog("Can be shop check failed.");
-          return;
-      }
-      Already checked above*/
+      /*
+       * if (!Util.canBeShop(b)) { Util.debugLog("Can be shop check failed."); return; } Already
+       * checked above
+       */
 
       if (Util.isWallSign(b.getType())) {
         Util.debugLog("WallSign check failed.");
@@ -266,19 +256,18 @@ public class PlayerListener implements Listener {
       final Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
 
       plugin.getShopManager().getActions().put(p.getUniqueId(), info);
-      p.sendMessage(
-          MsgUtil.getMessage(
-              "how-much-to-trade-for",
-              p,
-              Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
+      p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", p,
+          Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
     }
   }
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onInventoryClose(InventoryCloseEvent e) {
 
-    @Nullable Inventory inventory = e.getInventory(); // Possibly wrong tag
-    @Nullable Location location = null;
+    @Nullable
+    Inventory inventory = e.getInventory(); // Possibly wrong tag
+    @Nullable
+    Location location = null;
 
     try {
       // This will cause NPE when the internal getLocation method
@@ -288,11 +277,13 @@ public class PlayerListener implements Listener {
       return; // ignored as workaround, GH-303
     }
 
-    if (location == null) return;
+    if (location == null)
+      return;
 
     final Shop shop = plugin.getShopManager().getShopIncludeAttached(location);
 
-    if (shop != null) shop.setSignText();
+    if (shop != null)
+      shop.setSignText();
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -348,8 +339,7 @@ public class PlayerListener implements Listener {
 
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void onDyeing(PlayerInteractEvent e) {
-    if (e.getAction() != Action.RIGHT_CLICK_BLOCK
-        || e.getItem() == null
+    if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null
         || !Util.isDyes(e.getItem().getType())) {
       return;
     }

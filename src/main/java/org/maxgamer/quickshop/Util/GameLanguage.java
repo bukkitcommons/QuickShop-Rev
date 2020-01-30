@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is GameLanguage.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is GameLanguage.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Util;
@@ -57,18 +54,16 @@ public class GameLanguage extends Thread {
         if (count >= 20) {
           Util.debugLog(
               "No longer waiting file downloading because it now timed out, now downloading in background.");
-          QuickShop.instance
-              .getLogger()
-              .info(
-                  "No longer waiting file downloading because it now timed out, now downloading in background, please reset itemi18n.yml, potioni18n.yml and enchi18n.yml after download completed.");
+          QuickShop.instance.getLogger().info(
+              "No longer waiting file downloading because it now timed out, now downloading in background, please reset itemi18n.yml, potioni18n.yml and enchi18n.yml after download completed.");
         }
       } else {
         break;
       }
     }
     this.lang = loadThread.getLang(); // Get the Lang whatever thread running or died.
-    loadThread.setMainThreadWaiting(
-        false); // Told thread it now move to background, thread should told user reset files.
+    loadThread.setMainThreadWaiting(false); // Told thread it now move to background, thread should
+                                            // told user reset files.
   }
 
   public void loadLimited(@NotNull String languageCode) {
@@ -80,7 +75,10 @@ public class GameLanguage extends Thread {
       YamlConfiguration yamlConfiguration = new YamlConfiguration();
       yamlConfiguration.load(new File(Util.getCacheFolder(), "lang.cache"));
       boolean needUpdateCache = false;
-      /* The cache data, if it all matches, we doesn't need connect to internet to download files again. */
+      /*
+       * The cache data, if it all matches, we doesn't need connect to internet to download files
+       * again.
+       */
       String cachingServerVersion = yamlConfiguration.getString("ver");
       String cachingLanguageHash = yamlConfiguration.getString("hash");
       String cachingLanguageName = yamlConfiguration.getString("lang");
@@ -116,24 +114,18 @@ public class GameLanguage extends Thread {
                   .accept(new ByteArrayInputStream(langJson.getBytes(StandardCharsets.UTF_8)));
             } else {
               Util.debugLog("Cannot download file.");
-              QuickShop.instance
-                  .getLogger()
-                  .warning(
-                      "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
+              QuickShop.instance.getLogger().warning(
+                  "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
           } else {
             Util.debugLog("Cannot get file hash for language " + languageCode1);
-            QuickShop.instance
-                .getLogger()
-                .warning(
-                    "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
+            QuickShop.instance.getLogger().warning(
+                "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
           }
         } else {
           Util.debugLog("Cannot get version json.");
-          QuickShop.instance
-              .getLogger()
-              .warning(
-                  "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
+          QuickShop.instance.getLogger().warning(
+              "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
         }
       }
       yamlConfiguration.set("ver", cachingServerVersion);
@@ -277,6 +269,7 @@ public class GameLanguage extends Thread {
   }
 }
 
+
 @Getter
 @Setter
 class GameLanguageLoadThread extends Thread {
@@ -293,7 +286,10 @@ class GameLanguageLoadThread extends Thread {
       YamlConfiguration yamlConfiguration = new YamlConfiguration();
       yamlConfiguration.load(new File(Util.getCacheFolder(), "lang.cache"));
       boolean needUpdateCache = false;
-      /* The cache data, if it all matches, we doesn't need connect to internet to download files again. */
+      /*
+       * The cache data, if it all matches, we doesn't need connect to internet to download files
+       * again.
+       */
       String cachingServerVersion = yamlConfiguration.getString("ver");
       String cachingLanguageHash = yamlConfiguration.getString("hash");
       String cachingLanguageName = yamlConfiguration.getString("lang");
@@ -329,24 +325,18 @@ class GameLanguageLoadThread extends Thread {
                   .accept(new ByteArrayInputStream(langJson.getBytes(StandardCharsets.UTF_8)));
             } else {
               Util.debugLog("Cannot download file.");
-              QuickShop.instance
-                  .getLogger()
-                  .warning(
-                      "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
+              QuickShop.instance.getLogger().warning(
+                  "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
           } else {
             Util.debugLog("Cannot get file hash for language " + languageCode1);
-            QuickShop.instance
-                .getLogger()
-                .warning(
-                    "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
+            QuickShop.instance.getLogger().warning(
+                "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
           }
         } else {
           Util.debugLog("Cannot get version json.");
-          QuickShop.instance
-              .getLogger()
-              .warning(
-                  "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
+          QuickShop.instance.getLogger().warning(
+              "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
         }
       }
       yamlConfiguration.set("ver", cachingServerVersion);
@@ -369,10 +359,8 @@ class GameLanguageLoadThread extends Thread {
       e.printStackTrace();
     }
     if (!this.mainThreadWaiting) {
-      QuickShop.instance
-          .getLogger()
-          .info(
-              "Download completed, please execute /qs reset lang to generate localized language files.");
+      QuickShop.instance.getLogger().info(
+          "Download completed, please execute /qs reset lang to generate localized language files.");
     }
   }
 }

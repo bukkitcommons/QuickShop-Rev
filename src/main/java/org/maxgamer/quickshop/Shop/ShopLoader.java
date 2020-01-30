@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is ShopLoader.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is ShopLoader.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Shop;
@@ -53,8 +50,10 @@ public class ShopLoader {
   private QuickShop plugin;
   private int totalLoaded = 0;
   /* This may contains broken shop, must use null check before load it. */
-  @Getter private List<Shop> shopsInDatabase = new ArrayList<>();
-  @Getter private List<ShopDatabaseInfoOrigin> originShopsInDatabase = new ArrayList<>();
+  @Getter
+  private List<Shop> shopsInDatabase = new ArrayList<>();
+  @Getter
+  private List<ShopDatabaseInfoOrigin> originShopsInDatabase = new ArrayList<>();
 
   /**
    * The shop load allow plugin load shops fast and simply.
@@ -119,8 +118,7 @@ public class ShopLoader {
       this.plugin.getLogger().info("Loading shops from the database...");
       Timer fetchTimer = new Timer(true);
       ResultSet rs = plugin.getDatabaseHelper().selectAllShops();
-      this.plugin
-          .getLogger()
+      this.plugin.getLogger()
           .info("Used " + fetchTimer.endTimer() + "ms to fetch all shops from the database.");
       while (rs.next()) {
         Timer singleShopLoadTimer = new Timer(true);
@@ -131,14 +129,8 @@ public class ShopLoader {
           continue;
         }
         ShopDatabaseInfo data = new ShopDatabaseInfo(origin);
-        Shop shop =
-            new ContainerShop(
-                data.getLocation(),
-                data.getPrice(),
-                data.getItem(),
-                data.getModerators(),
-                data.isUnlimited(),
-                data.getType());
+        Shop shop = new ContainerShop(data.getLocation(), data.getPrice(), data.getItem(),
+            data.getModerators(), data.isUnlimited(), data.getType());
         shopsInDatabase.add(shop);
         this.costCalc(singleShopLoadTimer);
         if (shopNullCheck(shop)) {
@@ -158,13 +150,9 @@ public class ShopLoader {
             if (!backupedDatabaseInDeleteProcess) { // Only backup db one time.
               backupedDatabaseInDeleteProcess = Util.backupDatabase();
             } else {
-              plugin
-                  .getDatabaseHelper()
-                  .removeShop(
-                      shop.getLocation().getBlockX(),
-                      shop.getLocation().getBlockY(),
-                      shop.getLocation().getBlockZ(),
-                      Objects.requireNonNull(shop.getLocation().getWorld()).getName());
+              plugin.getDatabaseHelper().removeShop(shop.getLocation().getBlockX(),
+                  shop.getLocation().getBlockY(), shop.getLocation().getBlockZ(),
+                  Objects.requireNonNull(shop.getLocation().getWorld()).getName());
             }
             singleShopLoaded(singleShopLoadTimer);
             continue;
@@ -178,23 +166,11 @@ public class ShopLoader {
       }
       long totalUsedTime = totalLoadTimer.endTimer();
       long avgPerShop = mean(loadTimes.toArray(new Long[0]));
-      this.plugin
-          .getLogger()
-          .info(
-              "Successfully loaded "
-                  + totalLoaded
-                  + " shops! (Used "
-                  + totalUsedTime
-                  + "ms, Avg "
-                  + avgPerShop
-                  + "ms per shop)");
-      this.plugin
-          .getLogger()
-          .info(
-              this.loadAfterChunkLoaded
-                  + " shops will load after chunk have loaded, "
-                  + this.loadAfterWorldLoaded
-                  + " shops will load after the world has loaded.");
+      this.plugin.getLogger().info("Successfully loaded " + totalLoaded + " shops! (Used "
+          + totalUsedTime + "ms, Avg " + avgPerShop + "ms per shop)");
+      this.plugin.getLogger()
+          .info(this.loadAfterChunkLoaded + " shops will load after chunk have loaded, "
+              + this.loadAfterWorldLoaded + " shops will load after the world has loaded.");
     } catch (Exception e) {
       exceptionHandler(e, null);
     }
@@ -294,10 +270,8 @@ public class ShopLoader {
         return Util.deserialize(itemConfig);
       } catch (InvalidConfigurationException e) {
         e.printStackTrace();
-        plugin
-            .getLogger()
-            .warning(
-                "Failed load shop data, because target config can't deserialize the ItemStack.");
+        plugin.getLogger().warning(
+            "Failed load shop data, because target config can't deserialize the ItemStack.");
         Util.debugLog("Failed to load data to the ItemStack: " + itemConfig);
         return null;
       }

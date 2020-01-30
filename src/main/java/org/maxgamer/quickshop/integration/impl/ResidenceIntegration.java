@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is ResidenceIntegration.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is ResidenceIntegration.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.integration.impl;
@@ -53,25 +50,20 @@ public class ResidenceIntegration implements IntegratedPlugin {
       if ("FLAG".equalsIgnoreCase(limit)) {
         if (residence == null) {
           // Check world permission
-          if (!Residence.getInstance()
-              .getWorldFlags()
-              .getPerms(location.getWorld().getName())
+          if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
               .playerHas(player, Flags.getFlag("quickshop-create"), false)) {
             return false;
           }
         } else {
-          if (!residence
-              .getPermissions()
-              .playerHas(player, Flags.getFlag("quickshop-create"), false)) {
+          if (!residence.getPermissions().playerHas(player, Flags.getFlag("quickshop-create"),
+              false)) {
             return false;
           }
         }
       }
       // Not flag
       if (residence == null) {
-        if (!Residence.getInstance()
-            .getWorldFlags()
-            .getPerms(location.getWorld().getName())
+        if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
             .playerHas(player, Flags.getFlag(limit), false)) {
           return false;
         }
@@ -92,25 +84,20 @@ public class ResidenceIntegration implements IntegratedPlugin {
       if ("FLAG".equalsIgnoreCase(limit)) {
         if (residence == null) {
           // Check world permission
-          if (!Residence.getInstance()
-              .getWorldFlags()
-              .getPerms(location.getWorld().getName())
+          if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
               .playerHas(player, Flags.getFlag("quickshop-trade"), false)) {
             return false;
           }
         } else {
-          if (!residence
-              .getPermissions()
-              .playerHas(player, Flags.getFlag("quickshop-trade"), true)) {
+          if (!residence.getPermissions().playerHas(player, Flags.getFlag("quickshop-trade"),
+              true)) {
             return false;
           }
         }
       }
       // Not flag
       if (residence == null) {
-        if (!Residence.getInstance()
-            .getWorldFlags()
-            .getPerms(location.getWorld().getName())
+        if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
             .playerHas(player, Flags.getFlag(limit), false)) {
           return false;
         }

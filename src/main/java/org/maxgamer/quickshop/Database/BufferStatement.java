@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is BufferStatement.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is BufferStatement.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Database;
@@ -28,9 +25,11 @@ import org.maxgamer.quickshop.Util.Util;
 
 public class BufferStatement {
 
-  @NotNull private final String query;
+  @NotNull
+  private final String query;
 
-  @NotNull private final Object[] values;
+  @NotNull
+  private final Object[] values;
 
   /**
    * Represents a PreparedStatement in a state before preparing it (E.g. No file I/O Required)
@@ -48,7 +47,8 @@ public class BufferStatement {
    * Returns a prepared statement using the given connection. Will try to return an empty statement
    * if something went wrong. If that fails, returns null.
    *
-   * <p>This method escapes everything automatically.
+   * <p>
+   * This method escapes everything automatically.
    *
    * @param con The connection to prepare this on using con.prepareStatement(..)
    * @return The prepared statement, ready for execution.
@@ -66,7 +66,7 @@ public class BufferStatement {
 
   /**
    * @return A string representation of this statement. Returns "Query: " + query + ", values: " +
-   *     Arrays.toString(values).
+   *         Arrays.toString(values).
    */
   @Override
   public String toString() {

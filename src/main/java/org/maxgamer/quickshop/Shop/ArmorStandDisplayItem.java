@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is ArmorStandDisplayItem.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is ArmorStandDisplayItem.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Shop;
@@ -59,7 +56,7 @@ public class ArmorStandDisplayItem implements DisplayItem {
   ArmorStandDisplayItem(@NotNull Shop shop) {
     this(shop, new DisplayData(DisplayType.ARMORSTAND, false, false));
   }
-    
+
   ArmorStandDisplayItem(@NotNull Shop shop, @NotNull DisplayData data) {
     this.shop = shop;
     this.originalItemStack = new ItemStack(shop.getItem());
@@ -102,7 +99,7 @@ public class ArmorStandDisplayItem implements DisplayItem {
               trace.getClassName() + "#" + trace.getMethodName() + "#" + trace.getLineNumber());
         }
       }
-      
+
       ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
           new ShopDisplayItemSpawnEvent(shop, originalItemStack, DisplayType.ARMORSTAND);
       Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
@@ -111,59 +108,57 @@ public class ArmorStandDisplayItem implements DisplayItem {
             "Canceled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
         return;
       }
-      
+
       Location location = getDisplayLocation();
-      this.armorStand =
-          (ArmorStand)
-              this.shop
-                  .getLocation()
-                  .getWorld().spawn(location, ArmorStand.class, armorStand -> {
-                    // Set basic armorstand datas.
-                    armorStand.setGravity(false);
-                    armorStand.setVisible(false);
-                    armorStand.setMarker(true);
-                    armorStand.setCollidable(false);
-                    armorStand.setSmall(getAttribute(DisplayAttribute.SMALL, true));
-                    armorStand.setArms(false);
-                    armorStand.setBasePlate(false);
-                    armorStand.setSilent(true);
-                    armorStand.setAI(false);
-                    armorStand.setCanMove(false);
-                    armorStand.setCanPickupItems(false);
-                    // Set pose
-                    setPoseForArmorStand(armorStand);
-                  });
+      this.armorStand = (ArmorStand) this.shop.getLocation().getWorld().spawn(location,
+          ArmorStand.class, armorStand -> {
+            // Set basic armorstand datas.
+            armorStand.setGravity(false);
+            armorStand.setVisible(false);
+            armorStand.setMarker(true);
+            armorStand.setCollidable(false);
+            armorStand.setSmall(getAttribute(DisplayAttribute.SMALL, true));
+            armorStand.setArms(false);
+            armorStand.setBasePlate(false);
+            armorStand.setSilent(true);
+            armorStand.setAI(false);
+            armorStand.setCanMove(false);
+            armorStand.setCanPickupItems(false);
+            // Set pose
+            setPoseForArmorStand(armorStand);
+          });
       // Set safeGuard
-      Util.debugLog("Spawned armor stand @ " + this.armorStand.getLocation() + " with UUID " + this.armorStand.getUniqueId());
+      Util.debugLog("Spawned armor stand @ " + this.armorStand.getLocation() + " with UUID "
+          + this.armorStand.getUniqueId());
       safeGuard(this.armorStand); // Helmet must be set after spawning
     }
   }
-  
+
   @SuppressWarnings("unchecked")
   private <T> T getAttribute(DisplayAttribute attr, T defaultValue) {
     Object value = data.attribute.get(attr);
     if (value == ObjectUtils.NULL || value == null)
       return defaultValue;
     Util.debugLog("Attribute to cast: " + value);
-    
+
     try {
       if (defaultValue instanceof EquipmentSlot) {
         return (T) EquipmentSlot.valueOf(String.class.cast(value));
       }
-      
+
       if (value instanceof Integer) {
         if (defaultValue instanceof Double)
           return (T) Double.valueOf((int) value);
-        
+
         if (defaultValue instanceof Float)
           return (T) Float.valueOf((int) value);
       }
-      
+
       return (T) value;
     } catch (Throwable t) {
-      plugin.getLogger().warning("Error when processing attribute for " +
-          attr.name() + " with unexpected value " +
-          value.toString() + ", please check your config before reporting!");
+      plugin.getLogger()
+          .warning("Error when processing attribute for " + attr.name() + " with unexpected value "
+              + value.toString() + ", please check your config before reporting!");
       t.printStackTrace();
       return defaultValue;
     }
@@ -183,13 +178,10 @@ public class ArmorStandDisplayItem implements DisplayItem {
       ArmorStand eArmorStand = (ArmorStand) entity;
 
       if (!eArmorStand.getUniqueId().equals(this.armorStand.getUniqueId())) {
-        if (DisplayItem.checkIsTargetShopDisplay(
-            eArmorStand.getItem(EquipmentSlot.HAND), this.shop)) {
-          Util.debugLog(
-              "Removing dupes ArmorEntity "
-                  + eArmorStand.getUniqueId()
-                  + " at "
-                  + eArmorStand.getLocation());
+        if (DisplayItem.checkIsTargetShopDisplay(eArmorStand.getItem(EquipmentSlot.HAND),
+            this.shop)) {
+          Util.debugLog("Removing dupes ArmorEntity " + eArmorStand.getUniqueId() + " at "
+              + eArmorStand.getLocation());
           entity.remove();
           removed = true;
         }
@@ -210,12 +202,9 @@ public class ArmorStandDisplayItem implements DisplayItem {
     this.guardedIstack = DisplayItem.createGuardItemStack(this.originalItemStack, this.shop);
     armorStand.setItem(getAttribute(DisplayAttribute.SLOT, EquipmentSlot.HEAD), guardedIstack);
     try {
-      armorStand
-          .getPersistentDataContainer()
-          .set(
-              new NamespacedKey(plugin, "displayMark"),
-              DisplayItemPersistentDataType.INSTANCE,
-              DisplayItem.createShopProtectionFlag(this.originalItemStack, shop));
+      armorStand.getPersistentDataContainer().set(new NamespacedKey(plugin, "displayMark"),
+          DisplayItemPersistentDataType.INSTANCE,
+          DisplayItem.createShopProtectionFlag(this.originalItemStack, shop));
     } catch (Throwable ignored) {
     }
   }
@@ -250,13 +239,16 @@ public class ArmorStandDisplayItem implements DisplayItem {
     BlockFace containerBlockFace = BlockFace.NORTH; // Set default vaule
     if (this.shop.getLocation().getBlock().getBlockData() instanceof Directional) {
       containerBlockFace =
-          ((Directional) this.shop.getLocation().getBlock().getBlockData())
-              .getFacing(); // Replace by container face.
+          ((Directional) this.shop.getLocation().getBlock().getBlockData()).getFacing(); // Replace
+                                                                                         // by
+                                                                                         // container
+                                                                                         // face.
     }
-    
+
     // Fix specific block facing
     Material type = this.shop.getLocation().getBlock().getType();
-    if (type.name().contains("ANVIL") || type.name().contains("FENCE") || type.name().contains("WALL") ) {
+    if (type.name().contains("ANVIL") || type.name().contains("FENCE")
+        || type.name().contains("WALL")) {
       switch (containerBlockFace) {
         case SOUTH:
           containerBlockFace = BlockFace.WEST;
@@ -271,14 +263,14 @@ public class ArmorStandDisplayItem implements DisplayItem {
           break;
       }
     }
-    
+
     Location asloc = getCenter(this.shop.getLocation());
     Util.debugLog("containerBlockFace " + containerBlockFace);
-    
+
     if (this.originalItemStack.getType().isBlock()) {
       asloc.add(0, 0.5, 0);
     }
-    
+
     switch (containerBlockFace) {
       case SOUTH:
         asloc.add(0, -0.5, 0);
@@ -303,53 +295,43 @@ public class ArmorStandDisplayItem implements DisplayItem {
       default:
         break;
     }
-    
+
     asloc.setYaw(asloc.getYaw() + getAttribute(DisplayAttribute.OFFSET_YAW, 0f));
     asloc.setPitch(asloc.getYaw() + getAttribute(DisplayAttribute.OFFSET_PITCH, 0f));
-    asloc.add(
-        getAttribute(DisplayAttribute.OFFSET_X, 0d),
-        getAttribute(DisplayAttribute.OFFSET_Y, 0d),
-        getAttribute(DisplayAttribute.OFFSET_Z, 0d));
-    
+    asloc.add(getAttribute(DisplayAttribute.OFFSET_X, 0d),
+        getAttribute(DisplayAttribute.OFFSET_Y, 0d), getAttribute(DisplayAttribute.OFFSET_Z, 0d));
+
     return asloc;
   }
-  
+
   public Location getCenter(Location loc) {
     // This is always '+' instead of '-' even in negative pos
-    return new Location(loc.getWorld(),
-        loc.getBlockX() + .5,
-        loc.getBlockY() + .5,
+    return new Location(loc.getWorld(), loc.getBlockX() + .5, loc.getBlockY() + .5,
         loc.getBlockZ() + .5);
   }
 
   private void setPoseForArmorStand(ArmorStand armorStand) {
-    armorStand.setBodyPose(new EulerAngle(
-        getAttribute(DisplayAttribute.POSE_BODY_X, 0d),
+    armorStand.setBodyPose(new EulerAngle(getAttribute(DisplayAttribute.POSE_BODY_X, 0d),
         getAttribute(DisplayAttribute.POSE_BODY_Y, 0d),
         getAttribute(DisplayAttribute.POSE_BODY_Z, 0d)));
-    
-    armorStand.setHeadPose(new EulerAngle(
-        getAttribute(DisplayAttribute.POSE_HEAD_X, 0d),
+
+    armorStand.setHeadPose(new EulerAngle(getAttribute(DisplayAttribute.POSE_HEAD_X, 0d),
         getAttribute(DisplayAttribute.POSE_HEAD_Y, 0d),
         getAttribute(DisplayAttribute.POSE_HEAD_Z, 0d)));
-    
-    armorStand.setRightArmPose(new EulerAngle(
-        getAttribute(DisplayAttribute.POSE_ARM_RIGHT_X, 0d),
+
+    armorStand.setRightArmPose(new EulerAngle(getAttribute(DisplayAttribute.POSE_ARM_RIGHT_X, 0d),
         getAttribute(DisplayAttribute.POSE_ARM_RIGHT_Y, 0d),
         getAttribute(DisplayAttribute.POSE_ARM_RIGHT_Z, 0d)));
-    
-    armorStand.setLeftArmPose(new EulerAngle(
-        getAttribute(DisplayAttribute.POSE_ARM_LEFT_X, 0d),
+
+    armorStand.setLeftArmPose(new EulerAngle(getAttribute(DisplayAttribute.POSE_ARM_LEFT_X, 0d),
         getAttribute(DisplayAttribute.POSE_ARM_LEFT_Y, 0d),
         getAttribute(DisplayAttribute.POSE_ARM_LEFT_Z, 0d)));
-    
-    armorStand.setRightLegPose(new EulerAngle(
-        getAttribute(DisplayAttribute.POSE_LEG_RIGHT_X, 0d),
+
+    armorStand.setRightLegPose(new EulerAngle(getAttribute(DisplayAttribute.POSE_LEG_RIGHT_X, 0d),
         getAttribute(DisplayAttribute.POSE_LEG_RIGHT_Y, 0d),
         getAttribute(DisplayAttribute.POSE_LEG_RIGHT_Z, 0d)));
-    
-    armorStand.setLeftLegPose(new EulerAngle(
-        getAttribute(DisplayAttribute.POSE_LEG_LEFT_X, 0d),
+
+    armorStand.setLeftLegPose(new EulerAngle(getAttribute(DisplayAttribute.POSE_LEG_LEFT_X, 0d),
         getAttribute(DisplayAttribute.POSE_LEG_LEFT_Y, 0d),
         getAttribute(DisplayAttribute.POSE_LEG_LEFT_Z, 0d)));
   }
@@ -391,11 +373,8 @@ public class ArmorStandDisplayItem implements DisplayItem {
       }
       ArmorStand eArmorStand = (ArmorStand) entity;
       if (eArmorStand.getUniqueId().equals(Objects.requireNonNull(this.armorStand).getUniqueId())) {
-        Util.debugLog(
-            "Fixing moved ArmorStand displayItem "
-                + eArmorStand.getUniqueId()
-                + " at "
-                + eArmorStand.getLocation());
+        Util.debugLog("Fixing moved ArmorStand displayItem " + eArmorStand.getUniqueId() + " at "
+            + eArmorStand.getLocation());
         eArmorStand.teleport(getDisplayLocation());
         return;
       }

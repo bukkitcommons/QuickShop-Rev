@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is RealDisplayItem.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is RealDisplayItem.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Shop;
@@ -42,8 +39,10 @@ public class RealDisplayItem implements DisplayItem {
 
   private static QuickShop plugin = QuickShop.instance;
   boolean pendingRemoval;
-  @Nullable private ItemStack guardedIstack;
-  @Nullable private Item item;
+  @Nullable
+  private ItemStack guardedIstack;
+  @Nullable
+  private Item item;
   private ItemStack originalItemStack;
   private Shop shop;
 
@@ -67,8 +66,7 @@ public class RealDisplayItem implements DisplayItem {
     }
     // return !this.item.getLocation().equals(getDisplayLocation());
     /* We give 0.6 block to allow item drop on the chest, not floating on the air. */
-    if (!this.item.getLocation().getWorld()
-        .equals(getDisplayLocation().getWorld())) {
+    if (!this.item.getLocation().getWorld().equals(getDisplayLocation().getWorld())) {
       return true;
     }
     return this.item.getLocation().distance(getDisplayLocation()) > 0.6;
@@ -113,12 +111,8 @@ public class RealDisplayItem implements DisplayItem {
       if (eItem.getUniqueId().equals(Objects.requireNonNull(this.item).getUniqueId())) {
         Util.debugLog(
             "Fixing moved Item displayItem " + eItem.getUniqueId() + " at " + eItem.getLocation());
-        plugin
-            .getBukkitAPIWrapper()
-            .teleportEntity(
-                eItem,
-                getDisplayLocation(),
-                PlayerTeleportEvent.TeleportCause.PLUGIN);
+        plugin.getBukkitAPIWrapper().teleportEntity(eItem, getDisplayLocation(),
+            PlayerTeleportEvent.TeleportCause.PLUGIN);
         return;
       }
     }
@@ -207,7 +201,7 @@ public class RealDisplayItem implements DisplayItem {
       Util.debugLog("Canceled the displayItem spawning because the ItemStack is null.");
       return;
     }
-    
+
     synchronized (this) {
       if (item != null && item.isValid() && !item.isDead()) {
         Util.debugLog(
@@ -218,8 +212,7 @@ public class RealDisplayItem implements DisplayItem {
               trace.getClassName() + "#" + trace.getMethodName() + "#" + trace.getLineNumber());
         }
       }
-      if (!Util.isDisplayAllowBlock(
-          getDisplayLocation().getBlock().getType())) {
+      if (!Util.isDisplayAllowBlock(getDisplayLocation().getBlock().getType())) {
         Util.debugLog(
             "Can't spawn the displayItem because there is not an AIR block above the shopblock.");
         return;
@@ -236,7 +229,8 @@ public class RealDisplayItem implements DisplayItem {
       this.guardedIstack = DisplayItem.createGuardItemStack(this.originalItemStack, this.shop);
       this.item =
           this.shop.getLocation().getWorld().dropItem(getDisplayLocation(), this.guardedIstack);
-      Util.debugLog("Spawned item @ " + this.item.getLocation() + " with UUID " + this.item.getUniqueId());
+      Util.debugLog(
+          "Spawned item @ " + this.item.getLocation() + " with UUID " + this.item.getUniqueId());
       this.item.setItemStack(this.guardedIstack);
       safeGuard(this.item);
     }

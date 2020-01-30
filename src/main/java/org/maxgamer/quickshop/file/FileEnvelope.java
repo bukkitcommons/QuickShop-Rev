@@ -24,17 +24,19 @@ import org.maxgamer.quickshop.utils.location.StringOf;
 @ToString
 public abstract class FileEnvelope implements IFile {
 
-  @NotNull protected final File file;
+  @NotNull
+  protected final File file;
   protected final boolean loadDefault;
-  @NotNull private final Plugin plugin;
-  @NotNull private final Copied copied;
-  @NotNull private final String resourcePath;
-  @NotNull protected FileConfiguration fileConfiguration = new MckFileConfiguration();
+  @NotNull
+  private final Plugin plugin;
+  @NotNull
+  private final Copied copied;
+  @NotNull
+  private final String resourcePath;
+  @NotNull
+  protected FileConfiguration fileConfiguration = new MckFileConfiguration();
 
-  public FileEnvelope(
-      @NotNull Plugin plugin,
-      @NotNull File file,
-      @NotNull String resourcePath,
+  public FileEnvelope(@NotNull Plugin plugin, @NotNull File file, @NotNull String resourcePath,
       boolean loadDefault) {
     this.plugin = plugin;
     this.file = file;

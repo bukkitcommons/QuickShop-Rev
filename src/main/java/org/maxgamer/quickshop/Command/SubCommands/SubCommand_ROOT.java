@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is SubCommand_ROOT.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is SubCommand_ROOT.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.Command.SubCommands;
@@ -34,8 +31,8 @@ public class SubCommand_ROOT implements CommandProcesser {
 
   @NotNull
   @Override
-  public List<String> onTabComplete(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] strings) {
+  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] strings) {
     final List<String> candidate = new ArrayList<>();
 
     for (CommandContainer container : plugin.getCommandManager().getCmds()) {
@@ -48,16 +45,10 @@ public class SubCommand_ROOT implements CommandProcesser {
 
       if (requirePermissions != null) {
         for (String requirePermission : requirePermissions) {
-          if (requirePermission != null
-              && !requirePermission.isEmpty()
+          if (requirePermission != null && !requirePermission.isEmpty()
               && !QuickShop.getPermissionManager().hasPermission(sender, requirePermission)) {
-            Util.debugLog(
-                "Sender "
-                    + sender.getName()
-                    + " trying tab-complete the command: "
-                    + commandLabel
-                    + ", but no permission "
-                    + requirePermission);
+            Util.debugLog("Sender " + sender.getName() + " trying tab-complete the command: "
+                + commandLabel + ", but no permission " + requirePermission);
             return new ArrayList<>();
           }
         }
@@ -72,8 +63,8 @@ public class SubCommand_ROOT implements CommandProcesser {
   }
 
   @Override
-  public void onCommand(
-      @NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
+      @NotNull String[] cmdArg) {
     new SubCommand_Help().onCommand(sender, commandLabel, cmdArg);
   }
 }

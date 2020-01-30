@@ -107,7 +107,7 @@ public class QuickShopLogger extends PluginLogger {
   public QuickShopLogger(Plugin plugin) {
     super(plugin);
     registerStyles();
-    
+
     // Logger re-naming
     String prefix = plugin.getDescription().getPrefix();
     String pluginName = (useLog4j = BaseConfig.useLog4j) ?
@@ -119,7 +119,7 @@ public class QuickShopLogger extends PluginLogger {
         (prefix != null ? "[" + ChatColor.YELLOW + prefix + ChatColor.RESET + "] "
             : "[" + ChatColor.YELLOW + plugin.getDescription().getName() + ChatColor.RESET + "] ");
     pluginName = applyStyles(pluginName);
-    
+
     // Log4j setup
     if (useLog4j) {
       registerLevels();
@@ -131,7 +131,7 @@ public class QuickShopLogger extends PluginLogger {
       nameField.setAccessible(true); // private
       nameField.set(this, "");
     }
-    
+
     // Apply plugin name for BukkitLogger
     Field pluginNameField = PluginLogger.class.getDeclaredField("pluginName");
     pluginNameField.setAccessible(true); // private

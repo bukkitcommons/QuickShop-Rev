@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is QuickShop.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is QuickShop.java Copyright (C) Ghost_chu
+ * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop;
@@ -106,7 +103,7 @@ import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
 import org.maxgamer.quickshop.utils.logger.QuickShopLogger;
-import org.maxgamer.quickshop.utils.wrappers.fork.BukkitAPIWrapper;
+import org.maxgamer.quickshop.utils.wrappers.fork.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.fork.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.fork.SpigotWrapper;
 
@@ -121,7 +118,8 @@ public class QuickShop extends JavaPlugin {
   // Listeners (These don't)
   private BlockListener blockListener;
   /** The BootError, if it not NULL, plugin will stop loading and show setted errors when use /qs */
-  @Nullable private BootError bootError;
+  @Nullable
+  private BootError bootError;
   // Listeners - We decide which one to use at runtime
   private ChatListener chatListener;
   private ChunkListener chunkListener;
@@ -147,16 +145,17 @@ public class QuickShop extends JavaPlugin {
   private ItemMatcher itemMatcher;
   /** Language manager, to select which language will loaded. */
   private Language language;
-  
+
   /** Whether or not to limit players shop amounts */
   private boolean limit = false;
-  
+
   /** The shop limites. */
   private HashMap<String, Integer> limits = new HashMap<>();
 
   private LockListener lockListener;
   // private BukkitTask itemWatcherTask;
-  @Nullable private LogWatcher logWatcher;
+  @Nullable
+  private LogWatcher logWatcher;
   /** bStats, good helper for metrics. */
   private Metrics metrics;
 
@@ -199,7 +198,7 @@ public class QuickShop extends JavaPlugin {
   private OngoingFeeWatcher ongoingFeeWatcher;
   private SignUpdateWatcher signUpdateWatcher;
   private ShopContainerWatcher shopContainerWatcher;
-  private BukkitAPIWrapper bukkitAPIWrapper;
+  private BukkitWrapper bukkitAPIWrapper;
   private boolean isUtilInited = false;
   private boolean enabledAsyncDisplayDespawn;
 
@@ -229,7 +228,7 @@ public class QuickShop extends JavaPlugin {
    * @return int Player's shop limit
    */
   public int getShopLimit(@NotNull Player p) {
-    int max = getConfig().getInt("limits.default");
+    int max = BaseConfig.defaultLimits;
     for (Entry<String, Integer> entry : limits.entrySet()) {
       if (entry.getValue() > max && getPermissionManager().hasPermission(p, entry.getKey())) {
         max = entry.getValue();
@@ -242,13 +241,13 @@ public class QuickShop extends JavaPlugin {
   private void load3rdParty() {
     // added for compatibility reasons with OpenInv - see
     // https://github.com/KaiKikuchi/QuickShop/issues/139
-    if (getConfig().getBoolean("plugin.OpenInv")) {
+    if (BaseConfig.openInv) {
       this.openInvPlugin = Bukkit.getPluginManager().getPlugin("OpenInv");
       if (this.openInvPlugin != null) {
         getLogger().info("Successfully loaded OpenInv support!");
       }
     }
-    if (getConfig().getBoolean("plugin.PlaceHolderAPI")) {
+    if (BaseConfig.placeHolderAPI) {
       this.placeHolderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
       if (this.placeHolderAPI != null) {
         getLogger().info("Successfully loaded PlaceHolderAPI support!");
@@ -258,8 +257,8 @@ public class QuickShop extends JavaPlugin {
       if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
         try {
           Clearlag clearlag = (Clearlag) Bukkit.getPluginManager().getPlugin("ClearLag");
-          for (RegisteredListener clearLagListener :
-              ItemSpawnEvent.getHandlerList().getRegisteredListeners()) {
+          for (RegisteredListener clearLagListener : ItemSpawnEvent.getHandlerList()
+              .getRegisteredListeners()) {
             if (!clearLagListener.getPlugin().equals(clearlag)) {
               continue;
             }
@@ -268,15 +267,12 @@ public class QuickShop extends JavaPlugin {
               ItemSpawnEvent.getHandlerList().unregister(clearLagListener.getListener());
               for (int i = 0; i < spamTimes; i++) {
                 getLogger().warning("+++++++++++++++++++++++++++++++++++++++++++");
-                getLogger()
-                    .severe(
-                        "Detected incompatible module of ClearLag-ItemMerge module, it will broken the QuickShop display, we already unregister this module listener!");
-                getLogger()
-                    .severe(
-                        "Please turn off it in the ClearLag config.yml or turn off the QuickShop display feature!");
-                getLogger()
-                    .severe(
-                        "If you didn't do that, this message will keep spam in your console every times you server boot up!");
+                getLogger().severe(
+                    "Detected incompatible module of ClearLag-ItemMerge module, it will broken the QuickShop display, we already unregister this module listener!");
+                getLogger().severe(
+                    "Please turn off it in the ClearLag config.yml or turn off the QuickShop display feature!");
+                getLogger().severe(
+                    "If you didn't do that, this message will keep spam in your console every times you server boot up!");
                 getLogger().warning("+++++++++++++++++++++++++++++++++++++++++++");
                 getLogger().info("This message will spam more " + (spamTimes - i) + " times!");
               }
@@ -293,13 +289,13 @@ public class QuickShop extends JavaPlugin {
    * it will return false.
    *
    * @return true if successful, false if the core is invalid or is not found, and vault cannot be
-   *     used.
+   *         used.
    */
   private boolean loadEcon() {
     try {
       // EconomyCore core = new Economy_Vault();
       EconomyCore core = null;
-      switch (EconomyType.fromID(getConfig().getInt("economy-type"))) {
+      switch (EconomyType.fromID(BaseConfig.economyType)) {
         case UNKNOWN:
           bootError =
               new BootError("Can't load the Economy provider, invaild value in config.yml.");
@@ -358,7 +354,7 @@ public class QuickShop extends JavaPlugin {
   public void reloadConfig() {
     super.reloadConfig();
     // Load quick variables
-    //this.display = this.getConfig().getBoolean("shop.display-items");
+    // this.display = this.getConfig().getBoolean("shop.display-items");
     this.priceChangeRequiresFee = this.getConfig().getBoolean("shop.price-change-requires-fee");
     this.displayItemCheckTicks = this.getConfig().getInt("shop.display-items-check-ticks");
     language = new Language(this); // Init locale
@@ -385,8 +381,9 @@ public class QuickShop extends JavaPlugin {
       Util.debugLogHeavy("Check WG plugin...");
       if (wg != null) {
         Util.debugLogHeavy("Loading WG modules.");
-        this.integrationHelper.register(
-            new WorldGuardIntegration(this)); // WG require register flags when onLoad called.
+        this.integrationHelper.register(new WorldGuardIntegration(this)); // WG require register
+                                                                          // flags when onLoad
+                                                                          // called.
       }
     }
 
@@ -419,7 +416,7 @@ public class QuickShop extends JavaPlugin {
 
     Util.debugLog("Unregistering tasks...");
     // if (itemWatcherTask != null)
-    //    itemWatcherTask.cancel();
+    // itemWatcherTask.cancel();
     if (logWatcher != null) {
       logWatcher.close(); // Closes the file
     }
@@ -459,9 +456,9 @@ public class QuickShop extends JavaPlugin {
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.onEnableBegin);
     /* PreInit for BootError feature */
     commandManager = new CommandManager();
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
     getCommand("qs").setExecutor(commandManager);
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
     getCommand("qs").setTabCompleter(commandManager);
 
     getLogger().info("Quickshop " + getFork());
@@ -485,7 +482,7 @@ public class QuickShop extends JavaPlugin {
     /* It will generate a new UUID above updateConfig */
     /* Process Metrics and Sentry error reporter. */
     metrics = new Metrics(this);
-    //noinspection ConstantConditions
+    // noinspection ConstantConditions
     serverUniqueID =
         UUID.fromString(getConfig().getString("server-uuid", String.valueOf(UUID.randomUUID())));
     sentryErrorReporter = new SentryErrorReporter(this);
@@ -493,9 +490,8 @@ public class QuickShop extends JavaPlugin {
     switch (getConfig().getInt("server-platform", 0)) {
       case 1:
         bukkitAPIWrapper = new SpigotWrapper();
-        getLogger()
-            .info(
-                "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
+        getLogger().info(
+            "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
       case 2:
         bukkitAPIWrapper = new PaperWrapper();
         getLogger().info("Plugin now running under Paper mode.");
@@ -505,9 +501,8 @@ public class QuickShop extends JavaPlugin {
           getLogger().info("Plugin now running under Paper mode.");
         } else {
           bukkitAPIWrapper = new SpigotWrapper();
-          getLogger()
-              .info(
-                  "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
+          getLogger().info(
+              "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
         }
     }
 
@@ -548,8 +543,8 @@ public class QuickShop extends JavaPlugin {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
         this.enabledAsyncDisplayDespawn = true;
         this.displayAutoDespawnWatcher = new DisplayAutoDespawnWatcher(this);
-        this.displayAutoDespawnWatcher.runTaskTimerAsynchronously(
-            this, 20, getConfig().getInt("shop.display-check-time")); // not worth async
+        this.displayAutoDespawnWatcher.runTaskTimerAsynchronously(this, 20,
+            getConfig().getInt("shop.display-check-time")); // not worth async
       }
     }
     this.shopManager = new ShopManager(this);
@@ -639,9 +634,7 @@ public class QuickShop extends JavaPlugin {
     }
     if (getConfig().getBoolean("shop.ongoing-fee.enable")) {
       getLogger().info("Ongoing fee feature is enabled.");
-      ongoingFeeWatcher.runTaskTimerAsynchronously(
-          this,
-          0,
+      ongoingFeeWatcher.runTaskTimerAsynchronously(this, 0,
           getConfig().getInt("shop.ongoing-fee.ticks"));
     }
     registerIntegrations();
@@ -695,9 +688,8 @@ public class QuickShop extends JavaPlugin {
    */
   private void runtimeCheck(QuickShop shop) throws RuntimeException {
     if (Util.isClassAvailable("org.maxgamer.quickshop.Util.NMS")) {
-      getLogger()
-          .severe(
-              "FATAL: Old QuickShop is installed, You must remove old quickshop jar from plugins folder!");
+      getLogger().severe(
+          "FATAL: Old QuickShop is installed, You must remove old quickshop jar from plugins folder!");
       throw new RuntimeException(
           "FATAL: Old QuickShop is installed, You must remove old quickshop jar from plugins folder!");
     }
@@ -720,32 +712,22 @@ public class QuickShop extends JavaPlugin {
       getLogger().severe("WARNING: You are running QSRR in dev-mode");
       getLogger().severe("WARNING: Keep backup and DO NOT run this in a production environment!");
       getLogger().severe("WARNING: Test version may destroy everything!");
-      getLogger()
-          .severe(
-              "WARNING: QSRR won't start without your confirmation, nothing will change before you turn on dev allowed.");
+      getLogger().severe(
+          "WARNING: QSRR won't start without your confirmation, nothing will change before you turn on dev allowed.");
       if (!getConfig().getBoolean("dev-mode")) {
-        getLogger()
-            .severe(
-                "WARNING: Set dev-mode: true in config.yml to allow qs load in dev mode(You may need add this line to the config yourself).");
+        getLogger().severe(
+            "WARNING: Set dev-mode: true in config.yml to allow qs load in dev mode(You may need add this line to the config yourself).");
         noopDisable = true;
         throw new RuntimeException("Snapshot cannot run when dev-mode is false in the config");
       }
     }
     String nmsVersion = Util.getNMSVersion();
     IncompatibleChecker incompatibleChecker = new IncompatibleChecker();
-    getLogger()
-        .info(
-            "Running QuickShop-Reremake on NMS version "
-                + nmsVersion
-                + " For Minecraft version "
-                + ReflectFactory.getServerVersion());
+    getLogger().info("Running QuickShop-Reremake on NMS version " + nmsVersion
+        + " For Minecraft version " + ReflectFactory.getServerVersion());
     if (incompatibleChecker.isIncompatible(nmsVersion)) {
-      throw new RuntimeException(
-          "Your Minecraft version is nolonger supported: "
-              + ReflectFactory.getServerVersion()
-              + " ("
-              + nmsVersion
-              + ")");
+      throw new RuntimeException("Your Minecraft version is nolonger supported: "
+          + ReflectFactory.getServerVersion() + " (" + nmsVersion + ")");
     }
   }
 
@@ -760,24 +742,21 @@ public class QuickShop extends JavaPlugin {
       DatabaseCore dbCore;
       if (Objects.requireNonNull(dbCfg).getBoolean("mysql")) {
         // MySQL database - Required database be created first.
-        //dbPrefix = dbCfg.getString("prefix");
-        //if (dbPrefix == null || "none".equals(dbPrefix)) {
-        //  dbPrefix = "";
-        //}
+        // dbPrefix = dbCfg.getString("prefix");
+        // if (dbPrefix == null || "none".equals(dbPrefix)) {
+        // dbPrefix = "";
+        // }
         String user = dbCfg.getString("user");
         String pass = dbCfg.getString("password");
         String host = dbCfg.getString("host");
         String port = dbCfg.getString("port");
         String database = dbCfg.getString("database");
         boolean useSSL = dbCfg.getBoolean("usessl");
-        dbCore =
-            new MySQLCore(
-                Objects.requireNonNull(host, "MySQL host can't be null"),
-                Objects.requireNonNull(user, "MySQL username can't be null"),
-                Objects.requireNonNull(pass, "MySQL password can't be null"),
-                Objects.requireNonNull(database, "MySQL database name can't be null"),
-                Objects.requireNonNull(port, "MySQL port can't be null"),
-                useSSL);
+        dbCore = new MySQLCore(Objects.requireNonNull(host, "MySQL host can't be null"),
+            Objects.requireNonNull(user, "MySQL username can't be null"),
+            Objects.requireNonNull(pass, "MySQL password can't be null"),
+            Objects.requireNonNull(database, "MySQL database name can't be null"),
+            Objects.requireNonNull(port, "MySQL port can't be null"), useSSL);
       } else {
         // SQLite database - Doing this handles file creation
         dbCore = new SQLiteCore(new File(this.getDataFolder(), "shops.db"));
@@ -821,8 +800,8 @@ public class QuickShop extends JavaPlugin {
       }
       // Use internal Metric class not Maven for solve plugin name issues
       String display_Items;
-      if (getConfig()
-          .getBoolean("shop.display-items")) { // Maybe mod server use this plugin more? Or have big
+      if (getConfig().getBoolean("shop.display-items")) { // Maybe mod server use this plugin more?
+                                                          // Or have big
         // number items need disabled?
         display_Items = "Enabled";
       } else {
@@ -885,487 +864,6 @@ public class QuickShop extends JavaPlugin {
       serverUUID = uuid.toString();
       getConfig().set("server-uuid", serverUUID);
     }
-    if (selectedVersion == 1) {
-      getConfig().set("disabled-metrics", false);
-      getConfig().set("config-version", 2);
-      selectedVersion = 2;
-    }
-    if (selectedVersion == 2) {
-      getConfig().set("protect.minecart", true);
-      getConfig().set("protect.entity", true);
-      getConfig().set("protect.redstone", true);
-      getConfig().set("protect.structuregrow", true);
-      getConfig().set("protect.explode", true);
-      getConfig().set("protect.hopper", true);
-      getConfig().set("config-version", 3);
-      selectedVersion = 3;
-    }
-    if (selectedVersion == 3) {
-      getConfig().set("shop.alternate-currency-symbol", '$');
-      getConfig().set("config-version", 4);
-      selectedVersion = 4;
-    }
-    if (selectedVersion == 4) {
-      getConfig().set("updater", true);
-      getConfig().set("config-version", 5);
-      selectedVersion = 5;
-    }
-    if (selectedVersion == 5) {
-      getConfig().set("shop.display-item-use-name", true);
-      getConfig().set("config-version", 6);
-      selectedVersion = 6;
-    }
-    if (selectedVersion == 6) {
-      getConfig().set("shop.sneak-to-control", false);
-      getConfig().set("config-version", 7);
-      selectedVersion = 7;
-    }
-    if (selectedVersion == 7) {
-      getConfig().set("database.prefix", "none");
-      getConfig().set("database.reconnect", false);
-      getConfig().set("database.use-varchar", false);
-      getConfig().set("config-version", 8);
-      selectedVersion = 8;
-    }
-    if (selectedVersion == 8) {
-      getConfig().set("database.use-varchar", true);
-      getConfig().set("limits.old-algorithm", false);
-      getConfig().set("shop.pay-player-from-unlimited-shop-owner", false);
-      getConfig().set("plugin.ProtocolLib", false);
-      getConfig().set("plugin.Multiverse-Core", true);
-      getConfig().set("shop.ignore-unlimited", false);
-      getConfig().set("config-version", 9);
-      selectedVersion = 9;
-    }
-    if (selectedVersion == 9) {
-      getConfig().set("shop.enable-enderchest", true);
-      getConfig().set("config-version", 10);
-      selectedVersion = 10;
-    }
-    if (selectedVersion == 10) {
-      getConfig().set("shop.pay-player-from-unlimited-shop-owner", null); // Removed
-      getConfig().set("config-version", 11);
-      selectedVersion = 11;
-    }
-    if (selectedVersion == 11) {
-      getConfig().set("shop.enable-enderchest", null); // Removed
-      getConfig().set("plugin.OpenInv", true);
-      List<String> shoppable = getConfig().getStringList("shop-blocks");
-      shoppable.add("ENDER_CHEST");
-      getConfig().set("shop-blocks", shoppable);
-      getConfig().set("config-version", 12);
-      selectedVersion = 12;
-    }
-    if (selectedVersion == 12) {
-      getConfig().set("plugin.ProtocolLib", null); // Removed
-      getConfig().set("plugin.BKCommonLib", null); // Removed
-      getConfig().set("plugin.BKCommonLib", null); // Removed
-      getConfig().set("database.use-varchar", null); // Removed
-      getConfig().set("database.reconnect", null); // Removed
-      getConfig().set("anonymous-metrics", false);
-      getConfig().set("display-items-check-ticks", 1200);
-      getConfig().set("shop.bypass-owner-check", null); // Removed
-      getConfig().set("config-version", 13);
-      selectedVersion = 13;
-    }
-    if (selectedVersion == 13) {
-      getConfig().set("plugin.AreaShop", false);
-      getConfig().set("shop.special-region-only", false);
-      getConfig().set("config-version", 14);
-      selectedVersion = 14;
-    }
-    if (selectedVersion == 14) {
-      getConfig().set("plugin.AreaShop", null);
-      getConfig().set("shop.special-region-only", null);
-      getConfig().set("config-version", 15);
-      selectedVersion = 15;
-    }
-    if (selectedVersion == 15) {
-      getConfig().set("ongoingfee", null);
-      getConfig().set("shop.display-item-use-name", null);
-      getConfig().set("shop.display-item-show-name", false);
-      getConfig().set("shop.auto-fetch-shop-messages", true);
-      getConfig().set("config-version", 16);
-      selectedVersion = 16;
-    }
-    if (selectedVersion == 16) {
-      getConfig().set("ignore-cancel-chat-event", false);
-      getConfig().set("config-version", 17);
-      selectedVersion = 17;
-    }
-    if (selectedVersion == 17) {
-      getConfig().set("ignore-cancel-chat-event", false);
-      getConfig().set("float", null);
-      getConfig().set("config-version", 18);
-      selectedVersion = 18;
-    }
-    if (selectedVersion == 18) {
-      getConfig().set("shop.disable-vault-format", false);
-      getConfig().set("config-version", 19);
-      selectedVersion = 19;
-    }
-    if (selectedVersion == 19) {
-      getConfig().set("shop.allow-shop-without-space-for-sign", true);
-      getConfig().set("config-version", 20);
-      selectedVersion = 20;
-    }
-    if (selectedVersion == 20) {
-      getConfig().set("shop.maximum-price", -1);
-      getConfig().set("config-version", 21);
-      selectedVersion = 21;
-    }
-    if (selectedVersion == 21) {
-      getConfig().set("shop.sign-material", "OAK_WALL_SIGN");
-      getConfig().set("config-version", 22);
-      selectedVersion = 22;
-    }
-    if (selectedVersion == 22) {
-      getConfig().set("include-offlineplayer-list", "false");
-      getConfig().set("config-version", 23);
-      selectedVersion = 23;
-    }
-    if (selectedVersion == 23) {
-      getConfig().set("lockette.enable", null);
-      getConfig().set("lockette.item", null);
-      getConfig().set("lockette.lore", null);
-      getConfig().set("lockette.displayname", null);
-      getConfig().set("float", null);
-      getConfig().set("lockette.enable", true);
-      ArrayList<String> blackListWorld = new ArrayList<>();
-      blackListWorld.add("disabled_world_name");
-      getConfig().set("shop.blacklist-world", blackListWorld);
-      getConfig().set("config-version", 24);
-      selectedVersion = 24;
-    }
-    if (selectedVersion == 24) {
-      getConfig().set("shop.strict-matches-check", false);
-      getConfig().set("config-version", 25);
-      selectedVersion = 25;
-    }
-    if (selectedVersion == 25) {
-      String language = getConfig().getString("language");
-      if (language == null || language.isEmpty() || "default".equals(language)) {
-        getConfig().set("language", "en");
-      }
-      getConfig().set("config-version", 26);
-      selectedVersion = 26;
-    }
-    if (selectedVersion == 26) {
-      getConfig().set("database.usessl", false);
-      getConfig().set("config-version", 27);
-      selectedVersion = 27;
-    }
-    if (selectedVersion == 27) {
-      getConfig().set("queue.enable", true);
-      getConfig().set("queue.shops-per-tick", 20);
-      getConfig().set("config-version", 28);
-      selectedVersion = 28;
-    }
-    if (selectedVersion == 28) {
-      getConfig().set("database.queue", true);
-      getConfig().set("config-version", 29);
-      selectedVersion = 29;
-    }
-    if (selectedVersion == 29) {
-      getConfig().set("plugin.Multiverse-Core", null);
-      getConfig().set("shop.protection-checking", true);
-      getConfig().set("config-version", 30);
-      selectedVersion = 30;
-    }
-    if (selectedVersion == 30) {
-      getConfig().set("auto-report-errors", true);
-      getConfig().set("config-version", 31);
-      selectedVersion = 31;
-    }
-    if (selectedVersion == 31) {
-      getConfig().set("shop.display-type", 0);
-      getConfig().set("config-version", 32);
-      selectedVersion = 32;
-    }
-    if (selectedVersion == 32) {
-      getConfig().set("effect.sound.ontabcomplete", true);
-      getConfig().set("effect.sound.oncommand", true);
-      getConfig().set("effect.sound.ononclick", true);
-      getConfig().set("config-version", 33);
-      selectedVersion = 33;
-    }
-    if (selectedVersion == 33) {
-      getConfig().set("matcher.item.damage", true);
-      getConfig().set("matcher.item.displayname", true);
-      getConfig().set("matcher.item.lores", true);
-      getConfig().set("matcher.item.enchs", true);
-      getConfig().set("matcher.item.potions", true);
-      getConfig().set("matcher.item.attributes", true);
-      getConfig().set("matcher.item.itemflags", true);
-      getConfig().set("matcher.item.custommodeldata", true);
-      getConfig().set("config-version", 34);
-      selectedVersion = 34;
-    }
-    if (selectedVersion == 34) {
-      getConfig().set("queue.enable", false); // Close it for everyone
-      if (getConfig().getInt("shop.display-items-check-ticks") == 1200) {
-        getConfig().set("shop.display-items-check-ticks", 6000);
-      }
-      getConfig().set("config-version", 35);
-      selectedVersion = 35;
-    }
-    if (selectedVersion == 35) {
-      getConfig().set("queue", null); // Close it for everyone
-      getConfig().set("config-version", 36);
-      selectedVersion = 36;
-    }
-    if (selectedVersion == 36) {
-      getConfig().set("economy-type", 0); // Close it for everyone
-      getConfig().set("config-version", 37);
-      selectedVersion = 37;
-    }
-    if (selectedVersion == 37) {
-      getConfig().set("shop.ignore-cancel-chat-event", true);
-      getConfig().set("config-version", 38);
-      selectedVersion = 38;
-    }
-    if (selectedVersion == 38) {
-      getConfig().set("protect.inventorymove", true);
-      getConfig().set("protect.spread", true);
-      getConfig().set("protect.fromto", true);
-      getConfig().set("protect.minecart", null);
-      getConfig().set("protect.hopper", null);
-      getConfig().set("config-version", 39);
-      selectedVersion = 39;
-    }
-    if (selectedVersion == 39) {
-      getConfig().set("update-sign-when-inventory-moving", true);
-      getConfig().set("config-version", 40);
-      selectedVersion = 39;
-    }
-    if (selectedVersion == 40) {
-      getConfig().set("allow-economy-loan", false);
-      getConfig().set("config-version", 41);
-      selectedVersion = 41;
-    }
-    if (selectedVersion == 41) {
-      getConfig().set("send-display-item-protection-alert", true);
-      getConfig().set("config-version", 42);
-      selectedVersion = 42;
-    }
-    if (selectedVersion == 42) {
-      getConfig().set("langutils-language", "en_us");
-      getConfig().set("config-version", 43);
-      selectedVersion = 43;
-    }
-    if (selectedVersion == 43) {
-      getConfig().set("permission-type", 0);
-      getConfig().set("config-version", 44);
-      selectedVersion = 44;
-    }
-    if (selectedVersion == 44) {
-      getConfig().set("matcher.item.repaircost", false);
-      getConfig().set("config-version", 45);
-      selectedVersion = 45;
-    }
-    if (selectedVersion == 45) {
-      getConfig().set("shop.display-item-use-name", true);
-      getConfig().set("shop.protection-checking-filter", new ArrayList<>());
-      getConfig().set("config-version", 46);
-      selectedVersion = 46;
-    }
-    if (selectedVersion == 46) {
-      getConfig().set("shop.use-protection-checking-filter", true);
-      getConfig().set("shop.max-shops-checks-in-once", 100);
-      getConfig().set("config-version", 47);
-      selectedVersion = 47;
-    }
-    if (selectedVersion == 47) {
-      getConfig().set("shop.use-protection-checking-filter", false);
-      getConfig().set("config-version", 48);
-      selectedVersion = 48;
-    }
-    if (selectedVersion == 48) {
-      getConfig().set("permission-type", null);
-      getConfig().set("shop.use-protection-checking-filter", null);
-      getConfig().set("shop.protection-checking-filter", null);
-      getConfig().set("config-version", 49);
-      selectedVersion = 49;
-    }
-    if (selectedVersion == 49 || selectedVersion == 50) {
-      getConfig().set("shop.enchance-display-protect", false);
-      getConfig().set("shop.enchance-shop-protect", false);
-      getConfig().set("protect", null);
-      getConfig().set("config-version", 51);
-      selectedVersion = 51;
-    }
-    if (selectedVersion < 60) { // Ahhh fuck versions
-      getConfig().set("matcher.use-bukkit-matcher", false);
-      getConfig().set("config-version", 60);
-      selectedVersion = 60;
-    }
-    if (selectedVersion == 60) { // Ahhh fuck versions
-      getConfig().set("matcher.use-bukkit-matcher", null);
-      getConfig().set("shop.strict-matches-check", null);
-      getConfig().set("matcher.work-type", 0);
-      getConfig().set("shop.display-auto-despawn", true);
-      getConfig().set("shop.display-despawn-range", 10);
-      getConfig().set("shop.display-check-time", 10);
-      getConfig().set("config-version", 61);
-      selectedVersion = 61;
-    }
-    if (selectedVersion == 61) { // Ahhh fuck versions
-      getConfig().set("shop.word-for-sell-all-items", "all");
-      getConfig().set("plugin.PlaceHolderAPI", true);
-      getConfig().set("config-version", 62);
-      selectedVersion = 62;
-    }
-    if (selectedVersion == 62) { // Ahhh fuck versions
-      getConfig().set("shop.display-auto-despawn", false);
-      getConfig()
-          .set(
-              "shop.word-for-trade-all-items",
-              getConfig().getString("shop.word-for-sell-all-items"));
-
-      getConfig().set("config-version", 63);
-      selectedVersion = 63;
-    }
-    if (selectedVersion == 63) { // Ahhh fuck versions
-      getConfig().set("shop.ongoing-fee.enable", false);
-      getConfig().set("shop.ongoing-fee.ticks", 42000);
-      getConfig().set("shop.ongoing-fee.cost-per-shop", 2);
-      getConfig().set("shop.ongoing-fee.ignore-unlimited", true);
-      getConfig().set("config-version", 64);
-      selectedVersion = 64;
-    }
-    if (selectedVersion == 64) {
-      getConfig().set("shop.allow-free-shop", false);
-      getConfig().set("config-version", 65);
-      selectedVersion = 65;
-    }
-    if (selectedVersion == 65) {
-      getConfig().set("shop.minimum-price", 0.01);
-      getConfig().set("config-version", 66);
-      selectedVersion = 66;
-    }
-    if (selectedVersion == 66) {
-      getConfig().set("use-decimal-format", false);
-      getConfig().set("decimal-format", "#,###.##");
-      getConfig().set("shop.show-owner-uuid-in-controlpanel-if-op", false);
-      getConfig().set("config-version", 67);
-      selectedVersion = 67;
-    }
-    if (selectedVersion == 67) {
-      getConfig().set("disable-debuglogger", false);
-      getConfig().set("matcher.use-bukkit-matcher", null);
-      getConfig().set("config-version", 68);
-      selectedVersion = 68;
-    }
-    if (selectedVersion == 68) {
-      ArrayList<String> temp = new ArrayList<>();
-      temp.add("SoulBound");
-      getConfig().set("shop.blacklist-lores", temp);
-      getConfig().set("config-version", 69);
-      selectedVersion = 69;
-    }
-    if (selectedVersion == 69) {
-      getConfig().set("shop.display-item-use-name", false);
-      getConfig().set("config-version", 70);
-      selectedVersion = 70;
-    }
-    if (selectedVersion == 70) {
-      getConfig().set("cachingpool.enable", false);
-      getConfig().set("cachingpool.maxsize", 100000000);
-      getConfig().set("config-version", 71);
-      selectedVersion = 71;
-    }
-    if (selectedVersion == 71) {
-      if (Objects.equals(getConfig().getString("language"), "en")) {
-        getConfig().set("language", "en-US");
-      }
-      getConfig().set("server-platform", 0);
-      getConfig().set("config-version", 72);
-      selectedVersion = 72;
-    }
-    if (selectedVersion == 72) {
-      if (getConfig().getBoolean("use-deciaml-format")) {
-        getConfig().set("use-decimal-format", getConfig().getBoolean("use-deciaml-format"));
-      } else {
-        getConfig().set("use-decimal-format", false);
-      }
-      getConfig().set("use-deciaml-format", null);
-
-      getConfig().set("shop.force-load-downgrade-items.enable", false);
-      getConfig().set("shop.force-load-downgrade-items.method", 0);
-      getConfig().set("config-version", 73);
-      selectedVersion = 73;
-    }
-    if (selectedVersion == 73) {
-      getConfig().set("mixedeconomy.deposit", "eco give {0} {1}");
-      getConfig().set("mixedeconomy.withdraw", "eco take {0} {1}");
-      getConfig().set("config-version", 74);
-      selectedVersion = 74;
-    }
-    if (selectedVersion == 74) {
-      String langUtilsLanguage = getConfig().getString("langutils-language");
-      getConfig().set("langutils-language", null);
-      if ("en_us".equals(langUtilsLanguage)) {
-        langUtilsLanguage = "default";
-      }
-      getConfig().set("game-language", langUtilsLanguage);
-      getConfig().set("maximum-digits-in-price", -1);
-      getConfig().set("config-version", 75);
-      selectedVersion = 75;
-    }
-    if (selectedVersion == 75) {
-      getConfig().set("langutils-language", null);
-      if (getConfig().getString("game-language") == null) {
-        getConfig().set("game-language", "default");
-      }
-      getConfig().set("config-version", 76);
-      selectedVersion = 76;
-    }
-    if (selectedVersion == 76) {
-      getConfig().set("database.auto-fix-encoding-issue-in-database", false);
-      getConfig().set("send-shop-protection-alert", false);
-      getConfig().set("send-display-item-protection-alert", false);
-      getConfig().set("shop.use-fast-shop-search-algorithm", false);
-      getConfig().set("config-version", 77);
-      selectedVersion = 77;
-    }
-    if (selectedVersion == 77) {
-      getConfig().set("integration.towny.enable", false);
-      getConfig().set("integration.towny.create", new String[] {"SHOPTYPE", "MODIFY"});
-      getConfig().set("integration.towny.trade", new String[] {});
-      getConfig().set("integration.worldguard.enable", false);
-      getConfig().set("integration.worldguard.create", new String[] {"FLAG", "CHEST_ACCESS"});
-      getConfig().set("integration.worldguard.trade", new String[] {});
-      getConfig().set("integration.plotsquared.enable", false);
-      getConfig().set("integration.plotsquared.enable", false);
-      getConfig().set("integration.plotsquared.enable", false);
-      getConfig().set("integration.residence.enable", false);
-      getConfig().set("integration.residence.create", new String[] {"FLAG", "interact", "use"});
-      getConfig().set("integration.residence.trade", new String[] {});
-
-      getConfig().set("integration.factions.enable", false);
-      getConfig().set("integration.factions.create.flag", new String[] {});
-      getConfig().set("integration.factions.trade.flag", new String[] {});
-      getConfig().set("integration.factions.create.require.open", false);
-      getConfig().set("integration.factions.create.require.normal", true);
-      getConfig().set("integration.factions.create.require.wilderness", false);
-      getConfig().set("integration.factions.create.require.peaceful", true);
-      getConfig().set("integration.factions.create.require.permanent", false);
-      getConfig().set("integration.factions.create.require.safezone", false);
-      getConfig().set("integration.factions.create.require.own", false);
-      getConfig().set("integration.factions.create.require.warzone", false);
-      getConfig().set("integration.factions.trade.require.open", false);
-      getConfig().set("integration.factions.trade.require.normal", true);
-      getConfig().set("integration.factions.trade.require.wilderness", false);
-      getConfig().set("integration.factions.trade.require.peaceful", false);
-      getConfig().set("integration.factions.trade.require.permanent", false);
-      getConfig().set("integration.factions.trade.require.safezone", false);
-      getConfig().set("integration.factions.trade.require.own", false);
-      getConfig().set("integration.factions.trade.require.warzone", false);
-      getConfig().set("anonymous-metrics", null);
-      getConfig().set("shop.ongoing-fee.async", true);
-      getConfig().set("config-version", 78);
-      selectedVersion = 78;
-    }
     saveConfig();
     reloadConfig();
     File file = new File(getDataFolder(), "example.config.yml");
@@ -1383,7 +881,7 @@ public class QuickShop extends JavaPlugin {
    * @return The fork name.
    */
   public static String getFork() {
-    return "Reremake";
+    return "Rev";
   }
 
   private void replaceLogger() {

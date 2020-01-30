@@ -1,20 +1,17 @@
 /*
- * This file is a part of project QuickShop, the name is WorldGuardIntegration.java
- * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
- * Copyright (C) Bukkit Commons Studio and contributors
+ * This file is a part of project QuickShop, the name is WorldGuardIntegration.java Copyright (C)
+ * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.maxgamer.quickshop.integration.impl;
@@ -50,12 +47,10 @@ public class WorldGuardIntegration implements IntegratedPlugin {
 
   public WorldGuardIntegration(QuickShop plugin) {
     this.plugin = plugin;
-    createFlags =
-        WorldGuardFlags.deserialize(
-            plugin.getConfig().getStringList("integration.worldguard.create"));
-    tradeFlags =
-        WorldGuardFlags.deserialize(
-            plugin.getConfig().getStringList("integration.worldguard.trade"));
+    createFlags = WorldGuardFlags
+        .deserialize(plugin.getConfig().getStringList("integration.worldguard.create"));
+    tradeFlags = WorldGuardFlags
+        .deserialize(plugin.getConfig().getStringList("integration.worldguard.trade"));
   }
 
   @Override
@@ -84,16 +79,11 @@ public class WorldGuardIntegration implements IntegratedPlugin {
   public boolean canCreateShopHere(@NotNull Player player, @NotNull Location location) {
     LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
     com.sk89q.worldedit.util.Location wgLoc = BukkitAdapter.adapt(location);
-    boolean canBypass =
-        WorldGuard.getInstance()
-            .getPlatform()
-            .getSessionManager()
-            .hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
+    boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager()
+        .hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
     if (canBypass) {
-      Util.debugLog(
-          "Player "
-              + player.getName()
-              + " bypassing the protection checks, because player have bypass permission in WorldGuard");
+      Util.debugLog("Player " + player.getName()
+          + " bypassing the protection checks, because player have bypass permission in WorldGuard");
       return true;
     }
     RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -129,16 +119,11 @@ public class WorldGuardIntegration implements IntegratedPlugin {
   public boolean canTradeShopHere(@NotNull Player player, @NotNull Location location) {
     LocalPlayer localPlayer = WorldGuardPlugin.inst().wrapPlayer(player);
     com.sk89q.worldedit.util.Location wgLoc = BukkitAdapter.adapt(location);
-    boolean canBypass =
-        WorldGuard.getInstance()
-            .getPlatform()
-            .getSessionManager()
-            .hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
+    boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager()
+        .hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
     if (canBypass) {
-      Util.debugLog(
-          "Player "
-              + player.getName()
-              + " bypassing the protection checks, because player have bypass permission in WorldGuard");
+      Util.debugLog("Player " + player.getName()
+          + " bypassing the protection checks, because player have bypass permission in WorldGuard");
       return true;
     }
     RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
