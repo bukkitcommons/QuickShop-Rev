@@ -1,5 +1,5 @@
 /*
- * This file is a part of project QuickShop, the name is DisplayDupeRemoverWatcher.java
+ * This file is a part of project QuickShop, the name is SignUpdateWatcher.java
  * Copyright (C) Ghost_chu <https://github.com/Ghost-chu>
  * Copyright (C) Bukkit Commons Studio and contributors
  *
@@ -17,28 +17,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.Watcher;
+package org.maxgamer.quickshop.scheduler;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.Shop.DisplayItem;
+import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.Shop.Shop;
 
-/**
- * Deprecated for unused and inproper implementation,
- * this is likely to be removed in a future version.
- */
-@Deprecated
-public class DisplayDupeRemoverWatcher extends BukkitRunnable {
-  private Queue<DisplayItem> checkQueue = new LinkedList<>();
+public class SignUpdateWatcher extends BukkitRunnable {
+  // private QuickShop plugin;
+  private Queue<Shop> signUpdateQueue = new LinkedList<>();
 
-  @Override
-  public @Deprecated void run() {
-    checkQueue.forEach(DisplayItem::removeDupe);
+  public SignUpdateWatcher(QuickShop plugin) {
+    // this.plugin = plugin;
   }
 
-  public @Deprecated void add(@NotNull DisplayItem displayItem) {
-    checkQueue.offer(displayItem);
+  public void scheduleSignUpdate(@NotNull Shop shop) {
+    if (signUpdateQueue.contains(shop)) {
+      return; // Ignore
+    }
+    signUpdateQueue.add(shop);
+  }
+
+  @Override
+  public void run() {
+    Shop shop = signUpdateQueue.poll();
+    while (shop != null) {
+      shop.setSignText();
+      shop = signUpdateQueue.poll();
+    }
   }
 }

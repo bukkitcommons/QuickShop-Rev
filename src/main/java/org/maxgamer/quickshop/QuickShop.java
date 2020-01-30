@@ -85,15 +85,6 @@ import org.maxgamer.quickshop.Util.ReflectionUtil;
 import org.maxgamer.quickshop.Util.SentryErrorReporter;
 import org.maxgamer.quickshop.Util.Timer;
 import org.maxgamer.quickshop.Util.Util;
-import org.maxgamer.quickshop.Watcher.DisplayAutoDespawnWatcher;
-import org.maxgamer.quickshop.Watcher.DisplayDupeRemoverWatcher;
-import org.maxgamer.quickshop.Watcher.DisplayWatcher;
-import org.maxgamer.quickshop.Watcher.LogWatcher;
-import org.maxgamer.quickshop.Watcher.OngoingFeeWatcher;
-import org.maxgamer.quickshop.Watcher.ShopContainerWatcher;
-import org.maxgamer.quickshop.Watcher.SignUpdateWatcher;
-import org.maxgamer.quickshop.Watcher.SyncTaskWatcher;
-import org.maxgamer.quickshop.Watcher.UpdateWatcher;
 import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.annotation.Configuration;
 import org.maxgamer.quickshop.configuration.annotation.Node;
@@ -106,6 +97,14 @@ import org.maxgamer.quickshop.integration.impl.TownyIntegration;
 import org.maxgamer.quickshop.integration.impl.WorldGuardIntegration;
 import org.maxgamer.quickshop.internal.listener.InternalListener;
 import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.scheduler.DisplayAutoDespawnWatcher;
+import org.maxgamer.quickshop.scheduler.DisplayWatcher;
+import org.maxgamer.quickshop.scheduler.LogWatcher;
+import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
+import org.maxgamer.quickshop.scheduler.ShopContainerWatcher;
+import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
+import org.maxgamer.quickshop.scheduler.UpdateWatcher;
+import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
 import org.maxgamer.quickshop.utils.logger.QuickShopLogger;
 import org.maxgamer.quickshop.utils.wrappers.fork.BukkitAPIWrapper;
 import org.maxgamer.quickshop.utils.wrappers.fork.PaperWrapper;
@@ -200,7 +199,6 @@ public class QuickShop extends JavaPlugin {
   private OngoingFeeWatcher ongoingFeeWatcher;
   private SignUpdateWatcher signUpdateWatcher;
   private ShopContainerWatcher shopContainerWatcher;
-  private @Deprecated DisplayDupeRemoverWatcher displayDupeRemoverWatcher;
   private BukkitAPIWrapper bukkitAPIWrapper;
   private boolean isUtilInited = false;
   private boolean enabledAsyncDisplayDespawn;
@@ -573,7 +571,6 @@ public class QuickShop extends JavaPlugin {
 
     signUpdateWatcher = new SignUpdateWatcher(this);
     shopContainerWatcher = new ShopContainerWatcher(this);
-    displayDupeRemoverWatcher = new DisplayDupeRemoverWatcher();
 
     /* Load all shops. */
     shopLoader = new ShopLoader(this);
@@ -636,7 +633,6 @@ public class QuickShop extends JavaPlugin {
     // shopVaildWatcher.runTaskTimer(this, 0, 20 * 60); // Nobody use it
     signUpdateWatcher.runTaskTimer(this, 0, 10);
     shopContainerWatcher.runTaskTimer(this, 0, 5); // Nobody use it
-    displayDupeRemoverWatcher.runTaskTimerAsynchronously(this,0,1);
     if (logWatcher != null) {
       logWatcher.runTaskTimerAsynchronously(this, 10, 10);
       getLogger().info("Log actions is enabled, actions will log in the qs.log file!");

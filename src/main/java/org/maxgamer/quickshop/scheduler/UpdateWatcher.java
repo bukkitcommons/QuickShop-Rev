@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.Watcher;
+package org.maxgamer.quickshop.scheduler;
 
 import java.util.List;
 import java.util.Random;

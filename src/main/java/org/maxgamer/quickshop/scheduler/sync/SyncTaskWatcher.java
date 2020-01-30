@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.Watcher;
+package org.maxgamer.quickshop.scheduler.sync;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -27,6 +27,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.scheduler.InventoryEditContainer;
 
 public class SyncTaskWatcher {
   @Getter private Queue<Entity> entityRemoveQueue = new LinkedList<>();
