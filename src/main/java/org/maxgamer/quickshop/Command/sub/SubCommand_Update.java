@@ -19,14 +19,15 @@ package org.maxgamer.quickshop.command.sub;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.utils.UpdateInfomation;
-import org.maxgamer.quickshop.utils.Updater;
+import org.maxgamer.quickshop.utils.VersionData;
+import org.maxgamer.quickshop.utils.VersionUpdater;
 
 public class SubCommand_Update implements CommandProcesser {
 
@@ -47,42 +48,35 @@ public class SubCommand_Update implements CommandProcesser {
       public void run() {
         sender.sendMessage(ChatColor.YELLOW + "Checking for updates...");
 
-        final UpdateInfomation updateInfomation = Updater.checkUpdate();
-        final String updateVersion = updateInfomation.getVersion();
+        final Optional<VersionData> data = VersionUpdater.acquire();
 
-        if (updateVersion == null) {
-          sender.sendMessage(ChatColor.RED + "Failed check the update, connection issue?");
-          return;
-        }
-
-        if (updateVersion.equals(plugin.getDescription().getVersion())) {
+        if (!data.isPresent()) {
           sender.sendMessage(ChatColor.GREEN + "No updates can update now.");
           return;
         }
 
         sender.sendMessage(ChatColor.YELLOW + "Downloading update, this may need a while...");
-
         final byte[] pluginBin;
-
+        
         try {
-          pluginBin = Updater.downloadUpdatedJar();
+          pluginBin = VersionUpdater.downloadUpdatedJar();
         } catch (IOException e) {
           sender.sendMessage(ChatColor.RED + "Update failed, get details to look the console.");
           plugin.getSentryErrorReporter().ignoreThrow();
           e.printStackTrace();
           return;
         }
-
+        
         if (pluginBin.length < 1) {
           sender.sendMessage(
               ChatColor.RED + "Download failed, check your connection before contact the author.");
           return;
         }
-
+        
         sender.sendMessage(ChatColor.YELLOW + "Installing update...");
-
+        
         try {
-          Updater.replaceTheJar(pluginBin);
+          VersionUpdater.replaceTheJar(pluginBin);
         } catch (IOException ioe) {
           sender.sendMessage(ChatColor.RED + "Update failed, get details to look the console.");
           plugin.getSentryErrorReporter().ignoreThrow();

@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is Updater.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.utils;
 
 import java.io.BufferedReader;
@@ -28,8 +12,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Objects;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import java.util.Optional;
 import org.bukkit.plugin.InvalidDescriptionException;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +22,8 @@ import org.maxgamer.quickshop.utils.github.GithubAPI;
 import org.maxgamer.quickshop.utils.github.ReleaseJsonContainer;
 import com.google.common.collect.Lists;
 
-public class Updater {
-  public static List<String> getHistoryVersions() throws IOException {
+public class VersionUpdater {
+  private static List<String> getHistoryVersions() throws IOException {
     String hostUrl = "https://www.spigotmc.org/resources/62575/history";
     HttpURLConnection conn = (HttpURLConnection) new URL(hostUrl).openConnection();
     
@@ -65,30 +48,29 @@ public class Updater {
   }
   
   /**
-   * Check new update
-   *
-   * @return True=Have a new update; False=No new update or check update failed.
+   * Try to obtain a version data for updating.
+   * @see VersionData
+   * @return the update-ready version data, or empty if not ready.
    */
-  public static UpdateInfomation checkUpdate() {
-    if (!BaseConfig.enableUpdater) {
-      return new UpdateInfomation(false, null);
-    }
+  public static Optional<VersionData> acquire() {
+    if (!BaseConfig.enableUpdater)
+      return Optional.empty();
+
     try {
       List<String> versions = getHistoryVersions();
       int curIndex = versions.indexOf(QuickShop.getVersion());
-      if (curIndex == -1 || curIndex == 0)
-        return new UpdateInfomation(false, QuickShop.getVersion());
       
-      String latest = versions.get(0);
-      boolean beta = latest.toLowerCase().contains("beta");
-      return new UpdateInfomation(beta, latest);
+      // Custom build or already latest
+      if (curIndex == -1 || curIndex == 0)
+        return Optional.empty();
+      else
+        return Optional.of(VersionData.create(versions.get(0)));
+      
     } catch (IOException e) {
-      Bukkit.getConsoleSender().sendMessage(ChatColor.RED
-          + "[QuickShop] Failed to check for an update on SpigotMC.org! It might be an internet issue or the SpigotMC host is down. If you want disable the update checker, you can disable in config.yml, but we still high-recommend check for updates on SpigotMC.org often.");
-      return new UpdateInfomation(false, null);
+      return Optional.empty();
     }
   }
-
+  
   public static byte[] downloadUpdatedJar() throws IOException {
     @Nullable
     String uurl;
