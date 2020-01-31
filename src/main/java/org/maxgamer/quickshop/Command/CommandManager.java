@@ -141,8 +141,8 @@ public class CommandManager implements TabCompleter, CommandExecutor {
   @Override
   public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
       @NotNull String commandLabel, @NotNull String[] cmdArg) {
-    if (QuickShop.instance.getBootError() != null) {
-      QuickShop.instance.getBootError().printErrors(sender);
+    if (QuickShop.instance().getBootError() != null) {
+      QuickShop.instance().getBootError().printErrors(sender);
       return true;
     }
 
@@ -197,7 +197,7 @@ public class CommandManager implements TabCompleter, CommandExecutor {
   public @Nullable List<String> onTabComplete(@NotNull CommandSender sender,
       @NotNull Command command, @NotNull String commandLabel, @NotNull String[] cmdArg) {
     // No args, it shouldn't happend
-    if (QuickShop.instance.getBootError() != null) {
+    if (QuickShop.instance().getBootError() != null) {
       return null;
     }
     if (sender instanceof Player) {

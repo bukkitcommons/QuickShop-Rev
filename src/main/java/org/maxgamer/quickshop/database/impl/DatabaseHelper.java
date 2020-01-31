@@ -74,7 +74,7 @@ public class DatabaseHelper {
     } catch (SQLException e) {
       // ignore
     }
-    if (QuickShop.instance.getDatabase().getCore() instanceof MySQLCore) {
+    if (QuickShop.instance().getDatabase().getCore() instanceof MySQLCore) {
       try {
         ps = db.getConnection().prepareStatement("ALTER TABLE " + BaseConfig.databasePrefix
             + "messages MODIFY COLUMN message text CHARACTER SET utf8mb4 NOT NULL AFTER owner");
@@ -89,7 +89,7 @@ public class DatabaseHelper {
 
   public void cleanMessage(long weekAgo) {
     try {
-      // QuickShop.instance.getDB().execute("DELETE FROM " + QuickShop.instance
+      // QuickShop.instance().getDB().execute("DELETE FROM " + QuickShop.instance
       // .getDbPrefix() + "messages WHERE time < ?", weekAgo);
       String sqlString = "DELETE FROM " + BaseConfig.databasePrefix + "messages WHERE time < ?";
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
@@ -133,7 +133,7 @@ public class DatabaseHelper {
     removeShop(x, y, z, world); // First purge old exist shop before create new shop.
     String sqlString = "INSERT INTO " + BaseConfig.databasePrefix
         + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    // QuickShop.instance.getDB().execute(q, owner, price, Util.serialize(item), x, y, z, world,
+    // QuickShop.instance().getDB().execute(q, owner, price, Util.serialize(item), x, y, z, world,
     // unlimited, shopType);
     PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
     ps.setString(1, owner);
@@ -162,7 +162,7 @@ public class DatabaseHelper {
 
   public boolean removeShop(int x, int y, int z, @NotNull String worldName) throws SQLException {
     // db.getConnection().createStatement()
-    // .executeUpdate("DELETE FROM " + QuickShop.instance.getDbPrefix() + "shops WHERE x = " + x + "
+    // .executeUpdate("DELETE FROM " + QuickShop.instance().getDbPrefix() + "shops WHERE x = " + x + "
     // AND y = " + y
     // + " AND z = " + z + " AND world = \"" + worldName + "\""
     // + (db.getCore() instanceof MySQLCore ? " LIMIT 1" : ""));
@@ -194,7 +194,7 @@ public class DatabaseHelper {
     try {
       String sqlString = "INSERT INTO " + BaseConfig.databasePrefix
           + "messages (owner, message, time) VALUES (?, ?, ?)";
-      // QuickShop.instance.getDB().execute(q, player.toString(), message,
+      // QuickShop.instance().getDB().execute(q, player.toString(), message,
       // System.currentTimeMillis());
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
       ps.setString(1, player.toString());
@@ -208,8 +208,8 @@ public class DatabaseHelper {
 
   public void updateOwner2UUID(@NotNull String ownerUUID, int x, int y, int z,
       @NotNull String worldName) throws SQLException {
-    // QuickShop.instance.getDB().getConnection().createStatement()
-    // .executeUpdate("UPDATE " + QuickShop.instance.getDbPrefix() + "shops SET owner = \"" +
+    // QuickShop.instance().getDB().getConnection().createStatement()
+    // .executeUpdate("UPDATE " + QuickShop.instance().getDbPrefix() + "shops SET owner = \"" +
     // ownerUUID.toString()
     // + "\" WHERE x = " + x + " AND y = " + y + " AND z = " + z
     // + " AND world = \"" + worldName + "\" LIMIT 1");

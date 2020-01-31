@@ -204,7 +204,7 @@ public class SentryErrorReporter {
    */
   public @Nullable UUID sendError(@NotNull Throwable throwable, @NotNull String... context) {
     try {
-      if (QuickShop.instance.getBootError() != null) {
+      if (QuickShop.instance().getBootError() != null) {
         return null; // Don't report any errors if boot failed.
       }
       if (tempDisable) {

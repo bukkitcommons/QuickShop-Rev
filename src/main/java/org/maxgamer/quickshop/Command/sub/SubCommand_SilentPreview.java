@@ -24,9 +24,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.InventoryPreview;
 import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.impl.ContainerShop;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
 

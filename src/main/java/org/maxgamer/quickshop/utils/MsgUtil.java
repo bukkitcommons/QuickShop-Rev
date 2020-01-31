@@ -65,7 +65,7 @@ import org.maxgamer.quickshop.utils.file.JSONFile;
 public class MsgUtil {
   public static String invaildMsg = "Invaild message";
   private static YamlConfiguration builtInDefaultLanguage = YamlConfiguration.loadConfiguration(
-      new InputStreamReader(QuickShop.instance.getLanguage().getFile("en", "messages")));
+      new InputStreamReader(QuickShop.instance().getLanguage().getFile("en", "messages")));
   private static YamlConfiguration enchi18n;
   private static boolean inited;
   private static YamlConfiguration itemi18n;

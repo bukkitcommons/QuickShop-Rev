@@ -54,7 +54,7 @@ public class GameLanguage extends Thread {
         if (count >= 20) {
           Util.debugLog(
               "No longer waiting file downloading because it now timed out, now downloading in background.");
-          QuickShop.instance.getLogger().info(
+          QuickShop.instance().getLogger().info(
               "No longer waiting file downloading because it now timed out, now downloading in background, please reset itemi18n.yml, potioni18n.yml and enchi18n.yml after download completed.");
         }
       } else {
@@ -114,17 +114,17 @@ public class GameLanguage extends Thread {
                   .accept(new ByteArrayInputStream(langJson.getBytes(StandardCharsets.UTF_8)));
             } else {
               Util.debugLog("Cannot download file.");
-              QuickShop.instance.getLogger().warning(
+              QuickShop.instance().getLogger().warning(
                   "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
           } else {
             Util.debugLog("Cannot get file hash for language " + languageCode1);
-            QuickShop.instance.getLogger().warning(
+            QuickShop.instance().getLogger().warning(
                 "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
           }
         } else {
           Util.debugLog("Cannot get version json.");
-          QuickShop.instance.getLogger().warning(
+          QuickShop.instance().getLogger().warning(
               "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
         }
       }
@@ -144,7 +144,7 @@ public class GameLanguage extends Thread {
         Util.debugLog("json is null");
       }
     } catch (Exception e) {
-      QuickShop.instance.getSentryErrorReporter().ignoreThrow();
+      QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       e.printStackTrace();
     }
   }
@@ -325,17 +325,17 @@ class GameLanguageLoadThread extends Thread {
                   .accept(new ByteArrayInputStream(langJson.getBytes(StandardCharsets.UTF_8)));
             } else {
               Util.debugLog("Cannot download file.");
-              QuickShop.instance.getLogger().warning(
+              QuickShop.instance().getLogger().warning(
                   "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
           } else {
             Util.debugLog("Cannot get file hash for language " + languageCode1);
-            QuickShop.instance.getLogger().warning(
+            QuickShop.instance().getLogger().warning(
                 "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
           }
         } else {
           Util.debugLog("Cannot get version json.");
-          QuickShop.instance.getLogger().warning(
+          QuickShop.instance().getLogger().warning(
               "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
         }
       }
@@ -355,11 +355,11 @@ class GameLanguageLoadThread extends Thread {
         Util.debugLog("json is null");
       }
     } catch (Exception e) {
-      QuickShop.instance.getSentryErrorReporter().ignoreThrow();
+      QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       e.printStackTrace();
     }
     if (!this.mainThreadWaiting) {
-      QuickShop.instance.getLogger().info(
+      QuickShop.instance().getLogger().info(
           "Download completed, please execute /qs reset lang to generate localized language files.");
     }
   }

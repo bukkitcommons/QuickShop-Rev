@@ -46,7 +46,7 @@ public class Updater {
     }
     try {
 
-      String localPluginVersion = QuickShop.instance.getDescription().getVersion();
+      String localPluginVersion = QuickShop.instance().getDescription().getVersion();
       String spigotPluginVersion =
           HttpRequest.get(new URL("https://api.spigotmc.org/legacy/update.php?resource=62575"))
               .execute().expectResponseCode(200).returnContent().asString("UTF-8").trim();
@@ -120,8 +120,8 @@ public class Updater {
     for (File plugin : plugins) {
       try {
         PluginDescriptionFile desc =
-            QuickShop.instance.getPluginLoader().getPluginDescription(plugin);
-        if (!desc.getName().equals(QuickShop.instance.getDescription().getName())) {
+            QuickShop.instance().getPluginLoader().getPluginDescription(plugin);
+        if (!desc.getName().equals(QuickShop.instance().getDescription().getName())) {
           continue;
         }
         Util.debugLog("Selected: " + plugin.getPath());

@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -264,7 +265,7 @@ public class Util {
         debugLogs.remove(0);
       }
       if (devMode) {
-        QuickShop.instance.getLogger().info(text);
+        QuickShop.instance().getLogger().info(text);
       }
     }
     long debugLogCost = System.currentTimeMillis() - startTime;
@@ -275,8 +276,8 @@ public class Util {
           BaseConfig.debugLogger = false;
           ConfigurationManager.getManager(plugin).save(BaseConfig.class);
           disableDebugLogger = true;
-          QuickShop.instance.saveConfig();
-          QuickShop.instance.getLogger().warning(
+          QuickShop.instance().saveConfig();
+          QuickShop.instance().getLogger().warning(
               "Detected the debug logger tooked time keep too lang, QuickShop already auto-disable debug logger, your server performance should back to normal. But you must re-enable it if you want to report any bugs.");
         }
       }
@@ -885,14 +886,14 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      Shop firstShop = plugin.getShopManager().getShop(c.getLocation());
+      Optional<Shop> firstShop = plugin.getShopManager().getShop(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Block secondHalf = getSecondHalf(c);
-      Shop secondShop =
-          secondHalf == null ? null : plugin.getShopManager().getShop(secondHalf.getLocation());
-      if (firstShop != null && !p.getUniqueId().equals(firstShop.getOwner())
-          || secondShop != null && !p.getUniqueId().equals(secondShop.getOwner())) {
+      Optional<Shop> secondShop =
+          secondHalf == null ? Optional.empty() : plugin.getShopManager().getShop(secondHalf.getLocation());
+      if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
+          || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
         return true;
       }
     }
@@ -1153,11 +1154,11 @@ public class Util {
 
   /** Send warning message when some plugin calling deprecated method... With the trace. */
   public static void sendDeprecatedMethodWarn() {
-    QuickShop.instance.getLogger().warning(
+    QuickShop.instance().getLogger().warning(
         "Some plugin is calling a Deprecated method, Please contact the author to tell them to use the new api!");
     StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
     for (StackTraceElement stackTraceElement : stackTraceElements) {
-      QuickShop.instance.getLogger()
+      QuickShop.instance().getLogger()
           .warning("at " + stackTraceElement.getClassName() + "#"
               + stackTraceElement.getMethodName() + " (" + stackTraceElement.getFileName() + ":"
               + stackTraceElement.getLineNumber() + ")");
@@ -1277,7 +1278,7 @@ public class Util {
    * @return DevEdition status
    */
   public static boolean isDevEdition() {
-    String version = QuickShop.instance.getDescription().getVersion().toLowerCase();
+    String version = QuickShop.instance().getDescription().getVersion().toLowerCase();
     return (version.contains("dev") || version.contains("develop") || version.contains("alpha")
         || version.contains("beta") || version.contains("test") || version.contains("snapshot")
         || version.contains("preview"));
@@ -1351,7 +1352,7 @@ public class Util {
    * @return The caching folder
    */
   public static File getCacheFolder() {
-    File cache = new File(QuickShop.instance.getDataFolder(), "cache");
+    File cache = new File(QuickShop.instance().getDataFolder(), "cache");
     if (!cache.exists()) {
       cache.mkdirs();
     }

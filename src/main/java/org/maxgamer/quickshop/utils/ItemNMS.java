@@ -46,9 +46,9 @@ public abstract class ItemNMS {
           .getDeclaredMethod("save", nbtTagCompoundClass);
 
     } catch (Throwable t) {
-      QuickShop.instance.getLogger().info("A error happend:");
+      QuickShop.instance().getLogger().info("A error happend:");
       t.printStackTrace();
-      QuickShop.instance.getLogger().info(
+      QuickShop.instance().getLogger().info(
           "Try to update QSRR and leave feedback about the bug on issue tracker if it continues.");
     }
   }

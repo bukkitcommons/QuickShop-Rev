@@ -38,8 +38,9 @@ public class SubCommand_About implements CommandProcesser {
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
+    QuickShop.instance();
     sender.sendMessage(
-        ChatColor.AQUA + "QuickShop " + ChatColor.YELLOW + QuickShop.instance.getFork());
+        ChatColor.AQUA + "QuickShop " + ChatColor.YELLOW + QuickShop.getFork());
     sender.sendMessage(ChatColor.AQUA + "Ver " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
         + QuickShop.getVersion());
     if (QuickShop.getVersion().toUpperCase().contains("LTS")) {
@@ -68,7 +69,7 @@ public class SubCommand_About implements CommandProcesser {
           ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN + "[Main Line]");
     }
     sender.sendMessage(ChatColor.AQUA + "Dev " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-        + Util.list2String(QuickShop.instance.getDescription().getAuthors()));
+        + Util.list2String(QuickShop.instance().getDescription().getAuthors()));
     sender.sendMessage(ChatColor.GOLD + "Powered by Bukkit Common Studio");
     sender.sendMessage(ChatColor.RED + "Made with ❤");
   }

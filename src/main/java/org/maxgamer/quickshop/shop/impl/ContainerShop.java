@@ -1,20 +1,4 @@
-/*
- * This file is a part of project QuickShop, the name is ContainerShop.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.impl;
 
 import com.lishid.openinv.OpenInv;
 import java.sql.SQLException;
@@ -24,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import lombok.EqualsAndHashCode;
@@ -51,6 +36,9 @@ import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
 import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
 import org.maxgamer.quickshop.event.ShopUnloadEvent;
 import org.maxgamer.quickshop.event.ShopUpdateEvent;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopModerator;
+import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
@@ -70,7 +58,6 @@ public class ContainerShop implements Shop {
   @EqualsAndHashCode.Exclude
   private boolean isLoaded = false;
   private ShopModerator moderator;
-  private QuickShop plugin;
   private double price;
   private ShopType shopType;
   private boolean unlimited;
@@ -80,7 +67,6 @@ public class ContainerShop implements Shop {
     this.shopType = s.shopType;
     this.item = s.item;
     this.location = s.location;
-    this.plugin = s.plugin;
     this.unlimited = s.unlimited;
     this.moderator = s.moderator;
     this.price = s.price;
@@ -104,7 +90,6 @@ public class ContainerShop implements Shop {
     this.price = price;
     this.moderator = moderator;
     this.item = new ItemStack(item);
-    this.plugin = QuickShop.instance;
     this.item.setAmount(1);
     this.shopType = type;
     this.unlimited = unlimited;
@@ -190,7 +175,7 @@ public class ContainerShop implements Shop {
    */
   @Override
   public boolean matches(@Nullable ItemStack item) {
-    return plugin.getItemMatcher().matches(this.item, item);
+    return QuickShop.instance().getItemMatcher().matches(this.item, item);
   }
 
   /** @return The location of the shops chest */
@@ -237,11 +222,11 @@ public class ContainerShop implements Shop {
     String world = Objects.requireNonNull(this.getLocation().getWorld()).getName();
     int unlimited = this.isUnlimited() ? 1 : 0;
     try {
-      plugin.getDatabaseHelper().updateShop(ShopModerator.serialize(this.moderator.clone()),
+      QuickShop.instance().getDatabaseHelper().updateShop(ShopModerator.serialize(this.moderator.clone()),
           this.getItem(), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
     } catch (Exception e) {
       e.printStackTrace();
-      plugin.getLogger().log(Level.WARNING,
+      QuickShop.instance().getLogger().log(Level.WARNING,
           "Could not update a shop in the database! Changes will revert after a reboot!");
     }
   }
@@ -317,7 +302,7 @@ public class ContainerShop implements Shop {
       this.setSignText();
       // This should not happen.
       if (amount1 > 0) {
-        plugin.getLogger().log(Level.WARNING,
+        QuickShop.instance().getLogger().log(Level.WARNING,
             "Could not take all items from a players inventory on purchase! " + p.getName()
                 + ", missing: " + amount1 + ", item: " + Util.getItemStackName(this.getItem())
                 + "!");
@@ -392,15 +377,15 @@ public class ContainerShop implements Shop {
     String world = Objects.requireNonNull(this.getLocation().getWorld()).getName();
     // Refund if necessary
     if (BaseConfig.refundable) {
-      plugin.getEconomy().deposit(this.getOwner(), BaseConfig.refundCost);
+      QuickShop.instance().getEconomy().deposit(this.getOwner(), BaseConfig.refundCost);
     }
     if (fromMemory) {
       // Delete it from memory
-      plugin.getShopManager().removeShop(this);
+      QuickShop.instance().getShopManager().removeShop(this);
     } else {
       try {
-        plugin.getShopManager().removeShop(this);
-        plugin.getDatabaseHelper().removeShop(x, y, z, world);
+        QuickShop.instance().getShopManager().removeShop(this);
+        QuickShop.instance().getDatabaseHelper().removeShop(x, y, z, world);
       } catch (SQLException e) {
         e.printStackTrace();
       }
@@ -558,13 +543,14 @@ public class ContainerShop implements Shop {
    * @return the shop that shares it's inventory with this one. Will return null if this shop is not
    *         attached to another.
    */
-  public @Nullable ContainerShop getAttachedShop() {
+  @Nullable
+  public ContainerShop getAttachedShop() {
     Block c = Util.getSecondHalf(this.getLocation().getBlock());
     if (c == null) {
       return null;
     }
-    Shop shop = plugin.getShopManager().getShop(c.getLocation());
-    return shop == null ? null : (ContainerShop) shop;
+    Optional<Shop> shop = QuickShop.instance().getShopManager().getShop(c.getLocation());
+    return (ContainerShop) shop.get();
   }
 
   /**
@@ -586,8 +572,8 @@ public class ContainerShop implements Shop {
   public @Nullable Inventory getInventory() {
     try {
       if (location.getBlock().getState().getType() == Material.ENDER_CHEST
-          && plugin.getOpenInvPlugin() != null) {
-        OpenInv openInv = ((OpenInv) plugin.getOpenInvPlugin());
+          && QuickShop.instance().getOpenInvPlugin() != null) {
+        OpenInv openInv = ((OpenInv) QuickShop.instance().getOpenInvPlugin());
         return openInv.getSpecialEnderChest(
             Objects.requireNonNull(
                 openInv.loadPlayer(Bukkit.getOfflinePlayer(this.moderator.getOwner()))),
@@ -742,7 +728,7 @@ public class ContainerShop implements Shop {
 
     for (Block b : blocks) {
       if (b == null) {
-        plugin.getLogger().warning("Null signs in the queue, skipping");
+        QuickShop.instance().getLogger().warning("Null signs in the queue, skipping");
         continue;
       }
       Material mat = b.getType();
@@ -873,8 +859,8 @@ public class ContainerShop implements Shop {
     }
 
     this.isLoaded = true;
-    Objects.requireNonNull(plugin.getShopManager().getLoadedShops()).add(this);
-    plugin.getShopContainerWatcher().scheduleCheck(this);
+    Objects.requireNonNull(QuickShop.instance().getShopManager().getLoadedShops()).add(this);
+    QuickShop.instance().getShopContainerWatcher().scheduleCheck(this);
     // check price restriction
     Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.getMaterial());
 
@@ -902,7 +888,7 @@ public class ContainerShop implements Shop {
     }
     update();
     this.isLoaded = false;
-    plugin.getShopManager().getLoadedShops().remove(this);
+    QuickShop.instance().getShopManager().getLoadedShops().remove(this);
     ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
     Bukkit.getPluginManager().callEvent(shopUnloadEvent);
   }

@@ -51,7 +51,10 @@ public class BaseConfig {
   public static int displayTypeId = 0;
 
   @Node(value = "settings.tax.account")
-  public static String taxAccount = "tax";
+  public static String taxAccount = "";
+  
+  @Node(value = "settings.tax.rate")
+  public static double taxRate = 0.01;
 
   @Node(value = "settings.matcher.item.damage")
   public static boolean damage = true;
@@ -236,4 +239,7 @@ public class BaseConfig {
   
   @Node(value = "shop.blacklist-lores")
   public static List<String> blacklistLores = Lists.newArrayList();
+  
+  @Node(value = "shop.use-fast-shop-search-algorithm")
+  public static boolean useFastShopSearchAlgorithm = false;
 }

@@ -69,8 +69,8 @@ import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.ShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.impl.ShopLoader;
+import org.maxgamer.quickshop.shop.impl.ShopManager;
 import org.maxgamer.quickshop.utils.Compatibility;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.IncompatibleChecker;
@@ -197,7 +197,7 @@ public class QuickShop extends JavaPlugin {
    * @return Plugin Version
    */
   public static String getVersion() {
-    return QuickShop.instance.getDescription().getVersion();
+    return QuickShop.instance().getDescription().getVersion();
   }
 
   /**
@@ -535,7 +535,7 @@ public class QuickShop extends JavaPlugin {
             getConfig().getInt("shop.display-check-time")); // not worth async
       }
     }
-    this.shopManager = new ShopManager(this);
+    this.shopManager = new ShopManager();
     this.databaseManager = new DatabaseManager(this, database);
     this.permissionChecker = new PermissionChecker(this);
 

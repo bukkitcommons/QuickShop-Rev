@@ -22,7 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -43,12 +42,12 @@ public class UpdateWatcher implements Listener {
   private static UpdateInfomation info = null;
 
   public static String fixVer(@NotNull String originalVer) {
-    originalVer = originalVer.replaceAll(QuickShop.instance.getFork(), "");
+    originalVer = originalVer.replaceAll(QuickShop.instance().getFork(), "");
     originalVer = originalVer.trim();
     return originalVer;
   }
   
-  // Match *.*.*, where * is a number from 0 to 9
+  // Match *.*.*, where * are version numbers
   private static final Pattern VERSION_PATTERN = Pattern.compile("\\d+\\.\\d+\\.\\d+");
   
   private static boolean isHigherVersion(@NotNull String current, @NotNull String test) {
@@ -90,9 +89,9 @@ public class UpdateWatcher implements Listener {
         hasNewUpdate = true;
 
         if (!info.isBeta()) {
-          QuickShop.instance.getLogger()
+          QuickShop.instance().getLogger()
               .info("A new version of QuickShop has been released! [" + info.getVersion() + "]");
-          QuickShop.instance.getLogger()
+          QuickShop.instance().getLogger()
               .info("Update here: https://www.spigotmc.org/resources/62575/");
 
           Bukkit.getOnlinePlayers().forEach(player -> {
@@ -129,10 +128,10 @@ public class UpdateWatcher implements Listener {
             }
           });
         } else {
-          QuickShop.instance.getLogger().info("A new BETA version of QuickShop is available!");
-          QuickShop.instance.getLogger()
+          QuickShop.instance().getLogger().info("A new BETA version of QuickShop is available!");
+          QuickShop.instance().getLogger()
               .info("Update here: https://www.spigotmc.org/resources/62575/");
-          QuickShop.instance.getLogger()
+          QuickShop.instance().getLogger()
               .info("This is a BETA version, which means you should use it with caution.");
         }
       }

@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.impl;
 
 import com.google.gson.JsonSyntaxException;
 import java.sql.ResultSet;
@@ -37,6 +37,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopModerator;
+import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.Timer;
 import org.maxgamer.quickshop.utils.Util;
 
