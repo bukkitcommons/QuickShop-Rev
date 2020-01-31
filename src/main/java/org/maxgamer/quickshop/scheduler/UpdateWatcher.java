@@ -20,18 +20,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.net.ssl.HttpsURLConnection;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -44,6 +37,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.UpdateInfomation;
 import org.maxgamer.quickshop.utils.Updater;
+import com.google.common.collect.Lists;
 
 public class UpdateWatcher implements Listener {
   public static boolean hasNewUpdate = false;
@@ -56,42 +50,23 @@ public class UpdateWatcher implements Listener {
     return originalVer;
   }
 
-  public static List<String> getHistoryVersions() throws IOException {
-    String hostUrl = "https://www.spigotmc.org/resources/62575/history";
-    HttpURLConnection conn = (HttpURLConnection) new URL(hostUrl).openConnection();
-    
-    conn.setDoInput(true);
-    conn.setRequestMethod("GET");
-    conn.setRequestProperty("User-Agent", "Chrome/79.0.3945.130");
-    
-    BufferedReader bufIn = new BufferedReader(
-        new InputStreamReader(conn.getInputStream()));
-    
-    List<String> list = new ArrayList<String>();
-    String header = "<td class=\"version\">";
-    String tailer = "</td>";
-    String line = null;
-    
-    while ((line = bufIn.readLine()) != null) {
-      if (line.startsWith(header) && line.endsWith(tailer))
-        list.add(line.substring(header.length(), line.indexOf(tailer)));
-    }
-    
-    return list;
-  }
-
   public static void init() {
     cronTask = new BukkitRunnable() {
 
       @Override
       public void run() {
-        try {
-          int index = getHistoryVersions().indexOf(QuickShop.getVersion());
-          hasNewUpdate = index != -1 && index != 0;
-        } catch (IOException e) {
+        info = Updater.checkUpdate();
+
+        if (info.getVersion() == null) {
           hasNewUpdate = false;
           return;
         }
+
+        if (info.getVersion().equals(QuickShop.getVersion())) {
+          hasNewUpdate = false;
+          return;
+        }
+        hasNewUpdate = true;
 
         if (!info.isBeta()) {
           QuickShop.instance().getLogger()

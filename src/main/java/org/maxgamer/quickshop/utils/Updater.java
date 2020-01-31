@@ -16,13 +16,17 @@
 
 package org.maxgamer.quickshop.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -33,8 +37,33 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.utils.github.GithubAPI;
 import org.maxgamer.quickshop.utils.github.ReleaseJsonContainer;
+import com.google.common.collect.Lists;
 
 public class Updater {
+  public static List<String> getHistoryVersions() throws IOException {
+    String hostUrl = "https://www.spigotmc.org/resources/62575/history";
+    HttpURLConnection conn = (HttpURLConnection) new URL(hostUrl).openConnection();
+    
+    conn.setDoInput(true);
+    conn.setRequestMethod("GET");
+    conn.setRequestProperty("User-Agent", "Chrome/79.0.3945.130");
+    
+    BufferedReader bufIn = new BufferedReader(
+        new InputStreamReader(conn.getInputStream()));
+    
+    List<String> list = Lists.newArrayList();
+    String header = "<td class=\"version\">";
+    String tailer = "</td>";
+    String line = null;
+    
+    while ((line = bufIn.readLine()) != null) {
+      if (line.startsWith(header) && line.endsWith(tailer))
+        list.add(line.substring(header.length(), line.indexOf(tailer)));
+    }
+    
+    return list;
+  }
+  
   /**
    * Check new update
    *
@@ -45,17 +74,14 @@ public class Updater {
       return new UpdateInfomation(false, null);
     }
     try {
-
-      String localPluginVersion = QuickShop.instance().getDescription().getVersion();
-      String spigotPluginVersion =
-          HttpRequest.get(new URL("https://api.spigotmc.org/legacy/update.php?resource=62575"))
-              .execute().expectResponseCode(200).returnContent().asString("UTF-8").trim();
-      if (!spigotPluginVersion.isEmpty() && !spigotPluginVersion.equals(localPluginVersion)) {
-        Util.debugLog(spigotPluginVersion);
-        return new UpdateInfomation(spigotPluginVersion.toLowerCase().contains("beta"),
-            spigotPluginVersion);
-      }
-      return new UpdateInfomation(false, spigotPluginVersion);
+      List<String> versions = getHistoryVersions();
+      int curIndex = versions.indexOf(QuickShop.getVersion());
+      if (curIndex == -1 || curIndex == 0)
+        return new UpdateInfomation(false, QuickShop.getVersion());
+      
+      String latest = versions.get(0);
+      boolean beta = latest.toLowerCase().contains("beta");
+      return new UpdateInfomation(beta, latest);
     } catch (IOException e) {
       Bukkit.getConsoleSender().sendMessage(ChatColor.RED
           + "[QuickShop] Failed to check for an update on SpigotMC.org! It might be an internet issue or the SpigotMC host is down. If you want disable the update checker, you can disable in config.yml, but we still high-recommend check for updates on SpigotMC.org often.");
