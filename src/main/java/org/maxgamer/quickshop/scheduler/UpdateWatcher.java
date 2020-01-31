@@ -16,10 +16,19 @@
 
 package org.maxgamer.quickshop.scheduler;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.net.ssl.HttpsURLConnection;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.math.NumberUtils;
@@ -42,32 +51,33 @@ public class UpdateWatcher implements Listener {
   private static UpdateInfomation info = null;
 
   public static String fixVer(@NotNull String originalVer) {
-    originalVer = originalVer.replaceAll(QuickShop.instance().getFork(), "");
+    originalVer = originalVer.replaceAll(QuickShop.getFork(), "");
     originalVer = originalVer.trim();
     return originalVer;
   }
-  
-  // Match *.*.*, where * are version numbers
-  private static final Pattern VERSION_PATTERN = Pattern.compile("\\d+\\.\\d+\\.\\d+");
-  
-  private static boolean isHigherVersion(@NotNull String current, @NotNull String test) {
-    Matcher currentMatcher = VERSION_PATTERN.matcher(current);
-    Matcher testMatcher    = VERSION_PATTERN.matcher(test);
-    if (!currentMatcher.find() || !testMatcher.find())
-      return true;
+
+  public static List<String> getHistoryVersions() throws IOException {
+    String hostUrl = "https://www.spigotmc.org/resources/62575/history";
+    HttpURLConnection conn = (HttpURLConnection) new URL(hostUrl).openConnection();
     
-    String[] currentVers = currentMatcher.group().split("\\.");
-    String[] testVers    = testMatcher.group().split("\\.");
+    conn.setDoInput(true);
+    conn.setRequestMethod("GET");
+    conn.setRequestProperty("User-Agent", "Chrome/79.0.3945.130");
     
-    for (int i = 0; i < Math.min(currentVers.length, testVers.length); i++) {
-      int currentVer = NumberUtils.toInt(currentVers[i]), testVer = NumberUtils.toInt(testVers[i]);
-      if (testVer > currentVer)
-        return true;
-      else if (currentVer > testVer)
-        return false;
+    BufferedReader bufIn = new BufferedReader(
+        new InputStreamReader(conn.getInputStream()));
+    
+    List<String> list = new ArrayList<String>();
+    String header = "<td class=\"version\">";
+    String tailer = "</td>";
+    String line = null;
+    
+    while ((line = bufIn.readLine()) != null) {
+      if (line.startsWith(header) && line.endsWith(tailer))
+        list.add(line.substring(header.length(), line.indexOf(tailer)));
     }
     
-    return testVers.length > currentVers.length;
+    return list;
   }
 
   public static void init() {
@@ -75,18 +85,13 @@ public class UpdateWatcher implements Listener {
 
       @Override
       public void run() {
-        info = Updater.checkUpdate();
-
-        if (info.getVersion() == null) {
+        try {
+          int index = getHistoryVersions().indexOf(QuickShop.getVersion());
+          hasNewUpdate = index != -1 && index != 0;
+        } catch (IOException e) {
           hasNewUpdate = false;
           return;
         }
-
-        if (!isHigherVersion(QuickShop.getVersion(), info.getVersion())) {
-          hasNewUpdate = false;
-          return;
-        }
-        hasNewUpdate = true;
 
         if (!info.isBeta()) {
           QuickShop.instance().getLogger()
