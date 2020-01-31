@@ -18,8 +18,12 @@ package org.maxgamer.quickshop.scheduler;
 
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -43,6 +47,29 @@ public class UpdateWatcher implements Listener {
     originalVer = originalVer.trim();
     return originalVer;
   }
+  
+  // Match *.*.*, where * is a number from 0 to 9
+  private static final Pattern VERSION_PATTERN = Pattern.compile("\\d+\\.\\d+\\.\\d+");
+  
+  private static boolean isHigherVersion(@NotNull String current, @NotNull String test) {
+    Matcher currentMatcher = VERSION_PATTERN.matcher(current);
+    Matcher testMatcher    = VERSION_PATTERN.matcher(test);
+    if (!currentMatcher.find() || !testMatcher.find())
+      return true;
+    
+    String[] currentVers = currentMatcher.group().split("\\.");
+    String[] testVers    = testMatcher.group().split("\\.");
+    
+    for (int i = 0; i < Math.min(currentVers.length, testVers.length); i++) {
+      int currentVer = NumberUtils.toInt(currentVers[i]), testVer = NumberUtils.toInt(testVers[i]);
+      if (testVer > currentVer)
+        return true;
+      else if (currentVer > testVer)
+        return false;
+    }
+    
+    return testVers.length > currentVers.length;
+  }
 
   public static void init() {
     cronTask = new BukkitRunnable() {
@@ -56,7 +83,7 @@ public class UpdateWatcher implements Listener {
           return;
         }
 
-        if (info.getVersion().equals(QuickShop.getVersion())) {
+        if (!isHigherVersion(QuickShop.getVersion(), info.getVersion())) {
           hasNewUpdate = false;
           return;
         }
