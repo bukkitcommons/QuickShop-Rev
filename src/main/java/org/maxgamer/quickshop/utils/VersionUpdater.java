@@ -72,8 +72,7 @@ public class VersionUpdater {
   }
   
   public static byte[] downloadUpdatedJar() throws IOException {
-    @Nullable
-    String uurl;
+    @Nullable String uurl;
     long uurlSize;
     try {
       ReleaseJsonContainer.AssetsBean bean =
@@ -83,7 +82,7 @@ public class VersionUpdater {
     } catch (Throwable ig) {
       throw new IOException(ig.getMessage());
     }
-
+    
     if (uurl == null) {
       throw new IOException("Failed read the URL, cause it is empty.");
     }

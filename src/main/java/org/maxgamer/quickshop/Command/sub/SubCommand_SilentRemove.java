@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -49,22 +50,22 @@ public class SubCommand_SilentRemove implements CommandProcesser {
     }
 
     final Player p = (Player) sender;
-    final Shop shop =
+    final Optional<Shop> shop =
         plugin.getShopManager().getShop(new Location(plugin.getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
-    if (shop == null) {
+    if (!shop.isPresent()) {
       sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
       return;
     }
 
-    if (!shop.getModerator().isModerator(p.getUniqueId())
+    if (!shop.get().getModerator().isModerator(p.getUniqueId())
         && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.destroy")) {
       sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
       return;
     }
 
-    shop.onUnload();
-    shop.delete();
+    shop.get().onUnload();
+    shop.get().delete();
   }
 }

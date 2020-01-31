@@ -1,22 +1,7 @@
-/*
- * This file is a part of project QuickShop, the name is BlockListener.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.listeners;
 
 import lombok.AllArgsConstructor;
+import java.util.Optional;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -33,7 +18,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Info;
@@ -54,8 +38,7 @@ public class BlockListener implements Listener {
    * @param loc The location of the sign
    * @return The shop
    */
-  @Nullable
-  private Shop getShopNextTo(@NotNull Location loc) {
+  private Optional<Shop> getShopNextTo(@NotNull Location loc) {
     final Block b = Util.getAttached(loc.getBlock());
     // Util.getAttached(b)
     if (b == null) {
@@ -87,12 +70,12 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     // If the shop was a chest
     if (Util.canBeShop(b)) {
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
-      if (shop == null) {
+      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
+      if (shop.get() == null) {
         return;
       }
       // If they're either survival or the owner, they can break it
-      if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.getOwner())) {
+      if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.get().getOwner())) {
         // Check SuperTool
         if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
           p.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", p));
@@ -110,7 +93,7 @@ public class BlockListener implements Listener {
         return;
       }
 
-      if (!shop.getModerator().isOwner(p.getUniqueId())
+      if (!shop.get().getModerator().isOwner(p.getUniqueId())
           && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
         e.setCancelled(true);
         p.sendMessage(MsgUtil.getMessage("no-permission", p));
@@ -123,8 +106,8 @@ public class BlockListener implements Listener {
         action.setAction(ShopAction.CANCELLED);
       }
 
-      shop.onUnload();
-      shop.delete();
+      shop.get().onUnload();
+      shop.get().delete();
       p.sendMessage(MsgUtil.getMessage("success-removed-shop", p));
     } else if (Util.isWallSign(b.getType())) {
       if (b instanceof Sign) {
@@ -136,18 +119,18 @@ public class BlockListener implements Listener {
         }
       }
 
-      final Shop shop = getShopNextTo(b.getLocation());
+      Optional<Shop> shop = getShopNextTo(b.getLocation());
 
-      if (shop == null) {
+      if (shop.get() == null) {
         return;
       }
       // If they're in creative and not the owner, don't let them
       // (accidents happen)
-      if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.getOwner())) {
+      if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.get().getOwner())) {
         // Check SuperTool
         if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
           p.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", p));
-          shop.delete();
+          shop.get().delete();
           return;
         }
         e.setCancelled(true);
@@ -174,9 +157,9 @@ public class BlockListener implements Listener {
     }
 
     // Delayed task. Event triggers when item is moved, not when it is received.
-    final Shop shop = plugin.getShopManager().getShopIncludeAttached(location);
-    if (shop != null) {
-      plugin.getSignUpdateWatcher().scheduleSignUpdate(shop);
+    final Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(location);
+    if (shop.get() != null) {
+      plugin.getSignUpdateWatcher().scheduleSignUpdate(shop.get());
     }
   }
 

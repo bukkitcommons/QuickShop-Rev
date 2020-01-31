@@ -14,6 +14,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
@@ -46,6 +48,7 @@ import org.maxgamer.quickshop.shop.ShopChunk;
 import org.maxgamer.quickshop.shop.ShopModerator;
 import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 /** Manage a lot of shops. */
@@ -725,6 +728,10 @@ public class ShopManager {
       public @Nullable String format(double d) {
         return QuickShop.instance().getEconomy().format(d);
       }
+      
+      public ShopViewer getShop(@NotNull Block block) {
+        return getShop(block);
+      }
 
       /**
        * Gets a shop in a specific location
@@ -732,10 +739,10 @@ public class ShopManager {
        * @param loc The location to get the shop from
        * @return The shop at that location
        */
-      public Optional<Shop> getShop(@NotNull Location loc) {
+      public ShopViewer getShop(@NotNull Location loc) {
         HashMap<Location, Shop> inChunk = getShops(loc.getChunk());
         if (inChunk == null) {
-          return Optional.empty();
+          return ShopViewer.empty();
         }
         loc = loc.clone();
         // Fix double chest XYZ issue
@@ -744,9 +751,25 @@ public class ShopManager {
         loc.setZ(loc.getBlockZ());
         // We can do this because WorldListener updates the world reference so
         // the world in loc is the same as world in inChunk.get(loc)
-        return Optional.ofNullable(inChunk.get(loc));
+        return ShopViewer.of(inChunk.get(loc));
       }
-
+      
+      public void accept(@NotNull Location loc, @NotNull Consumer<Shop> consumer) {
+        HashMap<Location, Shop> inChunk = getShops(loc.getChunk());
+        if (inChunk != null) {
+          loc = loc.clone();
+          // Fix double chest XYZ issue
+          loc.setX(loc.getBlockX());
+          loc.setY(loc.getBlockY());
+          loc.setZ(loc.getBlockZ());
+          // We can do this because WorldListener updates the world reference so
+          // the world in loc is the same as world in inChunk.get(loc)
+          Shop shop = inChunk.get(loc);
+          if (shop != null)
+            consumer.accept(shop);
+        }
+      }
+      
       /**
        * Gets a shop in a specific location Include the attached shop, e.g DoubleChest shop.
        *

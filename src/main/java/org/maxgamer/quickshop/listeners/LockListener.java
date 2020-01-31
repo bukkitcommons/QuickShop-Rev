@@ -17,6 +17,7 @@
 package org.maxgamer.quickshop.listeners;
 
 import lombok.AllArgsConstructor;
+import java.util.Optional;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -125,17 +126,14 @@ public class LockListener implements Listener {
     final Player p = e.getPlayer();
     // If the chest was a chest
     if (Util.canBeShop(b)) {
-      final Shop shop = plugin.getShopManager().getShopIncludeAttached(b.getLocation());
-
-      if (shop == null) {
-        return; // Wasn't a shop
-      }
-      // If they owned it or have bypass perms, they can destroy it
-      if (!shop.getOwner().equals(p.getUniqueId())
-          && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
-        e.setCancelled(true);
-        p.sendMessage(MsgUtil.getMessage("no-permission", p));
-      }
+      plugin.getShopManager().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
+        // If they owned it or have bypass perms, they can destroy it
+        if (!shop.getOwner().equals(p.getUniqueId())
+            && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
+          e.setCancelled(true);
+          p.sendMessage(MsgUtil.getMessage("no-permission", p));
+        }
+      });
     } else if (Util.isWallSign(b.getType())) {
       if (b instanceof Sign) {
         final Sign sign = (Sign) b;
@@ -153,18 +151,15 @@ public class LockListener implements Listener {
         return;
       }
 
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
-
-      if (shop == null) {
-        return;
-      }
-      // If they're the shop owner or have bypass perms, they can destroy
-      // it.
-      if (!shop.getOwner().equals(p.getUniqueId())
-          && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
-        e.setCancelled(true);
-        p.sendMessage(MsgUtil.getMessage("no-permission", p));
-      }
+      plugin.getShopManager().getShop(b.getLocation()).ifPresent(shop -> {
+        // If they're the shop owner or have bypass perms, they can destroy
+        // it.
+        if (!shop.getOwner().equals(p.getUniqueId())
+            && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
+          e.setCancelled(true);
+          p.sendMessage(MsgUtil.getMessage("no-permission", p));
+        }
+      });
     }
   }
 
@@ -187,20 +182,17 @@ public class LockListener implements Listener {
       return; // Didn't right click it, we dont care.
     }
 
-    final Shop shop = plugin.getShopManager().getShopIncludeAttached(b.getLocation());
     // Make sure they're not using the non-shop half of a double chest.
-    if (shop == null) {
-      return;
-    }
-
-    if (!shop.getModerator().isModerator(p.getUniqueId())) {
-      if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.open")) {
-        p.sendMessage(MsgUtil.getMessage("bypassing-lock", p));
-        return;
+    plugin.getShopManager().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
+      if (!shop.getModerator().isModerator(p.getUniqueId())) {
+        if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.open")) {
+          p.sendMessage(MsgUtil.getMessage("bypassing-lock", p));
+          return;
+        }
+        p.sendMessage(MsgUtil.getMessage("that-is-locked", p));
+        e.setCancelled(true);
       }
-      p.sendMessage(MsgUtil.getMessage("that-is-locked", p));
-      e.setCancelled(true);
-    }
+    });
   }
   /*
    * Moved to ShopProtectionListener Handles shops breaking through explosions

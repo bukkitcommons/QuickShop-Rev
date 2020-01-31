@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.listeners;
 
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.bukkit.GameMode;
@@ -72,9 +73,11 @@ public class PlayerListener implements Listener {
         } else {
           block = e.getClickedBlock();
         }
+        
+        Optional<Shop> optional = plugin.getShopManager().getShop(block.getLocation());
 
-        if (plugin.getShopManager().getShop(Objects.requireNonNull(block).getLocation()) != null
-            && (Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation()))
+        if (optional.isPresent()
+            && (optional.get()
                 .getOwner().equals(e.getPlayer().getUniqueId()) || e.getPlayer().isOp())) {
           if (BaseConfig.sneakToControl
               && !e.getPlayer().isSneaking()) {
@@ -86,10 +89,8 @@ public class PlayerListener implements Listener {
                 1.0f);
           }
 
-          MsgUtil.sendControlPanelInfo(e.getPlayer(),
-              Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation())));
-          Objects.requireNonNull(plugin.getShopManager().getShop(block.getLocation()))
-              .setSignText();
+          MsgUtil.sendControlPanelInfo(e.getPlayer(), optional.get());
+          optional.get().setSignText();
         }
       }
 
@@ -110,9 +111,9 @@ public class PlayerListener implements Listener {
     final Location loc = b.getLocation();
     final ItemStack item = e.getItem();
     // Get the shop
-    Shop shop = plugin.getShopManager().getShop(loc);
+    Optional<Shop> shop = plugin.getShopManager().getShop(loc);
     // If that wasn't a shop, search nearby shops
-    if (shop == null) {
+    if (!shop.isPresent()) {
       final Block attached;
 
       if (Util.isWallSign(b.getType())) {
@@ -125,8 +126,8 @@ public class PlayerListener implements Listener {
         attached = Util.getSecondHalf(b);
 
         if (attached != null) {
-          Shop secondHalfShop = plugin.getShopManager().getShop(attached.getLocation());
-          if (secondHalfShop != null && !p.getUniqueId().equals(secondHalfShop.getOwner())) {
+          Optional<Shop> secondHalfShop = plugin.getShopManager().getShop(attached.getLocation());
+          if (secondHalfShop.isPresent() && !p.getUniqueId().equals(secondHalfShop.get().getOwner())) {
             // If player not the owner of the shop, make him select the second half of the
             // shop
             // Otherwise owner will be able to create new double chest shop
@@ -141,26 +142,26 @@ public class PlayerListener implements Listener {
         return;
       }
 
-      shop.onClick();
+      shop.get().onClick();
 
       if (BaseConfig.clickSound) {
         e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f,
             1.0f);
       }
       // Text menu
-      MsgUtil.sendShopInfo(p, shop);
-      shop.setSignText();
+      MsgUtil.sendShopInfo(p, shop.get());
+      shop.get().setSignText();
 
       final Economy eco = plugin.getEconomy();
-      final double price = shop.getPrice();
+      final double price = shop.get().getPrice();
       final double money = plugin.getEconomy().getBalance(p.getUniqueId());
 
-      if (shop.isSelling()) {
-        int itemAmount = Math.min(Util.countSpace(p.getInventory(), shop.getItem()),
+      if (shop.get().isSelling()) {
+        int itemAmount = Math.min(Util.countSpace(p.getInventory(), shop.get().getItem()),
             (int) Math.floor(money / price));
 
-        if (!shop.isUnlimited()) {
-          itemAmount = Math.min(itemAmount, shop.getRemainingStock());
+        if (!shop.get().isUnlimited()) {
+          itemAmount = Math.min(itemAmount, shop.get().getRemainingStock());
         }
 
         if (itemAmount < 0) {
@@ -169,13 +170,13 @@ public class PlayerListener implements Listener {
 
         p.sendMessage(MsgUtil.getMessage("how-many-buy", p, "" + itemAmount));
       } else {
-        final double ownerBalance = eco.getBalance(shop.getOwner());
-        int items = Util.countItems(p.getInventory(), shop.getItem());
-        final int ownerCanAfford = (int) (ownerBalance / shop.getPrice());
+        final double ownerBalance = eco.getBalance(shop.get().getOwner());
+        int items = Util.countItems(p.getInventory(), shop.get().getItem());
+        final int ownerCanAfford = (int) (ownerBalance / shop.get().getPrice());
 
-        if (!shop.isUnlimited()) {
+        if (!shop.get().isUnlimited()) {
           // Amount check player amount and shop empty slot
-          items = Math.min(items, shop.getRemainingSpace());
+          items = Math.min(items, shop.get().getRemainingSpace());
           // Amount check player selling item total cost and the shop owner's balance
           items = Math.min(items, ownerCanAfford);
         } else if (BaseConfig.payUnlimitedShopOwners) {
@@ -193,7 +194,7 @@ public class PlayerListener implements Listener {
       }
       // Add the new action
       HashMap<UUID, Info> actions = plugin.getShopManager().getActions();
-      Info info = new Info(shop.getLocation(), ShopAction.BUY, null, null, shop);
+      Info info = new Info(shop.get().getLocation(), ShopAction.BUY, null, null, shop.get());
       actions.put(p.getUniqueId(), info);
     }
     // Handles creating shops
@@ -280,10 +281,7 @@ public class PlayerListener implements Listener {
     if (location == null)
       return;
 
-    final Shop shop = plugin.getShopManager().getShopIncludeAttached(location);
-
-    if (shop != null)
-      shop.setSignText();
+    plugin.getShopManager().getShopIncludeAttached(location).ifPresent(Shop::setSignText);
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)

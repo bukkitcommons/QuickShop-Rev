@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -48,20 +49,20 @@ public class SubCommand_SilentBuy implements CommandProcesser {
       return;
     }
 
-    final Shop shop =
+    final Optional<Shop> shop =
         plugin.getShopManager().getShop(new Location(plugin.getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
-    if (shop == null || !shop.getModerator().isModerator(((Player) sender).getUniqueId())) {
+    if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
       sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
       return;
     }
 
-    shop.setShopType(ShopType.BUYING);
+    shop.get().setShopType(ShopType.BUYING);
     // shop.setSignText();
-    shop.update();
-    MsgUtil.sendControlPanelInfo(sender, shop);
+    shop.get().update();
+    MsgUtil.sendControlPanelInfo(sender, shop.get());
     sender.sendMessage(
-        MsgUtil.getMessage("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
+        MsgUtil.getMessage("command.now-buying", sender, Util.getItemStackName(shop.get().getItem())));
   }
 }

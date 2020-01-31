@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
@@ -59,17 +60,17 @@ public class SubCommand_Sell implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
+      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
 
-      if (shop == null || !shop.getModerator().isModerator(((Player) sender).getUniqueId())) {
+      if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
         continue;
       }
 
-      shop.setShopType(ShopType.SELLING);
+      shop.get().setShopType(ShopType.SELLING);
       // shop.setSignText();
-      shop.update();
+      shop.get().update();
       sender.sendMessage(
-          MsgUtil.getMessage("command.now-selling", sender, Util.getItemStackName(shop.getItem())));
+          MsgUtil.getMessage("command.now-selling", sender, Util.getItemStackName(shop.get().getItem())));
       return;
     }
     sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));

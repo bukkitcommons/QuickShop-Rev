@@ -19,6 +19,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -129,14 +130,14 @@ public class SubCommand_Price implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
+      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
 
-      if (shop == null || (!shop.getModerator().isModerator(((Player) sender).getUniqueId())
+      if (!shop.isPresent() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
           && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.price"))) {
         continue;
       }
 
-      if (shop.getPrice() == price) {
+      if (shop.get().getPrice() == price) {
         // Stop here if there isn't a price change
         sender.sendMessage(MsgUtil.getMessage("no-price-change", sender));
         return;
@@ -161,17 +162,17 @@ public class SubCommand_Price implements CommandProcesser {
         }
       }
       // Update the shop
-      shop.setPrice(price);
+      shop.get().setPrice(price);
       // shop.setSignText();
-      shop.update();
+      shop.get().update();
       sender.sendMessage(
-          MsgUtil.getMessage("price-is-now", sender, plugin.getEconomy().format(shop.getPrice())));
+          MsgUtil.getMessage("price-is-now", sender, plugin.getEconomy().format(shop.get().getPrice())));
       // Chest shops can be double shops.
-      if (!(shop instanceof ContainerShop)) {
+      if (!(shop.get() instanceof ContainerShop)) {
         return;
       }
 
-      final ContainerShop cs = (ContainerShop) shop;
+      final ContainerShop cs = (ContainerShop) shop.get();
 
       if (!cs.isDoubleShop()) {
         return;

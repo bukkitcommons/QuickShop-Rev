@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,9 +36,6 @@ import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_Staff implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
-
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
@@ -96,9 +94,9 @@ public class SubCommand_Staff implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
+      final Optional<Shop> shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
 
-      if (shop == null || !shop.getModerator().isModerator(((Player) sender).getUniqueId())) {
+      if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
         continue;
       }
 
@@ -115,11 +113,11 @@ public class SubCommand_Staff implements CommandProcesser {
               sender.sendMessage(MsgUtil.getMessage("command.wrong-args", sender));
               return;
             case "clear":
-              shop.clearStaffs();
+              shop.get().clearStaffs();
               sender.sendMessage(MsgUtil.getMessage("shop-staff-cleared", sender));
               return;
             case "list":
-              final List<UUID> staffs = shop.getStaffs();
+              final List<UUID> staffs = shop.get().getStaffs();
 
               if (staffs.isEmpty()) {
                 sender.sendMessage(ChatColor.GREEN
@@ -140,7 +138,7 @@ public class SubCommand_Staff implements CommandProcesser {
 
           break;
         case 2:
-          final OfflinePlayer offlinePlayer = plugin.getServer().getOfflinePlayer(cmdArg[1]);
+          final OfflinePlayer offlinePlayer = QuickShop.instance().getServer().getOfflinePlayer(cmdArg[1]);
           String offlinePlayerName = offlinePlayer.getName();
 
           if (offlinePlayerName == null) {
@@ -149,7 +147,7 @@ public class SubCommand_Staff implements CommandProcesser {
 
           switch (cmdArg[0]) {
             case "add":
-              shop.addStaff(offlinePlayer.getUniqueId());
+              shop.get().addStaff(offlinePlayer.getUniqueId());
               sender.sendMessage(MsgUtil.getMessage("shop-staff-added", sender, offlinePlayerName));
               return;
             case "del":

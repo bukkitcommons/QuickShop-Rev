@@ -16,6 +16,7 @@
 
 package org.maxgamer.quickshop.listeners;
 
+import java.util.Optional;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -79,13 +80,13 @@ public class DisplayProtectionListener implements Listener {
     }
     Block targetBlock = event.getToBlock();
     Block shopBlock = targetBlock.getRelative(BlockFace.DOWN);
-    Shop shop = plugin.getShopManager().getShopIncludeAttached(shopBlock.getLocation());
-    if (shop == null) {
+    Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(shopBlock.getLocation());
+    if (!shop.isPresent()) {
       return;
     }
     event.setCancelled(true);
-    if (shop.getDisplay() != null) {
-      shop.getDisplay().remove();
+    if (shop.get().getDisplay() != null) {
+      shop.get().getDisplay().remove();
     }
     sendAlert("[DisplayGuard] Liuqid " + targetBlock.getLocation()
         + " trying flow to top of shop, QuickShop already cancel it.");
@@ -110,13 +111,13 @@ public class DisplayProtectionListener implements Listener {
       return;
     }
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    Shop shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
-    if (shop != null) {
+    Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
+    if (shop.isPresent()) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
           + " trying push somethings on the shop top, QuickShop already cancel it.");
-      if (shop.getDisplay() != null) {
-        shop.getDisplay().remove();
+      if (shop.get().getDisplay() != null) {
+        shop.get().getDisplay().remove();
       }
       return;
     }
@@ -128,8 +129,8 @@ public class DisplayProtectionListener implements Listener {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
               + " trying push somethings on the shop top, QuickShop already cancel it.");
-          if (shop.getDisplay() != null) {
-            shop.getDisplay().remove();
+          if (shop.get().getDisplay() != null) {
+            shop.get().getDisplay().remove();
           }
           return;
         }
@@ -143,13 +144,13 @@ public class DisplayProtectionListener implements Listener {
       return;
     }
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    Shop shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
-    if (shop != null) {
+    Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
+    if (shop.get() != null) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
           + " trying pull somethings on the shop top, QuickShop already cancel it.");
-      if (shop.getDisplay() != null) {
-        shop.getDisplay().remove();
+      if (shop.get().getDisplay() != null) {
+        shop.get().getDisplay().remove();
       }
       return;
     }
@@ -157,12 +158,12 @@ public class DisplayProtectionListener implements Listener {
       Block otherBlock = oBlock.getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
       if (Util.canBeShop(otherBlock)) {
         shop = plugin.getShopManager().getShopIncludeAttached(otherBlock.getLocation());
-        if (shop != null) {
+        if (shop.get() != null) {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
               + " trying push somethings on the shop top, QuickShop already cancel it.");
-          if (shop.getDisplay() != null) {
-            shop.getDisplay().remove();
+          if (shop.get().getDisplay() != null) {
+            shop.get().getDisplay().remove();
           }
           return;
         }
@@ -515,14 +516,11 @@ public class DisplayProtectionListener implements Listener {
       return;
     }
     Block waterBlock = event.getBlockClicked().getRelative(event.getBlockFace());
-    Shop shop =
-        plugin.getShopManager().getShop(waterBlock.getRelative(BlockFace.DOWN).getLocation());
-    if (shop == null) {
-      return;
-    }
-    event.setCancelled(true);
-    sendAlert("[DisplayGuard] Player  " + event.getPlayer().getName()
-        + " trying use water to move somethings on the shop top, QuickShop already remove it.");
+    plugin.getShopManager().getShop(waterBlock.getRelative(BlockFace.DOWN).getLocation()).ifPresent(shop -> {
+      event.setCancelled(true);
+      sendAlert("[DisplayGuard] Player  " + event.getPlayer().getName()
+          + " trying use water to move somethings on the shop top, QuickShop already remove it.");
+    });
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

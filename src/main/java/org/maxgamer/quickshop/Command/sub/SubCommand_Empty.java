@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
@@ -27,21 +28,12 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.impl.ContainerShop;
 import org.maxgamer.quickshop.utils.MsgUtil;
 
-public class SubCommand_Empty implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
-
-  @NotNull
-  @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    return new ArrayList<>();
-  }
-
+public class SubCommand_Empty extends SneakyTabs implements CommandProcesser {
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
@@ -59,14 +51,14 @@ public class SubCommand_Empty implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
+      final Optional<Shop> shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
 
-      if (shop == null) {
+      if (!shop.isPresent()) {
         continue;
       }
 
-      if (shop instanceof ContainerShop) {
-        final ContainerShop cs = (ContainerShop) shop;
+      if (shop.get() instanceof ContainerShop) {
+        final ContainerShop cs = (ContainerShop) shop.get();
         final Inventory inventory = cs.getInventory();
 
         if (inventory == null) {

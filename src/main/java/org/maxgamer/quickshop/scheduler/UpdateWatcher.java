@@ -19,6 +19,10 @@ import org.maxgamer.quickshop.utils.VersionUpdater;
 public class UpdateWatcher implements Listener {
   private volatile static Optional<VersionData> data;
   private static int taskId = 1;
+  
+  public static boolean isLatest() {
+    return !data.isPresent();
+  }
 
   public static void init() {
     taskId = Bukkit.getScheduler().runTaskTimerAsynchronously(QuickShop.instance(), () -> {

@@ -19,6 +19,7 @@ package org.maxgamer.quickshop.listeners;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -44,7 +45,6 @@ import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
 
-@SuppressWarnings("DuplicatedCode")
 public class ShopProtectionListener implements Listener {
 
   @NotNull
@@ -64,15 +64,14 @@ public class ShopProtectionListener implements Listener {
 
     for (int i = 0; i < e.blockList().size(); i++) {
       final Block b = e.blockList().get(i);
-      final Shop shop = plugin.getShopManager().getShopIncludeAttached(b.getLocation());
+      final Optional<Shop> shopf = QuickShop.instance().getShopManager().getShopIncludeAttached(b.getLocation());
 
-      if (shop != null) {
-        if (BaseConfig.explosionProtection) {
+      shopf.ifPresent(shop -> {
+        if (BaseConfig.explosionProtection)
           e.setCancelled(true);
-        } else {
+        else
           shop.delete();
-        }
-      }
+      });
     }
   }
 
@@ -82,13 +81,8 @@ public class ShopProtectionListener implements Listener {
       return;
     }
 
-    final Shop shop = plugin.getShopManager().getShopIncludeAttached(e.getToBlock().getLocation());
-
-    if (shop == null) {
-      return;
-    }
-
-    e.setCancelled(true);
+    final Optional<Shop> shopf = QuickShop.instance().getShopManager().getShopIncludeAttached(e.getToBlock().getLocation());
+    shopf.ifPresent(shop -> e.setCancelled(true));
   }
 
   // Protect Redstone active shop
@@ -98,17 +92,10 @@ public class ShopProtectionListener implements Listener {
       return;
     }
 
-    final Shop shop =
-        plugin.getShopManager().getShopIncludeAttached(event.getBlock().getLocation());
+    final Optional<Shop> shopf =
+        QuickShop.instance().getShopManager().getShopIncludeAttached(event.getBlock().getLocation());
 
-    if (shop == null) {
-      return;
-    }
-
-    event.setNewCurrent(event.getOldCurrent());
-    // plugin.getLogger().warning("[Exploit Alert] a Redstone tried to active of " + shop);
-    // Util.debugLog(ChatColor.RED + "[QuickShop][Exploit alert] Redstone was activated on the
-    // following shop " + shop);
+    shopf.ifPresent(shop -> event.setNewCurrent(event.getOldCurrent()));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -118,15 +105,12 @@ public class ShopProtectionListener implements Listener {
     }
 
     final Block newBlock = e.getNewState().getBlock();
-    final Shop thisBlockShop =
-        plugin.getShopManager().getShopIncludeAttached(newBlock.getLocation());
-    final Shop underBlockShop = plugin.getShopManager()
+    final Optional<Shop> thisBlockShop =
+        QuickShop.instance().getShopManager().getShopIncludeAttached(newBlock.getLocation());
+    final Optional<Shop> underBlockShop = QuickShop.instance().getShopManager()
         .getShopIncludeAttached(newBlock.getRelative(BlockFace.DOWN).getLocation());
 
-    if (thisBlockShop == null && underBlockShop == null) {
-      return;
-    }
-    e.setCancelled(true);
+    thisBlockShop.ifPresent(s -> underBlockShop.ifPresent(shop -> e.setCancelled(true)));
   }
 
   /*
@@ -137,16 +121,14 @@ public class ShopProtectionListener implements Listener {
 
     for (int i = 0; i < e.blockList().size(); i++) {
       final Block b = e.blockList().get(i);
-      final Shop shop = plugin.getShopManager().getShopIncludeAttached(b.getLocation());
+      final Optional<Shop> shopf = QuickShop.instance().getShopManager().getShopIncludeAttached(b.getLocation());
 
-      if (shop == null) {
-        continue;
-      }
-      if (BaseConfig.explosionProtection) {
-        e.setCancelled(true);
-      } else {
-        shop.delete();
-      }
+      shopf.ifPresent(shop -> {
+        if (BaseConfig.explosionProtection)
+          e.setCancelled(true);
+        else
+          shop.delete();
+      });
     }
   }
 
@@ -163,33 +145,29 @@ public class ShopProtectionListener implements Listener {
       return;
     }
 
-    final Shop shop = plugin.getShopManager().getShopIncludeAttached(loc);
+    final Optional<Shop> shopf = QuickShop.instance().getShopManager().getShopIncludeAttached(loc);
 
-    if (shop == null) {
-      return;
-    }
+    shopf.ifPresent(shop -> {
+      event.setCancelled(true);
 
-    event.setCancelled(true);
+      final Location location = event.getInitiator().getLocation();
 
-    final Location location = event.getInitiator().getLocation();
+      if (location != null) {
+        final InventoryHolder holder = event.getInitiator().getHolder();
 
-    if (location == null) {
-      return;
-    }
+        if (holder instanceof Entity) {
+          ((Entity) holder).remove();
+        } else if (holder instanceof Block) {
+          location.getBlock().breakNaturally();
+        } else {
+          Util.debugLog("Unknown location = " + loc);
+        }
 
-    final InventoryHolder holder = event.getInitiator().getHolder();
-
-    if (holder instanceof Entity) {
-      ((Entity) holder).remove();
-    } else if (holder instanceof Block) {
-      location.getBlock().breakNaturally();
-    } else {
-      Util.debugLog("Unknown location = " + loc);
-    }
-
-    if (sendProtectionAlert) {
-      MsgUtil.sendGlobalAlert("[DisplayGuard] Defened a item steal action at" + location);
-    }
+        if (sendProtectionAlert) {
+          MsgUtil.sendGlobalAlert("[DisplayGuard] Defened a item steal action at" + location);
+        }
+      }
+    });
   }
 
   private boolean sendProtectionAlert = BaseConfig.enableAlert;
@@ -201,19 +179,15 @@ public class ShopProtectionListener implements Listener {
       return;
     }
 
-    final Shop shop =
-        plugin.getShopManager().getShopIncludeAttached(event.getBlock().getLocation());
+    final Optional<Shop> shop =
+        QuickShop.instance().getShopManager().getShopIncludeAttached(event.getBlock().getLocation());
 
-    if (shop == null) {
-      return;
-    }
-
-    if (BaseConfig.entityProtection) {
-      event.setCancelled(true);
-      return;
-    }
-
-    shop.delete();
+    shop.ifPresent(shopf -> {
+      if (BaseConfig.entityProtection)
+        event.setCancelled(true);
+      else
+        shopf.delete();
+    });
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -223,15 +197,15 @@ public class ShopProtectionListener implements Listener {
     }
 
     for (BlockState blockstate : event.getBlocks()) {
-      final Shop shop = plugin.getShopManager().getShopIncludeAttached(blockstate.getLocation());
+      final Optional<Shop> shop = QuickShop.instance().getShopManager().getShopIncludeAttached(blockstate.getLocation());
 
-      if (shop == null) {
+      if (!shop.isPresent()) {
         continue;
       }
 
       event.setCancelled(true);
       return;
-      // plugin.getLogger().warning("[Exploit Alert] a StructureGrowing tried to break the shop of "
+      // QuickShop.instance().getLogger().warning("[Exploit Alert] a StructureGrowing tried to break the shop of "
       // + shop);
       // Util.sendMessageToOps(ChatColor.RED + "[QuickShop][Exploit alert] A StructureGrowing tried
       // to break the shop of " + shop);

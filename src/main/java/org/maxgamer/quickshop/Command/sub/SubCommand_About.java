@@ -23,17 +23,11 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
 
-public class SubCommand_About implements CommandProcesser {
-
-  @NotNull
-  @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    return new ArrayList<>();
-  }
+public class SubCommand_About extends SneakyTabs implements CommandProcesser {
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

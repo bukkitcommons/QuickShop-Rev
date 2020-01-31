@@ -122,7 +122,7 @@ public class SentryErrorReporter {
     if (!enabled) {
       return false;
     }
-    if (UpdateWatcher.hasNewUpdate) { // We only receive latest reports.
+    if (!UpdateWatcher.isLatest()) { // We only receive latest reports.
       return false;
     }
     if (checker.isIncompatible(Util.getNMSVersion())) { // Ignore errors if user install quickshop

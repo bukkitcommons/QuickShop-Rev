@@ -18,6 +18,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
@@ -75,13 +76,13 @@ public class SubCommand_Refill implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Shop shop = plugin.getShopManager().getShop(b.getLocation());
+      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
 
-      if (shop == null) {
+      if (!shop.isPresent()) {
         continue;
       }
 
-      shop.add(shop.getItem(), add);
+      shop.get().add(shop.get().getItem(), add);
       sender.sendMessage(MsgUtil.getMessage("refill-success", sender));
       return;
     }
