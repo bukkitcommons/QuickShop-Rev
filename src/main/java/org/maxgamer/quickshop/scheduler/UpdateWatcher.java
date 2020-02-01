@@ -17,7 +17,7 @@ import org.maxgamer.quickshop.utils.VersionData;
 import org.maxgamer.quickshop.utils.VersionUpdater;
 
 public class UpdateWatcher implements Listener {
-  private volatile static Optional<VersionData> data;
+  private volatile static Optional<VersionData> data = Optional.empty();
   private static int taskId = 1;
   
   public static boolean isLatest() {

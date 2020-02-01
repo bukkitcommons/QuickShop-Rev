@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.permission.impl;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.permission.PermissionProvider;
+import org.maxgamer.quickshop.permission.ProviderType;
 
 public class BukkitPermsProvider implements PermissionProvider {
 
@@ -11,9 +12,9 @@ public class BukkitPermsProvider implements PermissionProvider {
     return sender.hasPermission(permission);
   }
 
-  @NotNull
   @Override
-  public String getName() {
-    return "Bukkit";
+  @NotNull
+  public ProviderType getType() {
+    return ProviderType.BUKKIT;
   }
 }

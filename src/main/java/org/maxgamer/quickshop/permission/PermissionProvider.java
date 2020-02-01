@@ -19,5 +19,11 @@ public interface PermissionProvider {
    * @return The name of permission provider
    */
   @NotNull
-  String getName();
+  @Deprecated
+  default String getName() {
+    return getType().name();
+  }
+  
+  @NotNull
+  ProviderType getType();
 }

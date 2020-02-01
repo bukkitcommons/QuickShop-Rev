@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.permission.PermissionProvider;
+import org.maxgamer.quickshop.permission.ProviderType;
 import net.milkbowl.vault.permission.Permission;
 
 public class VaultPermsProvider implements PermissionProvider {
@@ -23,9 +24,9 @@ public class VaultPermsProvider implements PermissionProvider {
     return provider.has(sender, permission);
   }
 
-  @NotNull
   @Override
-  public String getName() {
-    return "Vault";
+  @NotNull
+  public ProviderType getType() {
+    return ProviderType.VAULT;
   }
 }

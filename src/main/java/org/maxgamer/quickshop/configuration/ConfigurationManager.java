@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.annotation.Configuration;
 import org.maxgamer.quickshop.configuration.annotation.Node;
+import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.EqualsAndHashCode;
@@ -42,13 +43,11 @@ public class ConfigurationManager {
     if (data != null) {
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
-        Bukkit.getLogger()
-            .warning("rewrite: " + field.getName() + ", value " + data.conf().get(path));
+        Util.debugLog("rewrite: " + field.getName() + ", value " + data.conf().get(path));
         if (node.rewrite()) {
           data.conf().set(path, getStatic(field));
         }
-        Bukkit.getLogger()
-            .warning("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
+        Util.debugLog("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
       });
 
       data.conf().save(data.file());
@@ -96,13 +95,13 @@ public class ConfigurationManager {
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
         Object value = conf.get(path);
-        Bukkit.getLogger().warning("field: " + field.getName() + ", value " + value);
+        Util.debugLog("field: " + field.getName() + ", value " + value);
         if (value == null) {
           value = getStatic(field);
         } else {
           setStatic(field, value);
         }
-        Bukkit.getLogger().warning("field: " + field.getName() + ", value (fixed) " + value);
+        Util.debugLog("field: " + field.getName() + ", value (fixed) " + value);
       });
 
       return data;
@@ -127,7 +126,7 @@ public class ConfigurationManager {
       }
 
       for (File parent : Lists.reverse(parents)) {
-        Bukkit.getLogger().warning("Creating parent: " + parent.getCanonicalPath());
+        Util.debugLog("Making dir for parent: " + parent.getCanonicalPath());
         parent.mkdir();
       }
     }

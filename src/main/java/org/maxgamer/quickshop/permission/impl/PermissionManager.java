@@ -1,11 +1,11 @@
 package org.maxgamer.quickshop.permission.impl;
 
+import java.util.Locale;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionProvider;
-import org.maxgamer.quickshop.permission.ProviderType;
 
 public class PermissionManager {
   private final PermissionProvider provider;
@@ -16,16 +16,15 @@ public class PermissionManager {
    * @param plugin Instance
    */
   public PermissionManager() {
-    switch (ProviderType.valueOf(BaseConfig.permsProvider)) {
-      case VAULT:
+    switch (BaseConfig.permsProvider.toUpperCase(Locale.ROOT)) {
+      case "VAULT":
         provider = new VaultPermsProvider();
         break;
-      case BUKKIT:
       default:
         provider = new BukkitPermsProvider();
     }
     
-    QuickShop.instance().getLogger().info("Selected permission provider: " + provider.getName());
+    QuickShop.instance().getLogger().info("Selected permission provider: " + provider.getType());
   }
 
   /**
