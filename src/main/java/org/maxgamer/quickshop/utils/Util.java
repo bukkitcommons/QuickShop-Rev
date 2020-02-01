@@ -432,11 +432,10 @@ public class Util {
   }
 
   public static String getItemStackName(@NotNull ItemStack itemStack) {
-    if (itemStack.hasItemMeta()
-        && Objects.requireNonNull(itemStack.getItemMeta()).hasDisplayName()) {
+    if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
       return itemStack.getItemMeta().getDisplayName();
-    }
-    return MsgUtil.getItemi18n(itemStack.getType().name());
+    
+    return MsgUtil.getLocalizedName(itemStack.getType().name());
   }
 
   /**

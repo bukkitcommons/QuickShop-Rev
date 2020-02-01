@@ -282,7 +282,7 @@ public class QuickShop extends JavaPlugin {
       switch (EconomyType.fromID(BaseConfig.economyType)) {
         case UNKNOWN:
           bootError =
-              new BootError("Can't load the Economy provider, invaild value in config.yml.");
+              new BootError("Can't load the Economy provider, invalid value in config.yml.");
           return false;
         case VAULT:
           core = new Economy_Vault();
@@ -521,7 +521,7 @@ public class QuickShop extends JavaPlugin {
 
     /* Initalize the tools */
     // Create the shop manager.
-    permissionManager = new PermissionManager(this);
+    permissionManager = new PermissionManager();
     // This should be inited before shop manager
     if (BaseConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {

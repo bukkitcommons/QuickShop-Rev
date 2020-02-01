@@ -84,7 +84,7 @@ public class BlockListener implements Listener {
         }
         e.setCancelled(true);
         p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
-            MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
+            MsgUtil.getLocalizedName(Material.GOLDEN_AXE.name())));
         return;
       }
 
@@ -135,7 +135,7 @@ public class BlockListener implements Listener {
             }
             e.setCancelled(true);
             p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
-                MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
+                MsgUtil.getLocalizedName(Material.GOLDEN_AXE.name())));
           }
   
           Util.debugLog("Cannot break the sign.");

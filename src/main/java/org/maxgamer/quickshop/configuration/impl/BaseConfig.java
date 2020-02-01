@@ -15,6 +15,9 @@ public class BaseConfig {
 
   @Node("settings.database.queue")
   public static boolean databaseQueue = true;
+  
+  @Node("settings.permission.provider")
+  public static String permsProvider = "Bukkit";
 
   /** Whether we should use display items or not */
   @Node("settings.effects.display.enable-hologram")

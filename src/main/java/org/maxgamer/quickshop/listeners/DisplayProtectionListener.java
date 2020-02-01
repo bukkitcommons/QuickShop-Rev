@@ -536,9 +536,7 @@ public class DisplayProtectionListener implements Listener {
   }
 
   private void sendAlert(@NotNull String msg) {
-    if (!BaseConfig.enableAlert) {
-      return;
-    }
-    MsgUtil.sendGlobalAlert(msg);
+    if (BaseConfig.enableAlert)
+      MsgUtil.sendGlobalAlert(msg);
   }
 }

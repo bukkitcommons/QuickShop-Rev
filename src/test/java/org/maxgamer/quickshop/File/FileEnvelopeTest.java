@@ -9,7 +9,6 @@ import org.maxgamer.quickshop.QuickShopTest;
 import org.maxgamer.quickshop.mock.MckFileConfiguration;
 import org.maxgamer.quickshop.utils.file.IFile;
 import org.maxgamer.quickshop.utils.file.JSONFile;
-import org.maxgamer.quickshop.utils.file.YAMLFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,23 +29,14 @@ public class FileEnvelopeTest {
     plugin = MockBukkit.load(QuickShopTest.class);
     json = new JSONFile(plugin, "messages");
     json.create();
-    yaml = new YAMLFile(plugin, "messages");
-    yaml.create();
     test.add("test");
     json.set("test.list", test);
-    yaml.set("test.list", test);
     json.set("test.int", 13);
-    yaml.set("test.int", 13);
     json.set("test.boolean", true);
-    yaml.set("test.boolean", true);
     json.set("test.short", (short) 1);
-    yaml.set("test.short", (short) 1);
     json.set("test.long", (long) 1);
-    yaml.set("test.long", (long) 1);
     json.set("test.byte", (byte) 1);
-    yaml.set("test.byte", (byte) 1);
     json.set("test.double", (double) 1);
-    yaml.set("test.double", (double) 1);
   }
 
   @Test

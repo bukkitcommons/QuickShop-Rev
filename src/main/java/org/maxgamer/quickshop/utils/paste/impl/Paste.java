@@ -55,7 +55,7 @@ public class Paste {
   public @NotNull String genNewPaste() {
     StringBuilder finalReport = new StringBuilder();
     finalReport.append("###############################\n");
-    finalReport.append("QuickShop-Reremake Paste Result\n");
+    finalReport.append("QuickShop(Rev) Paste Result\n");
     finalReport.append("###############################\n");
     finalReport.append("\n");
     finalReport.append("\n");

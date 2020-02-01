@@ -285,12 +285,12 @@ public class PlayerListener implements Listener {
     plugin.getShopManager().getShopIncludeAttached(location).ifPresent(Shop::setSignText);
   }
 
-  @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-  public void onJoin(PlayerJoinEvent e) {
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onJoin(PlayerJoinEvent event) {
 
     // Notify the player any messages they were sent
     if (BaseConfig.autoFetchShopMessages) {
-      MsgUtil.flush(e.getPlayer());
+      MsgUtil.flush(event.getPlayer());
     }
   }
 
