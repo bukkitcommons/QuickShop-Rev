@@ -58,7 +58,7 @@ public class SubCommand_SilentUnlimited implements CommandProcesser {
 
     shop.get().setUnlimited(!shop.get().isUnlimited());
     // shop.setSignText();
-    shop.get().update();
+    shop.get().save();
     MsgUtil.sendControlPanelInfo(sender, shop.get());
 
     if (shop.get().isUnlimited()) {

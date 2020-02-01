@@ -64,7 +64,6 @@ import org.maxgamer.quickshop.scheduler.DisplayAutoDespawnWatcher;
 import org.maxgamer.quickshop.scheduler.DisplayWatcher;
 import org.maxgamer.quickshop.scheduler.LogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
-import org.maxgamer.quickshop.scheduler.ShopContainerWatcher;
 import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
@@ -185,7 +184,6 @@ public class QuickShop extends JavaPlugin {
   private WorldListener worldListener;
   private OngoingFeeWatcher ongoingFeeWatcher;
   private SignUpdateWatcher signUpdateWatcher;
-  private ShopContainerWatcher shopContainerWatcher;
   private BukkitWrapper bukkitAPIWrapper;
   private boolean isUtilInited = false;
   private boolean enabledAsyncDisplayDespawn;
@@ -553,10 +551,9 @@ public class QuickShop extends JavaPlugin {
     }
 
     signUpdateWatcher = new SignUpdateWatcher(this);
-    shopContainerWatcher = new ShopContainerWatcher(this);
 
     /* Load all shops. */
-    shopLoader = new ShopLoader(this);
+    shopLoader = new ShopLoader();
     shopLoader.loadShops();
 
     getLogger().info("Registering Listeners...");
@@ -564,13 +561,13 @@ public class QuickShop extends JavaPlugin {
 
     blockListener = new BlockListener(this);
     playerListener = new PlayerListener(this);
-    worldListener = new WorldListener(this);
+    worldListener = new WorldListener();
     chatListener = new ChatListener(this);
     chunkListener = new ChunkListener(this);
     inventoryListener = new DisplayProtectionListener(this);
     customInventoryListener = new CustomInventoryListener(this);
     displayBugFixListener = new DisplayBugFixListener(this);
-    shopProtectListener = new ShopProtector(this);
+    shopProtectListener = new ShopProtector();
     displayWatcher = new DisplayWatcher(this);
     syncTaskWatcher = new SyncTaskWatcher(this);
     // shopVaildWatcher = new ShopVaildWatcher(this);
@@ -615,7 +612,6 @@ public class QuickShop extends JavaPlugin {
     Util.debugLog("Registering shop watcher...");
     // shopVaildWatcher.runTaskTimer(this, 0, 20 * 60); // Nobody use it
     signUpdateWatcher.runTaskTimer(this, 0, 10);
-    shopContainerWatcher.runTaskTimer(this, 0, 5); // Nobody use it
     if (logWatcher != null) {
       logWatcher.runTaskTimerAsynchronously(this, 10, 10);
       getLogger().info("Log actions is enabled, actions will log in the qs.log file!");

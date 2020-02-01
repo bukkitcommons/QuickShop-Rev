@@ -39,7 +39,7 @@ public class SubCommand_Unlimited extends SneakyTabs implements CommandProcesser
 
       shop.get().setUnlimited(!shop.get().isUnlimited());
       // shop.setSignText();
-      shop.get().update();
+      shop.get().save();
 
       if (shop.get().isUnlimited()) {
         sender.sendMessage(MsgUtil.getMessage("command.toggle-unlimited.unlimited", sender));

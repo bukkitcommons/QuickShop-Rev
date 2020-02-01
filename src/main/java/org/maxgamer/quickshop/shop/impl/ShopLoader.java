@@ -16,7 +16,11 @@
 
 package org.maxgamer.quickshop.shop.impl;
 
+import com.google.common.collect.Lists;
+import com.google.common.graph.ElementOrder.Type;
 import com.google.gson.JsonSyntaxException;
+import java.io.Serializable;
+import java.security.interfaces.RSAKey;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,6 +32,7 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,285 +50,276 @@ import org.maxgamer.quickshop.utils.Util;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader {
-  private final ArrayList<Long> loadTimes = new ArrayList<>();
-  Map<Timer, Double> costCache = new HashMap<>();
-  private int errors;
-  private int loadAfterChunkLoaded = 0;
-  private int loadAfterWorldLoaded = 0;
-  private QuickShop plugin;
-  private int totalLoaded = 0;
-  /* This may contains broken shop, must use null check before load it. */
-  @Getter
-  private List<Shop> shopsInDatabase = new ArrayList<>();
-  @Getter
-  private List<ShopDatabaseInfoOrigin> originShopsInDatabase = new ArrayList<>();
-
-  /**
-   * The shop load allow plugin load shops fast and simply.
-   *
-   * @param plugin Plugin main class
-   */
-  public ShopLoader(@NotNull QuickShop plugin) {
-    this.plugin = plugin;
-  }
-
-  private void exceptionHandler(@NotNull Exception ex, @Nullable Location shopLocation) {
-    errors++;
-    Logger logger = plugin.getLogger();
-    logger.warning("##########FAILED TO LOAD SHOP##########");
-    logger.warning("  >> Error Info:");
-    String err = ex.getMessage();
-    if (err == null) {
-      err = "null";
-    }
-    logger.warning(err);
-    logger.warning("  >> Error Trace");
-    ex.printStackTrace();
-    logger.warning("  >> Target Location Info");
-    logger.warning("Location: " + ((shopLocation == null) ? "NULL" : shopLocation.toString()));
-    logger.warning(
-        "Block: " + ((shopLocation == null) ? "NULL" : shopLocation.getBlock().getType().name()));
-    logger.warning("  >> Database Info");
-    try {
-      logger.warning("Connected: " + plugin.getDatabase().getConnection().isClosed());
-    } catch (SQLException | NullPointerException e) {
-      logger.warning("Connected: " + "FALSE - Failed to load status.");
-    }
-
-    try {
-      logger.warning("Readonly: " + plugin.getDatabase().getConnection().isReadOnly());
-    } catch (SQLException | NullPointerException e) {
-      logger.warning("Readonly: " + "FALSE - Failed to load status.");
-    }
-
-    try {
-      logger.warning("ClientInfo: " + plugin.getDatabase().getConnection().getClientInfo());
-    } catch (SQLException | NullPointerException e) {
-      logger.warning("ClientInfo: " + "FALSE - Failed to load status.");
-    }
-
-    logger.warning("#######################################");
-    if (errors > 10) {
-      logger.severe(
-          "QuickShop detected too many errors when loading shops, you should backup your shop database and ask the developer for help");
-    }
-  }
-
   /**
    * Load all shops
    *
    * @param worldName The world name
    */
   public void loadShops(@Nullable String worldName) {
-    boolean backupedDatabaseInDeleteProcess = false;
-    Timer totalLoadTimer = new Timer(true);
+    long onLoad = System.currentTimeMillis();
+    
     try {
-      this.plugin.getLogger().info("Loading shops from the database...");
-      Timer fetchTimer = new Timer(true);
-      ResultSet rs = plugin.getDatabaseHelper().selectAllShops();
-      this.plugin.getLogger()
-          .info("Used " + fetchTimer.endTimer() + "ms to fetch all shops from the database.");
+      QuickShop.instance().getLogger().info("Loading shops from the database..");
+      long onFetch = System.currentTimeMillis();
+      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
+      long durFetch = System.currentTimeMillis() - onFetch;
+      long fetchSize = rs.getFetchSize();
+      QuickShop.instance().getLogger().info("Fetched" + fetchSize + "shops from database by " + durFetch + "ms");
+      
+      long loadedShops = 0;
+      long durTotalShopsNano = 0;
+      
       while (rs.next()) {
-        Timer singleShopLoadTimer = new Timer(true);
-        ShopDatabaseInfoOrigin origin = new ShopDatabaseInfoOrigin(rs);
-        originShopsInDatabase.add(origin);
-        if (worldName != null && !origin.getWorld().equals(worldName)) {
-          singleShopLoaded(singleShopLoadTimer);
+        long onPerShop = System.nanoTime();
+        ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
+        
+        boolean ignoreWorlds = worldName == null;
+        if (!ignoreWorlds && !data.getWorld().equals(worldName)) {
+          durTotalShopsNano = System.nanoTime() - onPerShop;
           continue;
         }
-        ShopDatabaseInfo data = new ShopDatabaseInfo(origin);
-        Shop shop = new ContainerShop(data.getLocation(), data.getPrice(), data.getItem(),
-            data.getModerators(), data.isUnlimited(), data.getType());
-        shopsInDatabase.add(shop);
-        this.costCalc(singleShopLoadTimer);
-        if (shopNullCheck(shop)) {
+        
+        if (!canLoad(data)) {
           Util.debugLog("Somethings gone wrong, skipping the loading...");
-          loadAfterWorldLoaded++;
-          singleShopLoaded(singleShopLoadTimer);
+          durTotalShopsNano = System.nanoTime() - onPerShop;
           continue;
         }
+        
+        Shop shop = new ContainerShop(
+            new Location(Bukkit.getWorld(data.getWorld()), data.getX(), data.getY(), data.getZ()),
+            data.getPrice(), data.getItem(),
+            data.getModerators(), data.isUnlimited(), data.getType());
+        
         // Load to RAM
-        plugin.getShopManager().loadShop(data.getWorld().getName(), shop);
-        if (Util.isLoaded(shop.getLocation())) {
+        QuickShop.instance().getShopManager().loadShop(data.getWorld(), shop);
+        
+        if (Util.isChunkLoaded(shop.getLocation())) {
           // Load to World
-          if (!Util.canBeShop(shop.getLocation().getBlock())) {
+          if (Util.canBeShop(shop.getLocation().getBlock())) {
+            loadedShops++;
+            shop.onLoad();
+            
+          } else {
             Util.debugLog("Target block can't be a shop, removing it from the database...");
             // shop.delete();
-            plugin.getShopManager().removeShop(shop); // Remove from Mem
-            if (!backupedDatabaseInDeleteProcess) { // Only backup db one time.
-              backupedDatabaseInDeleteProcess = Util.backupDatabase();
-            } else {
-              plugin.getDatabaseHelper().removeShop(shop.getLocation().getBlockX(),
-                  shop.getLocation().getBlockY(), shop.getLocation().getBlockZ(),
-                  Objects.requireNonNull(shop.getLocation().getWorld()).getName());
-            }
-            singleShopLoaded(singleShopLoadTimer);
-            continue;
+            QuickShop.instance().getShopManager().unloadShop(shop);
+            QuickShop.instance().getDatabaseHelper().deleteShop(
+                shop.getLocation().getBlockX(),
+                shop.getLocation().getBlockY(),
+                shop.getLocation().getBlockZ(),
+                shop.getLocation().getWorld().getName());
           }
-          shop.onLoad();
-          shop.update();
-        } else {
-          loadAfterChunkLoaded++;
         }
-        singleShopLoaded(singleShopLoadTimer);
+        
+        durTotalShopsNano = System.nanoTime() - onPerShop;
       }
-      long totalUsedTime = totalLoadTimer.endTimer();
-      long avgPerShop = mean(loadTimes.toArray(new Long[0]));
-      this.plugin.getLogger().info("Successfully loaded " + totalLoaded + " shops! (Used "
-          + totalUsedTime + "ms, Avg " + avgPerShop + "ms per shop)");
-      this.plugin.getLogger()
-          .info(this.loadAfterChunkLoaded + " shops will load after chunk have loaded, "
-              + this.loadAfterWorldLoaded + " shops will load after the world has loaded.");
-    } catch (Exception e) {
-      exceptionHandler(e, null);
+      
+      long durLoad = System.currentTimeMillis() - onLoad;
+      long averagePerShop = durTotalShopsNano / loadedShops;
+      
+      QuickShop.instance().getLogger().info(
+          "Successfully loaded " + loadedShops + " of " + fetchSize + " shops!" +
+          "(Total: " + durLoad + "ms, Fetch: " + durFetch + "ms," +
+          " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + "ns)");
+      
+    } catch (Throwable t) {
+      exceptionHandler(t, null);
     }
-  }
-
-  private double costCalc(@NotNull Timer timer) {
-    costCache.putIfAbsent(timer, (double) timer.getTimer());
-    return timer.getTimer() - costCache.get(timer);
   }
 
   public void loadShops() {
     loadShops(null);
   }
 
-  private @NotNull Long mean(Long[] m) {
-    long sum = 0;
-    for (Long aM : m) {
-      sum += aM;
-    }
-    if (m.length == 0) {
-      return sum;
-    }
-    return sum / m.length;
-  }
-
-  @SuppressWarnings("ConstantConditions")
-  private boolean shopNullCheck(@Nullable Shop shop) {
-    if (shop == null) {
-      Util.debugLog("Shop Object is null");
-      return true;
-    }
-    if (shop.getItem() == null) {
+  private boolean canLoad(@NotNull ShopDatabaseInfo info) {
+    if (info.item() == null) {
       Util.debugLog("Shop ItemStack is null");
-      return true;
+      return false;
     }
-    if (shop.getItem().getType() == Material.AIR) {
+    if (info.item().getType() == Material.AIR) {
       Util.debugLog("Shop ItemStack type can't be AIR");
-      return true;
+      return false;
     }
-    if (shop.getLocation() == null) {
-      Util.debugLog("Shop Location is null");
-      return true;
-    }
-    if (shop.getLocation().getWorld() == null) {
+    if (info.world() == null) {
       Util.debugLog("Shop World is null");
-      return true;
+      return false;
     }
-    if (shop.getOwner() == null) {
+    if (info.moderators() == null) {
       Util.debugLog("Shop Owner is null");
-      return true;
+      return false;
     }
-    if (Bukkit.getOfflinePlayer(shop.getOwner()).getName() == null) {
-      Util.debugLog("Shop owner not exist on this server, did you reset the playerdata?");
-    }
-    return false;
+    //if (Bukkit.getOfflinePlayer(shop.getOwner()).getName() == null) {
+    //  Util.debugLog("Shop owner not exist on this server, did you reset the playerdata?");
+    //}
+    return true;
   }
 
-  private void singleShopLoaded(@NotNull Timer singleShopLoadTimer) {
-    totalLoaded++;
-    long singleShopLoadTime = singleShopLoadTimer.endTimer();
-    loadTimes.add(singleShopLoadTime);
-    Util.debugLog("Loaded shop used time " + singleShopLoadTime + "ms");
+  private static @Nullable ItemStack deserializeItem(@NotNull String itemConfig) {
+    try {
+      return Util.deserialize(itemConfig);
+    } catch (InvalidConfigurationException e) {
+      e.printStackTrace();
+      QuickShop.instance().getLogger().warning(
+          "Failed load shop data, because target config can't deserialize the ItemStack.");
+      Util.debugLog("Failed to load data to the ItemStack: " + itemConfig);
+      return null;
+    }
+  }
+
+  private static @Nullable ShopModerator deserializeModerator(@NotNull String moderatorJson) {
+    ShopModerator shopModerator;
+    if (Util.isUUID(moderatorJson)) {
+      Util.debugLog("Updating old shop data... for " + moderatorJson);
+      shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
+    } else {
+      try {
+        shopModerator = ShopModerator.deserialize(moderatorJson);
+      } catch (JsonSyntaxException ex) {
+        Util.debugLog("Updating old shop data... for " + moderatorJson);
+        moderatorJson = Bukkit.getOfflinePlayer(moderatorJson).getUniqueId().toString();
+        shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
+      }
+    }
+    return shopModerator;
   }
 
   @Data
-  public class ShopDatabaseInfo {
+  @Accessors(fluent = true)
+  public class ShopDatabaseInfo implements Serializable {
+    private static final long serialVersionUID = 1L;
+    
     private ItemStack item;
-    private Location location;
     private ShopModerator moderators;
     private double price;
     private ShopType type;
-    private boolean unlimited;
-    private World world;
-    private int x;
-    private int y;
-    private int z;
-
-    ShopDatabaseInfo(ShopDatabaseInfoOrigin origin) {
-      try {
-        this.x = origin.getX();
-        this.y = origin.getY();
-        this.z = origin.getZ();
-        this.price = origin.getPrice();
-        this.unlimited = origin.isUnlimited();
-        this.type = ShopType.fromID(origin.getType());
-        this.world = Bukkit.getWorld(origin.getWorld());
-        this.item = deserializeItem(origin.getItem());
-        this.moderators = deserializeModerator(origin.getModerators());
-        this.location = new Location(world, x, y, z);
-      } catch (Exception ex) {
-        exceptionHandler(ex, this.location);
-      }
-    }
-
-    private @Nullable ItemStack deserializeItem(@NotNull String itemConfig) {
-      try {
-        return Util.deserialize(itemConfig);
-      } catch (InvalidConfigurationException e) {
-        e.printStackTrace();
-        plugin.getLogger().warning(
-            "Failed load shop data, because target config can't deserialize the ItemStack.");
-        Util.debugLog("Failed to load data to the ItemStack: " + itemConfig);
-        return null;
-      }
-    }
-
-    private @Nullable ShopModerator deserializeModerator(@NotNull String moderatorJson) {
-      ShopModerator shopModerator;
-      if (Util.isUUID(moderatorJson)) {
-        Util.debugLog("Updating old shop data... for " + moderatorJson);
-        shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
-      } else {
-        try {
-          shopModerator = ShopModerator.deserialize(moderatorJson);
-        } catch (JsonSyntaxException ex) {
-          Util.debugLog("Updating old shop data... for " + moderatorJson);
-          moderatorJson = Bukkit.getOfflinePlayer(moderatorJson).getUniqueId().toString();
-          shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
-        }
-      }
-      return shopModerator;
-    }
-  }
-
-  @Data
-  public class ShopDatabaseInfoOrigin {
-    private String item;
-    private String moderators;
-    private double price;
-    private int type;
     private boolean unlimited;
     private String world;
     private int x;
     private int y;
     private int z;
-
-    ShopDatabaseInfoOrigin(ResultSet rs) {
+    
+    public ShopDatabaseInfo(ResultSet rs) {
       try {
         this.x = rs.getInt("x");
         this.y = rs.getInt("y");
         this.z = rs.getInt("z");
-        this.world = rs.getString("world");
-        this.item = rs.getString("itemConfig");
-        this.moderators = rs.getString("owner");
         this.price = rs.getDouble("price");
-        this.type = rs.getInt("type");
         this.unlimited = rs.getBoolean("unlimited");
-      } catch (SQLException sqlex) {
-        exceptionHandler(sqlex, null);
+        this.type = ShopType.fromID(rs.getInt("type"));
+        this.world = rs.getString("world");
+        this.item = deserializeItem(rs.getString("itemConfig"));
+        this.moderators = deserializeModerator(rs.getString("owner"));
+        
+      } catch (SQLException sql) {
+        exceptionHandler(sql, rs); // FIXME
       }
     }
+  }
+  
+  private static Object getSafely(ResultSet set, String pos, List<Throwable> handler) {
+    try {
+      Object value = set.getObject("world");
+      return value == null ? "~NULL~" : value;
+    } catch (Throwable t) {
+      handler.add(t);
+      return "(Error) Failed to obtain, nested error id @ " + (handler.size() - 1);
+    }
+  }
+  
+  private static void exceptionHandler(@NotNull Throwable throwable, @NotNull ResultSet set) {
+    Logger logger = QuickShop.instance().getLogger();
+    
+    logger.warning("########## FAILED TO LOAD A SHOP FROM DB ##########");
+    logger.warning("  >> Error Info:");
+    String message = throwable.getMessage();
+    message = message == null ? "~NULL~" : message;
+    logger.warning("  > " + message);
+    
+    logger.warning("  >> Error Trace");
+    throwable.printStackTrace();
+    
+    logger.warning("  >> Shop Info");
+    Object temp; List<Throwable> nested = Lists.newArrayList();
+    
+    try {
+      temp = String.valueOf(temp = getSafely(set, "world", nested));
+    } catch (Throwable t) {
+      temp = "(Error) World name is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  World: " + temp);
+    try {
+      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "x", nested))));
+    } catch (Throwable t) {
+      temp = "(Error) X pos is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  X: " + temp);
+    try {
+      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "y", nested))));
+    } catch (Throwable t) {
+      temp = "(Error) Y pos is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  Y: " + temp);
+    try {
+      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "z", nested))));
+    } catch (Throwable t) {
+      temp = "(Error) Z pos is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  Z: " + temp);
+    try {
+      temp = Double.valueOf(String.valueOf((temp = getSafely(set, "price", nested))));
+    } catch (Throwable t) {
+      temp = "(Error) Pirce data is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  Price: " + temp);
+    try {
+      temp = Boolean.valueOf(String.valueOf((temp = getSafely(set, "unlimited", nested))));
+    } catch (Throwable t) {
+      temp = "(Error) Unlimited type is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  Unlimited: " + temp);
+    try {
+      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "type", nested))));
+    } catch (Throwable t) {
+      temp = "(Error) Shop type is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  Shop Type: " + temp);
+    try {
+      temp = String.valueOf((temp = getSafely(set, "itemConfig", nested)));
+    } catch (Throwable t) {
+      temp = "(Error) Item data is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >  Item: " + temp);
+    try {
+      temp = String.valueOf((temp = getSafely(set, "owner", nested)));
+    } catch (Throwable t) {
+      temp = "(Error) Owner data is corrupted, nested error id @ " + (nested.size() - 1);
+    }
+    logger.warning("  >> Owner: " + temp);
+    
+    logger.warning("  >> Database Info");
+    try {
+      logger.warning("  >  Connected: " + QuickShop.instance().getDatabase().getConnection().isClosed());
+    } catch (SQLException | NullPointerException e) {
+      logger.warning("  >  Connected: " + "Failed to load status.");
+    }
+    try {
+      logger.warning("  >  Readonly: " + QuickShop.instance().getDatabase().getConnection().isReadOnly());
+    } catch (SQLException | NullPointerException e) {
+      logger.warning("  >  Readonly: " + "Failed to load status.");
+    }
+    try {
+      logger.warning("  >  ClientInfo: " + QuickShop.instance().getDatabase().getConnection().getClientInfo());
+    } catch (SQLException | NullPointerException e) {
+      logger.warning("  >  ClientInfo: " + "Failed to load status.");
+    }
+    
+    logger.warning("  >> Nested Errors");
+    for (int i = 0; i < nested.size(); i++) {
+      logger.warning("  >  Id " + i);
+      nested.get(i).printStackTrace();
+      logger.warning("");
+    }
+
+    logger.warning("#######################################");
   }
 }

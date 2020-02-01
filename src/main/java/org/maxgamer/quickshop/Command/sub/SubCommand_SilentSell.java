@@ -61,7 +61,7 @@ public class SubCommand_SilentSell implements CommandProcesser {
 
     shop.get().setShopType(ShopType.SELLING);
     // shop.setSignText();
-    shop.get().update();
+    shop.get().save();
     MsgUtil.sendControlPanelInfo(sender, shop.get());
     sender.sendMessage(
         MsgUtil.getMessage("command.now-selling", sender, Util.getItemStackName(shop.get().getItem())));

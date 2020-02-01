@@ -34,8 +34,9 @@ import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.event.ShopLoadEvent;
 import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
 import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
+import org.maxgamer.quickshop.event.ShopPriceChangeEvent.Reason;
 import org.maxgamer.quickshop.event.ShopUnloadEvent;
-import org.maxgamer.quickshop.event.ShopUpdateEvent;
+import org.maxgamer.quickshop.event.ShopSaveEvent;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopModerator;
 import org.maxgamer.quickshop.shop.ShopType;
@@ -162,10 +163,7 @@ public class ContainerShop implements Shop {
    */
   @Override
   public int getRemainingSpace() {
-    if (this.unlimited) {
-      return -1;
-    }
-    return Util.countSpace(this.getInventory(), this.getItem());
+    return unlimited ? -1 : Util.countSpace(this.getInventory(), this.getItem());
   }
 
   /**
@@ -197,38 +195,41 @@ public class ContainerShop implements Shop {
    * @param price The new price of the shop.
    */
   @Override
-  public void setPrice(double price) {
-    ShopPriceChangeEvent event = new ShopPriceChangeEvent(this, this.price, price);
-    if (Util.fireCancellableEvent(event)) {
-      Util.debugLog("A plugin cancelled the price change event.");
+  public void setPrice(double newPrice) {
+    ShopPriceChangeEvent event = new ShopPriceChangeEvent(newPrice, price, false, this, Reason.RESTRICT);
+    if (Util.fireCancellableEvent(event))
       return;
-    }
-    this.price = price;
+    
+    price = event.getNewPrice();
     setSignText();
-    update();
+    save();
   }
 
   /** Upates the shop into the database. */
   @Override
-  public void update() {
-    ShopUpdateEvent shopUpdateEvent = new ShopUpdateEvent(this);
-    if (Util.fireCancellableEvent(shopUpdateEvent)) {
-      Util.debugLog("The Shop update action was canceled by a plugin.");
+  public void save() {
+    if (Util.fireCancellableEvent(new ShopSaveEvent(this)))
       return;
-    }
 
-    int x = this.getLocation().getBlockX();
-    int y = this.getLocation().getBlockY();
-    int z = this.getLocation().getBlockZ();
-    String world = Objects.requireNonNull(this.getLocation().getWorld()).getName();
-    int unlimited = this.isUnlimited() ? 1 : 0;
     try {
-      QuickShop.instance().getDatabaseHelper().updateShop(ShopModerator.serialize(this.moderator.clone()),
-          this.getItem(), unlimited, shopType.toID(), this.getPrice(), x, y, z, world);
-    } catch (Exception e) {
-      e.printStackTrace();
-      QuickShop.instance().getLogger().log(Level.WARNING,
+      QuickShop.instance()
+               .getDatabaseHelper()
+               .updateShop(
+                  ShopModerator.serialize(moderator),
+                  item,
+                  unlimited ? 1 : 0,
+                  shopType.toID(),
+                  price,
+                  location.getBlockX(),
+                  location.getBlockY(),
+                  location.getBlockZ(),
+                  location.getWorld().getName());
+      
+    } catch (Throwable t) {
+      QuickShop.instance().getLogger().severe(
           "Could not update a shop in the database! Changes will revert after a reboot!");
+      
+      t.printStackTrace();
     }
   }
 
@@ -254,7 +255,7 @@ public class ContainerShop implements Shop {
     this.moderator.setOwner(owner);
     Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
     this.setSignText();
-    update();
+    save();
   }
 
   /** @return Returns a dummy itemstack of the item this shop is selling. */
@@ -266,7 +267,7 @@ public class ContainerShop implements Shop {
   @Override
   public boolean addStaff(@NotNull UUID player) {
     boolean result = this.moderator.addStaff(player);
-    update();
+    save();
     if (result) {
       Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
     }
@@ -339,7 +340,7 @@ public class ContainerShop implements Shop {
   @Override
   public boolean delStaff(@NotNull UUID player) {
     boolean result = this.moderator.delStaff(player);
-    update();
+    save();
     if (result) {
       Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
     }
@@ -382,11 +383,11 @@ public class ContainerShop implements Shop {
     }
     if (fromMemory) {
       // Delete it from memory
-      QuickShop.instance().getShopManager().removeShop(this);
+      QuickShop.instance().getShopManager().unloadShop(this);
     } else {
       try {
-        QuickShop.instance().getShopManager().removeShop(this);
-        QuickShop.instance().getDatabaseHelper().removeShop(x, y, z, world);
+        QuickShop.instance().getShopManager().unloadShop(this);
+        QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
       } catch (SQLException e) {
         e.printStackTrace();
       }
@@ -441,7 +442,7 @@ public class ContainerShop implements Shop {
   public void clearStaffs() {
     this.moderator.clearStaffs();
     Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-    update();
+    save();
   }
 
   /**
@@ -629,7 +630,7 @@ public class ContainerShop implements Shop {
   public void setUnlimited(boolean unlimited) {
     this.unlimited = unlimited;
     this.setSignText();
-    update();
+    save();
   }
 
   @Override
@@ -646,7 +647,7 @@ public class ContainerShop implements Shop {
   public void setShopType(@NotNull ShopType shopType) {
     this.shopType = shopType;
     this.setSignText();
-    update();
+    save();
   }
 
   @Override
@@ -662,34 +663,38 @@ public class ContainerShop implements Shop {
   /** Updates signs attached to the shop */
   @Override
   public void setSignText() {
-    if (!Util.isLoaded(this.location)) {
+    if (!Util.isChunkLoaded(this.location)) // FIXME check
       return;
-    }
+    
     String[] lines = new String[4];
-    OfflinePlayer player = Bukkit.getOfflinePlayer(this.getOwner());
-    lines[0] = MsgUtil.getMessageOfflinePlayer("signs.header", player, this.ownerName());
-    if (this.isSelling()) {
-      if (this.getRemainingStock() == -1) {
-        lines[1] = MsgUtil.getMessageOfflinePlayer("signs.selling", player,
-            "" + MsgUtil.getMessageOfflinePlayer("signs.unlimited", player));
-      } else {
-        lines[1] =
-            MsgUtil.getMessageOfflinePlayer("signs.selling", player, "" + this.getRemainingStock());
-      }
-
-    } else if (this.isBuying()) {
-      if (this.getRemainingSpace() == -1) {
-        lines[1] = MsgUtil.getMessageOfflinePlayer("signs.buying", player,
-            "" + MsgUtil.getMessageOfflinePlayer("signs.unlimited", player));
-
-      } else {
-        lines[1] =
-            MsgUtil.getMessageOfflinePlayer("signs.buying", player, "" + this.getRemainingSpace());
-      }
-    }
-    lines[2] = MsgUtil.getMessageOfflinePlayer("signs.item", player,
-        Util.getItemStackName(this.getItem()));
-    lines[3] = MsgUtil.getMessageOfflinePlayer("signs.price", player, Util.format(this.getPrice()));
+    
+    OfflinePlayer player =
+        QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled() ?
+        Bukkit.getOfflinePlayer(this.getOwner()) : null;
+    
+    lines[0] = MsgUtil.getMessagePlaceholder(
+        "signs.header",
+        player,
+        ownerName());
+    
+    String section = isSelling() ? "selling" : "buying";
+    lines[1] = MsgUtil.getMessagePlaceholder(
+        "signs.".concat(section),
+        player,
+        unlimited ?
+            MsgUtil.getMessagePlaceholder("signs.unlimited", player) :
+            String.valueOf(getRemainingSpace()));
+    
+    lines[2] = MsgUtil.getMessagePlaceholder(
+        "signs.item",
+        player,
+        Util.getItemStackName(getItem()));
+    
+    lines[3] = MsgUtil.getMessagePlaceholder(
+        "signs.price",
+        player,
+        Util.format(this.getPrice()));
+    
     this.setSignText(lines);
   }
 
@@ -725,7 +730,7 @@ public class ContainerShop implements Shop {
     blocks[3] = location.getBlock().getRelative(BlockFace.WEST);
     OfflinePlayer player = Bukkit.getOfflinePlayer(this.getOwner());
     final String signHeader =
-        MsgUtil.getMessageOfflinePlayer("sign.header", player, this.ownerName());
+        MsgUtil.getMessagePlaceholder("sign.header", player, this.ownerName());
 
     for (Block b : blocks) {
       if (b == null) {
@@ -850,31 +855,27 @@ public class ContainerShop implements Shop {
   /** Load ContainerShop. */
   @Override
   public void onLoad() {
-    if (this.isLoaded) {
-      Util.debugLog("Dupe load request, canceled.");
+    if (this.isLoaded || Util.fireCancellableEvent(new ShopLoadEvent(this)))
       return;
-    }
-    ShopLoadEvent shopLoadEvent = new ShopLoadEvent(this);
-    if (Util.fireCancellableEvent(shopLoadEvent)) {
-      return;
-    }
 
     this.isLoaded = true;
-    Objects.requireNonNull(QuickShop.instance().getShopManager().getLoadedShops()).add(this);
-    QuickShop.instance().getShopContainerWatcher().scheduleCheck(this);
-    // check price restriction
+    QuickShop.instance()
+             .getShopManager()
+             .getLoadedShops().add(this);
+    
+    // check price restriction // FIXME move
     Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.getMaterial());
 
     if (priceRestriction != null) {
-      if (price < priceRestriction.getKey()) {
-        price = priceRestriction.getKey();
-        this.update();
-      } else if (price > priceRestriction.getValue()) {
-        price = priceRestriction.getValue();
-        this.update();
-      }
+      double min = priceRestriction.getKey();
+      double max = priceRestriction.getValue();
+      double fix = price < min ? min : (price > max ? max : price);
+      
+      price = fix;
+      save();
     }
-    this.checkDisplay();
+    
+    checkDisplay();
   }
 
   /** Unload ContainerShop. */
@@ -887,7 +888,7 @@ public class ContainerShop implements Shop {
     if (this.getDisplayItem() != null) {
       this.getDisplayItem().remove();
     }
-    update();
+    save();
     this.isLoaded = false;
     QuickShop.instance().getShopManager().getLoadedShops().remove(this);
     ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
@@ -908,12 +909,12 @@ public class ContainerShop implements Shop {
   @Override
   public @NotNull String ownerName() {
     if (this.isUnlimited()) {
-      return MsgUtil.getMessageOfflinePlayer("admin-shop",
+      return MsgUtil.getMessagePlaceholder("admin-shop",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
     String name = Bukkit.getOfflinePlayer(this.getOwner()).getName();
     if (name == null || name.isEmpty()) {
-      return MsgUtil.getMessageOfflinePlayer("unknown-owner",
+      return MsgUtil.getMessagePlaceholder("unknown-owner",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
     return name;
@@ -927,7 +928,7 @@ public class ContainerShop implements Shop {
   @Override
   public void setModerator(ShopModerator shopModerator) {
     this.moderator = shopModerator;
-    update();
+    save();
     Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
   }
 

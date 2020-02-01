@@ -855,7 +855,7 @@ public class Util {
    * @param loc The location
    * @return true if the given location is loaded or not.
    */
-  public static boolean isLoaded(@NotNull Location loc) {
+  public static boolean isChunkLoaded(@NotNull Location loc) {
     // plugin.getLogger().log(Level.WARNING, "Checking isLoaded(Location loc)");
     if (loc.getWorld() == null) {
       // plugin.getLogger().log(Level.WARNING, "Is not loaded. (No world)");
@@ -1339,9 +1339,6 @@ public class Util {
    * @return The event is cancelled.
    */
   public static boolean fireCancellableEvent(@NotNull Cancellable event) {
-    if (!(event instanceof Event)) {
-      throw new IllegalArgumentException("Cancellable must is event implement");
-    }
     Bukkit.getPluginManager().callEvent((Event) event);
     return event.isCancelled();
   }

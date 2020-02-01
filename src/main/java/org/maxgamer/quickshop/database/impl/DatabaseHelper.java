@@ -130,7 +130,7 @@ public class DatabaseHelper {
 
   public void createShop(@NotNull String owner, double price, @NotNull ItemStack item,
       int unlimited, int shopType, @NotNull String world, int x, int y, int z) throws SQLException {
-    removeShop(x, y, z, world); // First purge old exist shop before create new shop.
+    deleteShop(x, y, z, world); // First purge old exist shop before create new shop.
     String sqlString = "INSERT INTO " + BaseConfig.databasePrefix
         + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     // QuickShop.instance().getDB().execute(q, owner, price, Util.serialize(item), x, y, z, world,
@@ -160,7 +160,7 @@ public class DatabaseHelper {
     st.execute(createTable);
   }
 
-  public boolean removeShop(int x, int y, int z, @NotNull String worldName) throws SQLException {
+  public boolean deleteShop(int x, int y, int z, @NotNull String worldName) throws SQLException {
     // db.getConnection().createStatement()
     // .executeUpdate("DELETE FROM " + QuickShop.instance().getDbPrefix() + "shops WHERE x = " + x + "
     // AND y = " + y
@@ -226,8 +226,8 @@ public class DatabaseHelper {
   }
 
   public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited,
-      int shopType, double price, int x, int y, int z, String world) {
-    try {
+      int shopType, double price, int x, int y, int z, String world) throws SQLException {
+    
       String sqlString = "UPDATE " + BaseConfig.databasePrefix
           + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
@@ -242,9 +242,5 @@ public class DatabaseHelper {
       ps.setString(9, world);
       plugin.getDatabaseManager().add(ps);
       // db.execute(q, owner, Util.serialize(item), unlimited, shopType, price, x, y, z, world);
-    } catch (SQLException sqle) {
-      sqle.printStackTrace();
-    }
-
   }
 }

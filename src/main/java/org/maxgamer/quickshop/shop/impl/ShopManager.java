@@ -669,7 +669,7 @@ public class ShopManager {
           boolean backupSuccess = Util.backupDatabase();
           try {
             if (backupSuccess) {
-              QuickShop.instance().getDatabaseHelper().removeShop(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
+              QuickShop.instance().getDatabaseHelper().deleteShop(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
                   loc.getWorld().getName());
             } else {
               QuickShop.instance().getLogger()
@@ -936,7 +936,7 @@ public class ShopManager {
        *
        * @param shop The shop to remove
        */
-      public void removeShop(@NotNull Shop shop) {
+      public void unloadShop(@NotNull Shop shop) {
         // shop.onUnload();
         Location loc = shop.getLocation();
         String world = Objects.requireNonNull(loc.getWorld()).getName();
@@ -1003,7 +1003,8 @@ public class ShopManager {
        *
        * @return All loaded shops.
        */
-      public @Nullable Set<Shop> getLoadedShops() {
+      @NotNull
+      public Set<Shop> getLoadedShops() {
         return this.loadedShops;
       }
 

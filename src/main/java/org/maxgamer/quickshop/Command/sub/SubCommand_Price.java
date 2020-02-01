@@ -163,7 +163,7 @@ public class SubCommand_Price implements CommandProcesser {
       // Update the shop
       shop.get().setPrice(price);
       // shop.setSignText();
-      shop.get().update();
+      shop.get().save();
       sender.sendMessage(
           MsgUtil.getMessage("price-is-now", sender, QuickShop.instance().getEconomy().format(shop.get().getPrice())));
       // Chest shops can be double shops.

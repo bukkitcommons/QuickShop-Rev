@@ -122,7 +122,7 @@ public interface Shop {
   void setSignText();
 
   /** Update shop data to database */
-  void update();
+  void save();
 
   /**
    * Get shop's item durability, if have.

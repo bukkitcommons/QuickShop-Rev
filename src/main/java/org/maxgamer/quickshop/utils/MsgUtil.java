@@ -243,19 +243,22 @@ public class MsgUtil {
    * @param args args
    * @return message
    */
-  public static String getMessageOfflinePlayer(@NotNull String loc, @Nullable OfflinePlayer player,
+  public static String getMessagePlaceholder(
+      @NotNull String loc,
+      @Nullable OfflinePlayer player,
       @NotNull String... args) {
+    
     Optional<String> raw = messagei18n.getString(loc);
-    if (!raw.isPresent()) {
+    if (!raw.isPresent())
       return invaildMsg + ": " + loc;
-    }
+    
     String filled = fillArgs(raw.get(), args);
+    
     if (player != null) {
-      if (plugin.getPlaceHolderAPI() != null && plugin.getPlaceHolderAPI().isEnabled()) {
-        filled = PlaceholderAPI.setPlaceholders(player, filled);
-        Util.debugLog("Processed message " + filled + " by PlaceHolderAPI.");
-      }
+      filled = PlaceholderAPI.setPlaceholders(player, filled);
+      Util.debugLog("Processed message " + filled + " by PlaceHolderAPI.");
     }
+    
     return filled;
   }
 
