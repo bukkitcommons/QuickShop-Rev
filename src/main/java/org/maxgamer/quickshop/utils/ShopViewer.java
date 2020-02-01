@@ -70,4 +70,8 @@ public class ShopViewer {
   public boolean isPresent() {
     return shop != null;
   }
+
+  public Shop get() {
+    return shop;
+  }
 }

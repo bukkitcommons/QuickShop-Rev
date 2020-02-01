@@ -32,11 +32,10 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.impl.ContainerShop;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_Price implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
 
   @NotNull
   @Override
@@ -112,7 +111,7 @@ public class SubCommand_Price implements CommandProcesser {
 
     double fee = 0;
 
-    if (plugin.isPriceChangeRequiresFee()) {
+    if (QuickShop.instance().isPriceChangeRequiresFee()) {
       fee = BaseConfig.priceModFee;
     }
 
@@ -130,34 +129,34 @@ public class SubCommand_Price implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
 
-      if (!shop.isPresent() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
+      if (shop.isEmpty() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
           && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.price"))) {
         continue;
       }
-
+      
       if (shop.get().getPrice() == price) {
         // Stop here if there isn't a price change
         sender.sendMessage(MsgUtil.getMessage("no-price-change", sender));
         return;
       }
 
-      if (fee > 0 && !plugin.getEconomy().withdraw(p.getUniqueId(), fee)) {
+      if (fee > 0 && !QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), fee)) {
         sender.sendMessage(MsgUtil.getMessage("you-cant-afford-to-change-price", sender,
-            plugin.getEconomy().format(fee)));
+            QuickShop.instance().getEconomy().format(fee)));
         return;
       }
 
       if (fee > 0) {
         sender.sendMessage(MsgUtil.getMessage("fee-charged-for-price-change", sender,
-            plugin.getEconomy().format(fee)));
+            QuickShop.instance().getEconomy().format(fee)));
         try {
-          plugin.getEconomy().deposit(
-              plugin.getServer().getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), fee);
+          QuickShop.instance().getEconomy().deposit(
+              QuickShop.instance().getServer().getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), fee);
         } catch (Exception e) {
           e.getMessage();
-          plugin.getLogger().log(Level.WARNING,
+          QuickShop.instance().getLogger().log(Level.WARNING,
               "QuickShop can't pay tax to the account in config.yml, please set the tax account name to an existing player!");
         }
       }
@@ -166,7 +165,7 @@ public class SubCommand_Price implements CommandProcesser {
       // shop.setSignText();
       shop.get().update();
       sender.sendMessage(
-          MsgUtil.getMessage("price-is-now", sender, plugin.getEconomy().format(shop.get().getPrice())));
+          MsgUtil.getMessage("price-is-now", sender, QuickShop.instance().getEconomy().format(shop.get().getPrice())));
       // Chest shops can be double shops.
       if (!(shop.get() instanceof ContainerShop)) {
         return;

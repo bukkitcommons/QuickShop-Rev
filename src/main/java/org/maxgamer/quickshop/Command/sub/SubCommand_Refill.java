@@ -29,6 +29,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 
 public class SubCommand_Refill implements CommandProcesser {
 
@@ -76,7 +77,7 @@ public class SubCommand_Refill implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = plugin.getShopManager().getShop(b.getLocation());
 
       if (!shop.isPresent()) {
         continue;

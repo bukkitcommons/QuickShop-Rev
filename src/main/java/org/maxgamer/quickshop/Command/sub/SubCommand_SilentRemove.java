@@ -28,6 +28,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_SilentRemove implements CommandProcesser {
@@ -50,7 +51,7 @@ public class SubCommand_SilentRemove implements CommandProcesser {
     }
 
     final Player p = (Player) sender;
-    final Optional<Shop> shop =
+    final ShopViewer shop =
         plugin.getShopManager().getShop(new Location(plugin.getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 

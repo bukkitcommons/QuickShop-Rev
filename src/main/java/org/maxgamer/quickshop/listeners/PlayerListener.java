@@ -50,6 +50,7 @@ import org.maxgamer.quickshop.shop.Info;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopAction;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 // import com.griefcraft.lwc.LWC;
@@ -74,7 +75,7 @@ public class PlayerListener implements Listener {
           block = e.getClickedBlock();
         }
         
-        Optional<Shop> optional = plugin.getShopManager().getShop(block.getLocation());
+        ShopViewer optional = plugin.getShopManager().getShop(block.getLocation());
 
         if (optional.isPresent()
             && (optional.get()
@@ -111,7 +112,7 @@ public class PlayerListener implements Listener {
     final Location loc = b.getLocation();
     final ItemStack item = e.getItem();
     // Get the shop
-    Optional<Shop> shop = plugin.getShopManager().getShop(loc);
+    ShopViewer shop = plugin.getShopManager().getShop(loc);
     // If that wasn't a shop, search nearby shops
     if (!shop.isPresent()) {
       final Block attached;
@@ -126,7 +127,7 @@ public class PlayerListener implements Listener {
         attached = Util.getSecondHalf(b);
 
         if (attached != null) {
-          Optional<Shop> secondHalfShop = plugin.getShopManager().getShop(attached.getLocation());
+          ShopViewer secondHalfShop = plugin.getShopManager().getShop(attached.getLocation());
           if (secondHalfShop.isPresent() && !p.getUniqueId().equals(secondHalfShop.get().getOwner())) {
             // If player not the owner of the shop, make him select the second half of the
             // shop

@@ -44,6 +44,7 @@ import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.RealDisplayItem;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 /** ChestShop core */
@@ -549,7 +550,7 @@ public class ContainerShop implements Shop {
     if (c == null) {
       return null;
     }
-    Optional<Shop> shop = QuickShop.instance().getShopManager().getShop(c.getLocation());
+    ShopViewer shop = QuickShop.instance().getShopManager().getShop(c.getLocation());
     return (ContainerShop) shop.get();
   }
 

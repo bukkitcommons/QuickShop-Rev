@@ -886,12 +886,12 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      Optional<Shop> firstShop = plugin.getShopManager().getShop(c.getLocation());
+      ShopViewer firstShop = plugin.getShopManager().getShop(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Block secondHalf = getSecondHalf(c);
-      Optional<Shop> secondShop =
-          secondHalf == null ? Optional.empty() : plugin.getShopManager().getShop(secondHalf.getLocation());
+      ShopViewer secondShop =
+          secondHalf == null ? ShopViewer.empty() : plugin.getShopManager().getShop(secondHalf.getLocation());
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
         return true;

@@ -11,6 +11,7 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 
 public class SubCommand_Unlimited extends SneakyTabs implements CommandProcesser {
   @Override
@@ -30,7 +31,7 @@ public class SubCommand_Unlimited extends SneakyTabs implements CommandProcesser
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Optional<Shop> shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
 
       if (!shop.isPresent()) {
         continue;

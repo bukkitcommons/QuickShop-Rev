@@ -57,7 +57,7 @@ import org.maxgamer.quickshop.listeners.DisplayBugFixListener;
 import org.maxgamer.quickshop.listeners.DisplayProtectionListener;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.PlayerListener;
-import org.maxgamer.quickshop.listeners.ShopProtectionListener;
+import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.listeners.WorldListener;
 import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.scheduler.DisplayAutoDespawnWatcher;
@@ -173,7 +173,7 @@ public class QuickShop extends JavaPlugin {
   /** The Shop Manager used to store shops */
   private ShopManager shopManager;
 
-  private ShopProtectionListener shopProtectListener;
+  private ShopProtector shopProtectListener;
   private SyncTaskWatcher syncTaskWatcher;
   // private ShopVaildWatcher shopVaildWatcher;
   private DisplayAutoDespawnWatcher displayAutoDespawnWatcher;
@@ -570,7 +570,7 @@ public class QuickShop extends JavaPlugin {
     inventoryListener = new DisplayProtectionListener(this);
     customInventoryListener = new CustomInventoryListener(this);
     displayBugFixListener = new DisplayBugFixListener(this);
-    shopProtectListener = new ShopProtectionListener(this);
+    shopProtectListener = new ShopProtector(this);
     displayWatcher = new DisplayWatcher(this);
     syncTaskWatcher = new SyncTaskWatcher(this);
     // shopVaildWatcher = new ShopVaildWatcher(this);

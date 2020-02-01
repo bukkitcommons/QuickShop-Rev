@@ -2,9 +2,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
@@ -42,10 +40,9 @@ public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
               .getShop(block)
               
               .nonNull()
-              .filter(shop -> shop
-                  .getModerator()
-                  .isModerator(((Player) sender)
-                  .getUniqueId()))
+              .filter(shop -> shop.getModerator()
+                                  .isModerator(((Player) sender)
+                                  .getUniqueId()))
               
               .apply(shop -> {
                 shop.setShopType(ShopType.BUYING);

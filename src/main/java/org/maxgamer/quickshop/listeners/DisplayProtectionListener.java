@@ -62,6 +62,7 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 public class DisplayProtectionListener implements Listener {
@@ -80,7 +81,7 @@ public class DisplayProtectionListener implements Listener {
     }
     Block targetBlock = event.getToBlock();
     Block shopBlock = targetBlock.getRelative(BlockFace.DOWN);
-    Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(shopBlock.getLocation());
+    ShopViewer shop = plugin.getShopManager().getShopIncludeAttached(shopBlock.getLocation());
     if (!shop.isPresent()) {
       return;
     }
@@ -111,7 +112,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     }
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
+    ShopViewer shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
     if (shop.isPresent()) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -144,7 +145,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     }
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
+    ShopViewer shop = plugin.getShopManager().getShopIncludeAttached(block.getLocation());
     if (shop.get() != null) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()

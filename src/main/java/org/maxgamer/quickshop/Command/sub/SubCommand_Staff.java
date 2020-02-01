@@ -33,6 +33,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_Staff implements CommandProcesser {
@@ -94,7 +95,7 @@ public class SubCommand_Staff implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Optional<Shop> shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
 
       if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
         continue;

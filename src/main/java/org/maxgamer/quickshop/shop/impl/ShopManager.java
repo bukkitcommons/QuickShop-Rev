@@ -491,7 +491,7 @@ public class ShopManager {
 
         // Shop gone
         // Get the shop they interacted with
-        @Nullable Optional<Shop> shopOp = getShop(info.getLocation());
+        ShopViewer shopOp = getShop(info.getLocation());
         // It's not valid anymore
         if (!shopOp.isPresent() || !Util.canBeShop(info.getLocation().getBlock())) {
           p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
@@ -776,7 +776,7 @@ public class ShopManager {
        * @param loc The location to get the shop from
        * @return The shop at that location
        */
-      public Optional<Shop> getShopIncludeAttached(@Nullable Location loc) {
+      public ShopViewer getShopIncludeAttached(@Nullable Location loc) {
         if (loc == null) {
           Util.debugLog("Location is null.");
           return null;
@@ -790,7 +790,7 @@ public class ShopManager {
       }
 
       @Nullable
-      public Optional<Shop> getShopIncludeAttached_Classic(@NotNull Location loc) {
+      public ShopViewer getShopIncludeAttached_Classic(@NotNull Location loc) {
         @Nullable Shop shop;
         // Get location's chunk all shops
         @Nullable HashMap<Location, Shop> inChunk = getShops(loc.getChunk());
@@ -799,7 +799,7 @@ public class ShopManager {
           shop = inChunk.get(loc);
           if (shop != null) {
             // Okay, shop was founded.
-            return Optional.of(shop);
+            return ShopViewer.of(shop);
           }
           // Ooops, not founded that shop in this chunk.
         }
@@ -811,7 +811,7 @@ public class ShopManager {
             shop = inChunk.get(secondHalfShop.getLocation());
             if (shop != null) {
               // Okay, shop was founded.
-              return Optional.of(shop);
+              return ShopViewer.of(shop);
             }
             // Oooops, no any shops matched.
           }
@@ -823,7 +823,7 @@ public class ShopManager {
         if (attachedBlock == null) {
           // Nope
           Util.debugLog("No attached block.");
-          return Optional.empty();
+          return ShopViewer.empty();
         } else {
           // Okay we know it on some blocks.
           // We need set new location and chunk.
@@ -833,7 +833,7 @@ public class ShopManager {
             shop = inChunk.get(attachedBlock.getLocation());
             if (shop != null) {
               // Okay, shop was founded.
-              return Optional.empty();
+              return ShopViewer.empty();
             }
             // Oooops, no any shops matched.
           }
@@ -841,11 +841,11 @@ public class ShopManager {
 
         Util.debugLog("Not found shops use the attached util.");
 
-        return Optional.empty();
+        return ShopViewer.empty();
       }
 
-      private Optional<Shop> getShopIncludeAttached_Fast(@NotNull Location loc) {
-        Optional<Shop> shop = getShop(loc);
+      private ShopViewer getShopIncludeAttached_Fast(@NotNull Location loc) {
+        ShopViewer shop = getShop(loc);
         if (shop.isPresent()) {
           return shop;
         }
@@ -853,7 +853,7 @@ public class ShopManager {
         if (attachedBlock != null) {
           return getShop(attachedBlock.getLocation());
         } else {
-          return Optional.empty();
+          return ShopViewer.empty();
         }
       }
 

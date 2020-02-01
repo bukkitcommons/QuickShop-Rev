@@ -24,6 +24,7 @@ import org.maxgamer.quickshop.shop.Info;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopAction;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 @AllArgsConstructor
@@ -38,7 +39,7 @@ public class BlockListener implements Listener {
    * @param loc The location of the sign
    * @return The shop
    */
-  private Optional<Shop> getShopNextTo(@NotNull Location loc) {
+  private ShopViewer getShopNextTo(@NotNull Location loc) {
     final Block b = Util.getAttached(loc.getBlock());
     // Util.getAttached(b)
     if (b == null) {
@@ -70,7 +71,7 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     // If the shop was a chest
     if (Util.canBeShop(b)) {
-      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = plugin.getShopManager().getShop(b.getLocation());
       if (shop.get() == null) {
         return;
       }
@@ -119,27 +120,27 @@ public class BlockListener implements Listener {
         }
       }
 
-      Optional<Shop> shop = getShopNextTo(b.getLocation());
+      ShopViewer viewer = getShopNextTo(b.getLocation());
 
-      if (shop.get() == null) {
-        return;
-      }
-      // If they're in creative and not the owner, don't let them
-      // (accidents happen)
-      if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.get().getOwner())) {
-        // Check SuperTool
-        if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
-          p.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", p));
-          shop.get().delete();
-          return;
-        }
-        e.setCancelled(true);
-        p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
-            MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
-      }
-
-      Util.debugLog("Cannot break the sign.");
-      e.setCancelled(true);
+      viewer.nonNull()
+        .accept(shop -> {
+          // If they're in creative and not the owner, don't let them
+          // (accidents happen)
+          if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.getOwner())) {
+            // Check SuperTool
+            if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
+              p.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", p));
+              shop.delete();
+              return;
+            }
+            e.setCancelled(true);
+            p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
+                MsgUtil.getItemi18n(Material.GOLDEN_AXE.name())));
+          }
+  
+          Util.debugLog("Cannot break the sign.");
+          e.setCancelled(true);
+        });
     }
   }
 
@@ -157,7 +158,7 @@ public class BlockListener implements Listener {
     }
 
     // Delayed task. Event triggers when item is moved, not when it is received.
-    final Optional<Shop> shop = plugin.getShopManager().getShopIncludeAttached(location);
+    final ShopViewer shop = plugin.getShopManager().getShopIncludeAttached(location);
     if (shop.get() != null) {
       plugin.getSignUpdateWatcher().scheduleSignUpdate(shop.get());
     }

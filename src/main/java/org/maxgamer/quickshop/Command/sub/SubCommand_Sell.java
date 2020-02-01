@@ -30,6 +30,7 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_Sell implements CommandProcesser {
@@ -60,7 +61,7 @@ public class SubCommand_Sell implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final Optional<Shop> shop = plugin.getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = plugin.getShopManager().getShop(b.getLocation());
 
       if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
         continue;

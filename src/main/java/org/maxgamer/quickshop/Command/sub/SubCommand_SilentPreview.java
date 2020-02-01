@@ -29,6 +29,7 @@ import org.maxgamer.quickshop.shop.InventoryPreview;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.impl.ContainerShop;
 import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_SilentPreview implements CommandProcesser {
@@ -55,7 +56,7 @@ public class SubCommand_SilentPreview implements CommandProcesser {
       return;
     }
 
-    final Optional<Shop> shop =
+    final ShopViewer shop =
         plugin.getShopManager().getShop(new Location(plugin.getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
