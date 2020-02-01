@@ -63,13 +63,6 @@ public interface Shop {
   void delete();
 
   /**
-   * Delete shop from ram or ram and database
-   *
-   * @param paramBoolean true = only delete from ram, false = delete from both ram and database
-   */
-  void delete(boolean paramBoolean);
-
-  /**
    * Check shop is or not attacked the target block
    *
    * @param paramBlock Target block

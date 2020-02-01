@@ -1,37 +1,15 @@
-/*
- * This file is a part of project QuickShop, the name is ShopLoader.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.shop.impl;
 
 import com.google.common.collect.Lists;
-import com.google.common.graph.ElementOrder.Type;
 import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
-import java.security.interfaces.RSAKey;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -45,17 +23,42 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopModerator;
 import org.maxgamer.quickshop.shop.ShopType;
-import org.maxgamer.quickshop.utils.Timer;
 import org.maxgamer.quickshop.utils.Util;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader {
+  
+  public static void forEachShopFromDatabase(@NotNull Consumer<@NotNull Shop> consumer) {
+    try {
+      QuickShop.instance().getLogger().info("Loading shops from the database..");
+      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
+      
+      while (rs.next()) {
+        ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
+        
+        if (!canLoad(data)) {
+          Util.debugLog("Somethings gone wrong, skipping the loading...");
+          continue;
+        }
+        
+        Shop shop = new ContainerShop(
+            new Location(Bukkit.getWorld(data.world()), data.x(), data.y(), data.z()),
+            data.price(), data.item(),
+            data.moderators(), data.unlimited(), data.type());
+        
+        consumer.accept(shop);
+      }
+    } catch (Throwable t) {
+      exceptionHandler(t, null);
+    }
+  }
+  
   /**
    * Load all shops
    *
    * @param worldName The world name
    */
-  public void loadShops(@Nullable String worldName) {
+  public static void loadShops(@NotNull World world) {
     long onLoad = System.currentTimeMillis();
     
     try {
@@ -73,8 +76,7 @@ public class ShopLoader {
         long onPerShop = System.nanoTime();
         ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
         
-        boolean ignoreWorlds = worldName == null;
-        if (!ignoreWorlds && !data.getWorld().equals(worldName)) {
+        if (!data.world().equals(world.getName())) {
           durTotalShopsNano = System.nanoTime() - onPerShop;
           continue;
         }
@@ -86,28 +88,19 @@ public class ShopLoader {
         }
         
         Shop shop = new ContainerShop(
-            new Location(Bukkit.getWorld(data.getWorld()), data.getX(), data.getY(), data.getZ()),
-            data.getPrice(), data.getItem(),
-            data.getModerators(), data.isUnlimited(), data.getType());
-        
-        // Load to RAM
-        QuickShop.instance().getShopManager().loadShop(data.getWorld(), shop);
+            new Location(Bukkit.getWorld(data.world()), data.x(), data.y(), data.z()),
+            data.price(), data.item(),
+            data.moderators(), data.unlimited(), data.type());
         
         if (Util.isChunkLoaded(shop.getLocation())) {
           // Load to World
           if (Util.canBeShop(shop.getLocation().getBlock())) {
             loadedShops++;
+            QuickShop.instance().getShopManager().loadShop(data.world(), shop);
             shop.onLoad();
-            
           } else {
             Util.debugLog("Target block can't be a shop, removing it from the database...");
-            // shop.delete();
-            QuickShop.instance().getShopManager().unloadShop(shop);
-            QuickShop.instance().getDatabaseHelper().deleteShop(
-                shop.getLocation().getBlockX(),
-                shop.getLocation().getBlockY(),
-                shop.getLocation().getBlockZ(),
-                shop.getLocation().getWorld().getName());
+            shop.delete();
           }
         }
         
@@ -118,7 +111,7 @@ public class ShopLoader {
       long averagePerShop = durTotalShopsNano / loadedShops;
       
       QuickShop.instance().getLogger().info(
-          "Successfully loaded " + loadedShops + " of " + fetchSize + " shops!" +
+          "Successfully loaded " + loadedShops + " of " + fetchSize + " shops in" + world.getName() + "! " +
           "(Total: " + durLoad + "ms, Fetch: " + durFetch + "ms," +
           " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + "ns)");
       
@@ -127,23 +120,27 @@ public class ShopLoader {
     }
   }
 
-  public void loadShops() {
+  @Deprecated
+  public static void loadShops() {
     loadShops(null);
   }
 
-  private boolean canLoad(@NotNull ShopDatabaseInfo info) {
+  private static boolean canLoad(@NotNull ShopDatabaseInfo info) {
     if (info.item() == null) {
       Util.debugLog("Shop ItemStack is null");
       return false;
     }
+    
     if (info.item().getType() == Material.AIR) {
       Util.debugLog("Shop ItemStack type can't be AIR");
       return false;
     }
+    
     if (info.world() == null) {
       Util.debugLog("Shop World is null");
       return false;
     }
+    
     if (info.moderators() == null) {
       Util.debugLog("Shop Owner is null");
       return false;
@@ -185,7 +182,7 @@ public class ShopLoader {
 
   @Data
   @Accessors(fluent = true)
-  public class ShopDatabaseInfo implements Serializable {
+  public static class ShopDatabaseInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private ItemStack item;
@@ -210,8 +207,8 @@ public class ShopLoader {
         this.item = deserializeItem(rs.getString("itemConfig"));
         this.moderators = deserializeModerator(rs.getString("owner"));
         
-      } catch (SQLException sql) {
-        exceptionHandler(sql, rs); // FIXME
+      } catch (Throwable t) {
+        exceptionHandler(t, rs);
       }
     }
   }
@@ -226,10 +223,10 @@ public class ShopLoader {
     }
   }
   
-  private static void exceptionHandler(@NotNull Throwable throwable, @NotNull ResultSet set) {
+  private static void exceptionHandler(@NotNull Throwable throwable, @Nullable ResultSet set) {
     Logger logger = QuickShop.instance().getLogger();
     
-    logger.warning("########## FAILED TO LOAD A SHOP FROM DB ##########");
+    logger.warning("########## FAILED TO LOAD SHOP FROM DB ##########");
     logger.warning("  >> Error Info:");
     String message = throwable.getMessage();
     message = message == null ? "~NULL~" : message;
@@ -238,63 +235,72 @@ public class ShopLoader {
     logger.warning("  >> Error Trace");
     throwable.printStackTrace();
     
-    logger.warning("  >> Shop Info");
-    Object temp; List<Throwable> nested = Lists.newArrayList();
-    
-    try {
-      temp = String.valueOf(temp = getSafely(set, "world", nested));
-    } catch (Throwable t) {
-      temp = "(Error) World name is corrupted, nested error id @ " + (nested.size() - 1);
+    if (set != null) {
+      logger.warning("  >> Shop Info");
+      Object temp; List<Throwable> nested = Lists.newArrayList();
+      
+      try {
+        temp = String.valueOf(temp = getSafely(set, "world", nested));
+      } catch (Throwable t) {
+        temp = "(Error) World name is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  World: " + temp);
+      try {
+        temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "x", nested))));
+      } catch (Throwable t) {
+        temp = "(Error) X pos is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  X: " + temp);
+      try {
+        temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "y", nested))));
+      } catch (Throwable t) {
+        temp = "(Error) Y pos is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  Y: " + temp);
+      try {
+        temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "z", nested))));
+      } catch (Throwable t) {
+        temp = "(Error) Z pos is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  Z: " + temp);
+      try {
+        temp = Double.valueOf(String.valueOf((temp = getSafely(set, "price", nested))));
+      } catch (Throwable t) {
+        temp = "(Error) Pirce data is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  Price: " + temp);
+      try {
+        temp = Boolean.valueOf(String.valueOf((temp = getSafely(set, "unlimited", nested))));
+      } catch (Throwable t) {
+        temp = "(Error) Unlimited type is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  Unlimited: " + temp);
+      try {
+        temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "type", nested))));
+      } catch (Throwable t) {
+        temp = "(Error) Shop type is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  Shop Type: " + temp);
+      try {
+        temp = String.valueOf((temp = getSafely(set, "itemConfig", nested)));
+      } catch (Throwable t) {
+        temp = "(Error) Item data is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >  Item: " + temp);
+      try {
+        temp = String.valueOf((temp = getSafely(set, "owner", nested)));
+      } catch (Throwable t) {
+        temp = "(Error) Owner data is corrupted, nested error id @ " + (nested.size() - 1);
+      }
+      logger.warning("  >> Owner: " + temp);
+      
+      logger.warning("  >> Nested Errors");
+      for (int i = 0; i < nested.size(); i++) {
+        logger.warning("  >  Id " + i);
+        nested.get(i).printStackTrace();
+        logger.warning("");
+      }
     }
-    logger.warning("  >  World: " + temp);
-    try {
-      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "x", nested))));
-    } catch (Throwable t) {
-      temp = "(Error) X pos is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  X: " + temp);
-    try {
-      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "y", nested))));
-    } catch (Throwable t) {
-      temp = "(Error) Y pos is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  Y: " + temp);
-    try {
-      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "z", nested))));
-    } catch (Throwable t) {
-      temp = "(Error) Z pos is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  Z: " + temp);
-    try {
-      temp = Double.valueOf(String.valueOf((temp = getSafely(set, "price", nested))));
-    } catch (Throwable t) {
-      temp = "(Error) Pirce data is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  Price: " + temp);
-    try {
-      temp = Boolean.valueOf(String.valueOf((temp = getSafely(set, "unlimited", nested))));
-    } catch (Throwable t) {
-      temp = "(Error) Unlimited type is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  Unlimited: " + temp);
-    try {
-      temp = Integer.valueOf(String.valueOf((temp = getSafely(set, "type", nested))));
-    } catch (Throwable t) {
-      temp = "(Error) Shop type is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  Shop Type: " + temp);
-    try {
-      temp = String.valueOf((temp = getSafely(set, "itemConfig", nested)));
-    } catch (Throwable t) {
-      temp = "(Error) Item data is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >  Item: " + temp);
-    try {
-      temp = String.valueOf((temp = getSafely(set, "owner", nested)));
-    } catch (Throwable t) {
-      temp = "(Error) Owner data is corrupted, nested error id @ " + (nested.size() - 1);
-    }
-    logger.warning("  >> Owner: " + temp);
     
     logger.warning("  >> Database Info");
     try {
@@ -313,13 +319,6 @@ public class ShopLoader {
       logger.warning("  >  ClientInfo: " + "Failed to load status.");
     }
     
-    logger.warning("  >> Nested Errors");
-    for (int i = 0; i < nested.size(); i++) {
-      logger.warning("  >  Id " + i);
-      nested.get(i).printStackTrace();
-      logger.warning("");
-    }
-
     logger.warning("#######################################");
   }
 }

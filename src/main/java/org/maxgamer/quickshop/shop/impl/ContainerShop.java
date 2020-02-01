@@ -354,43 +354,40 @@ public class ContainerShop implements Shop {
    *        iterating*
    */
   @Override
-  public void delete(boolean fromMemory) {
-    ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(this, fromMemory);
+  public void delete() {
+    ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(this, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
       Util.debugLog("Shop deletion was canceled because a plugin canceled it.");
       return;
     }
+    
     // Unload the shop
-    if (isLoaded) {
+    if (isLoaded)
       this.onUnload();
-    }
+    
     // Delete the display item
-    if (this.getDisplayItem() != null) {
-      this.getDisplayItem().remove();
+    if (getDisplayItem() != null) {
+      getDisplayItem().remove();
     }
+    
     // Delete the signs around it
-    for (Sign s : this.getSigns()) {
+    for (Sign s : this.getSigns())
       s.getBlock().setType(Material.AIR);
-    }
+    
     // Delete it from the database
     int x = this.getLocation().getBlockX();
     int y = this.getLocation().getBlockY();
     int z = this.getLocation().getBlockZ();
-    String world = Objects.requireNonNull(this.getLocation().getWorld()).getName();
+    String world = this.getLocation().getWorld().getName();
     // Refund if necessary
-    if (BaseConfig.refundable) {
-      QuickShop.instance().getEconomy().deposit(this.getOwner(), BaseConfig.refundCost);
-    }
-    if (fromMemory) {
-      // Delete it from memory
+    if (BaseConfig.refundable)
+      QuickShop.instance().getEconomy().deposit(this.getOwner(), BaseConfig.refundCost); // FIXME
+    
+    try {
       QuickShop.instance().getShopManager().unloadShop(this);
-    } else {
-      try {
-        QuickShop.instance().getShopManager().unloadShop(this);
-        QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
+      QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
   }
 
@@ -784,12 +781,6 @@ public class ContainerShop implements Shop {
   @Override
   public boolean isAttached(@NotNull Block b) {
     return this.getLocation().getBlock().equals(Util.getAttached(b));
-  }
-
-  /** Deletes the shop from the list of shops and queues it for database */
-  @Override
-  public void delete() {
-    delete(false);
   }
 
   /**

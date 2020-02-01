@@ -167,8 +167,6 @@ public class QuickShop extends JavaPlugin {
   private UUID serverUniqueID;
 
   private boolean setupDBonEnableding = false;
-  /** Rewrited shoploader, more faster. */
-  private ShopLoader shopLoader;
   /** The Shop Manager used to store shops */
   private ShopManager shopManager;
 
@@ -553,8 +551,7 @@ public class QuickShop extends JavaPlugin {
     signUpdateWatcher = new SignUpdateWatcher(this);
 
     /* Load all shops. */
-    shopLoader = new ShopLoader();
-    shopLoader.loadShops();
+    //ShopLoader.loadShops();
 
     getLogger().info("Registering Listeners...");
     // Register events

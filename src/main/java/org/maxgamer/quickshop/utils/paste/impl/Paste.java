@@ -255,18 +255,6 @@ public class Paste {
       finalReport.append("\tFailed to get data\n");
     }
     finalReport.append("================================================\n");
-    finalReport.append("Shops in DB:\n");
-    plugin.getShopLoader().getOriginShopsInDatabase().forEach((shopDatabaseInfoOrigin -> finalReport
-        .append("\t").append(shopDatabaseInfoOrigin).append("\n")));
-    finalReport.append("Total: ").append(plugin.getShopLoader().getOriginShopsInDatabase().size())
-        .append("\n");
-    finalReport.append("================================================\n");
-    finalReport.append("Shops in Mem:\n");
-    plugin.getShopLoader().getShopsInDatabase()
-        .forEach((shop -> finalReport.append("\t").append(shop).append("\n")));
-    finalReport.append("Total: ").append(plugin.getShopLoader().getShopsInDatabase().size())
-        .append("\n");
-    finalReport.append("================================================\n");
 
     // Process the data to protect passwords.
     String report = finalReport.toString();
