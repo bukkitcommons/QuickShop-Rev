@@ -3,20 +3,15 @@ package org.maxgamer.quickshop.utils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.logging.Level;
 import lombok.SneakyThrows;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -37,15 +32,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.utils.file.IFile;
-import org.maxgamer.quickshop.utils.file.JSONFile;
-import com.google.common.collect.Lists;
+import org.maxgamer.quickshop.utils.file.LocaleConfiguration;
+import org.maxgamer.quickshop.utils.file.impl.JsonConfiguration;
+import com.bekvon.bukkit.residence.commands.gset;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 
 public class MsgUtil {
   private static YamlConfiguration builtInDefaultLanguage = YamlConfiguration.loadConfiguration(
@@ -55,7 +50,7 @@ public class MsgUtil {
   private static YamlConfiguration itemi18n;
   private static YamlConfiguration potioni18n;
   
-  private static IFile messagei18n;
+  private static LocaleConfiguration messagei18n;
   private static HashMap<UUID, String> playerMessages = Maps.newHashMap();
   
   private static DecimalFormat decimalFormat =
@@ -112,7 +107,7 @@ public class MsgUtil {
    * @param p The player to message
    * @return True if success, False if the player is offline or null
    */
-  public static void flush(@NotNull Player player) {
+  public static void flushMessagesFor(@NotNull Player player) {
     UUID uuid = player.getUniqueId();
     String message = playerMessages.remove(uuid);
     
@@ -242,61 +237,31 @@ public class MsgUtil {
     }
     return Util.prettifyText(potionString);
   }
+  
+  static Gson gson = new Gson();
 
   public static void loadCfgMessages() throws InvalidConfigurationException {
     /* Check & Load & Create default messages.yml */
     // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
     String languageCode = QuickShop.instance().getConfig().getString("language", "en");
-    // noinspection ConstantConditions
-
     minecraftLocale = new MinecraftLocale(QuickShop.instance().getConfig().getString("game-language", "default"));
     
     // Init nJson
-    IFile nJson;
-    if (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null) {
-      nJson = new JSONFile(QuickShop.instance(), new File(QuickShop.instance().getDataFolder(), "messages.json"),
-          "messages/en.json", true);
-    } else {
-      nJson = new JSONFile(QuickShop.instance(), new File(QuickShop.instance().getDataFolder(), "messages.json"),
-          "messages/" + languageCode + ".json", true);
-    }
-
-    nJson.create();
-
-    File oldMsgFile = new File(QuickShop.instance().getDataFolder(), "messages.yml");
-    if (oldMsgFile.exists()) { // Old messages file convert.
-      QuickShop.instance().getLogger().info("Converting the old format message.yml to message.json...");
+    LocaleConfiguration json;
+    languageCode = "en".equals(languageCode) ?
+        languageCode :
+          (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
+    json = new JsonConfiguration(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json");
+    json.create();
+    
+    if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {
       QuickShop.instance().getLanguage().saveFile(languageCode, "messages", "messages.json");
-      YamlConfiguration oldMsgI18n = YamlConfiguration.loadConfiguration(oldMsgFile);
-      for (String key : oldMsgI18n.getKeys(true)) {
-        oldMsgI18n.get(key);
-      }
-      nJson.save();
-      try {
-        Files.move(oldMsgFile.toPath(),
-            new File(QuickShop.instance().getDataFolder(), "messages.yml.bak").toPath());
-      } catch (IOException ignore) {
-      }
-      if (oldMsgFile.exists()) {
-        oldMsgFile.delete();
-      }
-      QuickShop.instance().getLogger().info("Successfully converted, Continue loading...");
+      json.loadFromString(Util.parseColours(Util.readToString(new File(QuickShop.instance().getDataFolder(), "messages.json").getAbsolutePath())));
     } else {
-      Util.debugLog("Loading language file from exist file...");
-      if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {
-        QuickShop.instance().getLanguage().saveFile(languageCode, "messages", "messages.json");
-        nJson.loadFromString(
-            Util.readToString(new File(QuickShop.instance().getDataFolder(), "messages.json").getAbsolutePath()));
-      }
+      json.loadFromString(Util.parseColours(json.saveToString()));
     }
-    messagei18n = nJson;
-    /* Set default language vesion and update messages.yml */
-    if (messagei18n.getInt("language-version") == 0) {
-      messagei18n.set("language-version", 1);
-    }
-    updateMessages(messagei18n.getInt("language-version"));
-    messagei18n.loadFromString(Util.parseColours(messagei18n.saveToString()));
-
+    
+    messagei18n = json;
     /* Print to console this language file's author, contributors, and region */
     QuickShop.instance().getLogger().info(getMessage("translation-author", null));
     QuickShop.instance().getLogger().info(getMessage("translation-contributors", null));
@@ -305,105 +270,78 @@ public class MsgUtil {
   }
 
   public static void loadEnchi18n() {
-    QuickShop.instance().getLogger().info("Starting loading Enchantment i18n...");
-    File enchi18nFile = new File(QuickShop.instance().getDataFolder(), "enchi18n.yml");
-    if (!enchi18nFile.exists()) {
-      QuickShop.instance().getLogger().info("Creating enchi18n.yml");
-      QuickShop.instance().saveResource("enchi18n.yml", false);
-    }
-    // Store it
-    enchi18n = YamlConfiguration.loadConfiguration(enchi18nFile);
-    enchi18n.options().copyDefaults(false);
-    YamlConfiguration enchi18nYAML = YamlConfiguration.loadConfiguration(
-        new InputStreamReader(Objects.requireNonNull(QuickShop.instance().getResource("enchi18n.yml"))));
-    enchi18n.setDefaults(enchi18nYAML);
-    Util.parseColours(enchi18n);
-    Enchantment[] enchsi18n = Enchantment.values();
-    for (Enchantment ench : enchsi18n) {
-      String enchi18nString = enchi18n.getString("enchi18n." + ench.getKey().getKey().trim());
-      if (enchi18nString != null && !enchi18nString.isEmpty()) {
-        continue;
+    loadCustomMinecraftLocale("ench18n", yaml -> {
+      itemi18n = yaml;
+        
+      Enchantment[] enchsi18n = Enchantment.values();
+      for (Enchantment ench : enchsi18n) {
+        String enchi18nString = enchi18n.getString("enchi18n." + ench.getKey().getKey().trim());
+        if (enchi18nString != null && !enchi18nString.isEmpty()) {
+          continue;
+        }
+        String enchName = minecraftLocale.getEnchantment(ench.getKey().getKey());
+        enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
+        QuickShop.instance().getLogger().info("Found new ench [" + enchName + "] , adding it to the config...");
       }
-      String enchName = minecraftLocale.getEnchantment(ench.getKey().getKey());
-      enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
-      QuickShop.instance().getLogger().info("Found new ench [" + enchName + "] , adding it to the config...");
-    }
-    try {
-      enchi18n.save(enchi18nFile);
-    } catch (IOException e) {
-      e.printStackTrace();
-      QuickShop.instance().getLogger().log(Level.WARNING,
-          "Could not load/save transaction enchname from enchi18n.yml. Skipping.");
-    }
-    QuickShop.instance().getLogger().info("Complete to load enchname i18n.");
+    });
   }
-
-  /** Load Itemi18n fron file */
+  
   public static void loadItemi18n() {
-    File itemi18nFile = new File(QuickShop.instance().getDataFolder(), "itemi18n.yml");
-    if (!itemi18nFile.exists()) {
-      QuickShop.instance().getLogger().info("Creating itemi18n.yml");
-      QuickShop.instance().saveResource("itemi18n.yml", false);
-    }
-    // Store it
-    itemi18n = YamlConfiguration.loadConfiguration(itemi18nFile);
-    itemi18n.options().copyDefaults(false);
-    YamlConfiguration itemi18nYAML = YamlConfiguration.loadConfiguration(
-        new InputStreamReader(Objects.requireNonNull(QuickShop.instance().getResource("itemi18n.yml"))));
-    itemi18n.setDefaults(itemi18nYAML);
-    Util.parseColours(itemi18n);
-    Material[] itemsi18n = Material.values();
-    for (Material material : itemsi18n) {
-      String itemi18nString = itemi18n.getString("itemi18n." + material.name());
-      if (itemi18nString != null && !itemi18nString.isEmpty()) {
-        continue;
+    loadCustomMinecraftLocale("potioni18n", yaml -> {
+      itemi18n = yaml;
+      
+      Material[] itemsi18n = Material.values();
+      for (Material material : itemsi18n) {
+        String itemi18nString = itemi18n.getString("itemi18n." + material.name());
+        if (itemi18nString != null && !itemi18nString.isEmpty()) {
+          continue;
+        }
+        String itemName = minecraftLocale.getItem(material);
+        itemi18n.set("itemi18n." + material.name(), itemName);
+        QuickShop.instance().getLogger()
+            .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
       }
-      String itemName = minecraftLocale.getItem(material);
-      itemi18n.set("itemi18n." + material.name(), itemName);
-      QuickShop.instance().getLogger()
-          .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
-    }
+    });
+  }
+  
+  public static void loadCustomMinecraftLocale(@NotNull String filePrefix, @NotNull Consumer<YamlConfiguration> consumer) {
+    String fileName = filePrefix.concat(".yml");
+    QuickShop.instance().getLogger().info("Loading custom locale for " + fileName);
+    
+    File file = new File(QuickShop.instance().getDataFolder(), fileName);
+    QuickShop.instance().saveResource(fileName, true);
+    
+    YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+    yaml.options().copyDefaults(false);
+    YamlConfiguration def = YamlConfiguration.loadConfiguration(new InputStreamReader(QuickShop.instance().getResource(fileName)));
+    yaml.setDefaults(def);
+    
+    Util.parseColours(yaml);
+    consumer.accept(yaml);
+    
     try {
-      itemi18n.save(itemi18nFile);
-    } catch (IOException e) {
-      e.printStackTrace();
-      QuickShop.instance().getLogger().log(Level.WARNING,
-          "Could not load/save transaction itemname from itemi18n.yml. Skipping.");
+      yaml.save(file);
+      QuickShop.instance().getLogger().info("Loaded custom locale: " + fileName);
+    } catch (IOException io) {
+      QuickShop.instance().getLogger().severe("Could not save custom locale for " + fileName);
+      io.printStackTrace();
     }
-    QuickShop.instance().getLogger().info("Complete to load Itemname i18n.");
   }
 
   public static void loadPotioni18n() {
-    QuickShop.instance().getLogger().info("Starting loading Potion i18n...");
-    File potioni18nFile = new File(QuickShop.instance().getDataFolder(), "potioni18n.yml");
-    if (!potioni18nFile.exists()) {
-      QuickShop.instance().getLogger().info("Creating potioni18n.yml");
-      QuickShop.instance().saveResource("potioni18n.yml", false);
-    }
-    // Store it
-    potioni18n = YamlConfiguration.loadConfiguration(potioni18nFile);
-    potioni18n.options().copyDefaults(false);
-    YamlConfiguration potioni18nYAML = YamlConfiguration.loadConfiguration(
-        new InputStreamReader(Objects.requireNonNull(QuickShop.instance().getResource("potioni18n.yml"))));
-    potioni18n.setDefaults(potioni18nYAML);
-    Util.parseColours(potioni18n);
-    for (PotionEffectType potion : PotionEffectType.values()) {
-      String potionI18n = potioni18n.getString("potioni18n." + potion.getName().trim());
-      if (potionI18n != null && !potionI18n.isEmpty()) {
-        continue;
+    loadCustomMinecraftLocale("potioni18n", yaml -> {
+      potioni18n = yaml;
+      
+      for (PotionEffectType potion : PotionEffectType.values()) {
+        String potionI18n = potioni18n.getString("potioni18n." + potion.getName().trim());
+        if (potionI18n != null && !potionI18n.isEmpty()) {
+          continue;
+        }
+        String potionName = minecraftLocale.getPotion(potion);
+        QuickShop.instance().getLogger().info("Found new potion [" + potionName + "] , adding it to the config...");
+        potioni18n.set("potioni18n." + potion.getName(), potionName);
       }
-      String potionName = minecraftLocale.getPotion(potion);
-      QuickShop.instance().getLogger().info("Found new potion [" + potionName + "] , adding it to the config...");
-      potioni18n.set("potioni18n." + potion.getName(), potionName);
-    }
-    try {
-      potioni18n.save(potioni18nFile);
-    } catch (IOException e) {
-      e.printStackTrace();
-      QuickShop.instance().getLogger().log(Level.WARNING,
-          "Could not load/save transaction potionname from potioni18n.yml. Skipping.");
-    }
-    QuickShop.instance().getLogger().info("Complete to load potionname i18n.");
+    });
   }
 
   /** loads all player purchase messages from the database. */
@@ -836,11 +774,13 @@ public class MsgUtil {
   }
 
   private static void updateMessages(int selectedVersion) {
-    String languageName = QuickShop.instance().getConfig().getString("language", "en");
+    String langCode = QuickShop.instance().getConfig().getString("language", "en");
+    
     if (!messagei18n.getString("language-name").isPresent()) {
-      setAndUpdate("language-name", languageName);
+      setAndUpdate("language-name", langCode);
     }
-    if (!messagei18n.getString("language-name").get().equals(languageName)) {
+    
+    if (!messagei18n.getString("language-name").get().equals(langCode)) {
       new File(QuickShop.instance().getDataFolder(), "messages.json").delete();
       try {
         loadCfgMessages();
@@ -848,6 +788,7 @@ public class MsgUtil {
       }
       return;
     }
+    
     messagei18n.save();
   }
 
@@ -863,7 +804,7 @@ public class MsgUtil {
     messagei18n.set(path, objFromBuiltIn);
   }
 
-  public static IFile getI18nFile() {
+  public static LocaleConfiguration getI18nFile() {
     return messagei18n;
   }
 }

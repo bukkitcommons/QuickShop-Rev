@@ -290,7 +290,7 @@ public class PlayerListener implements Listener {
 
     // Notify the player any messages they were sent
     if (BaseConfig.autoFetchShopMessages) {
-      MsgUtil.flush(event.getPlayer());
+      MsgUtil.flushMessagesFor(event.getPlayer());
     }
   }
 

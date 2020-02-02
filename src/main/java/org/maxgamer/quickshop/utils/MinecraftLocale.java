@@ -59,7 +59,7 @@ public class MinecraftLocale {
             String langJson = mojangAPI.downloadTextFileFromMojang(langHash);
 
             if (langJson != null) {
-              new Copied(new File(Util.getCacheFolder(), langHash))
+              new Rewriter(new File(Util.getCacheFolder(), langHash))
               .accept(new ByteArrayInputStream(langJson.getBytes(StandardCharsets.UTF_8)));
 
               cache.set("ver", serverVersion);

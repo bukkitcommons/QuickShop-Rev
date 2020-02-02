@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.utils.Copied;
+import org.maxgamer.quickshop.utils.Rewriter;
 import org.maxgamer.quickshop.utils.Util;
 
 public class Language {
@@ -77,7 +77,7 @@ public class Language {
 
     try {
       InputStream is = getFile(language, type);
-      new Copied(targetFile).accept(is);
+      new Rewriter(targetFile).accept(is);
       is.close();
     } catch (Exception err) {
       err.printStackTrace();
