@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.Database;
+import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.utils.Util;
 
 /**
@@ -74,7 +75,7 @@ public class DatabaseHelper {
     } catch (SQLException e) {
       // ignore
     }
-    if (QuickShop.instance().getDatabase().getCore() instanceof MySQLCore) {
+    if (QuickShop.instance().getDatabase().getConnector() instanceof MySQLConnector) {
       try {
         ps = db.getConnection().prepareStatement("ALTER TABLE " + BaseConfig.databasePrefix
             + "messages MODIFY COLUMN message text CHARACTER SET utf8mb4 NOT NULL AFTER owner");
@@ -121,7 +122,7 @@ public class DatabaseHelper {
     Statement st = db.getConnection().createStatement();
     String createTable = "CREATE TABLE " + BaseConfig.databasePrefix
         + "messages (owner  VARCHAR(255) NOT NULL, message  TEXT(25) NOT NULL, time  BIGINT(32) NOT NULL );";
-    if (plugin.getDatabase().getCore() instanceof MySQLCore) {
+    if (plugin.getDatabase().getConnector() instanceof MySQLConnector) {
       createTable = "CREATE TABLE " + BaseConfig.databasePrefix
           + "messages (owner  VARCHAR(255) NOT NULL, message  TEXT(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL , time  BIGINT(32) NOT NULL );";
     }
@@ -168,7 +169,7 @@ public class DatabaseHelper {
     // + (db.getCore() instanceof MySQLCore ? " LIMIT 1" : ""));
     String sqlString = "DELETE FROM " + BaseConfig.databasePrefix
         + "shops WHERE x = ? AND y = ? AND z = ? AND world = ?"
-        + (db.getCore() instanceof MySQLCore ? " LIMIT 1" : "");
+        + (db.getConnector() instanceof MySQLConnector ? " LIMIT 1" : "");
 
     PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
     ps.setInt(1, x);
@@ -215,7 +216,7 @@ public class DatabaseHelper {
     // + " AND world = \"" + worldName + "\" LIMIT 1");
     String sqlString = "UPDATE " + BaseConfig.databasePrefix
         + "shops SET owner = ? WHERE x = ? AND y = ? AND z = ? AND world = ?"
-        + (db.getCore() instanceof MySQLCore ? " LIMIT 1" : "");
+        + (db.getConnector() instanceof MySQLConnector ? " LIMIT 1" : "");
     PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
     ps.setString(1, ownerUUID);
     ps.setInt(2, x);

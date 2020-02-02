@@ -30,12 +30,12 @@ import org.maxgamer.quickshop.command.CommandManager;
 import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.Database;
-import org.maxgamer.quickshop.database.DatabaseCore;
 import org.maxgamer.quickshop.database.Database.ConnectionException;
+import org.maxgamer.quickshop.database.connector.DatabaseConnector;
+import org.maxgamer.quickshop.database.connector.MySQLConnector;
+import org.maxgamer.quickshop.database.connector.SQLiteConnector;
 import org.maxgamer.quickshop.database.impl.DatabaseHelper;
-import org.maxgamer.quickshop.database.impl.DatabaseManager;
-import org.maxgamer.quickshop.database.impl.MySQLCore;
-import org.maxgamer.quickshop.database.impl.SQLiteCore;
+import org.maxgamer.quickshop.database.impl.Dispatcher;
 import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.economy.EconomyType;
@@ -120,7 +120,7 @@ public class QuickShop extends JavaPlugin {
   /** Contains all SQL tasks */
   private DatabaseHelper databaseHelper;
   /** Queued database manager */
-  private DatabaseManager databaseManager;
+  private Dispatcher databaseManager;
 
   private DisplayBugFixListener displayBugFixListener;
   private int displayItemCheckTicks;
@@ -395,7 +395,7 @@ public class QuickShop extends JavaPlugin {
 
     Util.debugLog("Cleaning up database queues...");
     if (this.getDatabaseManager() != null) {
-      this.getDatabaseManager().unInit();
+      this.getDatabaseManager().flush();
     }
 
     Util.debugLog("Unregistering tasks...");
@@ -415,7 +415,6 @@ public class QuickShop extends JavaPlugin {
     if (database != null) {
       try {
         this.database.getConnection().close();
-        this.database.close();
       } catch (SQLException e) {
         if (getSentryErrorReporter() != null) {
           this.getSentryErrorReporter().ignoreThrow();
@@ -532,7 +531,7 @@ public class QuickShop extends JavaPlugin {
       }
     }
     this.shopManager = new ShopManager();
-    this.databaseManager = new DatabaseManager(this, database);
+    this.databaseManager = new Dispatcher(database);
     this.permissionChecker = new PermissionChecker(this);
 
     ConfigurationSection limitCfg = this.getConfig().getConfigurationSection("limits");
@@ -724,7 +723,7 @@ public class QuickShop extends JavaPlugin {
   private boolean setupDatabase() {
     try {
       ConfigurationSection dbCfg = getConfig().getConfigurationSection("database");
-      DatabaseCore dbCore;
+      DatabaseConnector dbCore;
       if (Objects.requireNonNull(dbCfg).getBoolean("mysql")) {
         // MySQL database - Required database be created first.
         // dbPrefix = dbCfg.getString("prefix");
@@ -737,14 +736,14 @@ public class QuickShop extends JavaPlugin {
         String port = dbCfg.getString("port");
         String database = dbCfg.getString("database");
         boolean useSSL = dbCfg.getBoolean("usessl");
-        dbCore = new MySQLCore(Objects.requireNonNull(host, "MySQL host can't be null"),
+        dbCore = new MySQLConnector(Objects.requireNonNull(host, "MySQL host can't be null"),
             Objects.requireNonNull(user, "MySQL username can't be null"),
             Objects.requireNonNull(pass, "MySQL password can't be null"),
             Objects.requireNonNull(database, "MySQL database name can't be null"),
             Objects.requireNonNull(port, "MySQL port can't be null"), useSSL);
       } else {
         // SQLite database - Doing this handles file creation
-        dbCore = new SQLiteCore(new File(this.getDataFolder(), "shops.db"));
+        dbCore = new SQLiteConnector(new File(this.getDataFolder(), "shops.db"));
       }
       this.database = new Database(dbCore);
       // Make the database up to date

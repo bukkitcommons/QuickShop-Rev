@@ -74,7 +74,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.database.impl.MySQLCore;
+import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.scheduler.InventoryEditContainer;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
@@ -126,7 +126,7 @@ public class Util {
    * @return The result for backup
    */
   public static boolean backupDatabase() {
-    if (plugin.getDatabase().getCore() instanceof MySQLCore) {
+    if (plugin.getDatabase().getConnector() instanceof MySQLConnector) {
       return true; // Backup and logs by MySQL
     }
     File dataFolder = plugin.getDataFolder();
