@@ -61,7 +61,7 @@ public class MsgUtil {
   private static DecimalFormat decimalFormat =
       new DecimalFormat(Objects.requireNonNull(QuickShop.instance().getConfig().getString("decimal-format")));
   
-  private static GameLanguage gameLanguage;
+  private static MinecraftLocale minecraftLocale;
 
   /**
    * Translate boolean value to String, the symbon is changeable by language file.
@@ -243,17 +243,14 @@ public class MsgUtil {
     return Util.prettifyText(potionString);
   }
 
-  public static void loadGameLanguage(@NotNull String languageCode) {
-    gameLanguage = new GameLanguage(languageCode);
-  }
-
   public static void loadCfgMessages() throws InvalidConfigurationException {
     /* Check & Load & Create default messages.yml */
     // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
     String languageCode = QuickShop.instance().getConfig().getString("language", "en");
     // noinspection ConstantConditions
 
-    loadGameLanguage(QuickShop.instance().getConfig().getString("game-language", "default"));
+    minecraftLocale = new MinecraftLocale(QuickShop.instance().getConfig().getString("game-language", "default"));
+    
     // Init nJson
     IFile nJson;
     if (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null) {
@@ -305,7 +302,6 @@ public class MsgUtil {
     QuickShop.instance().getLogger().info(getMessage("translation-contributors", null));
     QuickShop.instance().getLogger().info(getMessage("translation-country", null));
     /* Save the upgraded messages.yml */
-
   }
 
   public static void loadEnchi18n() {
@@ -328,7 +324,7 @@ public class MsgUtil {
       if (enchi18nString != null && !enchi18nString.isEmpty()) {
         continue;
       }
-      String enchName = gameLanguage.getEnchantment(ench.getKey().getKey());
+      String enchName = minecraftLocale.getEnchantment(ench.getKey().getKey());
       enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
       QuickShop.instance().getLogger().info("Found new ench [" + enchName + "] , adding it to the config...");
     }
@@ -362,7 +358,7 @@ public class MsgUtil {
       if (itemi18nString != null && !itemi18nString.isEmpty()) {
         continue;
       }
-      String itemName = gameLanguage.getItem(material);
+      String itemName = minecraftLocale.getItem(material);
       itemi18n.set("itemi18n." + material.name(), itemName);
       QuickShop.instance().getLogger()
           .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
@@ -396,7 +392,7 @@ public class MsgUtil {
       if (potionI18n != null && !potionI18n.isEmpty()) {
         continue;
       }
-      String potionName = gameLanguage.getPotion(potion);
+      String potionName = minecraftLocale.getPotion(potion);
       QuickShop.instance().getLogger().info("Found new potion [" + potionName + "] , adding it to the config...");
       potioni18n.set("potioni18n." + potion.getName(), potionName);
     }

@@ -1349,9 +1349,8 @@ public class Util {
    */
   public static File getCacheFolder() {
     File cache = new File(QuickShop.instance().getDataFolder(), "cache");
-    if (!cache.exists()) {
+    if (!cache.exists())
       cache.mkdirs();
-    }
     return cache;
   }
 }
