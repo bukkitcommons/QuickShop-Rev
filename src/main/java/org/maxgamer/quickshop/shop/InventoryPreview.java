@@ -1,22 +1,8 @@
-/*
- * This file is a part of project QuickShop, the name is InventoryPreview.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.shop;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import lombok.EqualsAndHashCode;
@@ -26,6 +12,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.event.ShopInventoryPreviewEvent;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
+import com.google.common.collect.Lists;
 
 /** A class to create a GUI item preview quickly */
 @EqualsAndHashCode
@@ -43,6 +31,8 @@ public class InventoryPreview implements Listener {
   private Inventory inventory;
   private ItemStack itemStack;
   private Player player;
+  
+  private boolean noShow; // FIXME use nbt tag
 
   /**
    * Create a preview item GUI for a player.
@@ -53,18 +43,21 @@ public class InventoryPreview implements Listener {
   public InventoryPreview(@NotNull ItemStack itemStack, @NotNull Player player) {
     this.itemStack = new ItemStack(itemStack);
     this.player = player;
-    if (Objects.requireNonNull(this.itemStack.getItemMeta()).hasLore()) {
-      ItemMeta itemMeta = this.itemStack.getItemMeta();
-      List<String> lores = itemMeta.getLore();
-      Objects.requireNonNull(lores).add("QuickShop GUI preview item");
-      itemMeta.setLore(lores);
-      this.itemStack.setItemMeta(itemMeta);
+    
+    if (itemStack.hasItemMeta()) {
+      ItemMeta meta = itemStack.getItemMeta();
+      
+      if (meta.hasLore()) {
+        List<String> lore = meta.getLore();
+        lore.add("QuickShop GUI preview item");
+        meta.setLore(lore);
+      } else {
+        meta.setLore(Collections.singletonList("QuickShop GUI preview item"));
+      }
+      
+      this.itemStack.setItemMeta(meta);
     } else {
-      ItemMeta itemMeta = this.itemStack.getItemMeta();
-      List<String> lores = new ArrayList<>();
-      lores.add("QuickShop GUI preview item");
-      itemMeta.setLore(lores);
-      this.itemStack.setItemMeta(itemMeta);
+      noShow = true;
     }
   }
 
@@ -96,6 +89,8 @@ public class InventoryPreview implements Listener {
 
   /** Open the preview GUI for player. */
   public void show() {
+    if (noShow)
+      return;
     if (inventory != null) // Not inited
     {
       close();
