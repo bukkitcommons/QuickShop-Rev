@@ -7,7 +7,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import lombok.SneakyThrows;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -15,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.utils.mojang.AssetJson;
 import org.maxgamer.quickshop.utils.mojang.MojangAPI;
 
@@ -22,8 +22,11 @@ public class MinecraftLocale {
   @NotNull
   private JsonObject lang;
 
-  @SneakyThrows
-  public MinecraftLocale(@NotNull String languageCode) {
+  public MinecraftLocale() {
+    reload();
+  }
+  
+  public void reload() {
     try {
       File cacheFile = new File(Util.getCacheFolder(), "lang.cache"); // Load cache file
       if (!cacheFile.exists())
@@ -37,13 +40,13 @@ public class MinecraftLocale {
       String langCode = cache.getString("lang", "");
 
       boolean fetchData;
-      if ("default".equals(languageCode.toLowerCase(Locale.ROOT))) {
+      if ("default".equals(BaseConfig.language.toLowerCase(Locale.ROOT))) {
         Locale locale = Locale.getDefault();
-        langCode = languageCode = locale.getLanguage() + "_" + locale.getCountry();
+        langCode = BaseConfig.language = locale.getLanguage() + "_" + locale.getCountry();
         fetchData = langHash.isEmpty();
       } else {
         fetchData =
-            !languageCode.equals(langCode) ||
+            !BaseConfig.language.equals(langCode) ||
             !serverVersion.equals(cachedNMSVersion) || langHash.isEmpty();
       }
 
@@ -53,7 +56,7 @@ public class MinecraftLocale {
 
         if (assetJson != null) {
           AssetJson versionJson = new AssetJson(assetJson);
-          langHash = versionJson.getLanguageHash(languageCode.toLowerCase());
+          langHash = versionJson.getLanguageHash(BaseConfig.language.toLowerCase());
 
           if (langHash != null) {
             String langJson = mojangAPI.downloadTextFileFromMojang(langHash);
@@ -64,7 +67,7 @@ public class MinecraftLocale {
 
               cache.set("ver", serverVersion);
               cache.set("hash", langHash);
-              cache.set("lang", languageCode);
+              cache.set("lang", BaseConfig.language);
               cache.save(cacheFile);
             } else {
               Util.debugLog("Cannot download file.");
@@ -72,7 +75,7 @@ public class MinecraftLocale {
                   "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
           } else {
-            Util.debugLog("Cannot get file hash for language " + languageCode.toLowerCase());
+            Util.debugLog("Cannot get file hash for language " + BaseConfig.language.toLowerCase());
             QuickShop.instance().getLogger().warning(
                 "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
           }

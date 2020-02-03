@@ -30,9 +30,6 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.utils.MsgUtil;
 
 public class SubCommand_Reset implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
-
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
@@ -56,29 +53,29 @@ public class SubCommand_Reset implements CommandProcesser {
 
     switch (cmdArg[0]) {
       case "lang":
-        File item = new File(plugin.getDataFolder(), "itemi18n.yml");
-        File ench = new File(plugin.getDataFolder(), "enchi18n.yml");
-        File potion = new File(plugin.getDataFolder(), "potioni18n.yml");
+        File item = new File(QuickShop.instance().getDataFolder(), "itemi18n.yml");
+        File ench = new File(QuickShop.instance().getDataFolder(), "enchi18n.yml");
+        File potion = new File(QuickShop.instance().getDataFolder(), "potioni18n.yml");
         item.delete();
         ench.delete();
         potion.delete();
-        MsgUtil.loadGameLanguage(BaseConfig.language);
+        MsgUtil.MINECRAFT_LOCALE.reload();
         MsgUtil.loadItemi18n();
         MsgUtil.loadEnchi18n();
         MsgUtil.loadPotioni18n();
         sender.sendMessage(MsgUtil.getMessage("complete", sender));
         break;
       case "config":
-        File config = new File(plugin.getDataFolder(), "config.yml");
+        File config = new File(QuickShop.instance().getDataFolder(), "config.yml");
         config.delete();
-        plugin.saveDefaultConfig();
-        plugin.reloadConfig();
-        Bukkit.getPluginManager().disablePlugin(plugin);
-        Bukkit.getPluginManager().enablePlugin(plugin);
+        QuickShop.instance().saveDefaultConfig();
+        QuickShop.instance().reloadConfig();
+        Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
+        Bukkit.getPluginManager().enablePlugin(QuickShop.instance());
         sender.sendMessage(MsgUtil.getMessage("complete", sender));
         break;
       case "messages":
-        File msgs = new File(plugin.getDataFolder(), "messages.json");
+        File msgs = new File(QuickShop.instance().getDataFolder(), "messages.json");
         msgs.delete();
         MsgUtil.loadCfgMessages();
         sender.sendMessage(MsgUtil.getMessage("complete", sender));

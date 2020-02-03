@@ -35,6 +35,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.file.LocaleConfiguration;
 import org.maxgamer.quickshop.utils.file.impl.JsonConfiguration;
@@ -56,7 +57,7 @@ public class MsgUtil {
   private static DecimalFormat decimalFormat =
       new DecimalFormat(Objects.requireNonNull(QuickShop.instance().getConfig().getString("decimal-format")));
   
-  private static MinecraftLocale minecraftLocale;
+  public final static MinecraftLocale MINECRAFT_LOCALE = new MinecraftLocale();
 
   /**
    * Translate boolean value to String, the symbon is changeable by language file.
@@ -244,7 +245,7 @@ public class MsgUtil {
     /* Check & Load & Create default messages.yml */
     // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
     String languageCode = QuickShop.instance().getConfig().getString("language", "en");
-    minecraftLocale = new MinecraftLocale(QuickShop.instance().getConfig().getString("game-language", "default"));
+    MINECRAFT_LOCALE.reload();
     
     // Init nJson
     LocaleConfiguration json;
@@ -279,7 +280,7 @@ public class MsgUtil {
         if (enchi18nString != null && !enchi18nString.isEmpty()) {
           continue;
         }
-        String enchName = minecraftLocale.getEnchantment(ench.getKey().getKey());
+        String enchName = MINECRAFT_LOCALE.getEnchantment(ench.getKey().getKey());
         enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
         QuickShop.instance().getLogger().info("Found new ench [" + enchName + "] , adding it to the config...");
       }
@@ -296,7 +297,7 @@ public class MsgUtil {
         if (itemi18nString != null && !itemi18nString.isEmpty()) {
           continue;
         }
-        String itemName = minecraftLocale.getItem(material);
+        String itemName = MINECRAFT_LOCALE.getItem(material);
         itemi18n.set("itemi18n." + material.name(), itemName);
         QuickShop.instance().getLogger()
             .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
@@ -337,7 +338,7 @@ public class MsgUtil {
         if (potionI18n != null && !potionI18n.isEmpty()) {
           continue;
         }
-        String potionName = minecraftLocale.getPotion(potion);
+        String potionName = MINECRAFT_LOCALE.getPotion(potion);
         QuickShop.instance().getLogger().info("Found new potion [" + potionName + "] , adding it to the config...");
         potioni18n.set("potioni18n." + potion.getName(), potionName);
       }
