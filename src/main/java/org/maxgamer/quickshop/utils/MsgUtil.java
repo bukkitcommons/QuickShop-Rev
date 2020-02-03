@@ -774,25 +774,6 @@ public class MsgUtil {
     return decimalFormat.format(value);
   }
 
-  private static void updateMessages(int selectedVersion) {
-    String langCode = QuickShop.instance().getConfig().getString("language", "en");
-    
-    if (!messagei18n.getString("language-name").isPresent()) {
-      setAndUpdate("language-name", langCode);
-    }
-    
-    if (!messagei18n.getString("language-name").get().equals(langCode)) {
-      new File(QuickShop.instance().getDataFolder(), "messages.json").delete();
-      try {
-        loadCfgMessages();
-      } catch (Exception ignore) {
-      }
-      return;
-    }
-    
-    messagei18n.save();
-  }
-
   public static void setAndUpdate(@NotNull String path, @Nullable Object object) {
     if (object == null) {
       messagei18n.set(path, null); // Removal

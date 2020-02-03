@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.viewer;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

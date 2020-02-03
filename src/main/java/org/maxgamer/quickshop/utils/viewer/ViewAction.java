@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.viewer;
 
 public enum ViewAction {
   NEXT,

@@ -68,11 +68,9 @@ import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.impl.ShopLoader;
 import org.maxgamer.quickshop.shop.impl.ShopManager;
 import org.maxgamer.quickshop.utils.Compatibility;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
-import org.maxgamer.quickshop.utils.IncompatibleChecker;
 import org.maxgamer.quickshop.utils.IntegrationHelper;
 import org.maxgamer.quickshop.utils.ItemMatcher;
 import org.maxgamer.quickshop.utils.MsgUtil;
@@ -706,13 +704,8 @@ public class QuickShop extends JavaPlugin {
       }
     }
     String nmsVersion = Util.getNMSVersion();
-    IncompatibleChecker incompatibleChecker = new IncompatibleChecker();
     getLogger().info("Running QuickShop-Reremake on NMS version " + nmsVersion
         + " For Minecraft version " + ReflectFactory.getServerVersion());
-    if (incompatibleChecker.isIncompatible(nmsVersion)) {
-      throw new RuntimeException("Your Minecraft version is nolonger supported: "
-          + ReflectFactory.getServerVersion() + " (" + nmsVersion + ")");
-    }
   }
 
   /**

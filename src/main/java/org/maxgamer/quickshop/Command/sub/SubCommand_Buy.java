@@ -8,10 +8,10 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ShopType;
-import org.maxgamer.quickshop.utils.BlockViewer;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.ViewAction;
+import org.maxgamer.quickshop.utils.viewer.BlockViewer;
+import org.maxgamer.quickshop.utils.viewer.ViewAction;
 
 public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
   @Override

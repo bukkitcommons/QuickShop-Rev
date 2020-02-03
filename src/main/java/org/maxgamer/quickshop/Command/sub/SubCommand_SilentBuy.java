@@ -28,8 +28,8 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.MsgUtil;
-import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_SilentBuy implements CommandProcesser {
 

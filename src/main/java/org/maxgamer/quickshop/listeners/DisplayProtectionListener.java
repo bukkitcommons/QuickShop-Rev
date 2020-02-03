@@ -62,8 +62,8 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.MsgUtil;
-import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class DisplayProtectionListener implements Listener {
   private QuickShop plugin;

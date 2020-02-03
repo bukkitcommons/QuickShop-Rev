@@ -9,10 +9,10 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.utils.BlockViewer;
 import org.maxgamer.quickshop.utils.MsgUtil;
-import org.maxgamer.quickshop.utils.ShopViewer;
-import org.maxgamer.quickshop.utils.ViewAction;
+import org.maxgamer.quickshop.utils.viewer.BlockViewer;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import org.maxgamer.quickshop.utils.viewer.ViewAction;
 
 public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
 

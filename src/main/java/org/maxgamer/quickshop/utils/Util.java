@@ -78,6 +78,7 @@ import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.scheduler.InventoryEditContainer;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 

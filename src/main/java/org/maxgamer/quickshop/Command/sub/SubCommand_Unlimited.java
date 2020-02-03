@@ -11,7 +11,7 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
-import org.maxgamer.quickshop.utils.ShopViewer;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_Unlimited extends SneakyTabs implements CommandProcesser {
   @Override

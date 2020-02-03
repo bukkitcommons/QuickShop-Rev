@@ -48,8 +48,8 @@ import org.maxgamer.quickshop.shop.ShopChunk;
 import org.maxgamer.quickshop.shop.ShopModerator;
 import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.MsgUtil;
-import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /** Manage a lot of shops. */
 public class ShopManager {

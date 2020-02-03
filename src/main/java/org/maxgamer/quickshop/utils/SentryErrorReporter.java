@@ -56,7 +56,6 @@ public class SentryErrorReporter {
   private SentryClient sentryClient;
   private boolean tempDisable;
   private String lastPaste;
-  private IncompatibleChecker checker = new IncompatibleChecker();
 
   public SentryErrorReporter(@NotNull QuickShop plugin) {
     this.plugin = plugin;
@@ -123,11 +122,6 @@ public class SentryErrorReporter {
       return false;
     }
     if (!UpdateWatcher.isLatest()) { // We only receive latest reports.
-      return false;
-    }
-    if (checker.isIncompatible(Util.getNMSVersion())) { // Ignore errors if user install quickshop
-                                                        // on unsupported
-                                                        // version.
       return false;
     }
     if (!checkWasCauseByQS(throwable)) {

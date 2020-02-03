@@ -45,8 +45,8 @@ import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.RealDisplayItem;
 import org.maxgamer.quickshop.utils.MsgUtil;
-import org.maxgamer.quickshop.utils.ShopViewer;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /** ChestShop core */
 @EqualsAndHashCode
@@ -92,7 +92,7 @@ public class ContainerShop implements Shop {
     this.price = price;
     this.moderator = moderator;
     this.item = new ItemStack(item);
-    this.item.setAmount(1);
+    //this.item.setAmount(1); // FIXME after stack
     this.shopType = type;
     this.unlimited = unlimited;
 
@@ -282,44 +282,44 @@ public class ContainerShop implements Shop {
    */
   @Override
   public void buy(@NotNull Player p, int amount) {
-    int amount1 = amount;
-    if (amount1 < 0) {
-      this.sell(p, -amount1);
+    if (amount < 0) {
+      this.sell(p, -amount);
     }
+    amount = amount * this.item.getAmount();
     if (this.isUnlimited()) {
       ItemStack[] contents = p.getInventory().getContents();
-      for (int i = 0; amount1 > 0 && i < contents.length; i++) {
+      for (int i = 0; amount > 0 && i < contents.length; i++) {
         ItemStack stack = contents[i];
         if (stack == null || stack.getType() == Material.AIR) {
           continue; // No item
         }
         if (matches(stack)) {
-          int stackSize = Math.min(amount1, stack.getAmount());
+          int stackSize = Math.min(amount, stack.getAmount());
           stack.setAmount(stack.getAmount() - stackSize);
-          amount1 -= stackSize;
+          amount -= stackSize;
         }
       }
       // Send the players new inventory to them
       p.getInventory().setContents(contents);
       this.setSignText();
       // This should not happen.
-      if (amount1 > 0) {
+      if (amount > 0) {
         QuickShop.instance().getLogger().log(Level.WARNING,
             "Could not take all items from a players inventory on purchase! " + p.getName()
-                + ", missing: " + amount1 + ", item: " + Util.getItemStackName(this.getItem())
+                + ", missing: " + amount + ", item: " + Util.getItemStackName(this.getItem())
                 + "!");
       }
     } else {
       ItemStack[] playerContents = p.getInventory().getContents();
       Inventory chestInv = this.getInventory();
-      for (int i = 0; amount1 > 0 && i < playerContents.length; i++) {
+      for (int i = 0; amount > 0 && i < playerContents.length; i++) {
         ItemStack item = playerContents[i];
         if (item != null && this.matches(item)) {
           // Copy it, we don't want to interfere
           item = new ItemStack(item);
           // Amount = total, item.getAmount() = how many items in the
           // stack
-          int stackSize = Math.min(amount1, item.getAmount());
+          int stackSize = Math.min(amount, item.getAmount());
           // If Amount is item.getAmount(), then this sets the amount
           // to 0
           // Else it sets it to the remainder
@@ -328,7 +328,7 @@ public class ContainerShop implements Shop {
           item.setAmount(stackSize);
           // Add the items to the players inventory
           Objects.requireNonNull(chestInv).addItem(item);
-          amount1 -= stackSize;
+          amount -= stackSize;
         }
       }
       // Now update the players inventory.
@@ -497,6 +497,7 @@ public class ContainerShop implements Shop {
     // Items to drop on floor
     ArrayList<ItemStack> floor = new ArrayList<>(5);
     Inventory pInv = p.getInventory();
+    amount = amount * this.item.getAmount();
     if (this.isUnlimited()) {
       ItemStack item = new ItemStack(this.item);
       while (amount > 0) {
