@@ -40,8 +40,8 @@ import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.RealDisplayItem;
-import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /** ChestShop core */
@@ -93,7 +93,7 @@ public class ContainerShop implements Shop {
     this.unlimited = unlimited;
 
     if (BaseConfig.displayItems) {
-      DisplayData data = DisplayItem.getNowUsing(this.item);
+      DisplayData data = DisplayData.getDisplayData(this.item);
       switch (data.type) {
         case UNKNOWN:
           Util.debugLog(
@@ -397,7 +397,7 @@ public class ContainerShop implements Shop {
     }
   }
 
-  public void checkDisplay0() {
+  private void checkDisplay0() {
     if (!BaseConfig.displayItems || !this.isLoaded) { // FIXME: Reinit scheduler on reloading config
       return;
     }
@@ -415,15 +415,7 @@ public class ContainerShop implements Shop {
       Util.debugLog("Target item not spawned, spawning...");
       this.displayItem.spawn();
     } else {
-      /* If not spawned, we didn't need check these, only check them when we need. */
-      if (this.displayItem.checkDisplayNeedRegen()) {
-        this.displayItem.fixDisplayNeedRegen();
-      } else {
-        /* If display was regened, we didn't need check it moved, performance! */
-        if (this.displayItem.checkDisplayIsMoved()) {
-          this.displayItem.fixDisplayMoved();
-        }
-      }
+      this.displayItem.fixPosition();
     }
 
     /* Dupe is always need check, if enabled display */

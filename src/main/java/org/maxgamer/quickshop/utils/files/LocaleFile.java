@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.json;
+package org.maxgamer.quickshop.utils.files;
 
 import java.io.InputStream;
 import java.util.List;

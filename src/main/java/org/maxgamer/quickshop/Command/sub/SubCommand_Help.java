@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandContainer;
 import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.utils.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class SubCommand_Help implements CommandProcesser {
 

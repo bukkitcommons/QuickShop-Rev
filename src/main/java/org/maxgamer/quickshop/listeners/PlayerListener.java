@@ -49,8 +49,8 @@ import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.shop.Info;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopAction;
-import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 // import com.griefcraft.lwc.LWC;

@@ -6,16 +6,23 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +30,23 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
 
 /** A class allow plugin load shops fast and simply. */
-public class ShopLoader {
+public class ShopLoader implements Listener {
+  
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onWorldUnload(WorldUnloadEvent event) {
+    for (Chunk chunk : event.getWorld().getLoadedChunks()) {
+      final Map<Location, Shop> inChunk = QuickShop.instance().getShopManager().getShops(chunk);
+
+      if (inChunk != null && !inChunk.isEmpty())
+        for (Shop shop : inChunk.values())
+          shop.onUnload(); // FIXME performance
+    }
+  }
+  
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onWorldLoad(WorldLoadEvent event) {
+    loadShopsForWorld(event.getWorld());
+  }
   
   public static void forEachShopFromDatabase(@NotNull Consumer<@NotNull Shop> consumer) {
     try {
@@ -55,7 +78,7 @@ public class ShopLoader {
    *
    * @param worldName The world name
    */
-  public static void loadShops(@NotNull World world) {
+  public void loadShopsForWorld(@NotNull World world) {
     long onLoad = System.currentTimeMillis();
     
     try {
@@ -115,11 +138,6 @@ public class ShopLoader {
     } catch (Throwable t) {
       exceptionHandler(t, null);
     }
-  }
-
-  @Deprecated
-  public static void loadShops() {
-    loadShops(null);
   }
 
   private static boolean canLoad(@NotNull ShopDatabaseInfo info) {

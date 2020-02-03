@@ -78,6 +78,8 @@ import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.scheduler.InventoryEditContainer;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
+import org.maxgamer.quickshop.utils.messages.Colorizer;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -752,7 +754,7 @@ public class Util {
             if (itemStack == null) {
               continue;
             }
-            if (DisplayItem.checkIsGuardItemStack(itemStack)) {
+            if (DisplayItem.isDisplayItem(itemStack, null)) {
               // Found Item and remove it.
               Location location = inv.getLocation();
               if (location == null) {

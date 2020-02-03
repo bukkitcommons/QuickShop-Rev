@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.json;
+package org.maxgamer.quickshop.utils.files;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

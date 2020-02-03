@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.messages;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -15,8 +15,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.files.Rewriter;
 import org.maxgamer.quickshop.utils.mojang.AssetJson;
 import org.maxgamer.quickshop.utils.mojang.MojangAPI;
+import org.maxgamer.quickshop.utils.nms.ReflectFactory;
 
 public class MinecraftLocale {
   @NotNull

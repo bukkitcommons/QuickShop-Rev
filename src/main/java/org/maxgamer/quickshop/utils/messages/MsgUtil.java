@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.messages;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +37,10 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.utils.json.JsonFile;
-import org.maxgamer.quickshop.utils.json.LocaleFile;
+import org.maxgamer.quickshop.utils.ItemNMS;
+import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.files.JsonFile;
+import org.maxgamer.quickshop.utils.files.LocaleFile;
 import com.bekvon.bukkit.residence.commands.gset;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;

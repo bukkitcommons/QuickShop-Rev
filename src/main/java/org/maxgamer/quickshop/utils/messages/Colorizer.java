@@ -15,7 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.messages;
 
 import java.util.HashMap;
 import java.util.Map;

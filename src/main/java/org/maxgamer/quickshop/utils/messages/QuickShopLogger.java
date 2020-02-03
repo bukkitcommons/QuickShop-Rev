@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.messages;
 
 import static org.bukkit.ChatColor.AQUA;
 import static org.bukkit.ChatColor.BLACK;

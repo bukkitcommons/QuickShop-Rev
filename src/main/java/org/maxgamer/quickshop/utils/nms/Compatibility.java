@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.nms;
 
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.utils.Util;
 
 /** WIP */
 public class Compatibility {

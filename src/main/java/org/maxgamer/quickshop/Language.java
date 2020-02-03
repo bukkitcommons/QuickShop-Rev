@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.utils.Rewriter;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.files.Rewriter;
 
 public class Language {
   private QuickShop plugin;

@@ -1,20 +1,4 @@
-/*
- * This file is a part of project QuickShop, the name is IntegrationHelper.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.integration;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,9 +6,7 @@ import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.integration.IntegrateStage;
-import org.maxgamer.quickshop.integration.IntegratedPlugin;
-import org.maxgamer.quickshop.integration.IntegrationStage;
+import org.maxgamer.quickshop.utils.Util;
 
 @Getter
 public class IntegrationHelper {
@@ -32,7 +14,7 @@ public class IntegrationHelper {
 
   public void register(@NotNull IntegratedPlugin clazz) {
     if (!isIntegrationClass(clazz)) {
-      throw new InvaildIntegratedPluginClass();
+      throw new InvaildIntegratedException();
     }
     Util.debugLogHeavy("Registering " + clazz.getName());
     integrations.add(clazz);
@@ -40,7 +22,7 @@ public class IntegrationHelper {
 
   public void unregister(@NotNull IntegratedPlugin clazz) {
     if (!isIntegrationClass(clazz)) {
-      throw new InvaildIntegratedPluginClass();
+      throw new InvaildIntegratedException();
     }
     Util.debugLogHeavy("Unregistering " + clazz.getName());
     integrations.remove(clazz);
@@ -100,5 +82,6 @@ public class IntegrationHelper {
 }
 
 
-class InvaildIntegratedPluginClass extends IllegalArgumentException {
+class InvaildIntegratedException extends IllegalArgumentException {
+  private static final long serialVersionUID = 1L;
 }

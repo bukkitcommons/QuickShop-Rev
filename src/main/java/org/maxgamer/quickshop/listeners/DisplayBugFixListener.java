@@ -49,7 +49,7 @@ public class DisplayBugFixListener implements Listener {
 
     for (Entity entity : entities) {
       if (!(entity instanceof ArmorStand)
-          || !DisplayItem.checkIsGuardItemStack(((ArmorStand) entity).getItemInHand())) {
+          || !DisplayItem.isDisplayItem(((ArmorStand) entity).getItemInHand(), null)) {
         continue;
       }
 

@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.json;
+package org.maxgamer.quickshop.utils.files;
 
 import java.util.ArrayList;
 import java.util.Arrays;

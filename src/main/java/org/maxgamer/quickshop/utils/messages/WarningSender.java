@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.messages;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

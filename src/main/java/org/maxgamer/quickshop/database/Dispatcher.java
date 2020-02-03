@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.WarningSender;
+import org.maxgamer.quickshop.utils.messages.WarningSender;
 import com.google.common.collect.Queues;
 
 /** Queued database manager. Use queue to solve run SQL make server lagg issue. */

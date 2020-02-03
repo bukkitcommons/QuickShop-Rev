@@ -15,7 +15,7 @@
  * not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.nms;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

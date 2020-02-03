@@ -61,8 +61,8 @@ import org.maxgamer.quickshop.command.sub.SubCommand_Unlimited;
 import org.maxgamer.quickshop.command.sub.SubCommand_Update;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 @Data
 public class CommandManager implements TabCompleter, CommandExecutor {

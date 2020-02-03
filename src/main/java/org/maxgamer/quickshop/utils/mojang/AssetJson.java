@@ -6,8 +6,8 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class AssetJson {
   final String pathTemplate = "minecraft/lang/{0}.json";

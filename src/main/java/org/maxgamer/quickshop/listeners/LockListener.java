@@ -41,8 +41,8 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 @AllArgsConstructor
 public class LockListener implements Listener {

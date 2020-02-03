@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.files;
 
 import java.io.File;
 import java.io.FileOutputStream;

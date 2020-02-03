@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.nms;
 
 import java.util.Objects;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +26,7 @@ import org.bukkit.inventory.meta.Repairable;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.utils.Util;
 
 /** A util allow quickshop check item matches easy and quick. */
 public class ItemMatcher {

@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.json;
+package org.maxgamer.quickshop.utils.files;
 
 import java.io.File;
 import java.io.InputStream;
@@ -12,7 +12,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.utils.Rewriter;
 
 @ToString
 public class JsonFile implements LocaleFile {
