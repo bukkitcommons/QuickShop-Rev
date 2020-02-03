@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils.paste.impl;
+package org.maxgamer.quickshop.utils.paste;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -24,7 +24,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.paste.PasteInterface;
 
 public class UbuntuPaster implements PasteInterface {
   /**

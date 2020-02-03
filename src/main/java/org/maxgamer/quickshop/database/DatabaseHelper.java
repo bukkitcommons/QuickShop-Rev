@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.database.impl;
+package org.maxgamer.quickshop.database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,7 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.database.Database;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.utils.Util;
 

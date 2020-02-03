@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop.impl;
+package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Sets;
 import java.sql.SQLException;
@@ -41,12 +41,6 @@ import org.maxgamer.quickshop.event.ShopCreateEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.event.ShopPurchaseEvent;
 import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
-import org.maxgamer.quickshop.shop.Info;
-import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.ShopAction;
-import org.maxgamer.quickshop.shop.ShopChunk;
-import org.maxgamer.quickshop.shop.ShopModerator;
-import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;

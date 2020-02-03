@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils.paste.impl;
+package org.maxgamer.quickshop.utils.paste;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -39,7 +39,6 @@ import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.economy.impl.Economy_Vault;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.paste.PasteInterface;
 
 /** A util to generate a paste report and upload it to EngineHub/Ubuntu Paste */
 @AllArgsConstructor

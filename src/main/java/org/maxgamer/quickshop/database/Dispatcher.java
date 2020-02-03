@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.database.impl;
+package org.maxgamer.quickshop.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.database.Database;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.WarningSender;
 import com.google.common.collect.Queues;

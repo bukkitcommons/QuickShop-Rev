@@ -1,17 +1,13 @@
-package org.maxgamer.quickshop.utils.file;
+package org.maxgamer.quickshop.utils.json;
 
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.mock.MckFileConfiguration;
 
-public interface LocaleConfiguration {
+public interface LocaleFile {
 
   /** Creates yml file on the path */
   void create();

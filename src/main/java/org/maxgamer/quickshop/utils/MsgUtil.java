@@ -37,8 +37,8 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.utils.file.LocaleConfiguration;
-import org.maxgamer.quickshop.utils.file.impl.JsonConfiguration;
+import org.maxgamer.quickshop.utils.json.JsonFile;
+import org.maxgamer.quickshop.utils.json.LocaleFile;
 import com.bekvon.bukkit.residence.commands.gset;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
@@ -51,7 +51,7 @@ public class MsgUtil {
   private static YamlConfiguration itemi18n;
   private static YamlConfiguration potioni18n;
   
-  private static LocaleConfiguration messagei18n;
+  private static LocaleFile messagei18n;
   private static HashMap<UUID, String> playerMessages = Maps.newHashMap();
   
   private static DecimalFormat decimalFormat =
@@ -248,11 +248,11 @@ public class MsgUtil {
     MINECRAFT_LOCALE.reload();
     
     // Init nJson
-    LocaleConfiguration json;
+    LocaleFile json;
     languageCode = "en".equals(languageCode) ?
         languageCode :
           (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
-    json = new JsonConfiguration(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json");
+    json = new JsonFile(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json");
     json.create();
     
     if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {
@@ -786,7 +786,7 @@ public class MsgUtil {
     messagei18n.set(path, objFromBuiltIn);
   }
 
-  public static LocaleConfiguration getI18nFile() {
+  public static LocaleFile getI18nFile() {
     return messagei18n;
   }
 }

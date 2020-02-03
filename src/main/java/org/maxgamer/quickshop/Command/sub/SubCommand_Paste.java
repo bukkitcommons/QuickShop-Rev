@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.paste.impl.Paste;
+import org.maxgamer.quickshop.utils.paste.Paste;
 
 public class SubCommand_Paste implements CommandProcesser {
 

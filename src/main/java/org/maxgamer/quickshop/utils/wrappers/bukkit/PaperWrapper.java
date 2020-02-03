@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.wrappers.bukkit.impl;
+package org.maxgamer.quickshop.utils.wrappers.bukkit;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 
 public class PaperWrapper implements BukkitWrapper {
   @Override

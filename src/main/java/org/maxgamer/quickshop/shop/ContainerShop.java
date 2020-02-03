@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop.impl;
+package org.maxgamer.quickshop.shop;
 
 import com.lishid.openinv.OpenInv;
 import java.sql.SQLException;
@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import lombok.EqualsAndHashCode;
@@ -37,9 +36,6 @@ import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
 import org.maxgamer.quickshop.event.ShopPriceChangeEvent.Reason;
 import org.maxgamer.quickshop.event.ShopUnloadEvent;
 import org.maxgamer.quickshop.event.ShopSaveEvent;
-import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.ShopModerator;
-import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;

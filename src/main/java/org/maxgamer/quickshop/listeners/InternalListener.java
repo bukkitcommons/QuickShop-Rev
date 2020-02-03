@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.internal.listener;
+package org.maxgamer.quickshop.listeners;
 
 import lombok.AllArgsConstructor;
 import org.bukkit.event.EventHandler;

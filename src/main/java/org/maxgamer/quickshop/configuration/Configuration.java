@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.configuration.annotation;
+package org.maxgamer.quickshop.configuration;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

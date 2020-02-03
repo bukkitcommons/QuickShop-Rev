@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
-import org.maxgamer.quickshop.shop.impl.ShopLoader;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesser {

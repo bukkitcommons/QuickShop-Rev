@@ -3,8 +3,8 @@ package org.maxgamer.quickshop.configuration.impl;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Material;
-import org.maxgamer.quickshop.configuration.annotation.Configuration;
-import org.maxgamer.quickshop.configuration.annotation.Node;
+import org.maxgamer.quickshop.configuration.Configuration;
+import org.maxgamer.quickshop.configuration.Node;
 import com.google.common.collect.Lists;
 
 @Configuration("base-config.yml")

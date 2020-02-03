@@ -10,7 +10,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.impl.ShopLoader;
+import org.maxgamer.quickshop.shop.ShopLoader;
 
 @Deprecated // merge with loader
 public class WorldListener implements Listener {

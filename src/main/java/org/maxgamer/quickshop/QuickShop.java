@@ -30,12 +30,12 @@ import org.maxgamer.quickshop.command.CommandManager;
 import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.Database;
+import org.maxgamer.quickshop.database.DatabaseHelper;
+import org.maxgamer.quickshop.database.Dispatcher;
 import org.maxgamer.quickshop.database.Database.ConnectionException;
 import org.maxgamer.quickshop.database.connector.DatabaseConnector;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.database.connector.SQLiteConnector;
-import org.maxgamer.quickshop.database.impl.DatabaseHelper;
-import org.maxgamer.quickshop.database.impl.Dispatcher;
 import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.economy.EconomyType;
@@ -47,7 +47,6 @@ import org.maxgamer.quickshop.integration.impl.PlotSquaredIntegration;
 import org.maxgamer.quickshop.integration.impl.ResidenceIntegration;
 import org.maxgamer.quickshop.integration.impl.TownyIntegration;
 import org.maxgamer.quickshop.integration.impl.WorldGuardIntegration;
-import org.maxgamer.quickshop.internal.listener.InternalListener;
 import org.maxgamer.quickshop.listeners.BlockListener;
 import org.maxgamer.quickshop.listeners.ChatListener;
 import org.maxgamer.quickshop.listeners.ChunkListener;
@@ -55,6 +54,7 @@ import org.maxgamer.quickshop.listeners.ClearLaggListener;
 import org.maxgamer.quickshop.listeners.CustomInventoryListener;
 import org.maxgamer.quickshop.listeners.DisplayBugFixListener;
 import org.maxgamer.quickshop.listeners.DisplayProtectionListener;
+import org.maxgamer.quickshop.listeners.InternalListener;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.PlayerListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
@@ -65,10 +65,10 @@ import org.maxgamer.quickshop.scheduler.DisplayWatcher;
 import org.maxgamer.quickshop.scheduler.LogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
+import org.maxgamer.quickshop.scheduler.SyncTaskWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
-import org.maxgamer.quickshop.scheduler.sync.SyncTaskWatcher;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.impl.ShopManager;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.Compatibility;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.IntegrationHelper;
@@ -82,8 +82,8 @@ import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Timer;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
-import org.maxgamer.quickshop.utils.wrappers.bukkit.impl.PaperWrapper;
-import org.maxgamer.quickshop.utils.wrappers.bukkit.impl.SpigotWrapper;
+import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
+import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
 
 @Getter
 public class QuickShop extends JavaPlugin {
@@ -344,7 +344,6 @@ public class QuickShop extends JavaPlugin {
     // this.display = this.getConfig().getBoolean("shop.display-items");
     this.priceChangeRequiresFee = BaseConfig.priceModFee > 0;
     this.displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
-    language = new Language(this); // Init locale
     if (BaseConfig.logActions) {
       logWatcher = new LogWatcher(this, new File(getDataFolder(), "qs.log"));
     } else {

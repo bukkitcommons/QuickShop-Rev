@@ -11,8 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.annotation.Configuration;
-import org.maxgamer.quickshop.configuration.annotation.Node;
+import org.maxgamer.quickshop.configuration.Configuration;
+import org.maxgamer.quickshop.configuration.Node;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 
 @Configuration("integrations.yml")

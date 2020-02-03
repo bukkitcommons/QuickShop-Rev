@@ -10,8 +10,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.configuration.annotation.Configuration;
-import org.maxgamer.quickshop.configuration.annotation.Node;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

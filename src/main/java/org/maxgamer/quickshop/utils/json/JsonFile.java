@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.file.impl;
+package org.maxgamer.quickshop.utils.json;
 
 import java.io.File;
 import java.io.InputStream;
@@ -13,11 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Rewriter;
-import org.maxgamer.quickshop.utils.file.LocaleConfiguration;
-import org.maxgamer.quickshop.utils.json.JSONConfiguration;
 
 @ToString
-public class JsonConfiguration implements LocaleConfiguration {
+public class JsonFile implements LocaleFile {
   @NotNull
   protected final File file;
   @NotNull
@@ -43,7 +41,7 @@ public class JsonConfiguration implements LocaleConfiguration {
     }
   };
 
-  public JsonConfiguration(@NotNull File file, @NotNull String resourcePath) {
+  public JsonFile(@NotNull File file, @NotNull String resourcePath) {
     this.file = file;
     this.rewriter = new Rewriter(file);
     this.resourcePath = resourcePath;
