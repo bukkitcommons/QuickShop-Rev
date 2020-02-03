@@ -19,14 +19,14 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.utils.Util;
 
-public class Economy_Vault implements EconomyCore, Listener {
+public class VaultEconProvider implements EconomyCore, Listener {
 
   @Getter
   @Setter
   @Nullable
   private Economy vault;
 
-  public Economy_Vault() {
+  public VaultEconProvider() {
     setupEconomy();
   }
 

@@ -37,7 +37,7 @@ import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.economy.EconomyCore;
-import org.maxgamer.quickshop.economy.impl.Economy_Vault;
+import org.maxgamer.quickshop.economy.impl.VaultEconProvider;
 import org.maxgamer.quickshop.utils.Util;
 
 /** A util to generate a paste report and upload it to EngineHub/Ubuntu Paste */
@@ -71,7 +71,7 @@ public class Paste {
       switch (Economy.getNowUsing()) {
         case VAULT:
           finalReport.append("Vault").append("%")
-              .append(((Economy_Vault) economyCore).getProviderName());
+              .append(((VaultEconProvider) economyCore).getProviderName());
           break;
         case RESERVE:
           finalReport.append("Reserve").append("%").append("No details");

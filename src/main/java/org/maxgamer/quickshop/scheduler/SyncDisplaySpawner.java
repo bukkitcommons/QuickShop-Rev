@@ -7,11 +7,11 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.Shop;
 
 @Data
-public class DisplayWatcher {
+public class SyncDisplaySpawner {
   // private ArrayList<Shop> pendingCheckDisplay = new ArrayList<>();
   private QuickShop plugin;
 
-  public DisplayWatcher(QuickShop plugin) {
+  public SyncDisplaySpawner(QuickShop plugin) {
     this.plugin = plugin;
     registerTask();
   }

@@ -30,7 +30,7 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.EconomyCore;
 
 /** @author creatorfromhell */
-public class Economy_Reserve implements EconomyCore {
+public class ReserveEconProvider implements EconomyCore {
 
   private final String errorMsg =
       "QuickShop got an error when calling your Economy system, this is NOT a QuickShop error, please do not report this issue to the QuickShop's Issue tracker, ask your Economy plugin's author.";
@@ -40,7 +40,7 @@ public class Economy_Reserve implements EconomyCore {
   @Nullable
   private EconomyAPI reserve = null;
 
-  public Economy_Reserve() {
+  public ReserveEconProvider() {
     setup();
   }
 

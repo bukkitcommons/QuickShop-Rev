@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
 import org.bukkit.Bukkit;
@@ -39,8 +38,8 @@ import org.maxgamer.quickshop.database.connector.SQLiteConnector;
 import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.economy.EconomyType;
-import org.maxgamer.quickshop.economy.impl.Economy_Reserve;
-import org.maxgamer.quickshop.economy.impl.Economy_Vault;
+import org.maxgamer.quickshop.economy.impl.ReserveEconProvider;
+import org.maxgamer.quickshop.economy.impl.VaultEconProvider;
 import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegrationHelper;
 import org.maxgamer.quickshop.integration.impl.FactionsIntegration;
@@ -60,8 +59,8 @@ import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.PlayerListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.permission.impl.PermissionManager;
-import org.maxgamer.quickshop.scheduler.DisplayAutoDespawnWatcher;
-import org.maxgamer.quickshop.scheduler.DisplayWatcher;
+import org.maxgamer.quickshop.scheduler.AsyncDisplayDespawner;
+import org.maxgamer.quickshop.scheduler.SyncDisplaySpawner;
 import org.maxgamer.quickshop.scheduler.LogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
@@ -73,7 +72,6 @@ import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.PermissionChecker;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
-import org.maxgamer.quickshop.utils.Timer;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.QuickShopLogger;
@@ -122,7 +120,7 @@ public class QuickShop extends JavaPlugin {
 
   private DisplayBugFixListener displayBugFixListener;
   private int displayItemCheckTicks;
-  private DisplayWatcher displayWatcher;
+  private SyncDisplaySpawner displayWatcher;
   /** The economy we hook into for transactions */
   private Economy economy;
 
@@ -171,7 +169,7 @@ public class QuickShop extends JavaPlugin {
   private ShopProtector shopProtectListener;
   private SyncTaskWatcher syncTaskWatcher;
   // private ShopVaildWatcher shopVaildWatcher;
-  private DisplayAutoDespawnWatcher displayAutoDespawnWatcher;
+  private AsyncDisplayDespawner displayAutoDespawnWatcher;
   /** Use SpoutPlugin to get item / block names */
   private boolean useSpout = false;
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
@@ -286,11 +284,11 @@ public class QuickShop extends JavaPlugin {
               new BootError("Can't load the Economy provider, invalid value in config.yml.");
           return false;
         case VAULT:
-          core = new Economy_Vault();
+          core = new VaultEconProvider();
           Util.debugLog("Now using the Vault economy system.");
           break;
         case RESERVE:
-          core = new Economy_Reserve();
+          core = new ReserveEconProvider();
           Util.debugLog("Now using the Reserve economy system.");
           break;
         default:
@@ -435,7 +433,7 @@ public class QuickShop extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    Timer enableTimer = new Timer(true);
+    long start = System.currentTimeMillis();
     configurationManager = ConfigurationManager.createManager(this);
     configurationManager.load(QuickShop.class);
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
@@ -527,9 +525,9 @@ public class QuickShop extends JavaPlugin {
     if (BaseConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
         this.enabledAsyncDisplayDespawn = true;
-        this.displayAutoDespawnWatcher = new DisplayAutoDespawnWatcher(this);
-        this.displayAutoDespawnWatcher.runTaskTimerAsynchronously(this, 20,
-            getConfig().getInt("shop.display-check-time")); // not worth async
+        this.displayAutoDespawnWatcher = new AsyncDisplayDespawner(this);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(QuickShop.instance(), this.displayAutoDespawnWatcher, 20,
+            getConfig().getInt("shop.display-check-time"));
       }
     }
     this.shopManager = new ShopManager();
@@ -566,7 +564,7 @@ public class QuickShop extends JavaPlugin {
     customInventoryListener = new CustomInventoryListener(this);
     displayBugFixListener = new DisplayBugFixListener(this);
     shopProtectListener = new ShopProtector();
-    displayWatcher = new DisplayWatcher(this);
+    displayWatcher = new SyncDisplaySpawner(this);
     syncTaskWatcher = new SyncTaskWatcher(this);
     // shopVaildWatcher = new ShopVaildWatcher(this);
     ongoingFeeWatcher = new OngoingFeeWatcher(this);
@@ -597,7 +595,7 @@ public class QuickShop extends JavaPlugin {
     UpdateWatcher.init();
     getLogger().info("Registering BStats Mertics...");
     submitMeritcs();
-    getLogger().info("QuickShop Loaded! " + enableTimer.endTimer() + " ms.");
+    getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
     /* Delay the Ecoonomy system load, give a chance to let economy system regiser. */
     /* And we have a listener to listen the ServiceRegisterEvent :) */
     Util.debugLog("Loading economy system...");
