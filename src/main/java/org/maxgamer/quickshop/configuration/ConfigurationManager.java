@@ -76,7 +76,7 @@ public class ConfigurationManager {
   }
 
   @NotNull
-  public static ConfigurationManager getManager(@NotNull Plugin plugin) {
+  public static ConfigurationManager createManager(@NotNull Plugin plugin) {
     return new ConfigurationManager(new File(".".concat(File.separator).concat("plugins")
         .concat(File.separator).concat(plugin.getName()).concat(File.separator)));
   }
@@ -85,7 +85,10 @@ public class ConfigurationManager {
   @SneakyThrows
   public ConfigurationData load(@NotNull Class<?> confClass) {
     Configuration filePath = confClass.getAnnotation(Configuration.class);
+    Util.debugLog("Loading configuration for " + confClass.getName());
+    
     if (filePath != null) {
+      Util.debugLog("Path of configuration " + confClass.getName() + " is " + filePath.value());
       File file = createConfigurationFile(new File(parent, filePath.value()));
       YamlConfiguration conf = YamlConfiguration.loadConfiguration(file);
 

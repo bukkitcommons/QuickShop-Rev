@@ -76,7 +76,7 @@ public class ShopProtector implements Listener {
   public void onInventoryMove(InventoryMoveItemEvent event) {
     final Location loc = event.getSource().getLocation();
 
-    if (loc != null && Util.isShoppables(loc.getBlock().getType())) // FIXME maybe dupe
+    if (loc != null && !Util.isBlocklisted(loc.getBlock().getType())) // FIXME maybe dupe
       handleProtection(event.getSource().getLocation(), () -> event.setCancelled(true));
   }
 

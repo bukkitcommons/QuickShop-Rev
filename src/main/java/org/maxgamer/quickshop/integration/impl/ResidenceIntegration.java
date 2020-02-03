@@ -16,9 +16,9 @@ import org.maxgamer.quickshop.integration.IntegratedPlugin;
 @Configuration("integrations.yml")
 public class ResidenceIntegration implements IntegratedPlugin {
   @Node("integration.residence.create")
-  List<String> createLimits = Lists.newArrayList();
+  public static List<String> createLimits = Lists.newArrayList();
   @Node("integration.residence.trade")
-  List<String> tradeLimits = Lists.newArrayList();
+  public static List<String> tradeLimits = Lists.newArrayList();
 
   @Override
   public @NotNull String getName() {

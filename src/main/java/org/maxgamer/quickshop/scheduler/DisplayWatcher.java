@@ -22,10 +22,6 @@ public class DisplayWatcher {
       new BukkitRunnable() {
         @Override
         public void run() {
-          if (BaseConfig.displayItemCheckTicks < 3000) {
-            plugin.getLogger().severe(
-                "Shop.display-items-check-ticks is too low! It may cause HUGE lag! Pick a number > 3000");
-          }
           plugin.getShopManager().getLoadedShops().forEach(Shop::checkDisplay);
         }
       }.runTaskTimer(plugin, 1L, plugin.getDisplayItemCheckTicks());

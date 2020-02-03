@@ -13,7 +13,7 @@ import org.maxgamer.quickshop.utils.WarningSender;
 import com.google.common.collect.Queues;
 
 /** Queued database manager. Use queue to solve run SQL make server lagg issue. */
-public class Dispatcher {
+public class Dispatcher implements Runnable {
 
   private final BlockingQueue<PreparedStatement> sqlQueue = Queues.newLinkedBlockingQueue();
 
@@ -35,7 +35,7 @@ public class Dispatcher {
     database = db;
     taskId =
         Bukkit.getScheduler()
-              .runTaskTimerAsynchronously(QuickShop.instance(), this::execute, 0, 10 * 20).getTaskId();
+              .runTaskTimerAsynchronously(QuickShop.instance(), this, 0, 10 * 20).getTaskId();
   }
 
   /**
@@ -47,42 +47,45 @@ public class Dispatcher {
     sqlQueue.offer(ps);
   }
 
-  private void execute() {
+  @Override
+  public void run() {
     try {
-      while (true) {
-        PreparedStatement statement = sqlQueue.take();
-        long timer = System.currentTimeMillis();
-        
-        try {
-          Util.debugLog("Executing the SQL task: " + statement);
-          statement.execute();
-        } catch (SQLException sql) {
-          QuickShop.instance().getSentryErrorReporter().ignoreThrow();
-          sql.printStackTrace();
-        }
-        
-        try {
-          statement.close();
-        } catch (SQLException sql) {
-          QuickShop.instance().getSentryErrorReporter().ignoreThrow();
-          sql.printStackTrace();
-        }
-        
-        long took = System.currentTimeMillis() - timer;
-        if (took > 5000)
-          warningSender.sendWarn("Database performance warning: "
-              + "It took too long time (" + took + "ms) to execute the task, "
-              + "it may caused by the connection with database server or just database server too slow,"
-              + "change to a better database server or switch to a local database instead!");
-      }
+      while (true)
+        execute(sqlQueue.take());
     } catch (InterruptedException interrupted) {
-      execute();
+      run();
     }
+  }
+  
+  private void execute(PreparedStatement statement) {
+    long timer = System.currentTimeMillis();
+
+    try {
+      Util.debugLog("Executing the SQL task: " + statement);
+      statement.execute();
+    } catch (SQLException sql) {
+      QuickShop.instance().getSentryErrorReporter().ignoreThrow();
+      sql.printStackTrace();
+    }
+
+    try {
+      statement.close();
+    } catch (SQLException sql) {
+      QuickShop.instance().getSentryErrorReporter().ignoreThrow();
+      sql.printStackTrace();
+    }
+
+    long took = System.currentTimeMillis() - timer;
+    if (took > 5000)
+      warningSender.sendWarn("Database performance warning: "
+          + "It took too long time (" + took + "ms) to execute the task, "
+          + "it may caused by the connection with database server or just database server too slow,"
+          + "change to a better database server or switch to a local database instead!");
   }
   
   public void flush() {
     Bukkit.getScheduler().cancelTask(taskId);
     QuickShop.instance().getLogger().info("Please wait for the data to flush its data...");
-    execute();
+    sqlQueue.forEach(statement -> execute(statement));
   }
 }

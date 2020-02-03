@@ -203,10 +203,11 @@ public class ShopManager {
           QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
         }
 
-        if (getShop(info.getLocation()) != null) {
+        if (getShop(info.getLocation()).isPresent()) {
           p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
           return;
         }
+        
         if (Util.getSecondHalf(info.getLocation().getBlock()) != null
             && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
           p.sendMessage(MsgUtil.getMessage("no-double-chests", p));

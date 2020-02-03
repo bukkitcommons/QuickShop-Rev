@@ -18,10 +18,10 @@ import org.maxgamer.quickshop.integration.IntegratedPlugin;
 @Configuration("integrations.yml")
 public class FactionsIntegration implements IntegratedPlugin {
   @Node(value = "integrations.factions.create.flags")
-  private List<String> createFlags = Lists.newArrayList();
+  public static List<String> createFlags = Lists.newArrayList();
   
   @Node(value = "integrations.factions.create.flags")
-  private List<String> tradeFlags = Lists.newArrayList();
+  public static List<String> tradeFlags = Lists.newArrayList();
   
   @Node(value = "integrations.factions.enabled")
   public static boolean enabled;

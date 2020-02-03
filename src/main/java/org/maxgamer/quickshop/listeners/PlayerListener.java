@@ -138,7 +138,7 @@ public class PlayerListener implements Listener {
       }
     }
     // Purchase handling
-    if (shop != null && QuickShop.getPermissionManager().hasPermission(p, "quickshop.use")) {
+    if (shop.isPresent() && QuickShop.getPermissionManager().hasPermission(p, "quickshop.use")) {
       if (BaseConfig.sneakToTrade && !p.isSneaking()) {
         return;
       }

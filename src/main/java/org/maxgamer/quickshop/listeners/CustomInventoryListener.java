@@ -29,7 +29,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.shop.InventoryPreview;
+import org.maxgamer.quickshop.shop.ItemPreviewer;
 
 @AllArgsConstructor
 public class CustomInventoryListener implements Listener {
@@ -44,7 +44,7 @@ public class CustomInventoryListener implements Listener {
     final ItemStack[] stacks = inventory.getContents();
 
     for (ItemStack itemStack : stacks) {
-      if (!InventoryPreview.isPreviewItem(itemStack)) {
+      if (!ItemPreviewer.isPreviewItem(itemStack)) {
         continue;
       }
 
@@ -56,7 +56,7 @@ public class CustomInventoryListener implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void invEvent(InventoryMoveItemEvent e) {
 
-    if (InventoryPreview.isPreviewItem(e.getItem())) {
+    if (ItemPreviewer.isPreviewItem(e.getItem())) {
       e.setCancelled(true);
     }
   }
@@ -64,12 +64,12 @@ public class CustomInventoryListener implements Listener {
   @EventHandler
   public void invEvent(InventoryClickEvent e) {
 
-    if (InventoryPreview.isPreviewItem(e.getCursor())) {
+    if (ItemPreviewer.isPreviewItem(e.getCursor())) {
       e.setCancelled(true);
       e.setResult(Result.DENY);
     }
 
-    if (InventoryPreview.isPreviewItem(e.getCurrentItem())) {
+    if (ItemPreviewer.isPreviewItem(e.getCurrentItem())) {
       e.setCancelled(true);
       e.setResult(Result.DENY);
     }
@@ -78,8 +78,8 @@ public class CustomInventoryListener implements Listener {
   @EventHandler
   public void invEvent(InventoryDragEvent e) {
 
-    if (InventoryPreview.isPreviewItem(e.getCursor())
-        || InventoryPreview.isPreviewItem(e.getOldCursor())) {
+    if (ItemPreviewer.isPreviewItem(e.getCursor())
+        || ItemPreviewer.isPreviewItem(e.getOldCursor())) {
       e.setCancelled(true);
       e.setResult(Result.DENY);
     }
@@ -92,7 +92,7 @@ public class CustomInventoryListener implements Listener {
     final ItemStack[] stacks = inventory.getContents();
 
     for (ItemStack itemStack : stacks) {
-      if (!InventoryPreview.isPreviewItem(itemStack)) {
+      if (!ItemPreviewer.isPreviewItem(itemStack)) {
         continue;
       }
 

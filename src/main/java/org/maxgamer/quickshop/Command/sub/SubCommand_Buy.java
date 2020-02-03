@@ -52,7 +52,7 @@ public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
                     MsgUtil.getMessage("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
 
                 return ViewAction.BREAK;
-              });
+              }, ViewAction.NEXT);
 
         }).ifNone(notLookingAtShop);
   }

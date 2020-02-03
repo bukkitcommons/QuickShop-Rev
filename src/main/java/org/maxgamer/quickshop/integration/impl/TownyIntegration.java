@@ -37,7 +37,7 @@ public class TownyIntegration implements IntegratedPlugin {
 
   public TownyIntegration(QuickShop plugin) {
     ConfigurationData data =
-        ConfigurationManager.getManager(QuickShop.instance()).load(TownyIntegration.class);
+        QuickShop.instance().getConfigurationManager().load(TownyIntegration.class);
     
     createFlags =
         TownyFlags.deserialize(data.conf().getStringList("integration.towny.create"));

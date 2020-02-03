@@ -51,7 +51,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
 
   public WorldGuardIntegration() {
     ConfigurationData data =
-        ConfigurationManager.getManager(QuickShop.instance()).load(WorldGuardIntegration.class);
+        QuickShop.instance().getConfigurationManager().load(WorldGuardIntegration.class);
     
     createFlags = WorldGuardFlags
         .deserialize(data.conf().getStringList("integration.worldguard.create"));

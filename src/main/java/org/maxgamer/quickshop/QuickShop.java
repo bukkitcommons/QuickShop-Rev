@@ -183,6 +183,9 @@ public class QuickShop extends JavaPlugin {
   private BukkitWrapper bukkitAPIWrapper;
   private boolean isUtilInited = false;
   private boolean enabledAsyncDisplayDespawn;
+  
+  @Getter
+  private ConfigurationManager configurationManager;
 
   /**
    * Returns QS version, this method only exist on QSRR forks If running other QSRR forks,, result
@@ -334,6 +337,8 @@ public class QuickShop extends JavaPlugin {
   /** Reloads QuickShops config */
   @Override
   public void reloadConfig() {
+    configurationManager.load(QuickShop.class);
+    configurationManager.load(BaseConfig.class);
     super.reloadConfig();
     // Load quick variables
     // this.display = this.getConfig().getBoolean("shop.display-items");
@@ -431,9 +436,9 @@ public class QuickShop extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    ConfigurationManager.getManager(this).load(QuickShop.class);
-
     Timer enableTimer = new Timer(true);
+    configurationManager = ConfigurationManager.createManager(this);
+    configurationManager.load(QuickShop.class);
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
     /* PreInit for BootError feature */
     commandManager = new CommandManager();
@@ -652,14 +657,14 @@ public class QuickShop extends JavaPlugin {
       }
     }
     
-    ConfigurationManager.getManager(this).load(FactionsIntegration.class);
+    configurationManager.load(FactionsIntegration.class);
     if (FactionsIntegration.enabled) {
       Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
       if (factions != null && factions.isEnabled()) {
         this.integrationHelper.register(new FactionsIntegration());
       }
     } else {
-      ConfigurationManager.getManager(this).unload(FactionsIntegration.class);
+      ConfigurationManager.createManager(this).unload(FactionsIntegration.class);
     }
   }
 
@@ -838,7 +843,7 @@ public class QuickShop extends JavaPlugin {
     String serverUUID = getConfig().getString("server-uuid");
     if (serverUUID == null || serverUUID.isEmpty()) {
       serverUUID = BaseConfig.uuid;
-      ConfigurationManager.getManager(this).save(BaseConfig.class);
+      configurationManager.save(BaseConfig.class);
       getConfig().set("server-uuid", serverUUID);
     }
     saveConfig();

@@ -260,18 +260,18 @@ public class Paste {
     String report = finalReport.toString();
     try {
       ConfigurationSection configurationSection =
-          ConfigurationManager.getManager(QuickShop.instance()).get(BaseConfig.class)
+          QuickShop.instance().getConfigurationManager().get(BaseConfig.class)
           .conf().getConfigurationSection("database");
       report = report.replaceAll(
-          Objects.requireNonNull(Objects.requireNonNull(configurationSection).getString("user")),
+          Objects.requireNonNull(configurationSection).getString("user"),
           "[PROTECTED]");
-      report = report.replaceAll(Objects.requireNonNull(configurationSection.getString("password")),
+      report = report.replaceAll(configurationSection.getString("password"),
           "[PROTECTED]");
-      report = report.replaceAll(Objects.requireNonNull(configurationSection.getString("host")),
+      report = report.replaceAll(configurationSection.getString("host"),
           "[PROTECTED]");
-      report = report.replaceAll(Objects.requireNonNull(configurationSection.getString("port")),
+      report = report.replaceAll(configurationSection.getString("port"),
           "[PROTECTED]");
-      report = report.replaceAll(Objects.requireNonNull(configurationSection.getString("database")),
+      report = report.replaceAll(configurationSection.getString("database"),
           "[PROTECTED]");
     } catch (Throwable tg) {
       // Ignore

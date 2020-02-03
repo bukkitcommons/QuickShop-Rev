@@ -88,12 +88,12 @@ public class Util {
   private static EnumSet<Material> blacklist = EnumSet.noneOf(Material.class);
   @Getter
   private static List<String> debugLogs = new LinkedList<>();
-  private static boolean devMode = false;
+  private static boolean devMode = true;
   private static QuickShop plugin;
   private static EnumMap<Material, Entry<Double, Double>> restrictedPrices =
       new EnumMap<>(Material.class);
   private static Object serverInstance;
-  private static EnumSet<Material> shoppables = EnumSet.noneOf(Material.class);
+  private static EnumSet<Material> blockListedBlocks = EnumSet.noneOf(Material.class);
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
   private static boolean disableDebugLogger = false;
@@ -158,7 +158,7 @@ public class Util {
     BlockState bs = b.getState();
 
     // Specificed types by configuration
-    if (!isShoppables(b.getType())) {
+    if (isBlocklisted(b.getType())) {
       return false;
     }
 
@@ -275,7 +275,7 @@ public class Util {
         tookLongTimeCostTimes++;
         if (tookLongTimeCostTimes > 15000) {
           BaseConfig.debugLogger = false;
-          ConfigurationManager.getManager(plugin).save(BaseConfig.class);
+          QuickShop.instance().getConfigurationManager().save(BaseConfig.class);
           disableDebugLogger = true;
           QuickShop.instance().saveConfig();
           QuickShop.instance().getLogger().warning(
@@ -644,7 +644,7 @@ public class Util {
   /** Initialize the Util tools. */
   public static void initialize() {
     blacklist.clear();
-    shoppables.clear();
+    blockListedBlocks.clear();
     restrictedPrices.clear();
     worldBlacklist.clear();
     plugin = QuickShop.instance;
@@ -658,7 +658,7 @@ public class Util {
       if (mat == null) {
         plugin.getLogger().warning("Invalid shop-block: " + s);
       } else {
-        shoppables.add(mat);
+        blockListedBlocks.add(mat);
       }
     }
     List<String> configBlacklist = BaseConfig.blacklist;
@@ -906,8 +906,8 @@ public class Util {
    * @param material Mat
    * @return Can or not
    */
-  public static boolean isShoppables(@NotNull Material material) {
-    return shoppables.contains(material);
+  public static boolean isBlocklisted(@NotNull Material material) {
+    return blockListedBlocks.contains(material);
   }
 
   /**

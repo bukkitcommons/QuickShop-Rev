@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is SubCommand_Create.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
@@ -37,9 +21,6 @@ import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_Create implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
-
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
@@ -68,15 +49,17 @@ public class SubCommand_Create implements CommandProcesser {
     }
 
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
+    Util.debugLog("Creating shop");
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
+      Util.debugLog("Checking block for shop creation: " + b);
 
       if (!Util.canBeShop(b)) {
         continue;
       }
 
-      if (p.isOnline() && !plugin.getPermissionChecker().canBuild(p, b)) {
+      if (p.isOnline() && !QuickShop.instance().getPermissionChecker().canBuild(p, b)) {
         Util.debugLog("Failed permission build check, canceled");
         return;
       }
@@ -88,7 +71,7 @@ public class SubCommand_Create implements CommandProcesser {
         blockFace = Util.getYawFace(p.getLocation().getYaw());
       }
 
-      if (!plugin.getShopManager().canBuildShop(p, b, blockFace)) {
+      if (!QuickShop.instance().getShopManager().canBuildShop(p, b, blockFace)) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
@@ -109,19 +92,19 @@ public class SubCommand_Create implements CommandProcesser {
       }
 
       // Send creation menu.
-      plugin.getShopManager().getActions().put(p.getUniqueId(),
+      QuickShop.instance().getShopManager().getActions().put(p.getUniqueId(),
           new Info(b.getLocation(), ShopAction.CREATE, p.getInventory().getItemInMainHand(),
               b.getRelative(p.getFacing().getOppositeFace())));
 
       if (cmdArg.length >= 1) {
-        plugin.getShopManager().handleChat(p, cmdArg[0]);
-
+        QuickShop.instance().getShopManager().handleChat(p, cmdArg[0]);
+        Util.debugLog("Created by handle chat");
         return;
       }
 
       p.sendMessage(
           MsgUtil.getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
-
+      Util.debugLog("Created by wait chat");
       return;
     }
   }

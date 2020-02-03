@@ -206,7 +206,7 @@ public interface DisplayItem {
 
       if (item != null) {
         YamlConfiguration conf =
-            ConfigurationManager.getManager(QuickShop.instance()).get(BaseConfig.class).conf();
+            QuickShop.instance().getConfigurationManager().get(BaseConfig.class).conf();
 
         if (conf != null) {
           DisplayData dataArmourStand = matchData(conf, "shop.display-type-specifics.armor-stand", item, true);

@@ -28,16 +28,17 @@ public class ShopViewer {
   }
   
   public ShopViewer accept(Consumer<Shop> consumer) {
-    consumer.accept(shop);
+    if (!fails)
+      consumer.accept(shop);
     return this;
   }
   
-  public boolean test(Predicate<Shop> predicate) {
-    return predicate.test(shop);
+  public boolean test(Predicate<Shop> predicate, boolean def) {
+    return fails ? def : predicate.test(shop);
   }
   
-  public <R> R apply(Function<Shop, R> function) {
-    return function.apply(shop);
+  public <R> R apply(Function<Shop, R> function, R def) {
+    return fails ? def : function.apply(shop);
   }
   
   public ShopViewer filter(Predicate<Shop> predicate) {

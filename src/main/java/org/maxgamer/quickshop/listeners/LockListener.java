@@ -39,7 +39,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.shop.InventoryPreview;
+import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.utils.MsgUtil;
 import org.maxgamer.quickshop.utils.Util;
@@ -52,7 +52,7 @@ public class LockListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void invEvent(InventoryMoveItemEvent e) {
-    if (!InventoryPreview.isPreviewItem(e.getItem())) {
+    if (!ItemPreviewer.isPreviewItem(e.getItem())) {
       return;
     }
 
@@ -61,13 +61,13 @@ public class LockListener implements Listener {
 
   @EventHandler
   public void invEvent(InventoryClickEvent e) {
-    if (InventoryPreview.isPreviewItem(e.getCursor())) {
+    if (ItemPreviewer.isPreviewItem(e.getCursor())) {
       e.setCancelled(true);
       e.setResult(Event.Result.DENY);
       return;
     }
 
-    if (InventoryPreview.isPreviewItem(e.getCurrentItem())) {
+    if (ItemPreviewer.isPreviewItem(e.getCurrentItem())) {
       e.setCancelled(true);
       e.setResult(Event.Result.DENY);
     }
@@ -75,13 +75,13 @@ public class LockListener implements Listener {
 
   @EventHandler
   public void invEvent(InventoryDragEvent e) {
-    if (InventoryPreview.isPreviewItem(e.getCursor())) {
+    if (ItemPreviewer.isPreviewItem(e.getCursor())) {
       e.setCancelled(true);
       e.setResult(Event.Result.DENY);
       return;
     }
 
-    if (InventoryPreview.isPreviewItem(e.getOldCursor())) {
+    if (ItemPreviewer.isPreviewItem(e.getOldCursor())) {
       e.setCancelled(true);
       e.setResult(Event.Result.DENY);
     }
@@ -97,7 +97,7 @@ public class LockListener implements Listener {
         continue;
       }
 
-      if (InventoryPreview.isPreviewItem(itemStack)) {
+      if (ItemPreviewer.isPreviewItem(itemStack)) {
         e.setCancelled(true);
         return;
       }

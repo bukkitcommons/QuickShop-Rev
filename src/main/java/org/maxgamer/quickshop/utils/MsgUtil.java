@@ -271,8 +271,8 @@ public class MsgUtil {
   }
 
   public static void loadEnchi18n() {
-    loadCustomMinecraftLocale("ench18n", yaml -> {
-      itemi18n = yaml;
+    loadCustomMinecraftLocale("enchi18n", yaml -> {
+      enchi18n = yaml;
         
       Enchantment[] enchsi18n = Enchantment.values();
       for (Enchantment ench : enchsi18n) {
@@ -288,7 +288,7 @@ public class MsgUtil {
   }
   
   public static void loadItemi18n() {
-    loadCustomMinecraftLocale("potioni18n", yaml -> {
+    loadCustomMinecraftLocale("itemi18n", yaml -> {
       itemi18n = yaml;
       
       Material[] itemsi18n = Material.values();
