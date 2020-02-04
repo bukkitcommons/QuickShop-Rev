@@ -70,13 +70,13 @@ import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
+import org.maxgamer.quickshop.utils.ItemMatcher;
 import org.maxgamer.quickshop.utils.PermissionChecker;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
+import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.QuickShopLogger;
-import org.maxgamer.quickshop.utils.nms.Compatibility;
-import org.maxgamer.quickshop.utils.nms.ItemMatcher;
 import org.maxgamer.quickshop.utils.nms.ReflectFactory;
 import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
@@ -108,7 +108,7 @@ public class QuickShop extends JavaPlugin {
   private ChunkListener chunkListener;
   private CommandManager commandManager;
   /** WIP */
-  private Compatibility compatibilityTool = new Compatibility(this);
+  private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
 
   private CustomInventoryListener customInventoryListener;
   /** The database for storing all our data for persistence */
@@ -490,7 +490,7 @@ public class QuickShop extends JavaPlugin {
     }
 
     /* Initalize the Utils */
-    itemMatcher = new ItemMatcher(this);
+    itemMatcher = new ItemMatcher();
     Util.initialize();
     this.isUtilInited = true;
     try {

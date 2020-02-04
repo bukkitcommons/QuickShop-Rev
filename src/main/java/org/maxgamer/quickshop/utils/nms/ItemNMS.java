@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.utils.nms;
 
 import java.lang.reflect.Method;
 import org.bukkit.Bukkit;

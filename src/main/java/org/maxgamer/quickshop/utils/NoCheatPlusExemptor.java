@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils.nms;
+package org.maxgamer.quickshop.utils;
 
 import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 import java.util.ArrayList;
@@ -23,16 +23,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.utils.Util;
 
 /** WIP */
-public class Compatibility {
-  private final ArrayList<RegisteredListener> disabledListeners = new ArrayList<>();
-  // private QuickShop plugin;
-
-  public Compatibility(@NotNull QuickShop plugin) {
-    // this.plugin = plugin;
-  }
+public class NoCheatPlusExemptor {
 
   private void disableListeners(@NotNull Player player) {
     if (Bukkit.getPluginManager().isPluginEnabled("NoCheatPlus")) {
