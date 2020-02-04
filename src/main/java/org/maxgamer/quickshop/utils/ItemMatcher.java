@@ -55,8 +55,14 @@ public class ItemMatcher {
       Util.debugLog("Type not match.");
       return false;
     }
+    
+    if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
+      Util.debugLog("Meta existence not match.");
+      return false;
+    }
 
-    return itemMetaMatcher.matches(requireStack, givenStack);
+    return requireStack.hasItemMeta() ?
+        itemMetaMatcher.matches(requireStack.getItemMeta(), givenStack.getItemMeta()) : true;
   }
 }
 
