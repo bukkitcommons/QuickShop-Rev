@@ -26,6 +26,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class SubCommand_Clean implements CommandProcesser {
@@ -57,7 +58,7 @@ public class SubCommand_Clean implements CommandProcesser {
       final Shop shop = shIt.next();
 
       try {
-        if (shop.getLocation().getWorld() != null && shop.isSelling()
+        if (shop.getLocation().getWorld() != null && shop.is(ShopType.SELLING)
             && shop.getRemainingStock() == 0 && shop instanceof ContainerShop) {
           ContainerShop cs = (ContainerShop) shop;
           if (cs.isDoubleShop()) {

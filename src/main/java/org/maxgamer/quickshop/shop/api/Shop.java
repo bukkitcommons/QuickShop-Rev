@@ -11,6 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 
 public interface Shop extends Managed {
+  default boolean is(@NotNull ShopType shopType) {
+    return getShopType() == shopType;
+  }
+  
   /**
    * Add x ItemStack to the shop inventory
    *

@@ -29,6 +29,7 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopChunk;
+import org.maxgamer.quickshop.shop.api.ShopType;
 
 public class SubCommand_Info implements CommandProcesser {
 
@@ -56,15 +57,15 @@ public class SubCommand_Info implements CommandProcesser {
         chunks++;
         // noinspection unchecked
         for (Shop shop : (ArrayList<Shop>) new ArrayList<>(inChunk.values()).clone()) {
-          if (shop.isBuying()) {
+          if (shop.is(ShopType.BUYING)) {
             buying++;
-          } else if (shop.isSelling()) {
+          } else {
             selling++;
           }
 
           if (shop instanceof ContainerShop && ((ContainerShop) shop).isDoubleShop()) {
             doubles++;
-          } else if (shop.isSelling() && shop.getRemainingStock() == 0) {
+          } else if (shop.is(ShopType.SELLING) && shop.getRemainingStock() == 0) {
             nostock++;
           }
 

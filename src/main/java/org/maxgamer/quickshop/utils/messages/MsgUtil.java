@@ -37,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.JsonFile;
 import org.maxgamer.quickshop.utils.files.LocaleFile;
@@ -481,7 +482,7 @@ public class MsgUtil {
     // Buying/Selling Mode
     if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.buy")
         && sender.hasPermission("quickshop.create.sell")) {
-      if (shop.isSelling()) {
+      if (shop.is(ShopType.SELLING)) {
         String text = MsgUtil.getMessage("controlpanel.mode-selling", sender);
         String hoverText = MsgUtil.getMessage("controlpanel.mode-selling-hover", sender);
         String clickCommand = MsgUtil.getMessage("controlpanel.commands.buy", sender,
@@ -490,7 +491,7 @@ public class MsgUtil {
             String.valueOf(shop.getLocation().getBlockY()),
             String.valueOf(shop.getLocation().getBlockZ()));
         chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
-      } else if (shop.isBuying()) {
+      } else {
         String text = MsgUtil.getMessage("controlpanel.mode-buying", sender);
         String hoverText = MsgUtil.getMessage("controlpanel.mode-buying-hover", sender);
         String clickCommand = MsgUtil.getMessage("controlpanel.commands.sell", sender,
@@ -713,7 +714,7 @@ public class MsgUtil {
       chatSheetPrinter.printLine(
           MsgUtil.getMessage("menu.damage-percent-remaining", p, Util.getToolPercentage(items)));
     }
-    if (shop.isSelling()) {
+    if (shop.is(ShopType.SELLING)) {
       if (shop.getRemainingStock() == -1) {
         chatSheetPrinter.printLine(
             MsgUtil.getMessage("menu.stock", p, "" + MsgUtil.getMessage("signs.unlimited", p)));
@@ -732,7 +733,7 @@ public class MsgUtil {
     }
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.price-per", p,
         Util.getItemStackName(shop.getItem()), Util.format(shop.getPrice())));
-    if (shop.isBuying()) {
+    if (shop.is(ShopType.BUYING)) {
       chatSheetPrinter.printLine(MsgUtil.getMessage("menu.this-shop-is-buying", p));
     } else {
       chatSheetPrinter.printLine(MsgUtil.getMessage("menu.this-shop-is-selling", p));

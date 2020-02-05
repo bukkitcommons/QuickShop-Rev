@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -184,7 +185,7 @@ public class SubCommand_Price implements CommandProcesser {
         return;
       }
 
-      if (cs.isSelling()) {
+      if (cs.is(ShopType.SELLING)) {
         if (cs.getPrice() < nextTo.getPrice()) {
           sender.sendMessage(MsgUtil.getMessage("buying-more-than-selling", sender));
         }
