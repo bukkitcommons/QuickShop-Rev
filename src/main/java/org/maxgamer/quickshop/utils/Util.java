@@ -76,6 +76,7 @@ import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.scheduler.InventoryEditContainer;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
@@ -596,7 +597,7 @@ public class Util {
    */
   public static int getShopsInWorld(@NotNull String worldName) {
     int cost = 0;
-    Iterator<Shop> iterator = plugin.getShopManager().getShopIterator();
+    Iterator<Shop> iterator = ShopManager.instance().getShopIterator();
     while (iterator.hasNext()) {
       Shop shop = iterator.next();
       if (Objects.requireNonNull(shop.getLocation().getWorld()).getName().equals(worldName)) {
@@ -888,12 +889,12 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      ShopViewer firstShop = plugin.getShopManager().getShop(c.getLocation());
+      ShopViewer firstShop = ShopManager.instance().getShop(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Block secondHalf = getSecondHalf(c);
       ShopViewer secondShop =
-          secondHalf == null ? ShopViewer.empty() : plugin.getShopManager().getShop(secondHalf.getLocation());
+          secondHalf == null ? ShopViewer.empty() : ShopManager.instance().getShop(secondHalf.getLocation());
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
         return true;

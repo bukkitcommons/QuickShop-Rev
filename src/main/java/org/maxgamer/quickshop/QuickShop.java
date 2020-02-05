@@ -163,8 +163,6 @@ public class QuickShop extends JavaPlugin {
   private UUID serverUniqueID;
 
   private boolean setupDBonEnableding = false;
-  /** The Shop Manager used to store shops */
-  private ShopManager shopManager;
 
   private ShopProtector shopProtectListener;
   private SyncTaskWatcher syncTaskWatcher;
@@ -385,7 +383,7 @@ public class QuickShop extends JavaPlugin {
     }
     Util.debugLog("Unloading all shops...");
     try {
-      this.getShopManager().getLoadedShops().forEach(Shop::onUnload);
+      ShopManager.instance().getLoadedShops().forEach(Shop::onUnload);
     } catch (Throwable th) {
       // ignore, we didn't care that
     }
@@ -405,9 +403,7 @@ public class QuickShop extends JavaPlugin {
     UpdateWatcher.uninit();
     Util.debugLog("Cleaning up resources and unloading all shops...");
     /* Remove all display items, and any dupes we can find */
-    if (shopManager != null) {
-      shopManager.clear();
-    }
+    ShopManager.instance().clear();
     /* Close Database */
     if (database != null) {
       try {
@@ -525,7 +521,6 @@ public class QuickShop extends JavaPlugin {
             getConfig().getInt("shop.display-check-time"));
       }
     }
-    this.shopManager = new ShopManager();
     this.databaseManager = new Dispatcher(database);
     this.permissionChecker = new PermissionChecker(this);
 
@@ -553,7 +548,7 @@ public class QuickShop extends JavaPlugin {
     blockListener = new BlockListener(this);
     playerListener = new PlayerListener(this);
     worldListener = new ShopLoader();
-    chatListener = new ChatListener(this);
+    chatListener = new ChatListener();
     chunkListener = new ChunkListener(this);
     inventoryListener = new DisplayProtectionListener(this);
     customInventoryListener = new CustomInventoryListener(this);

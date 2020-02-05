@@ -29,6 +29,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
 import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
@@ -83,7 +84,7 @@ public class SubCommand_SuperCreate implements CommandProcesser {
         blockFace = Util.getYawFace(p.getLocation().getYaw());
       }
 
-      if (!plugin.getShopManager().canBuildShop(p, b, blockFace)) {
+      if (!ShopManager.instance().canBuildShop(p, b, blockFace)) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
@@ -104,13 +105,13 @@ public class SubCommand_SuperCreate implements CommandProcesser {
       }
 
       if (cmdArg.length >= 1) {
-        plugin.getShopManager().handleChat(p, cmdArg[0], true);
+        ShopManager.instance().handleChat(p, cmdArg[0], true);
         return;
       }
       // Send creation menu.
       final ShopCreator info = new ShopCreator(b.getLocation(), item, b.getRelative(p.getFacing().getOppositeFace()));
 
-      plugin.getShopManager().getActions().put(p.getUniqueId(), info);
+      ShopManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(
           MsgUtil.getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
       return;

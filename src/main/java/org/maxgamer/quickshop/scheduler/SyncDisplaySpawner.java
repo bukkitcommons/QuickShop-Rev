@@ -4,6 +4,7 @@ import lombok.Data;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 
 @Data
@@ -22,7 +23,7 @@ public class SyncDisplaySpawner {
       new BukkitRunnable() {
         @Override
         public void run() {
-          plugin.getShopManager().getLoadedShops().forEach(Shop::checkDisplay);
+          ShopManager.instance().getLoadedShops().forEach(Shop::checkDisplay);
         }
       }.runTaskTimer(plugin, 1L, plugin.getDisplayItemCheckTicks());
     }

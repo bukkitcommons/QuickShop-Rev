@@ -47,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
@@ -79,7 +80,7 @@ public class PlayerListener implements Listener {
           block = e.getClickedBlock();
         }
         
-        ShopViewer optional = plugin.getShopManager().getShop(block.getLocation());
+        ShopViewer optional = ShopManager.instance().getShop(block.getLocation());
 
         if (optional.isPresent()
             && (optional.get()
@@ -116,7 +117,7 @@ public class PlayerListener implements Listener {
     final Location loc = b.getLocation();
     final ItemStack item = e.getItem();
     // Get the shop
-    ShopViewer shop = plugin.getShopManager().getShop(loc);
+    ShopViewer shop = ShopManager.instance().getShop(loc);
     // If that wasn't a shop, search nearby shops
     if (!shop.isPresent()) {
       final Block attached;
@@ -125,13 +126,13 @@ public class PlayerListener implements Listener {
         attached = Util.getAttached(b);
 
         if (attached != null) {
-          shop = plugin.getShopManager().getShop(attached.getLocation());
+          shop = ShopManager.instance().getShop(attached.getLocation());
         }
       } else if (Util.isDoubleChest(b)) {
         attached = Util.getSecondHalf(b);
 
         if (attached != null) {
-          ShopViewer secondHalfShop = plugin.getShopManager().getShop(attached.getLocation());
+          ShopViewer secondHalfShop = ShopManager.instance().getShop(attached.getLocation());
           if (secondHalfShop.isPresent() && !p.getUniqueId().equals(secondHalfShop.get().getOwner())) {
             // If player not the owner of the shop, make him select the second half of the
             // shop
@@ -198,7 +199,7 @@ public class PlayerListener implements Listener {
         p.sendMessage(MsgUtil.getMessage("how-many-sell", p, "" + items));
       }
       // Add the new action
-      Map<UUID, ShopData> actions = plugin.getShopManager().getActions();
+      Map<UUID, ShopData> actions = ShopManager.instance().getActions();
       ShopSnapshot info = new ShopSnapshot(shop.get());
       actions.put(p.getUniqueId(), info);
     }
@@ -209,7 +210,7 @@ public class PlayerListener implements Listener {
         && p.getGameMode() != GameMode.CREATIVE) {
       if (e.useInteractedBlock() == Result.DENY
           || BaseConfig.sneakToCreat && !p.isSneaking()
-          || !plugin.getShopManager().canBuildShop(p, b, e.getBlockFace())) {
+          || !ShopManager.instance().canBuildShop(p, b, e.getBlockFace())) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
@@ -261,7 +262,7 @@ public class PlayerListener implements Listener {
       // Send creation menu.
       final ShopCreator info = new ShopCreator(b.getLocation(), e.getItem(), last);
 
-      plugin.getShopManager().getActions().put(p.getUniqueId(), info);
+      ShopManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", p,
           Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
     }
@@ -286,7 +287,7 @@ public class PlayerListener implements Listener {
     if (location == null)
       return;
 
-    plugin.getShopManager().getShopIncludeAttached(location).ifPresent(Shop::setSignText);
+    ShopManager.instance().getShopIncludeAttached(location).ifPresent(Shop::setSignText);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -304,7 +305,7 @@ public class PlayerListener implements Listener {
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void onMove(PlayerMoveEvent e) {
 
-    final ShopData info = plugin.getShopManager().getActions().get(e.getPlayer().getUniqueId());
+    final ShopData info = ShopManager.instance().getActions().get(e.getPlayer().getUniqueId());
 
     if (info == null) {
       return;
@@ -322,7 +323,7 @@ public class PlayerListener implements Listener {
         p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", p));
         Util.debugLog(p.getName() + " too far with the shop location.");
       }
-      plugin.getShopManager().getActions().remove(p.getUniqueId());
+      ShopManager.instance().getActions().remove(p.getUniqueId());
     }
   }
 
@@ -330,7 +331,7 @@ public class PlayerListener implements Listener {
   public void onPlayerQuit(PlayerQuitEvent e) {
 
     // Remove them from the menu
-    plugin.getShopManager().getActions().remove(e.getPlayer().getUniqueId());
+    ShopManager.instance().getActions().remove(e.getPlayer().getUniqueId());
   }
 
   @EventHandler(ignoreCancelled = true)
@@ -356,7 +357,7 @@ public class PlayerListener implements Listener {
     final Block attachedBlock = Util.getAttached(block);
 
     if (attachedBlock == null
-        || plugin.getShopManager().getShopIncludeAttached(attachedBlock.getLocation()) == null) {
+        || ShopManager.instance().getShopIncludeAttached(attachedBlock.getLocation()) == null) {
       return;
     }
 

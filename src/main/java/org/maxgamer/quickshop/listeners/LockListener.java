@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -126,7 +127,7 @@ public class LockListener implements Listener {
     final Player p = e.getPlayer();
     // If the chest was a chest
     if (Util.canBeShop(b)) {
-      plugin.getShopManager().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
+      ShopManager.instance().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
         // If they owned it or have bypass perms, they can destroy it
         if (!shop.getOwner().equals(p.getUniqueId())
             && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
@@ -151,7 +152,7 @@ public class LockListener implements Listener {
         return;
       }
 
-      plugin.getShopManager().getShop(b.getLocation()).ifPresent(shop -> {
+      ShopManager.instance().getShop(b.getLocation()).ifPresent(shop -> {
         // If they're the shop owner or have bypass perms, they can destroy
         // it.
         if (!shop.getOwner().equals(p.getUniqueId())
@@ -183,7 +184,7 @@ public class LockListener implements Listener {
     }
 
     // Make sure they're not using the non-shop half of a double chest.
-    plugin.getShopManager().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
+    ShopManager.instance().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
       if (!shop.getModerator().isModerator(p.getUniqueId())) {
         if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.open")) {
           p.sendMessage(MsgUtil.getMessage("bypassing-lock", p));
@@ -199,10 +200,10 @@ public class LockListener implements Listener {
    * 
    * @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true) public void
    * onExplode(EntityExplodeEvent e) { for (int i = 0; i < e.blockList().size(); i++) { Block b =
-   * e.blockList().get(i); Shop shop = plugin.getShopManager().getShop(b.getLocation()); if (shop !=
+   * e.blockList().get(i); Shop shop = ShopManager.instance().getShop(b.getLocation()); if (shop !=
    * null) { e.blockList().remove(b); //Protect shop } if (Util.isWallSign(b.getType())) { Block
    * block = Util.getAttached(b); if (block != null) { shop =
-   * plugin.getShopManager().getShop(block.getLocation()); if (shop != null) {
+   * ShopManager.instance().getShop(block.getLocation()); if (shop != null) {
    * e.blockList().remove(b); //Protect shop } } } } }
    */
 

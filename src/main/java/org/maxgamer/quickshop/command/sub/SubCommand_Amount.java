@@ -23,11 +23,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class SubCommand_Amount implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
 
   @NotNull
   @Override
@@ -55,11 +54,11 @@ public class SubCommand_Amount implements CommandProcesser {
 
     final Player player = (Player) sender;
 
-    if (!plugin.getShopManager().getActions().containsKey(player.getUniqueId())) {
+    if (!ShopManager.instance().getActions().containsKey(player.getUniqueId())) {
       sender.sendMessage(MsgUtil.getMessage("no-pending-action", sender));
       return;
     }
 
-    plugin.getShopManager().handleChat(player, cmdArg[0]);
+    ShopManager.instance().handleChat(player, cmdArg[0]);
   }
 }

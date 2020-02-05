@@ -11,6 +11,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -59,7 +60,7 @@ public class SubCommand_Refill implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = QuickShop.instance().getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = ShopManager.instance().getShop(b.getLocation());
 
       if (!shop.isPresent()) {
         continue;

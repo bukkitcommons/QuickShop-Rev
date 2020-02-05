@@ -27,6 +27,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 
 @AllArgsConstructor
@@ -42,7 +43,7 @@ public class ChunkListener implements Listener {
       return;
     }
 
-    final HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(e.getChunk());
+    final HashMap<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
 
     if (inChunk == null || inChunk.isEmpty()) {
       return;
@@ -61,7 +62,7 @@ public class ChunkListener implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
 
-    final HashMap<Location, Shop> inChunk = plugin.getShopManager().getShops(e.getChunk());
+    final HashMap<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
 
     if (inChunk == null || inChunk.isEmpty()) {
       return;

@@ -38,7 +38,7 @@ public class ShopLoader implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onWorldUnload(WorldUnloadEvent event) {
     for (Chunk chunk : event.getWorld().getLoadedChunks()) {
-      final Map<Location, Shop> inChunk = QuickShop.instance().getShopManager().getShops(chunk);
+      final Map<Location, Shop> inChunk = ShopManager.instance().getShops(chunk);
 
       if (inChunk != null && !inChunk.isEmpty())
         for (Shop shop : inChunk.values())
@@ -119,7 +119,7 @@ public class ShopLoader implements Listener {
           // Load to World
           if (Util.canBeShop(shop.getLocation().getBlock())) {
             loadedShops++;
-            QuickShop.instance().getShopManager().loadShop(data.world(), shop);
+            ShopManager.instance().loadShop(data.world(), shop);
             shop.onLoad();
           } else {
             Util.debugLog("Target block can't be a shop, removing it from the database...");

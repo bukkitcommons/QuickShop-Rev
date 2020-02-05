@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
 import org.maxgamer.quickshop.shop.api.data.ShopData;
@@ -46,7 +47,7 @@ public class BlockListener implements Listener {
       return null;
     }
 
-    return plugin.getShopManager().getShop(b.getLocation());
+    return ShopManager.instance().getShop(b.getLocation());
   }
 
   /*
@@ -71,7 +72,7 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     // If the shop was a chest
     if (Util.canBeShop(b)) {
-      final ShopViewer shop = plugin.getShopManager().getShop(b.getLocation());
+      final ShopViewer shop = ShopManager.instance().getShop(b.getLocation());
       if (shop.get() == null) {
         return;
       }
@@ -101,7 +102,7 @@ public class BlockListener implements Listener {
         return;
       }
       // Cancel their current menu... Doesnt cancel other's menu's.
-      plugin.getShopManager().getActions().remove(p.getUniqueId());
+      ShopManager.instance().getActions().remove(p.getUniqueId());
 
       shop.get().onUnload();
       shop.get().delete();
@@ -154,7 +155,7 @@ public class BlockListener implements Listener {
     }
 
     // Delayed task. Event triggers when item is moved, not when it is received.
-    final ShopViewer shop = plugin.getShopManager().getShopIncludeAttached(location);
+    final ShopViewer shop = ShopManager.instance().getShopIncludeAttached(location);
     if (shop.get() != null) {
       plugin.getSignUpdateWatcher().scheduleSignUpdate(shop.get());
     }
@@ -176,7 +177,7 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     final Block chest = Util.getSecondHalf(b);
 
-    if (chest != null && plugin.getShopManager().getShop(chest.getLocation()) != null
+    if (chest != null && ShopManager.instance().getShop(chest.getLocation()) != null
         && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
       e.setCancelled(true);
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));

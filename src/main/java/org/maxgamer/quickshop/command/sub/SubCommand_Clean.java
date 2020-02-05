@@ -25,13 +25,12 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ContainerShop;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class SubCommand_Clean implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
 
   @NotNull
   @Override
@@ -50,7 +49,7 @@ public class SubCommand_Clean implements CommandProcesser {
 
     sender.sendMessage(MsgUtil.getMessage("command.cleaning", sender));
 
-    final Iterator<Shop> shIt = plugin.getShopManager().getShopIterator();
+    final Iterator<Shop> shIt = ShopManager.instance().getShopIterator();
     final ArrayList<Shop> pendingRemoval = new java.util.ArrayList<>();
     int i = 0;
 

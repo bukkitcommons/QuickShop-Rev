@@ -9,6 +9,7 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -28,7 +29,7 @@ public class SubCommand_SilentPreview extends SneakyTabs implements CommandProce
     }
 
     final ShopViewer shop =
-        QuickShop.instance().getShopManager().getShop(new Location(QuickShop.instance().getServer().getWorld(cmdArg[0]),
+        ShopManager.instance().getShop(new Location(QuickShop.instance().getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!(shop.get() instanceof ContainerShop)) {

@@ -23,6 +23,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -50,7 +51,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
     boolean ignoreUnlimited = BaseConfig.ongoingFeeIgnoreUnlimited;
     int perTaskFlow = 0;
     int parallelTasks = 0;
-    for (Shop shop : plugin.getShopManager().getAllShops()) {
+    for (Shop shop : ShopManager.instance().getAllShops()) {
       if (!shop.isUnlimited() || !ignoreUnlimited) {
         UUID shopOwner = shop.getOwner();
         parallelTasks++;

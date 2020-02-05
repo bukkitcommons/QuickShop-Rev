@@ -18,6 +18,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -35,8 +36,8 @@ public class ShopProtector implements Listener {
       @NotNull Runnable protection,
       @NotNull Consumer<Shop> orElse) {
 
-    QuickShop.instance()
-    .getShopManager()
+    ShopManager
+    .instance()
     .getShopIncludeAttached(location) // FIXME
 
     .ifPresent(shop -> {
@@ -94,9 +95,7 @@ public class ShopProtector implements Listener {
     if (BaseConfig.enhancedShopProtection)
 
       for (BlockState block : event.getBlocks()) {
-        ShopViewer viewer = QuickShop.instance()
-            .getShopManager()
-            .getShopIncludeAttached(block.getLocation());
+        ShopViewer viewer = ShopManager.instance().getShopIncludeAttached(block.getLocation());
 
         if (viewer.isPresent()) {
           event.setCancelled(true);
@@ -109,8 +108,8 @@ public class ShopProtector implements Listener {
   public void onSpongeing(SpongeAbsorbEvent event) {
     if (BaseConfig.enhancedShopProtection)
       for (BlockState block : event.getBlocks())
-        QuickShop.instance()
-        .getShopManager()
+        ShopManager
+        .instance()
         .getShopIncludeAttached(block.getLocation()).ifPresent(() -> event.setCancelled(true));
   }
 }

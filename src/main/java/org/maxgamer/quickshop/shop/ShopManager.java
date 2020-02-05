@@ -53,6 +53,15 @@ import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class ShopManager {
+  private static class LazySingleton {
+    private static final ShopManager INSTANCE = new ShopManager();
+  }
+  
+  private ShopManager() {}
+  
+  public static ShopManager instance() {
+    return LazySingleton.INSTANCE;
+  }
 
   private final HashMap<String, HashMap<ShopChunk, HashMap<Location, Shop>>> shops = Maps.newHashMap();
 
