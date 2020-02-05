@@ -1,10 +1,6 @@
 package org.maxgamer.quickshop.shop.api;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -14,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 
-public interface Shop {
+public interface Shop extends Managed {
   /**
    * Add x ItemStack to the shop inventory
    *
@@ -22,14 +18,6 @@ public interface Shop {
    * @param paramInt How many you want add
    */
   void add(ItemStack paramItemStack, int paramInt);
-
-  /**
-   * Add new staff to the moderators
-   *
-   * @param player New staff
-   * @return Success
-   */
-  boolean addStaff(UUID player);
 
   /**
    * Execute buy action for player with x items.
@@ -42,9 +30,6 @@ public interface Shop {
   /** Check the display location, and teleport, respawn if needs. */
   void checkDisplay();
 
-  /** Empty moderators team. */
-  void clearStaffs();
-
   /**
    * Clone new shop object. Not a deep clone.
    *
@@ -52,14 +37,6 @@ public interface Shop {
    */
   @NotNull
   Shop clone();
-
-  /**
-   * Remove a staff from moderators
-   *
-   * @param player Staff
-   * @return Success
-   */
-  boolean delStaff(UUID player);
 
   /** Delete shop from ram, and database. */
   void delete();
@@ -78,7 +55,7 @@ public interface Shop {
    * @param paramItemStack Target ItemStack.
    * @return Matches
    */
-  boolean matches(ItemStack paramItemStack);
+  boolean isShoppingItem(ItemStack paramItemStack);
 
   /** Execute codes when player click the shop will did things */
   void onClick();
@@ -150,36 +127,6 @@ public interface Shop {
   Location getLocation();
 
   /**
-   * Return this shop's moderators
-   *
-   * @return Shop moderators
-   */
-  @NotNull
-  ShopModerator getModerator();
-
-  /**
-   * Set new shop's moderators
-   *
-   * @param shopModerator New moderators team you want set
-   */
-  void setModerator(ShopModerator shopModerator);
-
-  /**
-   * Get shop's owner UUID
-   *
-   * @return Shop's owner UUID, can use Bukkit.getOfflinePlayer to convert to the OfflinePlayer.
-   */
-  @NotNull
-  UUID getOwner();
-
-  /**
-   * Set new owner to the shop's owner
-   *
-   * @param paramString New owner UUID
-   */
-  void setOwner(UUID paramString);
-
-  /**
    * Get shop's price
    *
    * @return Price
@@ -231,32 +178,11 @@ public interface Shop {
   List<Sign> getSigns();
 
   /**
-   * Directly get all staffs.
-   *
-   * @return staffs
-   */
-  @NotNull Set<UUID> getStaffs();
-
-  /**
-   * Get shop is or not in buying mode
-   *
-   * @return yes or no
-   */
-  boolean isBuying();
-
-  /**
    * Get this container shop is loaded or unloaded.
    *
    * @return Loaded
    */
   boolean isLoaded();
-
-  /**
-   * Get shop is or not in selling mode
-   *
-   * @return yes or no
-   */
-  boolean isSelling();
 
   /**
    * Get shop is or not in Unlimited Mode (Admin Shop)
@@ -286,4 +212,6 @@ public interface Shop {
    */
   @Nullable
   DisplayItem getDisplay();
+  
+  ShopModerator getModerator();
 }

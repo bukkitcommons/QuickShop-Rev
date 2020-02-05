@@ -511,13 +511,10 @@ public class ShopManager {
       return;
     }
 
-    if (shop.isBuying()) {
+    if (shop.getShopType() == ShopType.BUYING) {
       actionBuy(p, message, shop, amount);
-    } else if (shop.isSelling()) {
-      actionSell(p, message, shop, amount);
     } else {
-      p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", p));
-      QuickShop.instance().getLogger().warning("Shop data broken? Loc:" + shop.getLocation());
+      actionSell(p, message, shop, amount);
     }
   }
 

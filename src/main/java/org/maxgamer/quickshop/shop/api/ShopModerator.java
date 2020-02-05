@@ -8,7 +8,6 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 @Getter
 @EqualsAndHashCode
 @AllArgsConstructor
-public class ShopModerator {
+public class ShopModerator implements Managed {
   private static final Gson GSON = new Gson();
   
   private UUID owner;

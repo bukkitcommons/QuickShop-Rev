@@ -5,13 +5,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,7 +20,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -37,6 +37,7 @@ import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
 import org.maxgamer.quickshop.event.ShopPriceChangeEvent.Reason;
 import org.maxgamer.quickshop.event.ShopUnloadEvent;
 import org.maxgamer.quickshop.event.ShopSaveEvent;
+import org.maxgamer.quickshop.shop.api.Managed;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
@@ -49,16 +50,20 @@ import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /** ChestShop core */
+@Getter
+@Setter
 @EqualsAndHashCode
-public class ContainerShop implements Shop {
+public class ContainerShop implements Shop, Managed {
   @NotNull
   private final ItemStack item;
   @NotNull
   private final Location location;
   @Nullable
   private DisplayItem displayItem;
+  
   @EqualsAndHashCode.Exclude
   private boolean isLoaded = false;
+  
   private ShopModerator moderator;
   private double price;
   private ShopType shopType;
@@ -92,7 +97,6 @@ public class ContainerShop implements Shop {
     this.price = price;
     this.moderator = moderator;
     this.item = item;
-    //this.item.setAmount(1); // FIXME after stack
     this.shopType = type;
     this.unlimited = unlimited;
 
@@ -137,7 +141,7 @@ public class ContainerShop implements Shop {
     while (remains > 0) {
       int stackSize = Math.min(remains, item.getMaxStackSize());
       item.setAmount(stackSize);
-      Objects.requireNonNull(inv).addItem(item);
+      inv.addItem(item);
       remains -= stackSize;
     }
     this.setSignText();
@@ -150,10 +154,7 @@ public class ContainerShop implements Shop {
    */
   @Override
   public int getRemainingStock() {
-    if (this.unlimited) {
-      return -1;
-    }
-    return Util.countItems(this.getInventory(), this.getItem());
+    return unlimited ? -1 : Util.countItems(this.getInventory(), this.getItem());
   }
 
   /**
@@ -173,20 +174,8 @@ public class ContainerShop implements Shop {
    * @return True if the ItemStack is the same (Excludes amounts)
    */
   @Override
-  public boolean matches(@Nullable ItemStack item) {
+  public boolean isShoppingItem(@Nullable ItemStack item) {
     return QuickShop.instance().getItemMatcher().matches(this.item, item);
-  }
-
-  /** @return The location of the shops chest */
-  @Override
-  public @NotNull Location getLocation() {
-    return this.location;
-  }
-
-  /** @return The price per item this shop is selling */
-  @Override
-  public double getPrice() {
-    return this.price;
   }
 
   /**
@@ -239,41 +228,6 @@ public class ContainerShop implements Shop {
     return (short) ((Damageable) this.item.getItemMeta()).getDamage();
   }
 
-  /** @return The name of the player who owns the shop. */
-  @Override
-  public @NotNull UUID getOwner() {
-    return this.moderator.getOwner();
-  }
-
-  /**
-   * Changes the owner of this shop to the given player.
-   *
-   * @param owner the new owner
-   */
-  @Override
-  public void setOwner(@NotNull UUID owner) {
-    this.moderator.setOwner(owner);
-    Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-    this.setSignText();
-    save();
-  }
-
-  /** @return Returns a dummy itemstack of the item this shop is selling. */
-  @Override
-  public @NotNull ItemStack getItem() {
-    return item;
-  }
-
-  @Override
-  public boolean addStaff(@NotNull UUID player) {
-    boolean result = this.moderator.addStaff(player);
-    save();
-    if (result) {
-      Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-    }
-    return result;
-  }
-
   /**
    * Buys amount of item from Player p. Does NOT check our inventory, or balances
    *
@@ -293,7 +247,7 @@ public class ContainerShop implements Shop {
         if (stack == null || stack.getType() == Material.AIR) {
           continue; // No item
         }
-        if (matches(stack)) {
+        if (isShoppingItem(stack)) {
           int stackSize = Math.min(amount, stack.getAmount());
           stack.setAmount(stack.getAmount() - stackSize);
           amount -= stackSize;
@@ -314,7 +268,7 @@ public class ContainerShop implements Shop {
       Inventory chestInv = this.getInventory();
       for (int i = 0; amount > 0 && i < playerContents.length; i++) {
         ItemStack item = playerContents[i];
-        if (item != null && this.matches(item)) {
+        if (item != null && this.isShoppingItem(item)) {
           // Copy it, we don't want to interfere
           item = new ItemStack(item);
           // Amount = total, item.getAmount() = how many items in the
@@ -335,16 +289,6 @@ public class ContainerShop implements Shop {
       p.getInventory().setContents(playerContents);
       this.setSignText();
     }
-  }
-
-  @Override
-  public boolean delStaff(@NotNull UUID player) {
-    boolean result = this.moderator.removeStaff(player);
-    save();
-    if (result) {
-      Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-    }
-    return result;
   }
 
   /**
@@ -427,13 +371,6 @@ public class ContainerShop implements Shop {
     // plugin.getDisplayDupeRemoverWatcher().add(this.displayItem);
   }
 
-  @Override
-  public void clearStaffs() {
-    this.moderator.clearStaffs();
-    Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-    save();
-  }
-
   /**
    * Removes an item from the shop.
    *
@@ -456,13 +393,6 @@ public class ContainerShop implements Shop {
     this.setSignText();
   }
 
-  /** @return The list of players who can manage the shop. */
-  @NotNull
-  @Override
-  public Set<UUID> getStaffs() {
-    return this.moderator.getStaffs();
-  }
-
   /**
    * Returns a clone of this shop. References to the same display item, itemstack, location and
    * owner as this shop does. Do not modify them or you will modify this shop.
@@ -471,7 +401,8 @@ public class ContainerShop implements Shop {
    * **NOT A DEEP CLONE**
    */
   @Override
-  public @NotNull ContainerShop clone() {
+  @NotNull
+  public ContainerShop clone() {
     return new ContainerShop(this);
   }
 
@@ -503,7 +434,7 @@ public class ContainerShop implements Shop {
       for (int i = 0; amount > 0 && i < chestContents.length; i++) {
         // Can't clone it here, it could be null
         ItemStack item = chestContents[i];
-        if (item != null && item.getType() != Material.AIR && this.matches(item)) {
+        if (item != null && item.getType() != Material.AIR && this.isShoppingItem(item)) {
           // Copy it, we don't want to interfere
           item = new ItemStack(item);
           // Amount = total, item.getAmount() = how many items in the
@@ -545,21 +476,6 @@ public class ContainerShop implements Shop {
     return (ContainerShop) shop.get();
   }
 
-  /**
-   * Returns the display item associated with this shop.
-   *
-   * @return The display item associated with this shop.
-   */
-  @Nullable
-  public DisplayItem getDisplayItem() {
-    return this.displayItem;
-  }
-
-  /** @return The enchantments the shop has on its items. */
-  public @NotNull Map<Enchantment, Integer> getEnchants() {
-    return Objects.requireNonNull(this.item.getItemMeta()).getEnchants();
-  }
-
   /** @return The chest this shop is based on. */
   public @Nullable Inventory getInventory() {
     try {
@@ -587,11 +503,6 @@ public class ContainerShop implements Shop {
     }
   }
 
-  /** @return The ItemStack type of this shop */
-  public @NotNull Material getMaterial() {
-    return this.item.getType();
-  }
-
   /**
    * Changes all lines of text on a sign near the shop
    *
@@ -612,20 +523,10 @@ public class ContainerShop implements Shop {
   }
 
   @Override
-  public boolean isUnlimited() {
-    return this.unlimited;
-  }
-
-  @Override
   public void setUnlimited(boolean unlimited) {
     this.unlimited = unlimited;
     this.setSignText();
     save();
-  }
-
-  @Override
-  public @NotNull ShopType getShopType() {
-    return this.shopType;
   }
 
   /**
@@ -638,16 +539,6 @@ public class ContainerShop implements Shop {
     this.shopType = shopType;
     this.setSignText();
     save();
-  }
-
-  @Override
-  public boolean isBuying() {
-    return this.shopType == ShopType.BUYING;
-  }
-
-  @Override
-  public boolean isSelling() {
-    return this.shopType == ShopType.SELLING;
   }
 
   /** Updates signs attached to the shop */
@@ -667,7 +558,7 @@ public class ContainerShop implements Shop {
         player,
         ownerName());
     
-    String section = isSelling() ? "selling" : "buying";
+    String section = shopType.name().toLowerCase();
     lines[1] = MsgUtil.getMessagePlaceholder(
         "signs.".concat(section),
         player,
@@ -753,21 +644,6 @@ public class ContainerShop implements Shop {
       }
       signs.add(sign);
     }
-    // if (currentLine.contains(signHeader) || currentLine.isEmpty()) {
-    // signs.add(sign);
-    // } else {
-    // boolean text = false;
-    // for (String s : sign.getLines()) {
-    // if (!s.isEmpty()) {
-    // text = true;
-    // break;
-    // }
-    // }
-    // if (!text) {
-    // signs.add(sign);
-    // }
-    // }
-    // }
     return signs;
   }
 
@@ -788,7 +664,7 @@ public class ContainerShop implements Shop {
     if (nextTo == null) {
       return false;
     }
-    if (nextTo.matches(this.getItem())) {
+    if (nextTo.isShoppingItem(this.getItem())) {
       // They're both trading the same item
       // They're both buying or both selling => Not a double shop,
       // just two shops.
@@ -848,7 +724,7 @@ public class ContainerShop implements Shop {
              .getLoadedShops().add(this);
     
     // check price restriction // FIXME move
-    Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.getMaterial());
+    Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.item.getType());
 
     if (priceRestriction != null) {
       double min = priceRestriction.getKey();
@@ -903,21 +779,69 @@ public class ContainerShop implements Shop {
     }
     return name;
   }
-
+  
+  
+  /*
+   * Shop Moderator
+   */
+  @NotNull
   @Override
-  public @NotNull ShopModerator getModerator() {
-    return this.moderator;
+  public Set<UUID> getStaffs() {
+    return this.moderator.getStaffs();
+  }
+  
+  @Override
+  public boolean isModerator(@NotNull UUID player) {
+    return moderator.isModerator(player);
   }
 
   @Override
-  public void setModerator(ShopModerator shopModerator) {
-    this.moderator = shopModerator;
+  public boolean isOwner(@NotNull UUID player) {
+    return moderator.isOwner(player);
+  }
+
+  @Override
+  public boolean isStaff(@NotNull UUID player) {
+    return moderator.isStaff(player);
+  }
+
+  @Override
+  public boolean removeStaff(@NotNull UUID player) {
+    boolean result = this.moderator.removeStaff(player);
     save();
-    Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
+    if (result) {
+      Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
+    }
+    return result;
+  }
+  
+  @Override
+  public @NotNull UUID getOwner() {
+    return this.moderator.getOwner();
   }
 
   @Override
-  public boolean isLoaded() {
-    return this.isLoaded;
+  public void setOwner(@NotNull UUID owner) {
+    this.moderator.setOwner(owner);
+    Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
+    this.setSignText();
+    save();
+  }
+
+  @Override
+  public boolean addStaff(@NotNull UUID player) {
+    boolean result = this.moderator.addStaff(player);
+    save();
+    if (result) {
+      Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
+    }
+    return result;
+  }
+  
+  @Override
+  public void clearStaffs() {
+    this.moderator.clearStaffs();
+    Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
+    save();
   }
 }

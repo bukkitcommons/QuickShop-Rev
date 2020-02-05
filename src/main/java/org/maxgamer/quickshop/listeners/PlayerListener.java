@@ -48,6 +48,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
 import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
 import org.maxgamer.quickshop.shop.api.data.ShopData;
@@ -160,7 +161,7 @@ public class PlayerListener implements Listener {
       final double price = shop.get().getPrice();
       final double money = plugin.getEconomy().getBalance(p.getUniqueId());
 
-      if (shop.get().isSelling()) {
+      if (shop.get().getShopType() == ShopType.SELLING) {
         int itemAmount = Math.min(Util.countSpace(p.getInventory(), shop.get().getItem()),
             (int) Math.floor(money / price));
 
