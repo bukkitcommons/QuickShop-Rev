@@ -1,67 +1,38 @@
-/*
- * This file is a part of project QuickShop, the name is ShopModerator.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.shop;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-/** Contains shop's moderators infomations, owner, staffs etc. */
+/**
+ * Contains shop's moderators infomations, owner, staffs etc.
+ */
+@Getter
 @EqualsAndHashCode
+@AllArgsConstructor
 public class ShopModerator {
-  @NonNull
+  private static final Gson GSON = new Gson();
+  
   private UUID owner;
-  @NonNull
-  private ArrayList<UUID> staffs;
-
-  /**
-   * Shop moderators, inlucding owner, and empty staffs.
-   *
-   * @param owner The owner
-   */
-  public ShopModerator(@NotNull UUID owner) {
-    this.owner = owner;
-    this.staffs = new ArrayList<>();
-  }
-
-  /**
-   * Shop moderators, inlucding owner, staffs.
-   *
-   * @param owner The owner
-   * @param staffs The staffs
-   */
-  public ShopModerator(@NotNull UUID owner, @NotNull ArrayList<UUID> staffs) {
-    this.owner = owner;
-    this.staffs = staffs;
-  }
+  private final Set<UUID> staffs = Sets.newHashSet();
 
   public static ShopModerator deserialize(@NotNull String serilized) throws JsonSyntaxException {
-    // Use Gson deserialize data
-    Gson gson = new Gson();
-    return gson.fromJson(serilized, ShopModerator.class);
+    return GSON.fromJson(serilized, ShopModerator.class);
+  }
+  
+  public void setOwner(@NotNull UUID uuid) {
+    owner = uuid;
   }
 
-  public static String serialize(@NotNull ShopModerator shopModerator) {
-    Gson gson = new Gson();
-    return gson.toJson(shopModerator); // Use Gson serialize this class
+  public String serialize() {
+    return GSON.toJson(this);
   }
 
   /**
@@ -71,27 +42,28 @@ public class ShopModerator {
    * @return Success
    */
   public boolean addStaff(@NotNull UUID player) {
-    if (staffs.contains(player)) {
-      return false;
-    }
-    staffs.add(player);
-    return true;
+    return staffs.add(player);
   }
 
-  /** Remove all staffs */
+  /**
+   * Remove all staffs
+   */
   public void clearStaffs() {
     staffs.clear();
   }
 
   @Override
-  @SuppressWarnings("MethodDoesntCallSuperMethod")
-  public @NotNull ShopModerator clone() {
-    return new ShopModerator(this.owner, this.staffs);
+  @NotNull
+  public ShopModerator clone() {
+    ShopModerator copy = new ShopModerator(owner);
+    copy.staffs.addAll(staffs);
+    return copy;
   }
 
   @Override
-  public @NotNull String toString() {
-    return serialize(this);
+  @NotNull
+  public String toString() {
+    return serialize();
   }
 
   /**
@@ -100,7 +72,7 @@ public class ShopModerator {
    * @param player Staff
    * @return Success
    */
-  public boolean delStaff(@NotNull UUID player) {
+  public boolean removeStaff(@NotNull UUID player) {
     return staffs.remove(player);
   }
 
@@ -111,10 +83,7 @@ public class ShopModerator {
    * @return yes or no, return true when it is staff or owner
    */
   public boolean isModerator(@NotNull UUID player) {
-    if (isOwner(player)) {
-      return true;
-    }
-    return isStaff(player);
+    return isOwner(player) || isStaff(player);
   }
 
   /**
@@ -135,41 +104,5 @@ public class ShopModerator {
    */
   public boolean isStaff(@NotNull UUID player) {
     return staffs.contains(player);
-  }
-
-  /**
-   * Get moderators owner (Shop Owner).
-   *
-   * @return Owner's UUID
-   */
-  public @NotNull UUID getOwner() {
-    return owner;
-  }
-
-  /**
-   * Set moderators owner (Shop Owner)
-   *
-   * @param player Owner's UUID
-   */
-  public void setOwner(@NotNull UUID player) {
-    this.owner = player;
-  }
-
-  /**
-   * Get staffs list
-   *
-   * @return Staffs
-   */
-  public @NotNull ArrayList<UUID> getStaffs() {
-    return staffs;
-  }
-
-  /**
-   * Set moderators staffs
-   *
-   * @param players staffs list
-   */
-  public void setStaffs(@NotNull ArrayList<UUID> players) {
-    this.staffs = players;
   }
 }

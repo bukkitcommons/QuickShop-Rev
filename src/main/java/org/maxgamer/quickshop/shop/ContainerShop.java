@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 import lombok.EqualsAndHashCode;
@@ -211,7 +212,7 @@ public class ContainerShop implements Shop {
       QuickShop.instance()
                .getDatabaseHelper()
                .updateShop(
-                  ShopModerator.serialize(moderator),
+                  moderator.serialize(),
                   item,
                   unlimited ? 1 : 0,
                   shopType.toID(),
@@ -335,7 +336,7 @@ public class ContainerShop implements Shop {
 
   @Override
   public boolean delStaff(@NotNull UUID player) {
-    boolean result = this.moderator.delStaff(player);
+    boolean result = this.moderator.removeStaff(player);
     save();
     if (result) {
       Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
@@ -455,7 +456,7 @@ public class ContainerShop implements Shop {
   /** @return The list of players who can manage the shop. */
   @NotNull
   @Override
-  public ArrayList<UUID> getStaffs() {
+  public Set<UUID> getStaffs() {
     return this.moderator.getStaffs();
   }
 

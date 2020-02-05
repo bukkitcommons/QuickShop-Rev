@@ -641,7 +641,7 @@ public class ShopManager {
     Location loc = shop.getLocation();
     try {
       // Write it to the database
-      QuickShop.instance().getDatabaseHelper().createShop(ShopModerator.serialize(shop.getModerator()),
+      QuickShop.instance().getDatabaseHelper().createShop(shop.getModerator().serialize(),
           shop.getPrice(), shop.getItem(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID(),
           Objects.requireNonNull(loc.getWorld()).getName(), loc.getBlockX(), loc.getBlockY(),
           loc.getBlockZ());
