@@ -40,6 +40,10 @@ import org.maxgamer.quickshop.event.ShopCreateEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.event.ShopPurchaseEvent;
 import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
+import org.maxgamer.quickshop.shop.data.ShopAction;
+import org.maxgamer.quickshop.shop.data.ShopCreator;
+import org.maxgamer.quickshop.shop.data.ShopData;
+import org.maxgamer.quickshop.shop.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -165,7 +169,7 @@ public class ShopManager {
 
   private void actionCreate(
       @NotNull Player p,
-      @NotNull ShopCreationData info,
+      @NotNull ShopCreator info,
       @NotNull String message,
       boolean bypassProtectionChecks) {
 
@@ -624,7 +628,7 @@ public class ShopManager {
    * @param shop The shop object
    * @param info The info object
    */
-  public void createShop(@NotNull Shop shop, @NotNull ShopCreationData info) {
+  public void createShop(@NotNull Shop shop, @NotNull ShopCreator info) {
     Player player = Bukkit.getPlayer(shop.getOwner());
     if (player == null) {
       throw new IllegalStateException("The owner creating the shop is offline or not exist");
@@ -887,7 +891,7 @@ public class ShopManager {
       }
       
       if (info.action() == ShopAction.CREATE) {
-        actionCreate(p, (ShopCreationData) info, message, bypassProtectionChecks);
+        actionCreate(p, (ShopCreator) info, message, bypassProtectionChecks);
       }
       if (info.action() == ShopAction.TRADE) {
         actionTrade(p, (ShopSnapshot) info, message);

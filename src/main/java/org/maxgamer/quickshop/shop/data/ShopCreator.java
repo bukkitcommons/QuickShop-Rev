@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.data;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -10,12 +10,12 @@ import org.jetbrains.annotations.Nullable;
 
 @Data
 @Accessors(fluent = true)
-public class ShopCreationData implements ShopData {
+public class ShopCreator implements ShopData {
   private final Block sign;
   private final Location location;
   private final ItemStack item;
 
-  public ShopCreationData(
+  public ShopCreator(
       @NotNull Location loc,
       @Nullable ItemStack item,
       @Nullable Block last) {

@@ -1,10 +1,13 @@
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.data;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.ShopModerator;
+import org.maxgamer.quickshop.shop.ShopType;
 import org.maxgamer.quickshop.utils.ItemMatcher;
 
 @Data

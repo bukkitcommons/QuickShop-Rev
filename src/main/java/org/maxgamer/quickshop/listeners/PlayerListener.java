@@ -47,11 +47,11 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
-import org.maxgamer.quickshop.shop.ShopSnapshot;
 import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.ShopAction;
-import org.maxgamer.quickshop.shop.ShopCreationData;
-import org.maxgamer.quickshop.shop.ShopData;
+import org.maxgamer.quickshop.shop.data.ShopAction;
+import org.maxgamer.quickshop.shop.data.ShopCreator;
+import org.maxgamer.quickshop.shop.data.ShopData;
+import org.maxgamer.quickshop.shop.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -258,7 +258,7 @@ public class PlayerListener implements Listener {
         last = n;
       }
       // Send creation menu.
-      final ShopCreationData info = new ShopCreationData(b.getLocation(), e.getItem(), last);
+      final ShopCreator info = new ShopCreator(b.getLocation(), e.getItem(), last);
 
       plugin.getShopManager().getActions().put(p.getUniqueId(), info);
       p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", p,

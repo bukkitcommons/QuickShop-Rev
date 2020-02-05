@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.data;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
