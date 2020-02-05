@@ -47,6 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
+import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
@@ -75,12 +76,12 @@ public class PlayerListener implements Listener {
         final Block block;
 
         if (Util.isWallSign(e.getClickedBlock().getType())) {
-          block = Util.getAttached(e.getClickedBlock());
+          block = Util.getSignAttached(e.getClickedBlock());
         } else {
           block = e.getClickedBlock();
         }
         
-        ShopViewer optional = ShopManager.instance().getShop(block.getLocation());
+        ShopViewer optional = ShopManager.instance().getShopAt(block.getLocation());
 
         if (optional.isPresent()
             && (optional.get()
@@ -117,22 +118,22 @@ public class PlayerListener implements Listener {
     final Location loc = b.getLocation();
     final ItemStack item = e.getItem();
     // Get the shop
-    ShopViewer shop = ShopManager.instance().getShop(loc);
+    ShopViewer shop = ShopManager.instance().getShopAt(loc);
     // If that wasn't a shop, search nearby shops
     if (!shop.isPresent()) {
       final Block attached;
 
       if (Util.isWallSign(b.getType())) {
-        attached = Util.getAttached(b);
+        attached = Util.getSignAttached(b);
 
         if (attached != null) {
-          shop = ShopManager.instance().getShop(attached.getLocation());
+          shop = ShopManager.instance().getShopAt(attached.getLocation());
         }
       } else if (Util.isDoubleChest(b)) {
         attached = Util.getSecondHalf(b);
 
         if (attached != null) {
-          ShopViewer secondHalfShop = ShopManager.instance().getShop(attached.getLocation());
+          ShopViewer secondHalfShop = ShopManager.instance().getShopAt(attached.getLocation());
           if (secondHalfShop.isPresent() && !p.getUniqueId().equals(secondHalfShop.get().getOwner())) {
             // If player not the owner of the shop, make him select the second half of the
             // shop
@@ -199,12 +200,12 @@ public class PlayerListener implements Listener {
         p.sendMessage(MsgUtil.getMessage("how-many-sell", p, "" + items));
       }
       // Add the new action
-      Map<UUID, ShopData> actions = ShopManager.instance().getActions();
+      Map<UUID, ShopData> actions = ShopActionManager.instance().getActions();
       ShopSnapshot info = new ShopSnapshot(shop.get());
       actions.put(p.getUniqueId(), info);
     }
     // Handles creating shops
-    else if (e.useInteractedBlock() == Result.ALLOW && shop == null && item != null
+    else if (e.useInteractedBlock() == Result.ALLOW && shop.isPresent() && item != null
         && item.getType() != Material.AIR
         && QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.sell")
         && p.getGameMode() != GameMode.CREATIVE) {
@@ -262,7 +263,7 @@ public class PlayerListener implements Listener {
       // Send creation menu.
       final ShopCreator info = new ShopCreator(b.getLocation(), e.getItem(), last);
 
-      ShopManager.instance().getActions().put(p.getUniqueId(), info);
+      ShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", p,
           Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
     }
@@ -287,7 +288,7 @@ public class PlayerListener implements Listener {
     if (location == null)
       return;
 
-    ShopManager.instance().getShopIncludeAttached(location).ifPresent(Shop::setSignText);
+    ShopManager.instance().getShopFrom(location).ifPresent(Shop::setSignText);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -305,7 +306,7 @@ public class PlayerListener implements Listener {
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void onMove(PlayerMoveEvent e) {
 
-    final ShopData info = ShopManager.instance().getActions().get(e.getPlayer().getUniqueId());
+    final ShopData info = ShopActionManager.instance().getActions().get(e.getPlayer().getUniqueId());
 
     if (info == null) {
       return;
@@ -323,7 +324,7 @@ public class PlayerListener implements Listener {
         p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", p));
         Util.debugLog(p.getName() + " too far with the shop location.");
       }
-      ShopManager.instance().getActions().remove(p.getUniqueId());
+      ShopActionManager.instance().getActions().remove(p.getUniqueId());
     }
   }
 
@@ -331,7 +332,7 @@ public class PlayerListener implements Listener {
   public void onPlayerQuit(PlayerQuitEvent e) {
 
     // Remove them from the menu
-    ShopManager.instance().getActions().remove(e.getPlayer().getUniqueId());
+    ShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
   }
 
   @EventHandler(ignoreCancelled = true)
@@ -354,10 +355,10 @@ public class PlayerListener implements Listener {
       return;
     }
 
-    final Block attachedBlock = Util.getAttached(block);
+    final Block attachedBlock = Util.getSignAttached(block);
 
     if (attachedBlock == null
-        || ShopManager.instance().getShopIncludeAttached(attachedBlock.getLocation()) == null) {
+        || ShopManager.instance().getShopFrom(attachedBlock.getLocation()) == null) {
       return;
     }
 

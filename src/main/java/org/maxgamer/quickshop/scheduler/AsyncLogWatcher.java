@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is LogWatcher.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.scheduler;
 
 import java.io.File;
@@ -28,17 +12,16 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
 
-public class LogWatcher extends BukkitRunnable {
+public class AsyncLogWatcher implements Runnable {
   private Queue<String> logs = new ConcurrentLinkedQueue<>();
   private FileWriter logFileWriter = null;
   private PrintWriter pw;
 
-  public LogWatcher(QuickShop plugin, File log) {
+  public AsyncLogWatcher(QuickShop plugin, File log) {
     try {
       if (!log.exists()) {
         log.createNewFile();

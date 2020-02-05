@@ -15,6 +15,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
@@ -94,11 +95,11 @@ public class SubCommand_Create implements CommandProcesser {
       }
 
       // Send creation menu.
-      ShopManager.instance().getActions().put(p.getUniqueId(),
+      ShopActionManager.instance().setAction(p.getUniqueId(),
           new ShopCreator(b.getLocation(), item, b.getRelative(p.getFacing().getOppositeFace())));
 
       if (cmdArg.length >= 1) {
-        ShopManager.instance().handleChat(p, cmdArg[0]);
+        ShopActionManager.instance().handleChat(p, cmdArg[0]);
         Util.debugLog("Created by handle chat");
         return;
       }

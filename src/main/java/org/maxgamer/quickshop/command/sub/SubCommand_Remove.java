@@ -32,7 +32,7 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
       .ifEmpty(notLookingAtShop)
       
       .forEach(block -> {
-        ShopViewer shop = ShopManager.instance().getShop(block);
+        ShopViewer shop = ShopManager.instance().getShopAt(block);
         
         if (shop.isPresent()) {
           if (shop.get().getModerator().isModerator(((Player) sender).getUniqueId())

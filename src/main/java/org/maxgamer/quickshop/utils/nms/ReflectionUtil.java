@@ -23,8 +23,7 @@ import java.lang.reflect.Modifier;
 import org.jetbrains.annotations.Nullable;
 
 public class ReflectionUtil {
-
-  public static Class getClass(String name) {
+  public static Class<?> getClass(String name) {
     try {
       return Class.forName(name);
     } catch (Throwable ignored) {

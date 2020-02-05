@@ -36,7 +36,7 @@ public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
 
           return ShopManager
               .instance()
-              .getShop(block)
+              .getShopAt(block)
               
               .nonNull()
               .filter(shop -> shop.getModerator()

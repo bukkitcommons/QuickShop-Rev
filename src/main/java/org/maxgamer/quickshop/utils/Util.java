@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -67,15 +66,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.material.MaterialData;
+import org.bukkit.material.Sign;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
-import org.maxgamer.quickshop.scheduler.InventoryEditContainer;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
@@ -410,15 +408,13 @@ public class Util {
   /**
    * Fetches the block which the given sign is attached to
    *
-   * @param b The block which is attached
+   * @param block The block which is attached
    * @return The block the sign is attached to
    */
   @Nullable
-  public static Block getAttached(@NotNull Block b) {
-    if (b.getBlockData() instanceof Directional) {
-      Directional directional = (Directional) b.getBlockData();
-      return b.getRelative(directional.getFacing().getOppositeFace());
-
+  public static Block getSignAttached(@NotNull Block block) {
+    if (block.getType().name().endsWith("WALL_SIGN")) {
+      return block.getRelative(((Sign) block.getState().getData()).getFacing().getOppositeFace());
     } else {
       return null;
     }
@@ -747,33 +743,27 @@ public class Util {
       Util.debugLog("Skipped plugin gui inventory check.");
       return;
     }
-    new BukkitRunnable() {
-      @Override
-      public void run() {
-        try {
-          for (int i = 0; i < inv.getSize(); i++) {
-            ItemStack itemStack = inv.getItem(i);
-            if (itemStack == null) {
-              continue;
-            }
-            if (DisplayItem.isDisplayItem(itemStack, null)) {
-              // Found Item and remove it.
-              Location location = inv.getLocation();
-              if (location == null) {
-                return; // Virtual GUI
-              }
-              plugin.getSyncTaskWatcher().getInventoryEditQueue()
-                  .offer(new InventoryEditContainer(inv, i, new ItemStack(Material.AIR)));
-              Util.debugLog("Found a displayitem in an inventory, Scheduling to removal...");
-              MsgUtil.sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
-                  + location + ", Item is " + itemStack.getType().name());
-            }
+    try {
+      for (int i = 0; i < inv.getSize(); i++) {
+        ItemStack itemStack = inv.getItem(i);
+        if (itemStack == null) {
+          continue;
+        }
+        if (DisplayItem.isDisplayItem(itemStack, null)) {
+          // Found Item and remove it.
+          Location location = inv.getLocation();
+          if (location == null) {
+            return; // Virtual GUI
           }
-        } catch (Throwable t) {
-          // Ignore
+          inv.setItem(i, new ItemStack(Material.AIR));
+          Util.debugLog("Found a displayitem in an inventory, Scheduling to removal...");
+          MsgUtil.sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
+              + location + ", Item is " + itemStack.getType().name());
         }
       }
-    }.runTaskAsynchronously(plugin);
+    } catch (Throwable t) {
+      // Ignore
+    }
   }
 
   public static boolean isAir(@NotNull Material mat) {
@@ -890,12 +880,12 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      ShopViewer firstShop = ShopManager.instance().getShop(c.getLocation());
+      ShopViewer firstShop = ShopManager.instance().getShopAt(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Block secondHalf = getSecondHalf(c);
       ShopViewer secondShop =
-          secondHalf == null ? ShopViewer.empty() : ShopManager.instance().getShop(secondHalf.getLocation());
+          secondHalf == null ? ShopViewer.empty() : ShopManager.instance().getShopAt(secondHalf.getLocation());
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
         return true;

@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
@@ -41,13 +42,13 @@ public class BlockListener implements Listener {
    * @return The shop
    */
   private ShopViewer getShopNextTo(@NotNull Location loc) {
-    final Block b = Util.getAttached(loc.getBlock());
+    final Block b = Util.getSignAttached(loc.getBlock());
     // Util.getAttached(b)
     if (b == null) {
       return null;
     }
 
-    return ShopManager.instance().getShop(b.getLocation());
+    return ShopManager.instance().getShopAt(b.getLocation());
   }
 
   /*
@@ -72,7 +73,7 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     // If the shop was a chest
     if (Util.canBeShop(b)) {
-      final ShopViewer shop = ShopManager.instance().getShop(b.getLocation());
+      final ShopViewer shop = ShopManager.instance().getShopAt(b.getLocation());
       if (shop.get() == null) {
         return;
       }
@@ -102,7 +103,7 @@ public class BlockListener implements Listener {
         return;
       }
       // Cancel their current menu... Doesnt cancel other's menu's.
-      ShopManager.instance().getActions().remove(p.getUniqueId());
+      ShopActionManager.instance().getActions().remove(p.getUniqueId());
 
       shop.get().onUnload();
       shop.get().delete();
@@ -155,7 +156,7 @@ public class BlockListener implements Listener {
     }
 
     // Delayed task. Event triggers when item is moved, not when it is received.
-    final ShopViewer shop = ShopManager.instance().getShopIncludeAttached(location);
+    final ShopViewer shop = ShopManager.instance().getShopFrom(location);
     if (shop.get() != null) {
       plugin.getSignUpdateWatcher().scheduleSignUpdate(shop.get());
     }
@@ -177,7 +178,7 @@ public class BlockListener implements Listener {
     final Player p = e.getPlayer();
     final Block chest = Util.getSecondHalf(b);
 
-    if (chest != null && ShopManager.instance().getShop(chest.getLocation()) != null
+    if (chest != null && ShopManager.instance().getShopAt(chest.getLocation()) != null
         && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
       e.setCancelled(true);
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));

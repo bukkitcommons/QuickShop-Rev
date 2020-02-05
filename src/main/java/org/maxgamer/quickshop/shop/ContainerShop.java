@@ -473,7 +473,7 @@ public class ContainerShop implements Shop, Managed {
     if (c == null) {
       return null;
     }
-    ShopViewer shop = ShopManager.instance().getShop(c.getLocation());
+    ShopViewer shop = ShopManager.instance().getShopAt(c.getLocation());
     return (ContainerShop) shop.get();
   }
 
@@ -650,7 +650,7 @@ public class ContainerShop implements Shop, Managed {
 
   @Override
   public boolean isAttached(@NotNull Block b) {
-    return this.getLocation().getBlock().equals(Util.getAttached(b));
+    return this.getLocation().getBlock().equals(Util.getSignAttached(b));
   }
 
   /**

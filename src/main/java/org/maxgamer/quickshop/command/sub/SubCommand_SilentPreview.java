@@ -29,7 +29,7 @@ public class SubCommand_SilentPreview extends SneakyTabs implements CommandProce
     }
 
     final ShopViewer shop =
-        ShopManager.instance().getShop(new Location(QuickShop.instance().getServer().getWorld(cmdArg[0]),
+        ShopManager.instance().getShopAt(new Location(QuickShop.instance().getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!(shop.get() instanceof ContainerShop)) {

@@ -132,7 +132,7 @@ public class SubCommand_Price implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = ShopManager.instance().getShop(b.getLocation());
+      final ShopViewer shop = ShopManager.instance().getShopAt(b.getLocation());
 
       if (shop.isEmpty() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
           && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.price"))) {

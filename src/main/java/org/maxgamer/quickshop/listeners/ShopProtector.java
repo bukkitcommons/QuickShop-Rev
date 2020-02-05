@@ -38,7 +38,7 @@ public class ShopProtector implements Listener {
 
     ShopManager
     .instance()
-    .getShopIncludeAttached(location) // FIXME
+    .getShopFrom(location) // FIXME
 
     .ifPresent(shop -> {
       if (predicate)
@@ -95,7 +95,7 @@ public class ShopProtector implements Listener {
     if (BaseConfig.enhancedShopProtection)
 
       for (BlockState block : event.getBlocks()) {
-        ShopViewer viewer = ShopManager.instance().getShopIncludeAttached(block.getLocation());
+        ShopViewer viewer = ShopManager.instance().getShopFrom(block.getLocation());
 
         if (viewer.isPresent()) {
           event.setCancelled(true);
@@ -110,6 +110,6 @@ public class ShopProtector implements Listener {
       for (BlockState block : event.getBlocks())
         ShopManager
         .instance()
-        .getShopIncludeAttached(block.getLocation()).ifPresent(() -> event.setCancelled(true));
+        .getShopFrom(block.getLocation()).ifPresent(() -> event.setCancelled(true));
   }
 }

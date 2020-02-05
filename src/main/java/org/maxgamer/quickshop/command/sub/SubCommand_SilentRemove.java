@@ -53,7 +53,7 @@ public class SubCommand_SilentRemove implements CommandProcesser {
 
     final Player p = (Player) sender;
     final ShopViewer shop =
-        ShopManager.instance().getShop(new Location(plugin.getServer().getWorld(cmdArg[0]),
+        ShopManager.instance().getShopAt(new Location(plugin.getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent()) {

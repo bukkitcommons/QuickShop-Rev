@@ -242,7 +242,4 @@ public class BaseConfig {
   
   @Node(value = "shop.blacklist-lores")
   public static List<String> blacklistLores = Lists.newArrayList();
-  
-  @Node(value = "shop.use-fast-shop-search-algorithm")
-  public static boolean useFastShopSearchAlgorithm = false;
 }

@@ -54,6 +54,9 @@ import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class ShopManager {
+  /*
+   * Singleton
+   */
   private static class LazySingleton {
     private static final ShopManager INSTANCE = new ShopManager();
   }
@@ -64,469 +67,11 @@ public class ShopManager {
     return LazySingleton.INSTANCE;
   }
 
+  /*
+   * Shop containers
+   */
   private final Map<String, Map<ShopChunk, Map<Location, Shop>>> shops = Maps.newHashMap();
-
   private final Set<Shop> loadedShops = QuickShop.instance().isEnabledAsyncDisplayDespawn() ? Sets.newConcurrentHashSet() : Sets.newHashSet();
-
-  private Map<UUID, ShopData> actionData = Maps.newHashMap();
-
-  private boolean actionBuy(
-      @NotNull Player p,
-      @NotNull String message,
-      @NotNull Shop shop,
-      int amount) {
-
-    // No enough shop space
-    int space = shop.getRemainingSpace();
-    if (space != -1 && space < amount) {
-      p.sendMessage(
-          MsgUtil.getMessage("shop-has-no-space", p, "" + space,
-              Util.getItemStackName(shop.getItem())));
-      return false;
-    }
-
-    // Not enough items
-    int count = Util.countItems(p.getInventory(), shop.getItem());
-    if (amount > count) {
-      p.sendMessage(MsgUtil.getMessage("you-dont-have-that-many-items", p, "" + count,
-          Util.getItemStackName(shop.getItem())));
-      return false;
-    }
-
-    // Event
-    ShopPurchaseEvent e = new ShopPurchaseEvent(shop, p, amount);
-    if (e.isCancelled())
-      return false;
-
-    amount = e.getAmount();
-    // FIXME event modify
-    
-    return actionBuy0(p, message, shop, amount);
-  }
-
-  private boolean actionBuy0(
-      @NotNull Player p,
-      @NotNull String message,
-      @NotNull Shop shop,
-      int amount) {
-
-    // Tax handling
-    double tax = BaseConfig.taxRate;
-    if (tax < 0)
-      tax = 0; // Tax was disabled.
-
-    double totalPrice = amount * shop.getPrice();
-    if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.tax")) {
-      tax = 0;
-      Util.debugLog("Disable the Tax for player " + p.getName()
-      + " cause they have permission quickshop.tax");
-    }
-    if (shop.getModerator().isModerator(p.getUniqueId())) {
-      tax = 0; // Is staff or owner, so we won't will take them tax
-    }
-
-    // Paying - withdraw owner
-    boolean shouldPayOwner =
-        !shop.isUnlimited() ||
-        QuickShop.instance().getConfig().getBoolean("shop.pay-unlimited-shop-owners");
-    if (shouldPayOwner) {
-      boolean withdrawOwner = QuickShop.instance().getEconomy().withdraw(shop.getOwner(), totalPrice); // Withdraw owner's money
-      if (!withdrawOwner) {
-        p.sendMessage(MsgUtil.getMessage("the-owner-cant-afford-to-buy-from-you", p,
-            Objects.requireNonNull(format(totalPrice)),
-            Objects.requireNonNull(format(QuickShop.instance().getEconomy().getBalance(shop.getOwner())))));
-        return false;
-      }
-    }
-
-    // Paying - giving seller
-    double moneyAfterTax = totalPrice * (1 - tax);
-    boolean depositSeller = QuickShop.instance().getEconomy().deposit(p.getUniqueId(), moneyAfterTax); // Deposit player's money
-    if (!depositSeller) {
-      ShopLogger.instance().warning(
-          "Failed to deposit the money " + moneyAfterTax + " to player " + p.getName());
-      /* Rollback the trade */
-      if (shouldPayOwner) {
-        if (!QuickShop.instance().getEconomy().deposit(shop.getOwner(), totalPrice)) {
-          ShopLogger.instance().warning("Failed to rollback the purchase actions for player "
-              + Bukkit.getOfflinePlayer(shop.getOwner()).getName());
-        }
-      }
-      p.sendMessage(MsgUtil.getMessage("purchase-failed", p));
-      return false;
-    }
-
-    // Purchase successfully
-    if (tax != 0 && !BaseConfig.taxAccount.isEmpty())
-      QuickShop.instance().getEconomy().deposit(Bukkit.getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), totalPrice * tax);
-
-    // Notify the owner of the purchase.
-    String msg = MsgUtil.getMessage("player-sold-to-your-store", p, p.getName(),
-        String.valueOf(amount), "##########" + Util.serialize(shop.getItem()) + "##########");
-
-    int space = shop.getRemainingSpace();
-    if (space == amount) {
-      msg += "\n" + MsgUtil.getMessage("shop-out-of-space", p, "" + shop.getLocation().getBlockX(),
-          "" + shop.getLocation().getBlockY(), "" + shop.getLocation().getBlockZ());
-    }
-
-    MsgUtil.send(shop.getOwner(), msg, shop.isUnlimited());
-    shop.buy(p, amount);
-    MsgUtil.sendSellSuccess(p, shop, amount);
-
-    ShopSuccessPurchaseEvent se = new ShopSuccessPurchaseEvent(shop, p, amount, totalPrice, tax);
-    Bukkit.getPluginManager().callEvent(se);
-
-    shop.setSignText(); // Update the signs count\
-    return true;
-  }
-
-  private void actionCreate(
-      @NotNull Player p,
-      @NotNull ShopCreator info,
-      @NotNull String message,
-      boolean bypassProtectionChecks) {
-
-    Util.debugLog("actionCreate");
-    if (!bypassProtectionChecks) {
-      Util.debugLog("Calling for protection check...");
-
-      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(false, p);
-      if (!QuickShop.instance().getPermissionChecker().canBuild(p, info.location())) {
-        p.sendMessage(MsgUtil.getMessage("no-permission", p)
-            + ": Some 3rd party plugin denied the permission checks, did you have permission built in there?");
-        Util.debugLog("Failed to create shop: Protection check failed:");
-        for (RegisteredListener belisteners : BlockBreakEvent.getHandlerList()
-            .getRegisteredListeners()) {
-          Util.debugLog(belisteners.getPlugin().getName());
-        }
-        return;
-      }
-      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
-    }
-
-    if (getShop(info.location()).isPresent()) {
-      p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
-      return;
-    }
-
-    if (Util.getSecondHalf(info.location().getBlock()) != null
-        && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
-      p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
-      return;
-    }
-    if (!Util.canBeShop(info.location().getBlock())) {
-      p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
-      return;
-    }
-    if (info.location().getBlock().getType() == Material.ENDER_CHEST) {
-      if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.enderchest")) {
-        return;
-      }
-    }
-
-    // allow-shop-without-space-for-sign check
-    if (QuickShop.instance().getConfig().getBoolean("shop.auto-sign")
-        && !QuickShop.instance().getConfig().getBoolean("allow-shop-without-space-for-sign")) {
-
-      if (info.sign() == null) {
-        p.sendMessage(MsgUtil.getMessage("failed-to-put-sign", p));
-        return;
-      }
-
-      Material signType = info.sign().getType();
-      if (!Util.isAir(signType) && signType != Material.WATER) {
-        p.sendMessage(MsgUtil.getMessage("failed-to-put-sign", p));
-        return;
-      }
-    }
-
-    // Price per item
-    double price;
-    double minPrice = QuickShop.instance().getConfig().getDouble("shop.minimum-price");
-
-    try {
-      if (QuickShop.instance().getConfig().getBoolean("whole-number-prices-only")) {
-        try {
-          price = Integer.parseInt(message);
-        } catch (NumberFormatException ex2) {
-          // input is number, but not Integer
-          Util.debugLog(ex2.getMessage());
-          p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));
-          return;
-        }
-      } else {
-        price = Double.parseDouble(message);
-        String strFormat =
-            new DecimalFormat("#.#########").format(Math.abs(price)).replace(",", ".");
-        String[] processedDouble = strFormat.split(".");
-        if (processedDouble.length > 1) {
-          int maximumDigitsLimit = QuickShop.instance().getConfig().getInt("maximum-digits-in-price", -1);
-          if (processedDouble[1].length() > maximumDigitsLimit && maximumDigitsLimit != -1) {
-            p.sendMessage(MsgUtil.getMessage("digits-reach-the-limit", p,
-                String.valueOf(maximumDigitsLimit)));
-            return;
-          }
-        }
-      }
-
-    } catch (NumberFormatException ex) {
-      // No number input
-      Util.debugLog(ex.getMessage());
-      p.sendMessage(MsgUtil.getMessage("not-a-number", p, message));
-      return;
-    }
-
-    boolean decFormat = QuickShop.instance().getConfig().getBoolean("use-decimal-format");
-    if (QuickShop.instance().getConfig().getBoolean("shop.allow-free-shop")) {
-      if (price != 0 && price < minPrice) {
-        p.sendMessage(MsgUtil.getMessage("price-too-cheap", p,
-            (decFormat) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
-        return;
-      }
-    } else {
-      if (price < minPrice) {
-        p.sendMessage(MsgUtil.getMessage("price-too-cheap", p,
-            (decFormat) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
-        return;
-      }
-    }
-
-    double price_limit = QuickShop.instance().getConfig().getInt("shop.maximum-price");
-    if (price_limit != -1) {
-      if (price > price_limit) {
-        p.sendMessage(MsgUtil.getMessage("price-too-high", p,
-            (decFormat) ? MsgUtil.decimalFormat(price_limit) : "" + price_limit));
-        return;
-      }
-    }
-
-    // Check price restriction
-    Entry<Double, Double> priceRestriction = Util.getPriceRestriction(info.item().getType());
-    if (priceRestriction != null) {
-      if (price < priceRestriction.getKey() || price > priceRestriction.getValue()) {
-        // p.sendMessage(ChatColor.RED+"Restricted prices for
-        // "+info.getItem().getType()+": min "+priceRestriction.getKey()+", max
-        // "+priceRestriction.getValue());
-        p.sendMessage(MsgUtil.getMessage("restricted-prices", p,
-            Util.getItemStackName(info.item()), String.valueOf(priceRestriction.getKey()),
-            String.valueOf(priceRestriction.getValue())));
-      }
-    }
-
-    double createCost = QuickShop.instance().getConfig().getDouble("shop.cost");
-    // Create the sample shop.
-    ContainerShop shop = new ContainerShop(info.location(), price, info.item(),
-        new ShopModerator(p.getUniqueId()), false, ShopType.SELLING);
-
-    // This must be called after the event has been called.
-    // Else, if the event is cancelled, they won't get their
-    // money back.
-    if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.bypasscreatefee")) {
-      createCost = 0;
-    }
-
-    if (createCost > 0) {
-      if (!QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), createCost)) {
-        p.sendMessage(MsgUtil.getMessage("you-cant-afford-a-new-shop", p,
-            Objects.requireNonNull(format(createCost))));
-        return;
-      }
-      try {
-        String taxAccount = QuickShop.instance().getConfig().getString("tax-account");
-        if (taxAccount != null) {
-          QuickShop.instance().getEconomy().deposit(Bukkit.getOfflinePlayer(taxAccount).getUniqueId(),
-              createCost);
-        }
-      } catch (Exception e2) {
-        e2.printStackTrace();
-        ShopLogger.instance().log(Level.WARNING,
-            "QuickShop can't pay tax to account in config.yml, Please set tax account name to a existing player!");
-      }
-    }
-
-    shop.onLoad();
-    ShopCreateEvent e = new ShopCreateEvent(shop, p);
-    if (Util.fireCancellableEvent(e)) {
-      shop.onUnload();
-      return;
-    }
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location())) {
-      shop.onUnload();
-      Util.debugLog("Cancelled by integrations");
-      return;
-    }
-
-    /* The shop has hereforth been successfully created */
-    createShop(shop, info);
-    if (!QuickShop.instance().getConfig().getBoolean("shop.lock")) {
-      // Warn them if they haven't been warned since
-      // reboot
-      if (!QuickShop.instance().getWarnings().contains(p.getName())) {
-        p.sendMessage(MsgUtil.getMessage("shops-arent-locked", p));
-        QuickShop.instance().getWarnings().add(p.getName());
-      }
-    }
-    // Figures out which way we should put the sign on and
-    // sets its text.
-
-    if (shop.isDoubleShop()) {
-      Shop nextTo = shop.getAttachedShop();
-      if (Objects.requireNonNull(nextTo).getPrice() > shop.getPrice()) {
-        // The one next to it must always be a
-        // buying shop.
-        p.sendMessage(MsgUtil.getMessage("buying-more-than-selling", p));
-      }
-    }
-  }
-
-  private void actionSell(
-      @NotNull Player p,
-      @NotNull String message,
-      @NotNull Shop shop, int amount) {
-
-    int stock = shop.getRemainingStock();
-    if (stock == -1) {
-      stock = 10000;
-    }
-    if (stock < amount) {
-      p.sendMessage(MsgUtil.getMessage("shop-stock-too-low", p, "" + stock,
-          Util.getItemStackName(shop.getItem())));
-      return;
-    }
-    if (amount < 1) {
-      // & Dumber
-      p.sendMessage(MsgUtil.getMessage("negative-amount", p));
-      return;
-    }
-    int pSpace = Util.countSpace(p.getInventory(), shop.getItem());
-    if (amount > pSpace) {
-      p.sendMessage(MsgUtil.getMessage("not-enough-space", p, String.valueOf(pSpace)));
-      return;
-    }
-    ShopPurchaseEvent e = new ShopPurchaseEvent(shop, p, amount);
-    if (Util.fireCancellableEvent(e)) {
-      return; // Cancelled
-    }
-    // Money handling
-    double tax = QuickShop.instance().getConfig().getDouble("tax");
-    double total = amount * shop.getPrice();
-    if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.tax")) {
-      tax = 0;
-      Util.debugLog("Disable the Tax for player " + p.getName()
-      + " cause they have permission quickshop.tax");
-    }
-    if (tax < 0) {
-      tax = 0; // Tax was disabled.
-    }
-    if (shop.getModerator().isModerator(p.getUniqueId())) {
-      tax = 0; // Is staff or owner, so we won't will take them tax
-    }
-
-    boolean successA = QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), total); // Withdraw owner's money
-    if (!successA) {
-      p.sendMessage(
-          MsgUtil.getMessage("you-cant-afford-to-buy", p, Objects.requireNonNull(format(total)),
-              Objects.requireNonNull(format(QuickShop.instance().getEconomy().getBalance(p.getUniqueId())))));
-      return;
-    }
-    boolean shouldPayOwner = !shop.isUnlimited()
-        || (QuickShop.instance().getConfig().getBoolean("shop.pay-unlimited-shop-owners") && shop.isUnlimited());
-    if (shouldPayOwner) {
-      double depositMoney = total * (1 - tax);
-      boolean successB = QuickShop.instance().getEconomy().deposit(shop.getOwner(), depositMoney);
-      if (!successB) {
-        ShopLogger.instance().warning(
-            "Failed to deposit the money for player " + Bukkit.getOfflinePlayer(shop.getOwner()));
-        /* Rollback the trade */
-        if (!QuickShop.instance().getEconomy().deposit(p.getUniqueId(), depositMoney)) {
-          ShopLogger.instance().warning("Failed to rollback the purchase actions for player "
-              + Bukkit.getOfflinePlayer(shop.getOwner()).getName());
-        }
-        p.sendMessage(MsgUtil.getMessage("purchase-failed", p));
-        return;
-      }
-    }
-
-    String msg;
-    // Notify the shop owner
-    if (QuickShop.instance().getConfig().getBoolean("show-tax")) {
-      msg = MsgUtil.getMessage("player-bought-from-your-store-tax", p, p.getName(), "" + amount,
-          "##########" + Util.serialize(shop.getItem()) + "##########", Util.format((tax * total)));
-    } else {
-      msg = MsgUtil.getMessage("player-bought-from-your-store", p, p.getName(), "" + amount,
-          "##########" + Util.serialize(shop.getItem()) + "##########");
-    }
-    // Transfers the item from A to B
-    if (stock == amount) {
-      msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", p, "" + shop.getLocation().getBlockX(),
-          "" + shop.getLocation().getBlockY(), "" + shop.getLocation().getBlockZ(),
-          Util.getItemStackName(shop.getItem()));
-    }
-
-    MsgUtil.send(shop.getOwner(), msg, shop.isUnlimited());
-    shop.sell(p, amount);
-    MsgUtil.sendPurchaseSuccess(p, shop, amount);
-    ShopSuccessPurchaseEvent se = new ShopSuccessPurchaseEvent(shop, p, amount, total, tax);
-    Bukkit.getPluginManager().callEvent(se);
-  }
-
-  private void actionTrade(
-      @NotNull Player p,
-      @NotNull ShopSnapshot info,
-      @NotNull String message) {
-
-    if (QuickShop.instance().getEconomy() == null) {
-      p.sendMessage("Error: Economy system not loaded, type /qs main command to get details.");
-      return;
-    }
-
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanTrade(p, info.location())) {
-      Util.debugLog("Cancel by integrations.");
-      return;
-    }
-
-    // Shop gone
-    // Get the shop they interacted with
-    ShopViewer shopOp = getShop(info.location());
-    // It's not valid anymore
-    if (!shopOp.isPresent() || !Util.canBeShop(info.location().getBlock())) {
-      p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
-      return;
-    }
-
-    // Shop changed
-    Shop shop = shopOp.get();
-    if (info.hasChanged(shop)) {
-      p.sendMessage(MsgUtil.getMessage("shop-has-changed", p));
-      return;
-    }
-
-    int amount;
-    try {
-      amount = Integer.parseInt(message);
-
-      // Negative amount
-      if (amount < 1) {
-        p.sendMessage(MsgUtil.getMessage("negative-amount", p));
-        return;
-      }
-    } catch (NumberFormatException e) {
-      if (message.equalsIgnoreCase(
-          QuickShop.instance().getConfig().getString("shop.word-for-trade-all-items", "all")))
-        amount = -1;
-
-      p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));
-      Util.debugLog("Receive the chat " + message + " and it format failed: " + e.getMessage());
-      return;
-    }
-
-    if (shop.getShopType() == ShopType.BUYING) {
-      actionBuy(p, message, shop, amount);
-    } else {
-      actionSell(p, message, shop, amount);
-    }
-  }
 
   /**
    * Adds a shop to the world. Does NOT require the chunk or world to be loaded Call shop.onLoad by
@@ -628,7 +173,7 @@ public class ShopManager {
         }
       }
     }
-    this.actionData.clear();
+    ShopActionManager.instance().getActions().clear(); // FIXME
     this.shops.clear();
   }
 
@@ -712,18 +257,15 @@ public class ShopManager {
     }
   }
 
-  /**
-   * Format the price use economy system
-   *
-   * @param d price
-   * @return formated price
-   */
-  public @Nullable String format(double d) {
-    return QuickShop.instance().getEconomy().format(d);
-  }
-
-  public ShopViewer getShop(@NotNull Block block) {
-    return getShop(block);
+  public ShopViewer getShopAt(@NotNull Block block) {
+    switch (block.getType()) {
+      case CHEST:
+      case TRAPPED_CHEST:
+      case ENDER_CHEST:
+        return getShopAt(block.getLocation());
+      default:
+        return ShopViewer.empty();
+    }
   }
 
   /**
@@ -732,32 +274,19 @@ public class ShopManager {
    * @param loc The location to get the shop from
    * @return The shop at that location
    */
-  public ShopViewer getShop(@NotNull Location loc) {
+  public ShopViewer getShopAt(@NotNull Location loc) {
     @Nullable Map<Location, Shop> inChunk = getShops(loc.getChunk());
-    if (inChunk == null) {
+    if (inChunk == null)
       return ShopViewer.empty();
-    }
-    loc = loc.clone();
-    // Fix double chest XYZ issue
-    loc.setX(loc.getBlockX());
-    loc.setY(loc.getBlockY());
-    loc.setZ(loc.getBlockZ());
-    // We can do this because WorldListener updates the world reference so
-    // the world in loc is the same as world in inChunk.get(loc)
-    return ShopViewer.of(inChunk.get(loc));
+    
+    return ShopViewer.of(inChunk.get(new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
   }
 
   public void accept(@NotNull Location loc, @NotNull Consumer<Shop> consumer) {
     @Nullable Map<Location, Shop> inChunk = getShops(loc.getChunk());
+    
     if (inChunk != null) {
-      loc = loc.clone();
-      // Fix double chest XYZ issue
-      loc.setX(loc.getBlockX());
-      loc.setY(loc.getBlockY());
-      loc.setZ(loc.getBlockZ());
-      // We can do this because WorldListener updates the world reference so
-      // the world in loc is the same as world in inChunk.get(loc)
-      Shop shop = inChunk.get(loc);
+      Shop shop = inChunk.get(new Location(loc.getWorld(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
       if (shop != null)
         consumer.accept(shop);
     }
@@ -769,85 +298,47 @@ public class ShopManager {
    * @param loc The location to get the shop from
    * @return The shop at that location
    */
-  public ShopViewer getShopIncludeAttached(@Nullable Location loc) {
-    if (loc == null) {
-      Util.debugLog("Location is null.");
-      return null;
-    }
-
-    if (BaseConfig.useFastShopSearchAlgorithm) {
-      return getShopIncludeAttached_Fast(loc);
-    } else {
-      return getShopIncludeAttached_Classic(loc);
-    }
+  public ShopViewer getShopFrom(@Nullable Location loc) {
+    return loc == null ? ShopViewer.empty() : getShopFrom0(loc);
   }
 
-  @Nullable
-  public ShopViewer getShopIncludeAttached_Classic(@NotNull Location loc) {
-    @Nullable Shop shop;
-    // Get location's chunk all shops
-    @Nullable Map<Location, Shop> inChunk = getShops(loc.getChunk());
-    // Found some shops in this chunk.
-    if (inChunk != null) {
-      shop = inChunk.get(loc);
-      if (shop != null) {
-        // Okay, shop was founded.
-        return ShopViewer.of(shop);
-      }
-      // Ooops, not founded that shop in this chunk.
-    }
-    @Nullable
-    Block secondHalfShop = Util.getSecondHalf(loc.getBlock());
-    if (secondHalfShop != null) {
-      inChunk = getShops(secondHalfShop.getChunk());
-      if (inChunk != null) {
-        shop = inChunk.get(secondHalfShop.getLocation());
-        if (shop != null) {
-          // Okay, shop was founded.
-          return ShopViewer.of(shop);
+  private ShopViewer getShopFrom0(@NotNull Location loc) {
+    boolean secondHalf = false;
+    Block block = loc.getBlock();
+    
+    switch (block.getType()) {
+      case CHEST:
+      case TRAPPED_CHEST:
+        ShopViewer shopViewer = getShopAt(loc);
+        if (shopViewer.isPresent())
+          return shopViewer;
+        else
+          secondHalf = true;
+        
+      case ENDER_CHEST:
+        ShopViewer viewerAt = getShopAt(loc);
+        if (viewerAt.isPresent())
+          return viewerAt;
+        
+      default:
+        Block attached = Util.getSignAttached(block);
+        if (attached != null) {
+          ShopViewer viewer = getShopAt(attached);
+          if (viewer.isPresent())
+            return viewer;
         }
-        // Oooops, no any shops matched.
-      }
-    }
-    // If that chunk nothing we founded, we should check it is attached.
-    @Nullable
-    Block attachedBlock = Util.getAttached(loc.getBlock());
-    // Check is attached on some block.
-    if (attachedBlock == null) {
-      // Nope
-      Util.debugLog("No attached block.");
-      return ShopViewer.empty();
-    } else {
-      // Okay we know it on some blocks.
-      // We need set new location and chunk.
-      inChunk = getShops(attachedBlock.getChunk());
-      // Found some shops in this chunk
-      if (inChunk != null) {
-        shop = inChunk.get(attachedBlock.getLocation());
-        if (shop != null) {
-          // Okay, shop was founded.
-          return ShopViewer.empty();
+        
+        if (secondHalf) {
+          Block half = Util.getSecondHalf(block);
+          if (half != null) {
+            ShopViewer viewerHalf = getShopAt(half);
+            if (viewerHalf.isPresent())
+              return viewerHalf;
+          }
         }
-        // Oooops, no any shops matched.
-      }
     }
-
-    Util.debugLog("Not found shops use the attached util.");
-
+    
     return ShopViewer.empty();
-  }
-
-  private ShopViewer getShopIncludeAttached_Fast(@NotNull Location loc) {
-    ShopViewer shop = getShop(loc);
-    if (shop.isPresent()) {
-      return shop;
-    }
-    @Nullable Block attachedBlock = Util.getSecondHalf(loc.getBlock());
-    if (attachedBlock != null) {
-      return getShop(attachedBlock.getLocation());
-    } else {
-      return ShopViewer.empty();
-    }
   }
 
   /**
@@ -883,32 +374,6 @@ public class ShopManager {
     return inWorld.get(shopChunk);
   }
 
-  public void handleChat(@NotNull Player p, @NotNull String msg) {
-    handleChat(p, msg, false);
-  }
-
-  public void handleChat(@NotNull Player p, @NotNull String msg, boolean bypassProtectionChecks) {
-    final String message = ChatColor.stripColor(msg);
-    // Use from the main thread, because Bukkit hates life
-    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-      // They wanted to do something.
-      ShopData info = actionData.remove(p.getUniqueId());
-      
-      if (info.location().getWorld() != p.getLocation().getWorld()
-          || info.location().distanceSquared(p.getLocation()) > 25) {
-        p.sendMessage(MsgUtil.getMessage("not-looking-at-shop", p));
-        return;
-      }
-      
-      if (info.action() == ShopAction.CREATE) {
-        actionCreate(p, (ShopCreator) info, message, bypassProtectionChecks);
-      }
-      if (info.action() == ShopAction.TRADE) {
-        actionTrade(p, (ShopSnapshot) info, message);
-      }
-    });
-  }
-
   /**
    * Loads the given shop into storage. This method is used for loading data from the database. Do
    * not use this method to create a shop.
@@ -940,11 +405,6 @@ public class ShopManager {
     }
     inChunk.remove(loc);
     // shop.onUnload();
-  }
-
-  /** @return Returns the HashMap. Info contains what their last question etc was. */
-  public Map<UUID, ShopData> getActions() {
-    return this.actionData;
   }
 
   /**

@@ -127,7 +127,7 @@ public class LockListener implements Listener {
     final Player p = e.getPlayer();
     // If the chest was a chest
     if (Util.canBeShop(b)) {
-      ShopManager.instance().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
+      ShopManager.instance().getShopFrom(b.getLocation()).ifPresent(shop -> {
         // If they owned it or have bypass perms, they can destroy it
         if (!shop.getOwner().equals(p.getUniqueId())
             && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
@@ -146,13 +146,13 @@ public class LockListener implements Listener {
           return;
         }
       }
-      b = Util.getAttached(b);
+      b = Util.getSignAttached(b);
 
       if (b == null) {
         return;
       }
 
-      ShopManager.instance().getShop(b.getLocation()).ifPresent(shop -> {
+      ShopManager.instance().getShopAt(b.getLocation()).ifPresent(shop -> {
         // If they're the shop owner or have bypass perms, they can destroy
         // it.
         if (!shop.getOwner().equals(p.getUniqueId())
@@ -184,7 +184,7 @@ public class LockListener implements Listener {
     }
 
     // Make sure they're not using the non-shop half of a double chest.
-    ShopManager.instance().getShopIncludeAttached(b.getLocation()).ifPresent(shop -> {
+    ShopManager.instance().getShopFrom(b.getLocation()).ifPresent(shop -> {
       if (!shop.getModerator().isModerator(p.getUniqueId())) {
         if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.open")) {
           p.sendMessage(MsgUtil.getMessage("bypassing-lock", p));

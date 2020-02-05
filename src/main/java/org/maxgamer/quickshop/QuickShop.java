@@ -61,10 +61,9 @@ import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.scheduler.AsyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.SyncDisplaySpawner;
-import org.maxgamer.quickshop.scheduler.LogWatcher;
+import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
-import org.maxgamer.quickshop.scheduler.SyncTaskWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
@@ -138,7 +137,7 @@ public class QuickShop extends JavaPlugin {
   private LockListener lockListener;
   // private BukkitTask itemWatcherTask;
   @Nullable
-  private LogWatcher logWatcher;
+  private AsyncLogWatcher logWatcher;
   /** bStats, good helper for metrics. */
   private Metrics metrics;
 
@@ -165,7 +164,6 @@ public class QuickShop extends JavaPlugin {
   private boolean setupDBonEnableding = false;
 
   private ShopProtector shopProtectListener;
-  private SyncTaskWatcher syncTaskWatcher;
   // private ShopVaildWatcher shopVaildWatcher;
   private AsyncDisplayDespawner displayAutoDespawnWatcher;
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
@@ -338,7 +336,7 @@ public class QuickShop extends JavaPlugin {
     this.priceChangeRequiresFee = BaseConfig.priceModFee > 0;
     this.displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
     if (BaseConfig.logActions) {
-      logWatcher = new LogWatcher(this, new File(getDataFolder(), "qs.log"));
+      logWatcher = new AsyncLogWatcher(this, new File(getDataFolder(), "qs.log"));
     } else {
       logWatcher = null;
     }
@@ -550,12 +548,11 @@ public class QuickShop extends JavaPlugin {
     worldListener = new ShopLoader();
     chatListener = new ChatListener();
     chunkListener = new ChunkListener(this);
-    inventoryListener = new DisplayProtectionListener(this);
+    inventoryListener = new DisplayProtectionListener();
     customInventoryListener = new CustomInventoryListener(this);
     displayBugFixListener = new DisplayBugFixListener(this);
     shopProtectListener = new ShopProtector();
     displayWatcher = new SyncDisplaySpawner(this);
-    syncTaskWatcher = new SyncTaskWatcher(this);
     // shopVaildWatcher = new ShopVaildWatcher(this);
     ongoingFeeWatcher = new OngoingFeeWatcher(this);
     lockListener = new LockListener(this);
@@ -599,7 +596,7 @@ public class QuickShop extends JavaPlugin {
     // shopVaildWatcher.runTaskTimer(this, 0, 20 * 60); // Nobody use it
     signUpdateWatcher.runTaskTimer(this, 0, 10);
     if (logWatcher != null) {
-      logWatcher.runTaskTimerAsynchronously(this, 10, 10);
+      Bukkit.getScheduler().runTaskTimerAsynchronously(this, logWatcher, 0, 10);
       getLogger().info("Log actions is enabled, actions will log in the qs.log file!");
     }
     if (getConfig().getBoolean("shop.ongoing-fee.enable")) {
