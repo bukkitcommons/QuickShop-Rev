@@ -17,6 +17,7 @@
 package org.maxgamer.quickshop.listeners;
 
 import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -26,9 +27,11 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
+import com.google.common.collect.Maps;
 
 @AllArgsConstructor
 public class ChunkListener implements Listener {
@@ -43,7 +46,7 @@ public class ChunkListener implements Listener {
       return;
     }
 
-    final HashMap<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
+    final @Nullable Map<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
 
     if (inChunk == null || inChunk.isEmpty()) {
       return;
@@ -53,7 +56,7 @@ public class ChunkListener implements Listener {
       @Override
       public void run() {
         // noinspection unchecked
-        ((HashMap<Location, Shop>) inChunk.clone()).values().forEach(Shop::onLoad);
+        inChunk.values().forEach(Shop::onLoad);
         // Delay 1 tick, hope can fix the magic bug in 1.14 spigot build.
       }
     }.runTaskLater(plugin, 1);
@@ -62,7 +65,7 @@ public class ChunkListener implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
 
-    final HashMap<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
+    final @Nullable Map<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
 
     if (inChunk == null || inChunk.isEmpty()) {
       return;
@@ -72,7 +75,7 @@ public class ChunkListener implements Listener {
       @Override
       public void run() {
         // noinspection unchecked
-        ((HashMap<Location, Shop>) inChunk.clone()).values().forEach(Shop::onUnload);
+        inChunk.values().forEach(Shop::onUnload);
       }
     }.runTaskLater(plugin, 1); // Delay 1 tick, hope can fix the magic bug in 1.14 spigot build.
   }

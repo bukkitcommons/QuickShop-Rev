@@ -34,8 +34,6 @@ import org.maxgamer.quickshop.shop.api.ShopType;
 
 public class SubCommand_Info implements CommandProcesser {
 
-  private final QuickShop plugin = QuickShop.instance;
-
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
@@ -50,7 +48,7 @@ public class SubCommand_Info implements CommandProcesser {
     buying = selling = doubles = chunks = worlds = doubleschests = 0;
     int nostock = 0;
 
-    for (Map<ShopChunk, HashMap<Location, Shop>> inWorld : ShopManager.instance().getShops()
+    for (Map<ShopChunk, Map<Location, Shop>> inWorld : ShopManager.instance().getShops()
         .values()) {
       worlds++;
 
@@ -78,7 +76,7 @@ public class SubCommand_Info implements CommandProcesser {
     }
 
     sender.sendMessage(ChatColor.RED + "QuickShop Statistics...");
-    sender.sendMessage(ChatColor.GREEN + "Server UniqueID: " + plugin.getServerUniqueID());
+    sender.sendMessage(ChatColor.GREEN + "Server UniqueID: " + QuickShop.instance().getServerUniqueID());
     sender.sendMessage(ChatColor.GREEN + "" + (buying + selling) + " shops in " + chunks
         + " chunks spread over " + worlds + " worlds.");
     sender.sendMessage(ChatColor.GREEN + "" + doubles + " double shops. (" + doubleschests
