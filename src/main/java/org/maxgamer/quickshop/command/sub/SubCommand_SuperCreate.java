@@ -29,8 +29,9 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.shop.Info;
+import org.maxgamer.quickshop.shop.ShopSnapshot;
 import org.maxgamer.quickshop.shop.ShopAction;
+import org.maxgamer.quickshop.shop.ShopCreationData;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
@@ -107,8 +108,7 @@ public class SubCommand_SuperCreate implements CommandProcesser {
         return;
       }
       // Send creation menu.
-      final Info info = new Info(b.getLocation(), ShopAction.CREATE,
-          p.getInventory().getItemInMainHand(), b.getRelative(p.getFacing().getOppositeFace()));
+      final ShopCreationData info = new ShopCreationData(b.getLocation(), item, b.getRelative(p.getFacing().getOppositeFace()));
 
       plugin.getShopManager().getActions().put(p.getUniqueId(), info);
       p.sendMessage(

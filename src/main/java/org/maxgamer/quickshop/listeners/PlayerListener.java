@@ -17,6 +17,7 @@
 package org.maxgamer.quickshop.listeners;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,9 +47,11 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.Economy;
-import org.maxgamer.quickshop.shop.Info;
+import org.maxgamer.quickshop.shop.ShopSnapshot;
 import org.maxgamer.quickshop.shop.Shop;
 import org.maxgamer.quickshop.shop.ShopAction;
+import org.maxgamer.quickshop.shop.ShopCreationData;
+import org.maxgamer.quickshop.shop.ShopData;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -194,8 +197,8 @@ public class PlayerListener implements Listener {
         p.sendMessage(MsgUtil.getMessage("how-many-sell", p, "" + items));
       }
       // Add the new action
-      HashMap<UUID, Info> actions = plugin.getShopManager().getActions();
-      Info info = new Info(shop.get().getLocation(), ShopAction.BUY, null, null, shop.get());
+      Map<UUID, ShopData> actions = plugin.getShopManager().getActions();
+      ShopSnapshot info = new ShopSnapshot(shop.get());
       actions.put(p.getUniqueId(), info);
     }
     // Handles creating shops
@@ -255,7 +258,7 @@ public class PlayerListener implements Listener {
         last = n;
       }
       // Send creation menu.
-      final Info info = new Info(b.getLocation(), ShopAction.CREATE, e.getItem(), last);
+      final ShopCreationData info = new ShopCreationData(b.getLocation(), e.getItem(), last);
 
       plugin.getShopManager().getActions().put(p.getUniqueId(), info);
       p.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", p,
@@ -300,21 +303,21 @@ public class PlayerListener implements Listener {
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void onMove(PlayerMoveEvent e) {
 
-    final Info info = plugin.getShopManager().getActions().get(e.getPlayer().getUniqueId());
+    final ShopData info = plugin.getShopManager().getActions().get(e.getPlayer().getUniqueId());
 
     if (info == null) {
       return;
     }
 
     final Player p = e.getPlayer();
-    final Location loc1 = info.getLocation();
+    final Location loc1 = info.location();
     final Location loc2 = p.getLocation();
 
     if (loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25) {
-      if (info.getAction() == ShopAction.CREATE) {
+      if (info.action() == ShopAction.CREATE) {
         p.sendMessage(MsgUtil.getMessage("shop-creation-cancelled", p));
         Util.debugLog(p.getName() + " too far with the shop location.");
-      } else if (info.getAction() == ShopAction.BUY) {
+      } else if (info.action() == ShopAction.TRADE) {
         p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", p));
         Util.debugLog(p.getName() + " too far with the shop location.");
       }

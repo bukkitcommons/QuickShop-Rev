@@ -19,8 +19,10 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.shop.Info;
+import org.maxgamer.quickshop.shop.ShopSnapshot;
 import org.maxgamer.quickshop.shop.ShopAction;
+import org.maxgamer.quickshop.shop.ShopCreationData;
+import org.maxgamer.quickshop.shop.ShopData;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -99,11 +101,7 @@ public class BlockListener implements Listener {
         return;
       }
       // Cancel their current menu... Doesnt cancel other's menu's.
-      final Info action = plugin.getShopManager().getActions().get(p.getUniqueId());
-
-      if (action != null) {
-        action.setAction(ShopAction.CANCELLED);
-      }
+      plugin.getShopManager().getActions().remove(p.getUniqueId());
 
       shop.get().onUnload();
       shop.get().delete();

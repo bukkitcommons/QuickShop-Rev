@@ -87,7 +87,7 @@ public class ContainerShop implements Shop {
     this.location = location;
     this.price = price;
     this.moderator = moderator;
-    this.item = new ItemStack(item);
+    this.item = item;
     //this.item.setAmount(1); // FIXME after stack
     this.shopType = type;
     this.unlimited = unlimited;
