@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.api;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -235,7 +235,7 @@ public interface Shop {
    *
    * @return staffs
    */
-  @NotNull Collection<UUID> getStaffs();
+  @NotNull Set<UUID> getStaffs();
 
   /**
    * Get shop is or not in buying mode

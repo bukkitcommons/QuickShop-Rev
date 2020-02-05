@@ -10,8 +10,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.shop.Shop;
-import org.maxgamer.quickshop.shop.ShopProtectionFlag;
+import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopProtectionFlag;
 import org.maxgamer.quickshop.utils.Util;
 
 /**
@@ -39,7 +39,7 @@ public interface DisplayItem {
     if (!iMeta.hasLore())
       return false;
     
-    String defaultMark = ShopProtectionFlag.getDefaultMark();
+    String defaultMark = ShopProtectionFlag.defaultMark();
     // noinspection ConstantConditions
     for (String lore : iMeta.getLore()) {
       try {
@@ -53,10 +53,10 @@ public interface DisplayItem {
         if (shop == null && defaultMark.equals(shopProtectionFlag.getMark())) {
           return true;
         }
-        if (shopProtectionFlag.getShopLocation() != null) {
-          return shop == null ? true : shopProtectionFlag.getShopLocation().equals(shop.getLocation().toString());
+        if (shopProtectionFlag.getShopLocationData() != null) {
+          return shop == null ? true : shopProtectionFlag.getShopLocationData().equals(shop.getLocation().toString());
         }
-        if (shop == null && shopProtectionFlag.getItemStackString() != null) {
+        if (shop == null && shopProtectionFlag.getShopItemStackData() != null) {
           return true;
         }
       } catch (JsonSyntaxException e) {
@@ -87,7 +87,7 @@ public interface DisplayItem {
       iMeta.setDisplayName(null);
     }
     java.util.List<String> lore = new ArrayList<>();
-    ShopProtectionFlag shopProtectionFlag = createShopProtectionFlag(itemStack, shop);
+    ShopProtectionFlag shopProtectionFlag = ShopProtectionFlag.create(itemStack, shop);
     String protectFlag = GSON.toJson(shopProtectionFlag);
     for (int i = 0; i < 21; i++) {
       lore.add(protectFlag); // Create 20 lines lore to make sure no stupid plugin accident remove
@@ -96,18 +96,6 @@ public interface DisplayItem {
     iMeta.setLore(lore);
     itemStack.setItemMeta(iMeta);
     return itemStack;
-  }
-
-  /**
-   * Create the shop protection flag for display item.
-   *
-   * @param itemStack The item stack
-   * @param shop The shop
-   * @return ShopProtectionFlag obj
-   */
-  static ShopProtectionFlag createShopProtectionFlag(@NotNull ItemStack itemStack,
-      @NotNull Shop shop) {
-    return new ShopProtectionFlag(shop.getLocation().toString(), Util.serialize(itemStack));
   }
 
   /**

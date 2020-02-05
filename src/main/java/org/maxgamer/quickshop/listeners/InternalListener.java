@@ -26,7 +26,7 @@ import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
 import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
 import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
-import org.maxgamer.quickshop.shop.ShopType;
+import org.maxgamer.quickshop.shop.api.ShopType;
 
 @AllArgsConstructor
 public class InternalListener implements Listener {

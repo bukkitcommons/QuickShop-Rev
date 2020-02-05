@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.api;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

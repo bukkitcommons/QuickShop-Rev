@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.ShopProtectionFlag;
+import org.maxgamer.quickshop.shop.api.ShopProtectionFlag;
 import org.maxgamer.quickshop.utils.Util;
 
 public class DisplayItemPersistentDataType

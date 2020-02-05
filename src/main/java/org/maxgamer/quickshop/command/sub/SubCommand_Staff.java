@@ -19,6 +19,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -31,7 +32,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -118,7 +119,7 @@ public class SubCommand_Staff implements CommandProcesser {
               sender.sendMessage(MsgUtil.getMessage("shop-staff-cleared", sender));
               return;
             case "list":
-              final List<UUID> staffs = shop.get().getStaffs();
+              final Set<UUID> staffs = shop.get().getStaffs();
 
               if (staffs.isEmpty()) {
                 sender.sendMessage(ChatColor.GREEN

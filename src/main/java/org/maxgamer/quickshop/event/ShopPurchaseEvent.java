@@ -20,7 +20,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.api.Shop;
 
 public class ShopPurchaseEvent extends ShopEvent implements Cancellable {
 

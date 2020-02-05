@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.api.Shop;
 
 /**
  * Called when the price of a shop changes for some reason.

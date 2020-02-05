@@ -3,7 +3,7 @@ package org.maxgamer.quickshop.event;
 import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.api.Shop;
 
 public class ShopClickEvent extends ShopEvent implements Cancellable {
 

@@ -27,6 +27,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopModerator;
+import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 
 /** A class allow plugin load shops fast and simply. */
@@ -48,7 +51,7 @@ public class ShopLoader implements Listener {
     loadShopsForWorld(event.getWorld());
   }
   
-  public static void forEachShopFromDatabase(@NotNull Consumer<@NotNull Shop> consumer) {
+  public static void forEachShopFromDatabase(@NotNull Consumer<org.maxgamer.quickshop.shop.api.Shop> consumer) {
     try {
       QuickShop.instance().getLogger().info("Loading shops from the database..");
       ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();

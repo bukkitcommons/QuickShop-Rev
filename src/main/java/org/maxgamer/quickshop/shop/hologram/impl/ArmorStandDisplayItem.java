@@ -17,7 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.event.ShopDisplayItemDespawnEvent;
 import org.maxgamer.quickshop.event.ShopDisplayItemSpawnEvent;
-import org.maxgamer.quickshop.shop.Shop;
+import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.ShopProtectionFlag;
 import org.maxgamer.quickshop.shop.hologram.DisplayAttribute;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
@@ -141,7 +142,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     try {
       armorStand.getPersistentDataContainer().set(new NamespacedKey(QuickShop.instance(), "displayMark"),
           DisplayItemPersistentDataType.INSTANCE,
-          DisplayItem.createShopProtectionFlag(this.originalItemStack, shop));
+          ShopProtectionFlag.create(this.originalItemStack, shop));
     } catch (Throwable ignored) {
     }
   }

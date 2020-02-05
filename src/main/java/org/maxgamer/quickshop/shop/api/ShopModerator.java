@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.shop;
+package org.maxgamer.quickshop.shop.api;
 
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
