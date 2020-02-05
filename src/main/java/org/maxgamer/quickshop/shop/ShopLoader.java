@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader implements Listener {
@@ -53,7 +54,7 @@ public class ShopLoader implements Listener {
   
   public static void forEachShopFromDatabase(@NotNull Consumer<org.maxgamer.quickshop.shop.api.Shop> consumer) {
     try {
-      QuickShop.instance().getLogger().info("Loading shops from the database..");
+      ShopLogger.instance().info("Loading shops from the database..");
       ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
       
       while (rs.next()) {
@@ -85,12 +86,12 @@ public class ShopLoader implements Listener {
     long onLoad = System.currentTimeMillis();
     
     try {
-      QuickShop.instance().getLogger().info("Loading shops from the database..");
+      ShopLogger.instance().info("Loading shops from the database..");
       long onFetch = System.currentTimeMillis();
       ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
       long durFetch = System.currentTimeMillis() - onFetch;
       long fetchSize = rs.getFetchSize();
-      QuickShop.instance().getLogger().info("Fetched" + fetchSize + "shops from database by " + durFetch + "ms");
+      ShopLogger.instance().info("Fetched" + fetchSize + "shops from database by " + durFetch + "ms");
       
       long loadedShops = 0;
       long durTotalShopsNano = 0;
@@ -133,7 +134,7 @@ public class ShopLoader implements Listener {
       long durLoad = System.currentTimeMillis() - onLoad;
       long averagePerShop = durTotalShopsNano / loadedShops;
       
-      QuickShop.instance().getLogger().info(
+      ShopLogger.instance().info(
           "Successfully loaded " + loadedShops + " of " + fetchSize + " shops in" + world.getName() + "! " +
           "(Total: " + durLoad + "ms, Fetch: " + durFetch + "ms," +
           " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + "ns)");
@@ -174,7 +175,7 @@ public class ShopLoader implements Listener {
       return Util.deserialize(itemConfig);
     } catch (InvalidConfigurationException e) {
       e.printStackTrace();
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "Failed load shop data, because target config can't deserialize the ItemStack.");
       Util.debugLog("Failed to load data to the ItemStack: " + itemConfig);
       return null;
@@ -242,7 +243,7 @@ public class ShopLoader implements Listener {
   }
   
   private static void exceptionHandler(@NotNull Throwable throwable, @Nullable ResultSet set) {
-    Logger logger = QuickShop.instance().getLogger();
+    Logger logger = ShopLogger.instance();
     
     logger.warning("########## FAILED TO LOAD SHOP FROM DB ##########");
     logger.warning("  >> Error Info:");

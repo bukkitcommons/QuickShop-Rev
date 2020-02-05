@@ -74,17 +74,17 @@ public class MinecraftLocale {
               cache.save(cacheFile);
             } else {
               Util.debugLog("Cannot download file.");
-              QuickShop.instance().getLogger().warning(
+              ShopLogger.instance().warning(
                   "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
           } else {
             Util.debugLog("Cannot get file hash for language " + BaseConfig.language.toLowerCase());
-            QuickShop.instance().getLogger().warning(
+            ShopLogger.instance().warning(
                 "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
           }
         } else {
           Util.debugLog("Cannot get version json.");
-          QuickShop.instance().getLogger().warning(
+          ShopLogger.instance().warning(
               "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
         }
       }

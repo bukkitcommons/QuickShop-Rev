@@ -25,7 +25,6 @@ import static org.bukkit.ChatColor.YELLOW;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -36,75 +35,103 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import com.google.common.collect.Maps;
 
-/*
- * Originally take from Mypet which is a awesome project, extends PluginLogger in order to replace
- * the default logger.
- *
- * This is generally a new built logger system that rely on the Java logger to provide better
- * customization.
- *
- * It is possible to switch to Log4j for better performance in the future.
- */
-public class QuickShopLogger extends PluginLogger {
+public class ShopLogger extends PluginLogger {
+  /**
+   * Regex that indicates the case insensitive
+   */
+  private final static String PATTERN_IGNORE_CASE = "(?i)";
 
-  protected boolean debugSetup = false;
+  /**
+   * Mapping from the text pattern of Bukkit color to the corresponding text format of Ansi
+   */
+  private final static Map<Pattern, String> BUKKIT_TO_ANSI = Maps.newHashMap();
+
+  private final static Map<Level, org.apache.logging.log4j.Level> LOG4J_LEVELS = Maps.newHashMap();
+  
+  private static boolean hasAnsi = true;
+  private static boolean hasJline = true;
+  
+  static {
+    // Colors
+    regAnsiMapping(BLACK, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLACK);
+    regAnsiMapping(DARK_BLUE, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLUE);
+    regAnsiMapping(DARK_GREEN,
+        !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.GREEN);
+    regAnsiMapping(DARK_AQUA, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.CYAN);
+    regAnsiMapping(DARK_RED, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.RED);
+    regAnsiMapping(DARK_PURPLE,
+        !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.MAGENTA);
+    regAnsiMapping(GOLD, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.YELLOW);
+    regAnsiMapping(GRAY, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.WHITE);
+    regAnsiMapping(DARK_GRAY, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLACK,
+        true);
+    regAnsiMapping(BLUE, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLUE,
+        true);
+    regAnsiMapping(GREEN, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.GREEN,
+        true);
+    regAnsiMapping(AQUA, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.CYAN,
+        true);
+    regAnsiMapping(RED, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.RED, true);
+    regAnsiMapping(LIGHT_PURPLE,
+        !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.MAGENTA, true);
+    regAnsiMapping(YELLOW, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.YELLOW,
+        true);
+    regAnsiMapping(WHITE, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.WHITE,
+        true);
+    
+    // Effects
+    regAnsiMapping(MAGIC, org.fusesource.jansi.Ansi.Attribute.BLINK_SLOW);
+    regAnsiMapping(BOLD, org.fusesource.jansi.Ansi.Attribute.UNDERLINE_DOUBLE);
+    regAnsiMapping(STRIKETHROUGH, org.fusesource.jansi.Ansi.Attribute.STRIKETHROUGH_ON);
+    regAnsiMapping(UNDERLINE, org.fusesource.jansi.Ansi.Attribute.UNDERLINE);
+    regAnsiMapping(ITALIC, org.fusesource.jansi.Ansi.Attribute.ITALIC);
+    regAnsiMapping(RESET, org.fusesource.jansi.Ansi.Attribute.RESET);
+    
+    LOG4J_LEVELS.put(Level.ALL, org.apache.logging.log4j.Level.ALL);
+    LOG4J_LEVELS.put(Level.CONFIG, org.apache.logging.log4j.Level.DEBUG);
+    LOG4J_LEVELS.put(Level.FINE, org.apache.logging.log4j.Level.DEBUG);
+    LOG4J_LEVELS.put(Level.FINER, org.apache.logging.log4j.Level.TRACE);
+    LOG4J_LEVELS.put(Level.FINEST, org.apache.logging.log4j.Level.TRACE);
+    LOG4J_LEVELS.put(Level.INFO, org.apache.logging.log4j.Level.INFO);
+    LOG4J_LEVELS.put(Level.WARNING, org.apache.logging.log4j.Level.WARN);
+    LOG4J_LEVELS.put(Level.SEVERE, org.apache.logging.log4j.Level.ERROR);
+    LOG4J_LEVELS.put(Level.OFF, org.apache.logging.log4j.Level.OFF);
+  }
+  
+  private final static ShopLogger SINGLETON_LOGGER = new ShopLogger();
+  
+  public static ShopLogger instance() {
+    return SINGLETON_LOGGER;
+  }
+  
   @Nullable
   private org.apache.logging.log4j.Logger log4jLogger;
-
-  /** Mapping from the text pattern of Bukkit color to the corresponding text format of Ansi */
-  private Map<Pattern, String> bukkitToAnsi;
-
-  private Map<Level, org.apache.logging.log4j.Level> levelMapping;
-
-  private void registerLevels() {
-    levelMapping = Maps.newHashMap();
-
-    levelMapping.put(Level.ALL, org.apache.logging.log4j.Level.ALL);
-    levelMapping.put(Level.CONFIG, org.apache.logging.log4j.Level.DEBUG);
-    levelMapping.put(Level.FINE, org.apache.logging.log4j.Level.DEBUG);
-    levelMapping.put(Level.FINER, org.apache.logging.log4j.Level.TRACE);
-    levelMapping.put(Level.FINEST, org.apache.logging.log4j.Level.TRACE);
-    levelMapping.put(Level.INFO, org.apache.logging.log4j.Level.INFO);
-    levelMapping.put(Level.WARNING, org.apache.logging.log4j.Level.WARN);
-    levelMapping.put(Level.SEVERE, org.apache.logging.log4j.Level.ERROR);
-    levelMapping.put(Level.OFF, org.apache.logging.log4j.Level.OFF);
-  }
-
-  // below are non-static for secret optimization
-  /** Regex that indicates the case insensitive */
-  private String IGNORE_CASE;
-
-  // private FileHandler debugLogFileHandler = null;
-  private boolean hasAnsi = true;
-  private boolean hasJline = true;
   private boolean useLog4j;
 
   @SneakyThrows
-  public QuickShopLogger(Plugin plugin) {
-    super(plugin);
-    registerStyles();
+  private ShopLogger() {
+    super(QuickShop.instance());
 
     // Logger re-naming
-    String prefix = plugin.getDescription().getPrefix();
+    String prefix = QuickShop.instance().getDescription().getPrefix();
     String pluginName = (useLog4j = BaseConfig.useLog4j) ?
 
-        (ChatColor.YELLOW + (prefix == null ? plugin.getDescription().getName() : prefix)
+        (ChatColor.YELLOW + (prefix == null ? QuickShop.instance().getDescription().getName() : prefix)
             + ChatColor.RESET)
         :
 
         (prefix != null ? "[" + ChatColor.YELLOW + prefix + ChatColor.RESET + "] "
-            : "[" + ChatColor.YELLOW + plugin.getDescription().getName() + ChatColor.RESET + "] ");
+            : "[" + ChatColor.YELLOW + QuickShop.instance().getDescription().getName() + ChatColor.RESET + "] ");
     pluginName = applyStyles(pluginName);
 
     // Log4j setup
     if (useLog4j) {
-      registerLevels();
       log4jLogger = LogManager.getLogger(pluginName);
       info("Log4J has been enabled as logging system.");
     } else {
@@ -112,6 +139,8 @@ public class QuickShopLogger extends PluginLogger {
       Field nameField = Logger.class.getDeclaredField("name");
       nameField.setAccessible(true); // private
       nameField.set(this, "");
+      
+      LOG4J_LEVELS.clear();
     }
 
     // Apply plugin name for BukkitLogger
@@ -149,7 +178,7 @@ public class QuickShopLogger extends PluginLogger {
 
       if (useLog4j) {
         log4jLogger.log(
-            levelMapping.getOrDefault(logRecord.getLevel(), org.apache.logging.log4j.Level.INFO),
+            LOG4J_LEVELS.getOrDefault(logRecord.getLevel(), org.apache.logging.log4j.Level.INFO),
             applyStyles(message));
 
       } else {
@@ -241,7 +270,7 @@ public class QuickShopLogger extends PluginLogger {
    * @return text maybe applied styles
    */
   public String applyStyles(String message) {
-    for (Entry<Pattern, String> entry : bukkitToAnsi.entrySet()) {
+    for (Entry<Pattern, String> entry : BUKKIT_TO_ANSI.entrySet()) {
       message =
           entry.getKey().matcher(message).replaceAll(hasAnsi && hasJline ? entry.getValue() : "");
     }
@@ -251,61 +280,16 @@ public class QuickShopLogger extends PluginLogger {
   }
 
   /*
-   * This will compile patterns for Bukkit colors as the key, and stringify Ansi as the value, then
-   * register in to the system.
-   */
-  private void registerStyles() {
-    // Initial here for secert optimization
-    bukkitToAnsi = new HashMap<Pattern, String>();
-    IGNORE_CASE = "(?i)";
-
-    // Colors
-    regAnsiMapping(BLACK, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLACK);
-    regAnsiMapping(DARK_BLUE, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLUE);
-    regAnsiMapping(DARK_GREEN,
-        !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.GREEN);
-    regAnsiMapping(DARK_AQUA, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.CYAN);
-    regAnsiMapping(DARK_RED, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.RED);
-    regAnsiMapping(DARK_PURPLE,
-        !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.MAGENTA);
-    regAnsiMapping(GOLD, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.YELLOW);
-    regAnsiMapping(GRAY, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.WHITE);
-    regAnsiMapping(DARK_GRAY, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLACK,
-        true);
-    regAnsiMapping(BLUE, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.BLUE,
-        true);
-    regAnsiMapping(GREEN, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.GREEN,
-        true);
-    regAnsiMapping(AQUA, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.CYAN,
-        true);
-    regAnsiMapping(RED, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.RED, true);
-    regAnsiMapping(LIGHT_PURPLE,
-        !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.MAGENTA, true);
-    regAnsiMapping(YELLOW, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.YELLOW,
-        true);
-    regAnsiMapping(WHITE, !(hasAnsi && hasJline) ? null : org.fusesource.jansi.Ansi.Color.WHITE,
-        true);
-
-    // Effects
-    regAnsiMapping(MAGIC, org.fusesource.jansi.Ansi.Attribute.BLINK_SLOW);
-    regAnsiMapping(BOLD, org.fusesource.jansi.Ansi.Attribute.UNDERLINE_DOUBLE);
-    regAnsiMapping(STRIKETHROUGH, org.fusesource.jansi.Ansi.Attribute.STRIKETHROUGH_ON);
-    regAnsiMapping(UNDERLINE, org.fusesource.jansi.Ansi.Attribute.UNDERLINE);
-    regAnsiMapping(ITALIC, org.fusesource.jansi.Ansi.Attribute.ITALIC);
-    regAnsiMapping(RESET, org.fusesource.jansi.Ansi.Attribute.RESET);
-  }
-
-  /*
    * Register a mapping from Bukkit color to Ansi
    */
-  private void regAnsiMapping(ChatColor bukkColor, org.fusesource.jansi.Ansi.Color ansiColor) {
+  private static void regAnsiMapping(ChatColor bukkColor, org.fusesource.jansi.Ansi.Color ansiColor) {
     regAnsiMapping0(toPattern(bukkColor), toDesc(ansiColor));
   }
 
   /*
    * Register a mapping from Bukkit color to Ansi
    */
-  private void regAnsiMapping(ChatColor bukkColor,
+  private static void regAnsiMapping(ChatColor bukkColor,
       org.fusesource.jansi.Ansi.Attribute ansiAttribute) {
     regAnsiMapping0(toPattern(bukkColor), toDesc(ansiAttribute));
   }
@@ -313,7 +297,7 @@ public class QuickShopLogger extends PluginLogger {
   /*
    * Register a mapping from Bukkit color to Ansi, with color option
    */
-  private void regAnsiMapping(ChatColor bukkColor, org.fusesource.jansi.Ansi.Color ansiColor,
+  private static void regAnsiMapping(ChatColor bukkColor, org.fusesource.jansi.Ansi.Color ansiColor,
       boolean intensity) {
     regAnsiMapping0(toPattern(bukkColor), toDesc(ansiColor, intensity));
   }
@@ -322,8 +306,8 @@ public class QuickShopLogger extends PluginLogger {
    * Register a mapping from the pattern of Bukkit color to the description of Ansi, and this is the
    * genuine type for them to be registered.
    */
-  private void regAnsiMapping0(Pattern bukkitPattern, String ansiDesc) {
-    this.bukkitToAnsi.put(bukkitPattern, ansiDesc);
+  private static void regAnsiMapping0(Pattern bukkitPattern, String ansiDesc) {
+    BUKKIT_TO_ANSI.put(bukkitPattern, ansiDesc);
   }
 
   /**
@@ -332,8 +316,8 @@ public class QuickShopLogger extends PluginLogger {
    * @param bukkitColor the bukkit color
    * @return the pattern
    */
-  private Pattern toPattern(ChatColor bukkitColor) {
-    return Pattern.compile(IGNORE_CASE.concat(bukkitColor.toString()));
+  private static Pattern toPattern(ChatColor bukkitColor) {
+    return Pattern.compile(PATTERN_IGNORE_CASE.concat(bukkitColor.toString()));
   }
 
   /**
@@ -342,7 +326,7 @@ public class QuickShopLogger extends PluginLogger {
    * @param ansiColor
    * @return Ansi with reset ahead
    */
-  private org.fusesource.jansi.Ansi resetWith(org.fusesource.jansi.Ansi.Color ansiColor) {
+  private static org.fusesource.jansi.Ansi resetWith(org.fusesource.jansi.Ansi.Color ansiColor) {
     return org.fusesource.jansi.Ansi.ansi().a(org.fusesource.jansi.Ansi.Attribute.RESET)
         .fg(ansiColor);
   }
@@ -354,7 +338,7 @@ public class QuickShopLogger extends PluginLogger {
    * @param intensity Ansi color option
    * @return stringified Ansi
    */
-  private String toDesc(org.fusesource.jansi.Ansi.Color ansiColor, boolean intensity) {
+  private static String toDesc(org.fusesource.jansi.Ansi.Color ansiColor, boolean intensity) {
     return hasAnsi && hasJline
         ? (intensity ? resetWith(ansiColor).bold().toString() : toDesc(ansiColor))
         : "";
@@ -366,7 +350,7 @@ public class QuickShopLogger extends PluginLogger {
    * @param ansiColor Ansi
    * @return stringified Ansi
    */
-  private String toDesc(org.fusesource.jansi.Ansi.Color ansiColor) {
+  private static String toDesc(org.fusesource.jansi.Ansi.Color ansiColor) {
     return hasAnsi && hasJline ? resetWith(ansiColor).boldOff().toString() : "";
   }
 
@@ -376,7 +360,7 @@ public class QuickShopLogger extends PluginLogger {
    * @param ansiAttribute Ansi
    * @return stringified Ansi
    */
-  private String toDesc(org.fusesource.jansi.Ansi.Attribute ansiAttribute) {
+  private static String toDesc(org.fusesource.jansi.Ansi.Attribute ansiAttribute) {
     return hasAnsi && hasJline
         ? org.fusesource.jansi.Ansi.ansi().a(org.fusesource.jansi.Ansi.Attribute.RESET).toString()
         : "";

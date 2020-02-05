@@ -28,6 +28,7 @@ import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 @IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class PlotSquaredIntegration implements IntegratedPlugin {
@@ -65,7 +66,7 @@ public class PlotSquaredIntegration implements IntegratedPlugin {
     this.tradeFlag = new BooleanFlag("quickshop-trade");
     Flags.registerFlag(this.createFlag);
     Flags.registerFlag(this.tradeFlag);
-    QuickShop.instance().getLogger().info(ChatColor.GREEN + getName() + " flags register successfully.");
+    ShopLogger.instance().info(ChatColor.GREEN + getName() + " flags register successfully.");
     Util.debugLog("Success register " + getName() + " flags.");
   }
 

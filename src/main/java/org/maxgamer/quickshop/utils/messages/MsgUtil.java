@@ -75,7 +75,7 @@ public class MsgUtil {
   /** Deletes any messages that are older than a week in the database, to save on space. */
   @Deprecated // FIXME Move
   public static void clean() {
-    QuickShop.instance().getLogger()
+    ShopLogger.instance()
         .info("Cleaning purchase messages from the database that are over a week old...");
     // 604800,000 msec = 1 week.
     long weekAgo = System.currentTimeMillis() - 604800000;
@@ -267,9 +267,9 @@ public class MsgUtil {
     
     messagei18n = json;
     /* Print to console this language file's author, contributors, and region */
-    QuickShop.instance().getLogger().info(getMessage("translation-author", null));
-    QuickShop.instance().getLogger().info(getMessage("translation-contributors", null));
-    QuickShop.instance().getLogger().info(getMessage("translation-country", null));
+    ShopLogger.instance().info(getMessage("translation-author", null));
+    ShopLogger.instance().info(getMessage("translation-contributors", null));
+    ShopLogger.instance().info(getMessage("translation-country", null));
     /* Save the upgraded messages.yml */
   }
 
@@ -285,7 +285,7 @@ public class MsgUtil {
         }
         String enchName = MINECRAFT_LOCALE.getEnchantment(ench.getKey().getKey());
         enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
-        QuickShop.instance().getLogger().info("Found new ench [" + enchName + "] , adding it to the config...");
+        ShopLogger.instance().info("Found new ench [" + enchName + "] , adding it to the config...");
       }
     });
   }
@@ -302,7 +302,7 @@ public class MsgUtil {
         }
         String itemName = MINECRAFT_LOCALE.getItem(material);
         itemi18n.set("itemi18n." + material.name(), itemName);
-        QuickShop.instance().getLogger()
+        ShopLogger.instance()
             .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
       }
     });
@@ -310,7 +310,7 @@ public class MsgUtil {
   
   public static void loadCustomMinecraftLocale(@NotNull String filePrefix, @NotNull Consumer<YamlConfiguration> consumer) {
     String fileName = filePrefix.concat(".yml");
-    QuickShop.instance().getLogger().info("Loading custom locale for " + fileName);
+    ShopLogger.instance().info("Loading custom locale for " + fileName);
     
     File file = new File(QuickShop.instance().getDataFolder(), fileName);
     QuickShop.instance().saveResource(fileName, true);
@@ -325,9 +325,9 @@ public class MsgUtil {
     
     try {
       yaml.save(file);
-      QuickShop.instance().getLogger().info("Loaded custom locale: " + fileName);
+      ShopLogger.instance().info("Loaded custom locale: " + fileName);
     } catch (IOException io) {
-      QuickShop.instance().getLogger().severe("Could not save custom locale for " + fileName);
+      ShopLogger.instance().severe("Could not save custom locale for " + fileName);
       io.printStackTrace();
     }
   }
@@ -342,7 +342,7 @@ public class MsgUtil {
           continue;
         }
         String potionName = MINECRAFT_LOCALE.getPotion(potion);
-        QuickShop.instance().getLogger().info("Found new potion [" + potionName + "] , adding it to the config...");
+        ShopLogger.instance().info("Found new potion [" + potionName + "] , adding it to the config...");
         potioni18n.set("potioni18n." + potion.getName(), potionName);
       }
     });
@@ -368,7 +368,7 @@ public class MsgUtil {
       }
       
     } catch (Throwable t) {
-      QuickShop.instance().getLogger().severe("Could not load transaction messages from database.");
+      ShopLogger.instance().severe("Could not load transaction messages from database.");
       t.printStackTrace();
     }
   }
@@ -556,7 +556,7 @@ public class MsgUtil {
    */
   public static void sendGlobalAlert(@NotNull String content) {
     sendMessageToOps(content);
-    QuickShop.instance().getLogger().warning(content);
+    ShopLogger.instance().warning(content);
     QuickShop.instance().getLogWatcher().add(content);
   }
 

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.EconomyCore;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 /** @author creatorfromhell */
 public class ReserveEconProvider implements EconomyCore {
@@ -85,7 +86,7 @@ public class ReserveEconProvider implements EconomyCore {
     } catch (Throwable throwable) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       throwable.printStackTrace();
-      QuickShop.instance().getLogger().warning(this.errorMsg);
+      ShopLogger.instance().warning(this.errorMsg);
       return formatInternal(balance);
     }
   }
@@ -104,7 +105,7 @@ public class ReserveEconProvider implements EconomyCore {
     } catch (Throwable throwable) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       throwable.printStackTrace();
-      QuickShop.instance().getLogger().warning(this.errorMsg);
+      ShopLogger.instance().warning(this.errorMsg);
       return false;
     }
   }
@@ -128,7 +129,7 @@ public class ReserveEconProvider implements EconomyCore {
     } catch (Throwable throwable) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       throwable.printStackTrace();
-      QuickShop.instance().getLogger().warning(this.errorMsg);
+      ShopLogger.instance().warning(this.errorMsg);
       return false;
     }
   }
@@ -148,7 +149,7 @@ public class ReserveEconProvider implements EconomyCore {
     } catch (Throwable throwable) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       throwable.printStackTrace();
-      QuickShop.instance().getLogger().warning(this.errorMsg);
+      ShopLogger.instance().warning(this.errorMsg);
       return false;
     }
   }
@@ -166,7 +167,7 @@ public class ReserveEconProvider implements EconomyCore {
     } catch (Throwable throwable) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       throwable.printStackTrace();
-      QuickShop.instance().getLogger().warning(this.errorMsg);
+      ShopLogger.instance().warning(this.errorMsg);
       return 0.0;
     }
   }

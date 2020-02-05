@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionProvider;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 public class PermissionManager {
   private final PermissionProvider provider;
@@ -24,7 +25,7 @@ public class PermissionManager {
         provider = new BukkitPermsProvider();
     }
     
-    QuickShop.instance().getLogger().info("Selected permission provider: " + provider.getType());
+    ShopLogger.instance().info("Selected permission provider: " + provider.getType());
   }
 
   /**

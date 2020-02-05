@@ -76,7 +76,7 @@ import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.QuickShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.nms.ReflectFactory;
 import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
@@ -857,7 +857,7 @@ public class QuickShop extends JavaPlugin {
     try {
       Field logger = ReflectionUtil.getField(JavaPlugin.class, "logger");
       if (logger != null) {
-        logger.set(this, new QuickShopLogger(this));
+        logger.set(this, ShopLogger.instance());
       }
     } catch (Throwable e) {
       e.printStackTrace();

@@ -50,6 +50,7 @@ import org.maxgamer.quickshop.shop.api.data.ShopData;
 import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class ShopManager {
@@ -142,12 +143,12 @@ public class ShopManager {
     double moneyAfterTax = totalPrice * (1 - tax);
     boolean depositSeller = QuickShop.instance().getEconomy().deposit(p.getUniqueId(), moneyAfterTax); // Deposit player's money
     if (!depositSeller) {
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "Failed to deposit the money " + moneyAfterTax + " to player " + p.getName());
       /* Rollback the trade */
       if (shouldPayOwner) {
         if (!QuickShop.instance().getEconomy().deposit(shop.getOwner(), totalPrice)) {
-          QuickShop.instance().getLogger().warning("Failed to rollback the purchase actions for player "
+          ShopLogger.instance().warning("Failed to rollback the purchase actions for player "
               + Bukkit.getOfflinePlayer(shop.getOwner()).getName());
         }
       }
@@ -339,7 +340,7 @@ public class ShopManager {
         }
       } catch (Exception e2) {
         e2.printStackTrace();
-        QuickShop.instance().getLogger().log(Level.WARNING,
+        ShopLogger.instance().log(Level.WARNING,
             "QuickShop can't pay tax to account in config.yml, Please set tax account name to a existing player!");
       }
     }
@@ -435,11 +436,11 @@ public class ShopManager {
       double depositMoney = total * (1 - tax);
       boolean successB = QuickShop.instance().getEconomy().deposit(shop.getOwner(), depositMoney);
       if (!successB) {
-        QuickShop.instance().getLogger().warning(
+        ShopLogger.instance().warning(
             "Failed to deposit the money for player " + Bukkit.getOfflinePlayer(shop.getOwner()));
         /* Rollback the trade */
         if (!QuickShop.instance().getEconomy().deposit(p.getUniqueId(), depositMoney)) {
-          QuickShop.instance().getLogger().warning("Failed to rollback the purchase actions for player "
+          ShopLogger.instance().warning("Failed to rollback the purchase actions for player "
               + Bukkit.getOfflinePlayer(shop.getOwner()).getName());
         }
         p.sendMessage(MsgUtil.getMessage("purchase-failed", p));
@@ -657,19 +658,19 @@ public class ShopManager {
       // Add it to the world
       addShop(loc.getWorld().getName(), shop);
     } catch (SQLException error) {
-      QuickShop.instance().getLogger().warning("SQLException detected, trying to auto fix the database...");
+      ShopLogger.instance().warning("SQLException detected, trying to auto fix the database...");
       boolean backupSuccess = Util.backupDatabase();
       try {
         if (backupSuccess) {
           QuickShop.instance().getDatabaseHelper().deleteShop(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
               loc.getWorld().getName());
         } else {
-          QuickShop.instance().getLogger()
+          ShopLogger.instance()
           .warning("Failed to backup the database, all changes will revert after a reboot.");
         }
       } catch (SQLException error2) {
         // Failed removing
-        QuickShop.instance().getLogger()
+        ShopLogger.instance()
         .warning("Failed to autofix the database, all changes will revert after a reboot.");
         error2.printStackTrace();
       }
@@ -703,7 +704,7 @@ public class ShopManager {
           bs.setBlockData(signBlockDataType);
         }
       } else {
-        QuickShop.instance().getLogger().warning("Sign material " + bs.getType().name()
+        ShopLogger.instance().warning("Sign material " + bs.getType().name()
             + " not a WallSign, make sure you using correct sign material.");
       }
       bs.update(true);
@@ -869,7 +870,7 @@ public class ShopManager {
     // long start = System.nanoTime();
     return getShops(c.getWorld().getName(), c.getX(), c.getZ());
     // long end = System.nanoTime();
-    // QuickShop.instance().getLogger().log(Level.WARNING, "Chunk lookup in " + ((end - start)/1000000.0) +
+    // QuickShopLogger.instance().log(Level.WARNING, "Chunk lookup in " + ((end - start)/1000000.0) +
     // "ms.");
   }
 

@@ -18,6 +18,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.EconomyCore;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 public class VaultEconProvider implements EconomyCore, Listener {
 
@@ -33,7 +34,7 @@ public class VaultEconProvider implements EconomyCore, Listener {
   public boolean checkValid() {
     if (this.vault == null) {
       Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
-      QuickShop.instance().getLogger().severe("FATAL: Economy system not ready.");
+      ShopLogger.instance().severe("FATAL: Economy system not ready.");
       return false;
     } else {
       return true;
@@ -84,13 +85,13 @@ public class VaultEconProvider implements EconomyCore, Listener {
     }
 
     if (this.vault.getName() == null || this.vault.getName().isEmpty()) {
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "Current economy plugin not correct process all request, this usually cause by irregular code, you should report this issue to your economy plugin author or use other economy QuickShop.instance().");
-      QuickShop.instance().getLogger()
+      ShopLogger.instance()
           .warning("This is technical information, please send this to economy plugin author: "
               + "VaultEconomyProvider.getName() return a null or empty.");
     } else {
-      QuickShop.instance().getLogger().info("Using economy system: " + this.vault.getName());
+      ShopLogger.instance().info("Using economy system: " + this.vault.getName());
     }
     Bukkit.getPluginManager().registerEvents(this, QuickShop.instance());
     Util.debugLog("Economy service listener was registered.");
@@ -137,7 +138,7 @@ public class VaultEconProvider implements EconomyCore, Listener {
     } catch (Throwable t) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       t.printStackTrace();
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "This seems not QuickShop fault, you should cotact with your economy plugin author. ("
               + getProviderName() + ")");
       return false;
@@ -160,7 +161,7 @@ public class VaultEconProvider implements EconomyCore, Listener {
     } catch (Throwable t) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       t.printStackTrace();
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "This seems not QuickShop fault, you should cotact with your economy plugin author. ("
               + getProviderName() + ")");
       return false;
@@ -189,7 +190,7 @@ public class VaultEconProvider implements EconomyCore, Listener {
     } catch (Throwable t) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       t.printStackTrace();
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "This seems not QuickShop fault, you should cotact with your economy plugin author. ("
               + getProviderName() + ")");
       return false;
@@ -213,7 +214,7 @@ public class VaultEconProvider implements EconomyCore, Listener {
     } catch (Throwable t) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       t.printStackTrace();
-      QuickShop.instance().getLogger().warning(
+      ShopLogger.instance().warning(
           "This seems not QuickShop fault, you should contact with your economy plugin author. ("
               + getProviderName() + ")");
       return 0.0;

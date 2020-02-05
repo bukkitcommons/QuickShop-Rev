@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.messages.WarningSender;
 import com.google.common.collect.Queues;
 
@@ -84,7 +85,7 @@ public class Dispatcher implements Runnable {
   
   public void flush() {
     Bukkit.getScheduler().cancelTask(taskId);
-    QuickShop.instance().getLogger().info("Please wait for the data to flush its data...");
+    ShopLogger.instance().info("Please wait for the data to flush its data...");
     sqlQueue.forEach(statement -> execute(statement));
   }
 }

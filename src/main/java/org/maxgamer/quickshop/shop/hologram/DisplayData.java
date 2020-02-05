@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 
@@ -98,7 +99,7 @@ public class DisplayData {
 
       return (T) value;
     } catch (Throwable t) {
-      QuickShop.instance().getLogger()
+      ShopLogger.instance()
           .warning("Error when processing attribute for " + attr.name() + " with unexpected value "
               + value.toString() + ", please check your config before reporting!");
       t.printStackTrace();

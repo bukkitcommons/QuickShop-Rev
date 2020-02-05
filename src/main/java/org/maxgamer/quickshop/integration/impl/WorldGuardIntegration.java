@@ -22,6 +22,7 @@ import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 @Configuration("integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_LOAD)
@@ -48,7 +49,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
       // create a flag with the name "my-custom-flag", defaulting to true
       registry.register(this.createFlag);
       registry.register(this.tradeFlag);
-      QuickShop.instance().getLogger().info(ChatColor.GREEN + getName() + " flags register successfully.");
+      ShopLogger.instance().info(ChatColor.GREEN + getName() + " flags register successfully.");
       Util.debugLog("Success register " + getName() + " flags.");
     } catch (FlagConflictException e) {
       e.printStackTrace();

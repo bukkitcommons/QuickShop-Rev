@@ -47,6 +47,7 @@ import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.RealDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /** ChestShop core */
@@ -215,7 +216,7 @@ public class ContainerShop implements Shop, Managed {
                   location.getWorld().getName());
       
     } catch (Throwable t) {
-      QuickShop.instance().getLogger().severe(
+      ShopLogger.instance().severe(
           "Could not update a shop in the database! Changes will revert after a reboot!");
       
       t.printStackTrace();
@@ -258,7 +259,7 @@ public class ContainerShop implements Shop, Managed {
       this.setSignText();
       // This should not happen.
       if (amount > 0) {
-        QuickShop.instance().getLogger().log(Level.WARNING,
+        ShopLogger.instance().log(Level.WARNING,
             "Could not take all items from a players inventory on purchase! " + p.getName()
                 + ", missing: " + amount + ", item: " + Util.getItemStackName(this.getItem())
                 + "!");
@@ -615,7 +616,7 @@ public class ContainerShop implements Shop, Managed {
 
     for (Block b : blocks) {
       if (b == null) {
-        QuickShop.instance().getLogger().warning("Null signs in the queue, skipping");
+        ShopLogger.instance().warning("Null signs in the queue, skipping");
         continue;
       }
       Material mat = b.getType();

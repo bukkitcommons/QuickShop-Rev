@@ -81,6 +81,7 @@ import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -269,7 +270,7 @@ public class Util {
         debugLogs.remove(0);
       }
       if (devMode) {
-        QuickShop.instance().getLogger().info(text);
+        ShopLogger.instance().info(text);
       }
     }
     long debugLogCost = System.currentTimeMillis() - startTime;
@@ -281,7 +282,7 @@ public class Util {
           QuickShop.instance().getConfigurationManager().save(BaseConfig.class);
           disableDebugLogger = true;
           QuickShop.instance().saveConfig();
-          QuickShop.instance().getLogger().warning(
+          ShopLogger.instance().warning(
               "Detected the debug logger tooked time keep too lang, QuickShop already auto-disable debug logger, your server performance should back to normal. But you must re-enable it if you want to report any bugs.");
         }
       }
@@ -1157,11 +1158,11 @@ public class Util {
 
   /** Send warning message when some plugin calling deprecated method... With the trace. */
   public static void sendDeprecatedMethodWarn() {
-    QuickShop.instance().getLogger().warning(
+    ShopLogger.instance().warning(
         "Some plugin is calling a Deprecated method, Please contact the author to tell them to use the new api!");
     StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
     for (StackTraceElement stackTraceElement : stackTraceElements) {
-      QuickShop.instance().getLogger()
+      ShopLogger.instance()
           .warning("at " + stackTraceElement.getClassName() + "#"
               + stackTraceElement.getMethodName() + " (" + stackTraceElement.getFileName() + ":"
               + stackTraceElement.getLineNumber() + ")");

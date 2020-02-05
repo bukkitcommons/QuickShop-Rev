@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.HttpRequest;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 public class MojangAPI {
   final String versionManifestUrl = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
@@ -37,7 +38,7 @@ public class MojangAPI {
 
   @Nullable
   public String getVersionManifest() throws IOException {
-    QuickShop.instance().getLogger().info("Downloading version manifest...");
+    ShopLogger.instance().info("Downloading version manifest...");
     return HttpRequest.get(new URL(versionManifestUrl)).execute().expectResponseCode(200)
         .returnContent().asString("UTF-8").trim();
   }
@@ -48,7 +49,7 @@ public class MojangAPI {
     for (VersionList.VersionsBean mcv : list.getVersions()) {
       if (mcv.getId().equals(mcVer)) {
         try {
-          QuickShop.instance().getLogger().info("Downloading version index...");
+          ShopLogger.instance().info("Downloading version index...");
           return HttpRequest.get(new URL(mcv.getUrl())).execute().expectResponseCode(200)
               .returnContent().asString("UTF-8").trim();
         } catch (IOException e) {
@@ -93,7 +94,7 @@ public class MojangAPI {
       return Util.readToString(cacheFile);
     }
     String data;
-    QuickShop.instance().getLogger().info("Downloading assets file...");
+    ShopLogger.instance().info("Downloading assets file...");
     data = HttpRequest.get(new URL(this.assetsUrl + hash.substring(0, 2) + "/" + hash)).execute()
         .expectResponseCode(200).returnContent().asString("UTF-8").trim();
     return data;

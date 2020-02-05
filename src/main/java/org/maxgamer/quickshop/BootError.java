@@ -21,6 +21,7 @@ import lombok.ToString;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 /** BootError class contains print errors on /qs command when plugin failed launched. */
 @EqualsAndHashCode
@@ -32,7 +33,7 @@ public class BootError {
   BootError(@NotNull String... errors) {
     this.errors = errors;
     for (String err : errors) {
-      QuickShop.instance().getLogger().severe(err);
+      ShopLogger.instance().severe(err);
     }
   }
 

@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 public abstract class ItemNMS {
   private static Method craftItemStack_asNMSCopyMethod;
@@ -30,7 +31,7 @@ public abstract class ItemNMS {
 
     } catch (Throwable t) {
       disabled = true;
-      QuickShop.instance().getLogger().info("Failed to hook NMS, item hologram will be disabled.");
+      ShopLogger.instance().info("Failed to hook NMS, item hologram will be disabled.");
       t.printStackTrace();
     }
   }

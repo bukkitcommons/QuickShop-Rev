@@ -35,6 +35,7 @@ import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_Price implements CommandProcesser {
@@ -158,7 +159,7 @@ public class SubCommand_Price implements CommandProcesser {
               QuickShop.instance().getServer().getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), fee);
         } catch (Exception e) {
           e.getMessage();
-          QuickShop.instance().getLogger().log(Level.WARNING,
+          ShopLogger.instance().log(Level.WARNING,
               "QuickShop can't pay tax to the account in config.yml, please set the tax account name to an existing player!");
         }
       }
