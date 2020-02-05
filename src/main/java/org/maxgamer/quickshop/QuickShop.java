@@ -170,8 +170,6 @@ public class QuickShop extends JavaPlugin {
   private SyncTaskWatcher syncTaskWatcher;
   // private ShopVaildWatcher shopVaildWatcher;
   private AsyncDisplayDespawner displayAutoDespawnWatcher;
-  /** Use SpoutPlugin to get item / block names */
-  private boolean useSpout = false;
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
   private HashSet<String> warnings = new HashSet<>();
 
@@ -179,7 +177,6 @@ public class QuickShop extends JavaPlugin {
   private OngoingFeeWatcher ongoingFeeWatcher;
   private SignUpdateWatcher signUpdateWatcher;
   private BukkitWrapper bukkitAPIWrapper;
-  private boolean isUtilInited = false;
   private boolean enabledAsyncDisplayDespawn;
   
   @Getter
@@ -492,7 +489,6 @@ public class QuickShop extends JavaPlugin {
     /* Initalize the Utils */
     itemMatcher = new ItemMatcher();
     Util.initialize();
-    this.isUtilInited = true;
     try {
       MsgUtil.loadCfgMessages();
     } catch (Exception e) {
@@ -524,7 +520,6 @@ public class QuickShop extends JavaPlugin {
     // This should be inited before shop manager
     if (BaseConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
-        this.enabledAsyncDisplayDespawn = true;
         this.displayAutoDespawnWatcher = new AsyncDisplayDespawner(this);
         Bukkit.getScheduler().runTaskTimerAsynchronously(QuickShop.instance(), this.displayAutoDespawnWatcher, 20,
             getConfig().getInt("shop.display-check-time"));

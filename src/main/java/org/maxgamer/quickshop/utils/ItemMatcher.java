@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.utils;
 
 import java.util.Map;
-import java.util.Objects;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -13,7 +12,6 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import com.google.common.collect.Multimap;
-import com.palmergames.bukkit.towny.db.TownyFlatFileSource.elements;
 
 /** A util allow quickshop check item matches easy and quick. */
 public class ItemMatcher {
