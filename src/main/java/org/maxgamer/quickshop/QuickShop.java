@@ -71,7 +71,7 @@ import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.ItemMatcher;
-import org.maxgamer.quickshop.utils.PermissionChecker;
+import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.Util;
@@ -148,7 +148,7 @@ public class QuickShop extends JavaPlugin {
   /** The plugin PlaceHolderAPI(null if not present) */
   private Plugin placeHolderAPI;
   /** A util to call to check some actions permission */
-  private PermissionChecker permissionChecker;
+  private BuildPerms permissionChecker;
 
   private PlayerListener playerListener;
   private InternalListener internalListener;
@@ -522,7 +522,7 @@ public class QuickShop extends JavaPlugin {
       }
     }
     this.databaseManager = new Dispatcher(database);
-    this.permissionChecker = new PermissionChecker(this);
+    this.permissionChecker = new BuildPerms(this);
 
     ConfigurationSection limitCfg = this.getConfig().getConfigurationSection("limits");
     if (limitCfg != null) {

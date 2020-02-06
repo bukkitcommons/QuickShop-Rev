@@ -85,54 +85,42 @@ public class ShopManager {
   /**
    * Checks other plugins to make sure they can use the chest they're making a shop.
    *
-   * @param p The player to check
-   * @param b The block to check
-   * @param bf The blockface to check
+   * @param player The player to check
+   * @param block The block to check
    * @return True if they're allowed to place a shop there.
    */
-  public boolean canBuildShop(@NotNull Player p, @NotNull Block b, @NotNull BlockFace bf) {
+  public boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
     try {
-      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(false, p);
-
       if (QuickShop.instance().isLimit()) {
-        int owned = 0;
-        if (!QuickShop.instance().getConfig().getBoolean("limits.old-algorithm")) {
-          for (Map<Long, Map<Long, Shop>> shopmap : getShopsMap().values()) {
-            for (Map<Long, Shop> shopLocs : shopmap.values()) {
-              for (Shop shop : shopLocs.values()) {
-                if (shop.getOwner().equals(p.getUniqueId()) && !shop.isUnlimited()) {
-                  owned++;
-                }
-              }
-            }
-          }
-        } else {
-          Iterator<Shop> it = getShopIterator();
-          while (it.hasNext()) {
-            if (it.next().getOwner().equals(p.getUniqueId())) {
-              owned++;
-            }
-          }
-        }
-
-        int max = QuickShop.instance().getShopLimit(p);
-        if (owned + 1 > max) {
-          p.sendMessage(MsgUtil.getMessage("reached-maximum-can-create", p, String.valueOf(owned),
-              String.valueOf(max)));
+        UUID uuid = player.getUniqueId();
+        long owned = shops
+            .stream()
+            .filter(shop -> shop.getOwner().equals(uuid))
+            .count();
+        
+        int max = QuickShop.instance().getShopLimit(player);
+        
+        if (owned >= max) {
+          player.sendMessage(
+              MsgUtil.getMessage("reached-maximum-can-create", player,
+                  String.valueOf(owned), String.valueOf(max)));
+          
           return false;
         }
       }
-      if (!QuickShop.instance().getPermissionChecker().canBuild(p, b)) {
+      
+      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(false, player);
+      if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
         Util.debugLog("PermissionChecker canceled shop creation");
         return false;
       }
-      ShopPreCreateEvent spce = new ShopPreCreateEvent(p, b.getLocation());
-      Bukkit.getPluginManager().callEvent(spce);
-      if (Util.fireCancellableEvent(spce)) {
+      
+      ShopPreCreateEvent event = new ShopPreCreateEvent(player, block.getLocation());
+      if (Util.fireCancellableEvent(event))
         return false;
-      }
+      
     } finally {
-      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
+      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, player);
     }
 
     return true;

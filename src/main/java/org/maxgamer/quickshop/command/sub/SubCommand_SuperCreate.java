@@ -77,15 +77,7 @@ public class SubCommand_SuperCreate implements CommandProcesser {
         continue;
       }
 
-      BlockFace blockFace;
-
-      try {
-        blockFace = p.getFacing();
-      } catch (Throwable throwable) {
-        blockFace = Util.getYawFace(p.getLocation().getYaw());
-      }
-
-      if (!ShopManager.instance().canBuildShop(p, b, blockFace)) {
+      if (!ShopManager.instance().canBuildShop(p, b)) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
