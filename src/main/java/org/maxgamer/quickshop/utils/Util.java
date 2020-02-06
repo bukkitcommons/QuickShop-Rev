@@ -837,20 +837,14 @@ public class Util {
   /**
    * Returns true if the given location is loaded or not.
    *
-   * @param loc The location
+   * @param location The location
    * @return true if the given location is loaded or not.
    */
-  public static boolean isChunkLoaded(@NotNull Location loc) {
-    // ShopLogger.instance().log(Level.WARNING, "Checking isLoaded(Location loc)");
-    if (loc.getWorld() == null) {
-      // ShopLogger.instance().log(Level.WARNING, "Is not loaded. (No world)");
-      return false;
-    }
-    // Calculate the chunks coordinates. These are 1,2,3 for each chunk, NOT
-    // location rounded to the nearest 16.
-    int x = (int) Math.floor((loc.getBlockX()) / 16.0);
-    int z = (int) Math.floor((loc.getBlockZ()) / 16.0);
-    return (loc.getWorld().isChunkLoaded(x, z));
+  public static boolean isChunkLoaded(@NotNull Location location) {
+    int chunkX = location.getBlockX() >> 4;
+    int chunkZ = location.getBlockZ() >> 4;
+    
+    return location.getWorld().isChunkLoaded(chunkX, chunkZ);
   }
 
   /**

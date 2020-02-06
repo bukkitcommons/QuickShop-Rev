@@ -330,7 +330,7 @@ public class ContainerShop implements Shop, Managed {
       QuickShop.instance().getEconomy().deposit(this.getOwner(), BaseConfig.refundCost); // FIXME
     
     try {
-      ShopManager.instance().unloadShop(this);
+      ShopManager.instance().unload(this);
       QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
     } catch (SQLException e) {
       e.printStackTrace();
@@ -721,9 +721,6 @@ public class ContainerShop implements Shop, Managed {
       return;
 
     this.isLoaded = true;
-    ShopManager
-      .instance()
-      .getLoadedShops().add(this);
     
     // check price restriction // FIXME move
     Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.item.getType());
@@ -752,7 +749,7 @@ public class ContainerShop implements Shop, Managed {
     }
     save();
     this.isLoaded = false;
-    ShopManager.instance().getLoadedShops().remove(this);
+    ShopManager.instance().unload(this);
     ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
     Bukkit.getPluginManager().callEvent(shopUnloadEvent);
   }

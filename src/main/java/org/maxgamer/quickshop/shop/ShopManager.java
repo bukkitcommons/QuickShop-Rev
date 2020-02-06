@@ -57,8 +57,8 @@ public class ShopManager {
   /*
    * Shop containers
    */
-  private final Map<String, Map<Long, Map<Long, Shop>>> shops = Maps.newHashMap();
-  private final Set<Shop> loadedShops = QuickShop.instance().isEnabledAsyncDisplayDespawn() ? Sets.newConcurrentHashSet() : Sets.newHashSet();
+  private final Map<String, Map<Long, Map<Long, Shop>>> shopsMap = Maps.newHashMap();
+  private final Set<Shop> shops = QuickShop.instance().isEnabledAsyncDisplayDespawn() ? Sets.newConcurrentHashSet() : Sets.newHashSet();
 
   /**
    * Adds a shop to the world. Does NOT require the chunk or world to be loaded Call shop.onLoad by
@@ -67,15 +67,16 @@ public class ShopManager {
    * @param world The name of the world
    * @param shop The shop to add
    */
-  public void addShop(@NotNull String world, @NotNull Shop shop) {
+  public void load(@NotNull String world, @NotNull Shop shop) {
     Map<Long, Map<Long, Shop>> inWorld =
-        shops.computeIfAbsent(world, k -> new HashMap<>(3));
+        shopsMap.computeIfAbsent(world, k -> new HashMap<>(3));
     
     int chunkX = shop.getLocation().getBlockX() >> 4;
     int chunkZ = shop.getLocation().getBlockZ() >> 4;
     Map<Long, Shop> inChunk = inWorld.computeIfAbsent(Util.chunkKey(chunkX, chunkZ), k -> new HashMap<>(1));
     
     inChunk.put(Util.blockKey(shop.getLocation()), shop);
+    shops.add(shop);
   }
 
   /**
@@ -93,7 +94,7 @@ public class ShopManager {
       if (QuickShop.instance().isLimit()) {
         int owned = 0;
         if (!QuickShop.instance().getConfig().getBoolean("limits.old-algorithm")) {
-          for (Map<Long, Map<Long, Shop>> shopmap : getShops().values()) {
+          for (Map<Long, Map<Long, Shop>> shopmap : getShopsMap().values()) {
             for (Map<Long, Shop> shopLocs : shopmap.values()) {
               for (Shop shop : shopLocs.values()) {
                 if (shop.getOwner().equals(p.getUniqueId()) && !shop.isUnlimited()) {
@@ -154,6 +155,7 @@ public class ShopManager {
     }
     ShopActionManager.instance().getActions().clear(); // FIXME
     this.shops.clear();
+    this.shopsMap.clear();
   }
 
   /**
@@ -180,7 +182,7 @@ public class ShopManager {
           Objects.requireNonNull(loc.getWorld()).getName(), loc.getBlockX(), loc.getBlockY(),
           loc.getBlockZ());
       // Add it to the world
-      addShop(loc.getWorld().getName(), shop);
+      load(loc.getWorld().getName(), shop);
     } catch (SQLException error) {
       ShopLogger.instance().warning("SQLException detected, trying to auto fix the database...");
       boolean backupSuccess = Util.backupDatabase();
@@ -324,7 +326,7 @@ public class ShopManager {
    * @return a hashmap of Chunk - Shop
    */
   public @Nullable Map<Long, Map<Long, Shop>> getShops(@NotNull String world) {
-    return this.shops.get(world);
+    return this.shopsMap.get(world);
   }
 
   /**
@@ -346,35 +348,22 @@ public class ShopManager {
   }
 
   /**
-   * Loads the given shop into storage. This method is used for loading data from the database. Do
-   * not use this method to create a shop.
-   *
-   * @param world The world the shop is in
-   * @param shop The shop to load
-   */
-  public void loadShop(@NotNull String world, @NotNull Shop shop) {
-    this.addShop(world, shop);
-  }
-
-  /**
    * Removes a shop from the world. Does NOT remove it from the database. * REQUIRES * the world to
    * be loaded Call shop.onUnload by your self.
    *
    * @param shop The shop to remove
    */
-  public void unloadShop(@NotNull Shop shop) {
-    // shop.onUnload();
-    Location loc = shop.getLocation();
-    String world = Objects.requireNonNull(loc.getWorld()).getName();
-    Map<Long, Map<Long, Shop>> inWorld = shops.get(world);
-    int x = (int) Math.floor((shop.getLocation().getBlockX()) >> 4);
-    int z = (int) Math.floor((shop.getLocation().getBlockZ()) >> 4);
-    Map<Long, Shop> inChunk = inWorld.get(Util.chunkKey(x, z));
-    if (inChunk == null) {
-      return;
-    }
-    inChunk.remove(Util.blockKey(loc));
-    // shop.onUnload();
+  public void unload(@NotNull Shop shop) {
+    Location location = shop.getLocation();
+    Map<Long, Map<Long, Shop>> inWorld = shopsMap.get(location.getWorld().getName());
+    
+    int chunkX = shop.getLocation().getBlockX() >> 4;
+    int chunkZ = shop.getLocation().getBlockZ() >> 4;
+    Map<Long, Shop> inChunk = inWorld.get(Util.chunkKey(chunkX, chunkZ));
+    if (inChunk != null)
+      inChunk.remove(Util.blockKey(location));
+    
+    shops.remove(shop);
   }
 
   /**
@@ -397,7 +386,7 @@ public class ShopManager {
    */
   public Collection<Shop> getAllShops() {
     // noinspection unchecked
-    Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(getShops());
+    Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(getShopsMap());
     Collection<Shop> shops = new ArrayList<>();
     for (Map<Long, Map<Long, Shop>> shopMapData : worldsMap.values()) {
       for (Map<Long, Shop> shopData : shopMapData.values()) {
@@ -413,8 +402,8 @@ public class ShopManager {
    * @return a hashmap of World - Chunk - Shop
    */
   @NotNull
-  public Map<String, Map<Long, Map<Long, Shop>>> getShops() {
-    return this.shops;
+  public Map<String, Map<Long, Map<Long, Shop>>> getShopsMap() {
+    return this.shopsMap;
   }
 
   /**
@@ -424,7 +413,7 @@ public class ShopManager {
    */
   @NotNull
   public Set<Shop> getLoadedShops() {
-    return this.loadedShops;
+    return this.shops;
   }
 
   /**
@@ -457,7 +446,7 @@ public class ShopManager {
 
     public ShopIterator() {
       // noinspection unchecked
-      Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(getShops());
+      Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(getShopsMap());
       
       worlds = worldsMap.values().iterator();
     }

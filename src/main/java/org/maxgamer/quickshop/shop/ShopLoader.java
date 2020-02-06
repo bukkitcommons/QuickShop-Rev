@@ -1,5 +1,6 @@
 package org.maxgamer.quickshop.shop;
 
+import com.bekvon.bukkit.residence.commands.shop;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
@@ -95,11 +96,8 @@ public class ShopLoader implements Listener {
           // Load to World
           if (Util.canBeShop(shop.getLocation().getBlock())) {
             loadedShops++;
-            ShopManager.instance().loadShop(data.world(), shop);
+            ShopManager.instance().load(data.world(), shop);
             shop.onLoad();
-          } else {
-            Util.debugLog("Target block can't be a shop, removing it from the database...");
-            shop.delete();
           }
         }
         
@@ -145,28 +143,24 @@ public class ShopLoader implements Listener {
   }
 
   private static boolean canLoad(@NotNull ShopDatabaseInfo info) {
-    if (info.item() == null) {
-      Util.debugLog("Shop ItemStack is null");
+    if (info.item() == null)
       return false;
-    }
     
-    if (info.item().getType() == Material.AIR) {
-      Util.debugLog("Shop ItemStack type can't be AIR");
+    if (info.item().getType() == Material.AIR)
       return false;
-    }
     
-    if (info.world() == null) {
-      Util.debugLog("Shop World is null");
+    if (info.type() == null)
       return false;
-    }
     
-    if (info.moderators() == null) {
-      Util.debugLog("Shop Owner is null");
+    if (info.moderators() == null)
       return false;
-    }
-    //if (Bukkit.getOfflinePlayer(shop.getOwner()).getName() == null) {
-    //  Util.debugLog("Shop owner not exist on this server, did you reset the playerdata?");
-    //}
+    
+    if (info.world() == null)
+      return false;
+    
+    if (info.moderators() == null)
+      return false;
+    
     return true;
   }
 
@@ -204,17 +198,18 @@ public class ShopLoader implements Listener {
   public static class ShopDatabaseInfo implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private ItemStack item;
-    private ShopModerator moderators;
+    @NotNull private ItemStack item;
+    @NotNull private ShopModerator moderators;
+    @NotNull private String world;
+    @NotNull private ShopType type;
+    
     private double price;
-    private ShopType type;
     private boolean unlimited;
-    private String world;
     private int x;
     private int y;
     private int z;
     
-    public ShopDatabaseInfo(ResultSet rs) {
+    public ShopDatabaseInfo(@NotNull ResultSet rs) {
       try {
         this.x = rs.getInt("x");
         this.y = rs.getInt("y");
