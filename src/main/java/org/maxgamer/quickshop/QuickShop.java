@@ -543,7 +543,7 @@ public class QuickShop extends JavaPlugin {
     getLogger().info("Registering Listeners...");
     // Register events
 
-    blockListener = new BlockListener(this);
+    blockListener = new BlockListener();
     playerListener = new PlayerListener(this);
     worldListener = new ShopLoader();
     chatListener = new ChatListener();

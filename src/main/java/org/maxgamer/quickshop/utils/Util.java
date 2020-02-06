@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
@@ -352,19 +353,6 @@ public class Util {
   }
 
   /**
-   * Check two location is or not equals for the BlockPosition on 2D
-   *
-   * @param b1 block 1
-   * @param b2 block 2
-   * @return Equals or not.
-   */
-  private static boolean equalsBlockStateLocation(@NotNull Location b1, @NotNull Location b2) {
-    return (b1.getBlockX() == b2.getBlockX()) && (b1.getBlockY() == b2.getBlockY())
-        && (b1.getBlockZ() == b2.getBlockZ()) && (Objects.requireNonNull(b1.getWorld()).getName()
-            .equals(Objects.requireNonNull(b2.getWorld()).getName()));
-  }
-
-  /**
    * First uppercase for every words the first char for a text.
    *
    * @param string text
@@ -408,15 +396,14 @@ public class Util {
   /**
    * Fetches the block which the given sign is attached to
    *
-   * @param block The block which is attached
+   * @param sign The block which is attached
    * @return The block the sign is attached to
    */
-  @Nullable
-  public static Block getSignAttached(@NotNull Block block) {
-    if (block.getType().name().endsWith("WALL_SIGN")) {
-      return block.getRelative(((Sign) block.getState().getData()).getFacing().getOppositeFace());
+  public static Optional<Block> getSignAttached(@NotNull Block sign) {
+    if (sign.getType().name().endsWith("WALL_SIGN")) {
+      return Optional.of(sign.getRelative(((Sign) sign.getState().getData()).getFacing().getOppositeFace()));
     } else {
-      return null;
+      return Optional.empty();
     }
   }
 
@@ -530,32 +517,22 @@ public class Util {
   /**
    * Returns the chest attached to the given chest. The given block must be a chest.
    *
-   * @param b The chest to check.
+   * @param chest The chest to check.
    * @return the block which is also a chest and connected to b.
    */
-  @Nullable
-  public static Block getSecondHalf(@NotNull Block b) {
-    if (!isDoubleChest(b)) {
-      return null;
-    }
-    Chest oneSideOfChest = (Chest) b.getState();
-    InventoryHolder chestHolder = oneSideOfChest.getInventory().getHolder();
-    if (chestHolder instanceof DoubleChest) {
-      DoubleChest doubleChest = (DoubleChest) chestHolder;
-      InventoryHolder left = doubleChest.getLeftSide();
-      InventoryHolder right = doubleChest.getRightSide();
-      Chest leftC = (Chest) left;
-      Chest rightC = (Chest) right;
-      if (equalsBlockStateLocation(oneSideOfChest.getLocation(),
-          Objects.requireNonNull(rightC).getLocation())) {
-        return Objects.requireNonNull(leftC).getBlock();
-      }
-      if (equalsBlockStateLocation(oneSideOfChest.getLocation(),
-          Objects.requireNonNull(leftC).getLocation())) {
-        return rightC.getBlock();
-      }
-    }
-    return null;
+  public static Optional<Location> getSecondHalf(@NotNull Block chest) {
+    if (!isDoubleChest(chest))
+      return Optional.empty();
+    
+    Chest halfChest = (Chest) chest.getState();
+    DoubleChestInventory chestHolder = (@Nullable DoubleChestInventory) halfChest.getInventory();
+    
+    Inventory right = chestHolder.getRightSide();
+    Location rightLoc = right.getLocation();
+    return
+        Optional.of(
+            (rightLoc.getX() == halfChest.getX() && rightLoc.getZ() == halfChest.getZ() ?
+            chestHolder.getLeftSide().getLocation() : rightLoc));
   }
 
   /**
@@ -883,9 +860,11 @@ public class Util {
       ShopViewer firstShop = ShopManager.instance().getShopAt(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
-      Block secondHalf = getSecondHalf(c);
+      Optional<Location> secondHalf = getSecondHalf(c);
       ShopViewer secondShop =
-          secondHalf == null ? ShopViewer.empty() : ShopManager.instance().getShopAt(secondHalf.getLocation());
+          secondHalf.isPresent() ?
+              ShopManager.instance().getShopAt(secondHalf.get()) : ShopViewer.empty();
+      
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
         return true;

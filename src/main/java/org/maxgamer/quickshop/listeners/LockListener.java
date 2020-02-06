@@ -146,11 +146,9 @@ public class LockListener implements Listener {
           return;
         }
       }
-      b = Util.getSignAttached(b);
-
-      if (b == null) {
+      Optional<Block> chest = Util.getSignAttached(b);
+      if (!chest.isPresent())
         return;
-      }
 
       ShopManager.instance().getShopAt(b.getLocation()).ifPresent(shop -> {
         // If they're the shop owner or have bypass perms, they can destroy

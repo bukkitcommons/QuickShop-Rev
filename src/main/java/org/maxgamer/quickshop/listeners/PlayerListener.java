@@ -16,7 +16,6 @@
 
 package org.maxgamer.quickshop.listeners;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,7 +75,7 @@ public class PlayerListener implements Listener {
         final Block block;
 
         if (Util.isWallSign(e.getClickedBlock().getType())) {
-          block = Util.getSignAttached(e.getClickedBlock());
+          block = Util.getSignAttached(e.getClickedBlock()).get();
         } else {
           block = e.getClickedBlock();
         }
@@ -121,19 +120,19 @@ public class PlayerListener implements Listener {
     ShopViewer shop = ShopManager.instance().getShopAt(loc);
     // If that wasn't a shop, search nearby shops
     if (!shop.isPresent()) {
-      final Block attached;
+      final Optional<Block> attached;
 
       if (Util.isWallSign(b.getType())) {
         attached = Util.getSignAttached(b);
 
-        if (attached != null) {
-          shop = ShopManager.instance().getShopAt(attached.getLocation());
+        if (attached.isPresent()) {
+          shop = ShopManager.instance().getShopAt(attached.get());
         }
       } else if (Util.isDoubleChest(b)) {
-        attached = Util.getSecondHalf(b);
+        Optional<Location> half = Util.getSecondHalf(b);
 
-        if (attached != null) {
-          ShopViewer secondHalfShop = ShopManager.instance().getShopAt(attached.getLocation());
+        if (half.isPresent()) {
+          ShopViewer secondHalfShop = ShopManager.instance().getShopAt(half.get());
           if (secondHalfShop.isPresent() && !p.getUniqueId().equals(secondHalfShop.get().getOwner())) {
             // If player not the owner of the shop, make him select the second half of the
             // shop
@@ -355,10 +354,10 @@ public class PlayerListener implements Listener {
       return;
     }
 
-    final Block attachedBlock = Util.getSignAttached(block);
+    final Optional<Block> attachedBlock = Util.getSignAttached(block);
 
-    if (attachedBlock == null
-        || ShopManager.instance().getShopFrom(attachedBlock.getLocation()) == null) {
+    if (!attachedBlock.isPresent()
+        || !ShopManager.instance().getShopAt(attachedBlock.get()).isPresent()) {
       return;
     }
 

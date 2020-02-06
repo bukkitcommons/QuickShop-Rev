@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -469,11 +470,11 @@ public class ContainerShop implements Shop, Managed {
    */
   @Nullable
   public ContainerShop getAttachedShop() {
-    Block c = Util.getSecondHalf(this.getLocation().getBlock());
-    if (c == null) {
+    Optional<Location> c = Util.getSecondHalf(this.getLocation().getBlock());
+    if (!c.isPresent()) {
       return null;
     }
-    ShopViewer shop = ShopManager.instance().getShopAt(c.getLocation());
+    ShopViewer shop = ShopManager.instance().getShopAt(c.get());
     return (ContainerShop) shop.get();
   }
 

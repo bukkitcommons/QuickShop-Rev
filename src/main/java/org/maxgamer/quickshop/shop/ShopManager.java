@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -321,17 +322,17 @@ public class ShopManager {
           return viewerAt;
         
       default:
-        Block attached = Util.getSignAttached(block);
-        if (attached != null) {
-          ShopViewer viewer = getShopAt(attached);
+        Optional<Block> attached = Util.getSignAttached(block);
+        if (attached.isPresent()) {
+          ShopViewer viewer = getShopAt(attached.get());
           if (viewer.isPresent())
             return viewer;
         }
         
         if (secondHalf) {
-          Block half = Util.getSecondHalf(block);
-          if (half != null) {
-            ShopViewer viewerHalf = getShopAt(half);
+          Optional<Location> half = Util.getSecondHalf(block);
+          if (half.isPresent()) {
+            ShopViewer viewerHalf = getShopAt(half.get());
             if (viewerHalf.isPresent())
               return viewerHalf;
           }

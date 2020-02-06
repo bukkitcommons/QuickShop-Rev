@@ -1,6 +1,7 @@
 package org.maxgamer.quickshop.listeners;
 
 import lombok.AllArgsConstructor;
+import java.util.Optional;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,34 +22,25 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.data.ShopAction;
-import org.maxgamer.quickshop.shop.api.data.ShopCreator;
-import org.maxgamer.quickshop.shop.api.data.ShopData;
-import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 @AllArgsConstructor
 public class BlockListener implements Listener {
-
-  @NotNull
-  private final QuickShop plugin;
-
   /**
    * Gets the shop a sign is attached to
    *
-   * @param loc The location of the sign
+   * @param b The location of the sign
    * @return The shop
    */
-  private ShopViewer getShopNextTo(@NotNull Location loc) {
-    final Block b = Util.getSignAttached(loc.getBlock());
-    // Util.getAttached(b)
-    if (b == null) {
-      return null;
-    }
-
-    return ShopManager.instance().getShopAt(b.getLocation());
+  private ShopViewer getShopBySign(@NotNull Block sign) {
+    final Optional<Block> shopBlock = Util.getSignAttached(sign);
+    return shopBlock.isPresent() ?
+        ShopManager
+          .instance()
+          .getShopAt(shopBlock.get()) : ShopViewer.empty();
   }
 
   /*
@@ -64,8 +56,7 @@ public class BlockListener implements Listener {
       if (BaseConfig.locketteEnable && sign.getLine(0).equals(BaseConfig.lockettePrivateText)
           || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
         // Ignore break lockette sign
-        plugin.getLogger()
-            .info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
+        ShopLogger.instance().info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
         return;
       }
     }
@@ -109,8 +100,8 @@ public class BlockListener implements Listener {
       shop.get().delete();
       p.sendMessage(MsgUtil.getMessage("success-removed-shop", p));
     } else if (Util.isWallSign(b.getType())) {
-      if (b instanceof Sign) {
-        Sign sign = (Sign) b;
+      if (b.getState() instanceof Sign) {
+        Sign sign = (Sign) b.getState();
         if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
             || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
           // Ignore break lockette sign
@@ -118,7 +109,7 @@ public class BlockListener implements Listener {
         }
       }
 
-      ShopViewer viewer = getShopNextTo(b.getLocation());
+      ShopViewer viewer = getShopBySign(b);
 
       viewer.nonNull()
         .accept(shop -> {
@@ -158,7 +149,7 @@ public class BlockListener implements Listener {
     // Delayed task. Event triggers when item is moved, not when it is received.
     final ShopViewer shop = ShopManager.instance().getShopFrom(location);
     if (shop.get() != null) {
-      plugin.getSignUpdateWatcher().scheduleSignUpdate(shop.get());
+      QuickShop.instance().getSignUpdateWatcher().scheduleSignUpdate(shop.get());
     }
   }
 
@@ -176,9 +167,9 @@ public class BlockListener implements Listener {
 
     final Block b = e.getBlock();
     final Player p = e.getPlayer();
-    final Block chest = Util.getSecondHalf(b);
+    final Optional<Location> chest = Util.getSecondHalf(b);
 
-    if (chest != null && ShopManager.instance().getShopAt(chest.getLocation()) != null
+    if (chest.isPresent() && ShopManager.instance().getShopAt(chest.get()) != null
         && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
       e.setCancelled(true);
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
