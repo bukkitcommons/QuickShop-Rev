@@ -12,14 +12,49 @@ import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 
 public interface Shop extends Managed {
+  /**
+   * Delete the shop from database.
+   * @see ShopManager#delete(Shop)
+   */
   @Deprecated
   default public void delete() {
     ShopManager.instance().delete(this);
   }
   
+  /**
+   * Helper to check shop type.
+   * @param shopType type
+   * @return whether is that type.
+   */
   default boolean is(@NotNull ShopType shopType) {
     return getShopType() == shopType;
   }
+  
+  /**
+   * Gets moderators information of this shop.
+   * @return the moderator
+   */
+  ShopModerator getModerator();
+  
+  /**
+   * Clone the shop by its constructor.
+   * @return the cloned shop
+   */
+  @NotNull
+  @Deprecated
+  Shop clone();
+  
+  /**
+   * Invokes on shop being loaded.
+   * @see ShopManager#load(String, Shop)
+   */
+  void onLoad();
+
+  /**
+   * Invokes on shop being unloaded.
+   * @see ShopManager#unload(Shop)
+   */
+  void onUnload();
   
   /**
    * Add x ItemStack to the shop inventory
@@ -41,14 +76,6 @@ public interface Shop extends Managed {
   void checkDisplay();
 
   /**
-   * Clone new shop object. Not a deep clone.
-   *
-   * @return New shop object
-   */
-  @NotNull
-  Shop clone();
-
-  /**
    * Check shop is or not attacked the target block
    *
    * @param paramBlock Target block
@@ -66,12 +93,6 @@ public interface Shop extends Managed {
 
   /** Execute codes when player click the shop will did things */
   void onClick();
-
-  /** Load shop to the world */
-  void onLoad();
-
-  /** Unload shop from world */
-  void onUnload();
 
   /**
    * Get shop's owner name, it will return owner name or Admin Shop(i18n) when it is unlimited
@@ -219,6 +240,4 @@ public interface Shop extends Managed {
    */
   @Nullable
   DisplayItem getDisplay();
-  
-  ShopModerator getModerator();
 }
