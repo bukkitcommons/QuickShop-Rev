@@ -42,9 +42,6 @@ public interface Shop extends Managed {
   @NotNull
   Shop clone();
 
-  /** Delete shop from ram, and database. */
-  void delete();
-
   /**
    * Check shop is or not attacked the target block
    *

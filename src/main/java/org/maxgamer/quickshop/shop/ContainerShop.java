@@ -293,50 +293,6 @@ public class ContainerShop implements Shop, Managed {
     }
   }
 
-  /**
-   * Deletes the shop from the list of shops and queues it for database deletion
-   *
-   * @param fromMemory True if you are *NOT* iterating over this currently, *false if you are
-   *        iterating*
-   */
-  @Override
-  public void delete() {
-    ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(this, false);
-    if (Util.fireCancellableEvent(shopDeleteEvent)) {
-      Util.debugLog("Shop deletion was canceled because a plugin canceled it.");
-      return;
-    }
-    
-    // Unload the shop
-    if (isLoaded)
-      ShopManager.instance().unload(this);
-    
-    // Delete the display item
-    if (getDisplayItem() != null) {
-      getDisplayItem().remove();
-    }
-    
-    // Delete the signs around it
-    for (Sign s : this.getSigns())
-      s.getBlock().setType(Material.AIR);
-    
-    // Delete it from the database
-    int x = this.getLocation().getBlockX();
-    int y = this.getLocation().getBlockY();
-    int z = this.getLocation().getBlockZ();
-    String world = this.getLocation().getWorld().getName();
-    // Refund if necessary
-    if (BaseConfig.refundable)
-      QuickShop.instance().getEconomy().deposit(this.getOwner(), BaseConfig.refundCost); // FIXME
-    
-    try {
-      ShopManager.instance().unload(this);
-      QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
   @Override
   public void checkDisplay() {
     try {
@@ -498,8 +454,7 @@ public class ContainerShop implements Shop, Managed {
       container = (InventoryHolder) this.location.getBlock().getState();
       return container.getInventory();
     } catch (Exception e) {
-      this.onUnload();
-      this.delete();
+      ShopManager.instance().delete(this);
       Util.debugLog("Inventory doesn't exist anymore: " + this + " shop was removed.");
       return null;
     }

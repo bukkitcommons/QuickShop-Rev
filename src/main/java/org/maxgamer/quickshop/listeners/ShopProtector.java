@@ -54,13 +54,17 @@ public class ShopProtector implements Listener {
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onBlockExplode(BlockExplodeEvent event) {
     for (Block block : event.blockList())
-      handleProtection(block.getLocation(), BaseConfig.explosionProtection, () -> event.setCancelled(true), Shop::delete);
+      handleProtection(block.getLocation(), BaseConfig.explosionProtection,
+          () -> event.setCancelled(true),
+          shop -> ShopManager.instance().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
   public void onEntityExplode(EntityExplodeEvent event) {
     for (Block block : event.blockList())
-      handleProtection(block.getLocation(), BaseConfig.explosionProtection, () -> event.setCancelled(true), Shop::delete);
+      handleProtection(block.getLocation(), BaseConfig.explosionProtection,
+          () -> event.setCancelled(true),
+          shop -> ShopManager.instance().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

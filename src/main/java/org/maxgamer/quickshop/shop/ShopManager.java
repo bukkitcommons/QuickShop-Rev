@@ -24,6 +24,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
@@ -32,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopCreateEvent;
+import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
@@ -353,6 +355,40 @@ public class ShopManager {
     
     shops.remove(shop);
     shop.onUnload();
+  }
+  
+  public void delete(@NotNull Shop shop) {
+    ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
+    if (Util.fireCancellableEvent(shopDeleteEvent)) {
+      Util.debugLog("Shop deletion was canceled because a plugin canceled it.");
+      return;
+    }
+    
+    ShopManager.instance().unload(shop);
+    
+    // Delete the display item
+    if (shop.getDisplay() != null) {
+      shop.getDisplay().remove();
+    }
+    
+    // Delete the signs around it
+    for (Sign s : shop.getSigns())
+      s.getBlock().setType(Material.AIR);
+    
+    // Delete it from the database
+    int x = shop.getLocation().getBlockX();
+    int y = shop.getLocation().getBlockY();
+    int z = shop.getLocation().getBlockZ();
+    String world = shop.getLocation().getWorld().getName();
+    
+    try {
+      QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (BaseConfig.refundable)
+        QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
+    }
   }
 
   /**
