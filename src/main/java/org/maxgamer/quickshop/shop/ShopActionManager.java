@@ -361,11 +361,11 @@ public class ShopActionManager {
     shop.onLoad();
     ShopCreateEvent e = new ShopCreateEvent(shop, p);
     if (Util.fireCancellableEvent(e)) {
-      shop.onUnload();
+      ShopManager.instance().unload(shop);
       return;
     }
     if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location())) {
-      shop.onUnload();
+      ShopManager.instance().unload(shop);
       Util.debugLog("Cancelled by integrations");
       return;
     }

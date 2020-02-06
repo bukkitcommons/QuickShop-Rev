@@ -309,7 +309,7 @@ public class ContainerShop implements Shop, Managed {
     
     // Unload the shop
     if (isLoaded)
-      this.onUnload();
+      ShopManager.instance().unload(this);
     
     // Delete the display item
     if (getDisplayItem() != null) {
@@ -703,14 +703,13 @@ public class ContainerShop implements Shop, Managed {
   }
 
   /** Check the container still there and we can keep use it. */
-  public void checkContainer() {
+  public void checkContainer() { // FIXME not here
     if (!this.isLoaded) {
       return;
     }
     if (!Util.canBeShop(this.getLocation().getBlock())) {
       Util.debugLog("Shop at " + this.getLocation() + " container was missing, remove...");
-      this.onUnload();
-      this.delete();
+      ShopManager.instance().unload(this);
     }
   }
 

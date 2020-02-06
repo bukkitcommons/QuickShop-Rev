@@ -77,7 +77,7 @@ public class BlockListener implements Listener {
       }
       
       ShopActionManager.instance().getActions().remove(player.getUniqueId());
-      shop.onUnload();
+      ShopManager.instance().unload(shop);
       shop.delete();
       player.sendMessage(MsgUtil.getMessage("success-removed-shop", player));
     });

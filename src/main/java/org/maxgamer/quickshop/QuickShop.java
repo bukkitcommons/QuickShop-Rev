@@ -382,7 +382,7 @@ public class QuickShop extends JavaPlugin {
     }
     Util.debugLog("Unloading all shops...");
     try {
-      ShopManager.instance().getLoadedShops().forEach(Shop::onUnload);
+      ShopManager.instance().clear();
     } catch (Throwable th) {
       // ignore, we didn't care that
     }

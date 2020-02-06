@@ -1,20 +1,17 @@
 package org.maxgamer.quickshop.shop;
 
-import com.bekvon.bukkit.residence.commands.shop;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -39,13 +36,13 @@ public class ShopLoader implements Listener {
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onWorldUnload(WorldUnloadEvent event) {
-    for (Chunk chunk : event.getWorld().getLoadedChunks()) {
-      @Nullable Map<Long, Shop> inChunk = ShopManager.instance().getShops(chunk);
-
-      if (inChunk != null && !inChunk.isEmpty())
-        for (Shop shop : inChunk.values())
-          shop.onUnload(); // FIXME performance
-    }
+    String world = event.getWorld().getName();
+    
+    ShopManager.instance()
+               .getLoadedShops()
+               .stream()
+               .filter(shop -> shop.getLocation().getWorld().getName().equals(world))
+               .forEach(shop -> ShopManager.instance().unload(shop));
   }
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

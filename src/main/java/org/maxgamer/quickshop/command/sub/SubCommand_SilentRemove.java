@@ -67,7 +67,7 @@ public class SubCommand_SilentRemove implements CommandProcesser {
       return;
     }
 
-    shop.get().onUnload();
+    ShopManager.instance().unload(shop.get());
     shop.get().delete();
   }
 }
