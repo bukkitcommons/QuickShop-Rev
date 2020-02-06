@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
@@ -88,7 +89,7 @@ public class SubCommand_Find implements CommandProcesser {
     for (int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++) {
       for (int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++) {
         final Chunk d = c.getWorld().getChunkAt(x, z);
-        final @Nullable Map<Long, Shop> inChunk = QuickShop.instance().getShopLoader().getShops(d);
+        final @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(d);
 
         if (inChunk == null) {
           continue;

@@ -72,6 +72,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
@@ -586,7 +587,7 @@ public class Util {
    */
   public static int getShopsInWorld(@NotNull String worldName) {
     int cost = 0;
-    Iterator<Shop> iterator = QuickShop.instance().getShopLoader().getShopIterator();
+    Iterator<Shop> iterator = ShopLoader.instance().getShopIterator();
     while (iterator.hasNext()) {
       Shop shop = iterator.next();
       if (Objects.requireNonNull(shop.getLocation().getWorld()).getName().equals(worldName)) {

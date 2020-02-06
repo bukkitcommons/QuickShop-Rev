@@ -168,7 +168,6 @@ public class QuickShop extends JavaPlugin {
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
   private HashSet<String> warnings = new HashSet<>();
 
-  private ShopLoader shopLoader;
   private OngoingFeeWatcher ongoingFeeWatcher;
   private SignUpdateWatcher signUpdateWatcher;
   private BukkitWrapper bukkitAPIWrapper;
@@ -545,7 +544,6 @@ public class QuickShop extends JavaPlugin {
 
     blockListener = new BlockListener();
     playerListener = new PlayerListener(this);
-    shopLoader = new ShopLoader();
     chatListener = new ChatListener();
     inventoryListener = new DisplayProtectionListener();
     customInventoryListener = new CustomInventoryListener(this);
@@ -561,7 +559,6 @@ public class QuickShop extends JavaPlugin {
     Bukkit.getPluginManager().registerEvents(playerListener, this);
     Bukkit.getPluginManager().registerEvents(chatListener, this);
     Bukkit.getPluginManager().registerEvents(inventoryListener, this);
-    Bukkit.getPluginManager().registerEvents(shopLoader, this);
     Bukkit.getPluginManager().registerEvents(customInventoryListener, this);
     Bukkit.getPluginManager().registerEvents(displayBugFixListener, this);
     Bukkit.getPluginManager().registerEvents(shopProtectListener, this);

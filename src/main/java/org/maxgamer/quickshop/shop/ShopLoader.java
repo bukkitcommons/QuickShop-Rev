@@ -45,6 +45,20 @@ import org.maxgamer.quickshop.utils.viewer.ViewAction;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader implements Listener {
+  /*
+   * Singleton
+   */
+  private static class LazySingleton {
+    private static final ShopLoader INSTANCE = new ShopLoader();
+  }
+  
+  private ShopLoader() {
+    Bukkit.getPluginManager().registerEvents(this, QuickShop.instance());
+  }
+  
+  public static ShopLoader instance() {
+    return LazySingleton.INSTANCE;
+  }
   
   @Getter
   private final Map<String, Map<Long, Map<Long, Shop>>> allShops = Maps.newHashMap();
@@ -189,7 +203,7 @@ public class ShopLoader implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
 
-    @Nullable Map<Long, Shop> inChunk = QuickShop.instance().getShopLoader().getShops(e.getChunk());
+    @Nullable Map<Long, Shop> inChunk = getShops(e.getChunk());
 
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {

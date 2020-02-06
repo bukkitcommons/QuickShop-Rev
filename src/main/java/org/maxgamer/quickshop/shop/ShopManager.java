@@ -1,15 +1,9 @@
 package org.maxgamer.quickshop.shop;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -17,7 +11,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -80,11 +73,11 @@ public class ShopManager {
    * @param block The block to check
    * @return True if they're allowed to place a shop there.
    */
-  public boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
+  public static boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
     try {
       if (QuickShop.instance().isLimit()) {
         UUID uuid = player.getUniqueId();
-        long owned = loadedShops
+        long owned = ShopLoader.instance().getAllShop()
             .stream()
             .filter(shop -> shop.getOwner().equals(uuid))
             .count();
@@ -224,7 +217,7 @@ public class ShopManager {
    * @return The shop at that location
    */
   public ShopViewer getShopAt(@NotNull Location loc) {
-    @Nullable Map<Long, Shop> inChunk = QuickShop.instance().getShopLoader().getShops(loc.getChunk());
+    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     if (inChunk == null)
       return ShopViewer.empty();
     
@@ -232,7 +225,7 @@ public class ShopManager {
   }
   
   public boolean hasShopAt(@NotNull Location loc) {
-    @Nullable Map<Long, Shop> inChunk = QuickShop.instance().getShopLoader().getShops(loc.getChunk());
+    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     if (inChunk == null)
       return false;
     
@@ -240,7 +233,7 @@ public class ShopManager {
   }
 
   public void accept(@NotNull Location loc, @NotNull Consumer<Shop> consumer) {
-    @Nullable Map<Long, Shop> inChunk = QuickShop.instance().getShopLoader().getShops(loc.getChunk());
+    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     
     if (inChunk != null) {
       Shop shop = inChunk.get(Util.blockKey(loc));
@@ -357,7 +350,7 @@ public class ShopManager {
    * @return The list have this player's all shops.
    */
   public @NotNull List<Shop> getPlayerOweShops(@NotNull UUID playerUUID) {
-    return loadedShops.stream().filter(shop -> shop.getOwner().equals(playerUUID))
+    return ShopLoader.instance().getAllShop().stream().filter(shop -> shop.getOwner().equals(playerUUID))
         .collect(Collectors.toList());
   }
 
@@ -368,7 +361,7 @@ public class ShopManager {
    * @return The list have this world all shops
    */
   public @NotNull List<Shop> getShopsInWorld(@NotNull World world) {
-    return loadedShops.stream()
+    return ShopLoader.instance().getAllShop().stream()
         .filter(shop -> Objects.equals(shop.getLocation().getWorld(), world))
         .collect(Collectors.toList());
   }

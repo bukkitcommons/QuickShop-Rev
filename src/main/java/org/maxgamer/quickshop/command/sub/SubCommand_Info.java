@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ContainerShop;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopChunk;
@@ -48,7 +49,7 @@ public class SubCommand_Info implements CommandProcesser {
     buying = selling = doubles = chunks = worlds = doubleschests = 0;
     int nostock = 0;
 
-    for (Map<Long, Map<Long, Shop>> inWorld : QuickShop.instance().getShopLoader().getAllShops().values()) {
+    for (Map<Long, Map<Long, Shop>> inWorld : ShopLoader.instance().getAllShops().values()) {
       worlds++;
 
       for (Map<Long, Shop> inChunk : inWorld.values()) {

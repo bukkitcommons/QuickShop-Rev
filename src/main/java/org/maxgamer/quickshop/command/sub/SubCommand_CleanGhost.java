@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
@@ -36,7 +37,7 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
       sender.sendMessage(ChatColor.GREEN + "Async thread is started, please wait...");
       //Util.backupDatabase(); // Already warn the user, don't care about backup result.
       
-      for (Shop shop : QuickShop.instance().getShopLoader().getAllShop()) {
+      for (Shop shop : ShopLoader.instance().getAllShop()) {
         if (shop.getItem().getType() == Material.AIR) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause item data is damaged.");
