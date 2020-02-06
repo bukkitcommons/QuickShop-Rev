@@ -206,7 +206,7 @@ public class ShopLoader implements Listener {
     }
     
     // Delete the signs around it
-    for (Sign s : shop.getSigns())
+    for (Sign s : shop.getShopSigns())
       s.getBlock().setType(Material.AIR);
     
     // Delete it from the database

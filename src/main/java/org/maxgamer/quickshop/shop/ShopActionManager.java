@@ -2,14 +2,18 @@ package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Maps;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
+import javax.swing.text.AbstractDocument.BranchElement;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.RegisteredListener;
@@ -92,8 +96,6 @@ public class ShopActionManager {
       return false;
 
     amount = e.getAmount();
-    // FIXME event modify
-    
     return actionBuy0(p, message, shop, amount);
   }
 
@@ -229,8 +231,22 @@ public class ShopActionManager {
 
       Material signType = info.sign().getType();
       if (!Util.isAir(signType) && signType != Material.WATER) {
-        p.sendMessage(MsgUtil.getMessage("failed-to-put-sign", p));
-        return;
+        
+        boolean wallSign;
+        try {
+          wallSign = Tag.WALL_SIGNS.isTagged(signType);
+        } catch (Throwable t) {
+          wallSign = signType.name().equals("WALL_SIGN");
+        }
+        
+        if (!wallSign ||
+            !Arrays.stream(
+                ((Sign) info.sign().getState()).getLines())
+            .allMatch(String::isEmpty)) {
+          
+          p.sendMessage(MsgUtil.getMessage("failed-to-put-sign", p));
+          return;
+        }
       }
     }
 

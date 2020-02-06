@@ -1,9 +1,11 @@
 package org.maxgamer.quickshop.shop;
 
+import com.google.common.collect.Lists;
 import com.lishid.openinv.OpenInv;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -26,6 +28,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.checkerframework.checker.units.qual.s;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
@@ -467,7 +470,8 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public void setSignText(@NotNull String[] lines) {
-    for (Sign sign : this.getSigns()) {
+    Bukkit.getLogger().warning("4.0");
+    for (Sign sign : this.getShopSigns()) {
       if (Arrays.equals(sign.getLines(), lines)) {
         Util.debugLog("Skipped new sign text setup: Same content");
         continue;
@@ -475,6 +479,7 @@ public class ContainerShop implements Shop, Managed {
       for (int i = 0; i < lines.length; i++) {
         sign.setLine(i, lines[i]);
       }
+      Bukkit.getLogger().warning("4");
       sign.update(true);
     }
   }
@@ -501,9 +506,11 @@ public class ContainerShop implements Shop, Managed {
   /** Updates signs attached to the shop */
   @Override
   public void setSignText() {
+    Bukkit.getLogger().warning("1");
     if (!Util.isChunkLoaded(this.location)) // FIXME check
       return;
     
+    Bukkit.getLogger().warning("2");
     String[] lines = new String[4];
     
     OfflinePlayer player =
@@ -533,6 +540,7 @@ public class ContainerShop implements Shop, Managed {
         player,
         Util.format(this.getPrice()));
     
+    Bukkit.getLogger().warning("3");
     this.setSignText(lines);
   }
 
@@ -549,64 +557,50 @@ public class ContainerShop implements Shop, Managed {
     sb.append(" Item: ").append(getItem());
     return sb.toString();
   }
+  
+  private static final BlockFace[] SIGN_FACES =
+    {BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST};
 
   /**
    * Returns a list of signs that are attached to this shop (QuickShop and blank signs only)
    *
    * @return a list of signs that are attached to this shop (QuickShop and blank signs only)
    */
+  @NotNull
   @Override
-  public @NotNull List<Sign> getSigns() {
-    List<Sign> signs = new ArrayList<>(1);
-    if (this.getLocation().getWorld() == null) {
-      return signs;
-    }
-    Block[] blocks = new Block[4];
-    blocks[0] = location.getBlock().getRelative(BlockFace.EAST);
-    blocks[1] = location.getBlock().getRelative(BlockFace.NORTH);
-    blocks[2] = location.getBlock().getRelative(BlockFace.SOUTH);
-    blocks[3] = location.getBlock().getRelative(BlockFace.WEST);
+  public List<Sign> getShopSigns() {
+    Bukkit.getLogger().warning("5");
+    if (this.getLocation().getWorld() == null)
+      return Collections.emptyList();
+    
+    Bukkit.getLogger().warning("6");
     OfflinePlayer player = Bukkit.getOfflinePlayer(this.getOwner());
     final String signHeader =
         MsgUtil.getMessagePlaceholder("sign.header", player, this.ownerName());
+    
+    List<Sign> signs = Lists.newArrayListWithCapacity(4);
 
-    for (Block b : blocks) {
-      if (b == null) {
-        ShopLogger.instance().warning("Null signs in the queue, skipping");
+    Block chest = location.getBlock();
+    for (BlockFace face : SIGN_FACES) {
+      Block block = chest.getRelative(face);
+      
+      if (!Util.isWallSign(block.getType()) || !isAttached(block))
         continue;
-      }
-      Material mat = b.getType();
-      if (!Util.isWallSign(mat)) {
-        continue;
-      }
-      if (!isAttached(b)) {
-        continue;
-      }
-      if (!(b.getState() instanceof Sign)) {
-        continue;
-      }
-      org.bukkit.block.Sign sign = (org.bukkit.block.Sign) b.getState();
+      
+      Sign sign = (Sign) block.getState();
       String[] lines = sign.getLines();
-      for (int i = 0; i < lines.length; i++) {
-        if (i == 0) {
-          if (lines[i].contains(signHeader)) {
-            signs.add(sign);
-            break;
-          }
-        } else {
-          if (Arrays.stream(lines).anyMatch((str) -> !str.isEmpty())) {
-            break;
-          }
-        }
-      }
-      signs.add(sign);
+      
+      if (lines[0].contains(signHeader) ||
+          Arrays.stream(lines).allMatch(String::isEmpty))
+        signs.add(sign);
     }
+    
     return signs;
   }
 
   @Override
-  public boolean isAttached(@NotNull Block b) {
-    return this.getLocation().getBlock().equals(Util.getSignAttached(b));
+  public boolean isAttached(@NotNull Block sign) {
+    return location.equals(Util.getSignAttached(sign).get().getLocation());
   }
 
   /**

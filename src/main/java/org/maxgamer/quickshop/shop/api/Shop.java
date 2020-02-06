@@ -204,7 +204,7 @@ public interface Shop extends Managed {
    * @return Signs for the shop
    */
   @NotNull
-  List<Sign> getSigns();
+  List<Sign> getShopSigns();
 
   /**
    * Get this container shop is loaded or unloaded.

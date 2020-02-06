@@ -291,7 +291,7 @@ public class ShopManager {
     return loc == null ? ShopViewer.empty() : getLoadedShopFrom(loc.getBlock());
   }
 
-  private ShopViewer getLoadedShopFrom(@NotNull Block block) {
+  public ShopViewer getLoadedShopFrom(@NotNull Block block) {
     boolean secondHalf = false;
     Location location = block.getLocation();
     

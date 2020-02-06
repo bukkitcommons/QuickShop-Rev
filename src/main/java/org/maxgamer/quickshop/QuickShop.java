@@ -55,7 +55,7 @@ import org.maxgamer.quickshop.listeners.DisplayBugFixListener;
 import org.maxgamer.quickshop.listeners.DisplayProtectionListener;
 import org.maxgamer.quickshop.listeners.InternalListener;
 import org.maxgamer.quickshop.listeners.LockListener;
-import org.maxgamer.quickshop.listeners.PlayerListener;
+import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
@@ -146,7 +146,7 @@ public class QuickShop extends JavaPlugin {
   /** A util to call to check some actions permission */
   private BuildPerms permissionChecker;
 
-  private PlayerListener playerListener;
+  private ShopActionListener playerListener;
   private InternalListener internalListener;
   /**
    * Whether we players are charged a fee to change the price on their shop (To help deter endless
@@ -540,7 +540,7 @@ public class QuickShop extends JavaPlugin {
     // Register events
 
     blockListener = new BlockListener();
-    playerListener = new PlayerListener(this);
+    playerListener = new ShopActionListener(this);
     chatListener = new ChatListener();
     inventoryListener = new DisplayProtectionListener();
     customInventoryListener = new CustomInventoryListener(this);

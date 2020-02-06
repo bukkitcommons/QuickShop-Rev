@@ -42,7 +42,7 @@ public class ShopViewer {
   }
   
   public ShopViewer filter(Predicate<Shop> predicate) {
-    fails = predicate.test(shop);
+    fails = fails ? true : predicate.test(shop);
     return this;
   }
   
