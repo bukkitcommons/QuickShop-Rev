@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.checkerframework.checker.units.qual.s;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
@@ -100,7 +102,7 @@ public class ShopLoader implements Listener {
 
     public ShopIterator() {
       // noinspection unchecked
-      Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(allShops);
+      Map<String, Map<Long, Map<Long, Shop>>> worldsMap = allShops;
       
       worlds = worldsMap.values().iterator();
     }
@@ -220,6 +222,8 @@ public class ShopLoader implements Listener {
     long onLoad = System.currentTimeMillis();
     
     try {
+      Map<Long, Map<Long, Shop>> inWorld = allShops.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
+      
       ShopLogger.instance().info("Loading shops from the database..");
       long onFetch = System.currentTimeMillis();
       ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
@@ -250,12 +254,15 @@ public class ShopLoader implements Listener {
             data.price(), data.item(),
             data.moderators(), data.unlimited(), data.type());
         
+        Map<Long, Shop> inChunk =
+            inWorld.computeIfAbsent(Util.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
+        inChunk.put(Util.blockKey(data.x(), data.y(), data.z()), shop);
+        
         if (Util.isChunkLoaded(shop.getLocation())) {
           // Load to World
           if (Util.canBeShop(shop.getLocation().getBlock())) {
             loadedShops++;
             ShopManager.instance().load(shop);
-            shop.onLoad();
           }
         }
         
