@@ -96,7 +96,7 @@ public class Util {
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
   private static boolean disableDebugLogger = false;
-  
+
   /**
    * Gets an unique key of a chunk based on its coordinates.
    * 
@@ -104,11 +104,27 @@ public class Util {
    * @param z Z Coordinate
    * @return Chunk coordinates packed into a long
    * @author Aikar
-  */
-  public static long getChunkKey(int chunkX, int chunkZ) {
+   */
+  public static long chunkKey(int chunkX, int chunkZ) {
     return (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
   }
+
+  /**
+   * Gets an unique key of a block based on its coordinates.
+   * 
+   * @param x X Coordinate
+   * @param z Z Coordinate
+   * @return Chunk coordinates packed into a long
+   * @author Spottedleaf
+   */
+  public static long blockKey(int x, int y, int z) {
+    return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
+  }
   
+  public static long blockKey(Location location) {
+    return blockKey(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  }
+
   /**
    * Gets the shop a sign is attached to
    *

@@ -88,7 +88,7 @@ public class SubCommand_Find implements CommandProcesser {
     for (int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++) {
       for (int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++) {
         final Chunk d = c.getWorld().getChunkAt(x, z);
-        final @Nullable Map<Location, Shop> inChunk = ShopManager.instance().getShops(d);
+        final @Nullable Map<Long, Shop> inChunk = ShopManager.instance().getShops(d);
 
         if (inChunk == null) {
           continue;

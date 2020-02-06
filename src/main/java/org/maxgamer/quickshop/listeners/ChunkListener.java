@@ -16,10 +16,8 @@
 
 package org.maxgamer.quickshop.listeners;
 
-import java.util.HashMap;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -31,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
-import com.google.common.collect.Maps;
 
 @AllArgsConstructor
 public class ChunkListener implements Listener {
@@ -46,7 +43,7 @@ public class ChunkListener implements Listener {
       return;
     }
 
-    final @Nullable Map<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
+    @Nullable Map<Long, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
 
     if (inChunk == null || inChunk.isEmpty()) {
       return;
@@ -65,7 +62,7 @@ public class ChunkListener implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
 
-    final @Nullable Map<Location, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
+    @Nullable Map<Long, Shop> inChunk = ShopManager.instance().getShops(e.getChunk());
 
     if (inChunk == null || inChunk.isEmpty()) {
       return;

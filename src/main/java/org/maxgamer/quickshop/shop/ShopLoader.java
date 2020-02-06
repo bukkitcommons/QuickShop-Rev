@@ -39,7 +39,7 @@ public class ShopLoader implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onWorldUnload(WorldUnloadEvent event) {
     for (Chunk chunk : event.getWorld().getLoadedChunks()) {
-      final Map<Location, Shop> inChunk = ShopManager.instance().getShops(chunk);
+      @Nullable Map<Long, Shop> inChunk = ShopManager.instance().getShops(chunk);
 
       if (inChunk != null && !inChunk.isEmpty())
         for (Shop shop : inChunk.values())
