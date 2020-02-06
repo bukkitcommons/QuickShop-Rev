@@ -53,6 +53,8 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.block.EnderChest;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -444,11 +446,19 @@ public class Util {
    * @return The block the sign is attached to
    */
   public static Optional<Block> getSignAttached(@NotNull Block sign) {
-    if (sign.getType().name().endsWith("WALL_SIGN")) {
-      return Optional.of(sign.getRelative(((Sign) sign.getState().getData()).getFacing().getOppositeFace()));
-    } else {
-      return Optional.empty();
+    try {
+      org.bukkit.block.data.BlockData data = sign.getBlockData();
+      if (data instanceof org.bukkit.block.data.type.WallSign) {
+        BlockFace opposide = ((org.bukkit.block.data.type.WallSign) data).getFacing().getOppositeFace();
+        return Optional.of(sign.getRelative(opposide));
+      }
+    } catch (Throwable t) {
+      if (sign.getType().name().equals("WALL_SIGN"))
+        return Optional.of(sign.getRelative(
+            ((Sign) sign.getState().getData()).getFacing().getOppositeFace()));
     }
+    
+    return Optional.empty();
   }
 
   /**
