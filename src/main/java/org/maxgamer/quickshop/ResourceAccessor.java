@@ -24,14 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.Rewriter;
 
-public class Language {
-  private QuickShop plugin;
-  // private List<String> languages = new ArrayList<>();
-
-  Language(QuickShop plugin) {
-    this.plugin = plugin;
-  }
-
+public class ResourceAccessor {
   /**
    * Get target language's type file.
    *
@@ -47,10 +40,10 @@ public class Language {
     if (type == null || type.isEmpty()) {
       throw new IllegalArgumentException("Type cannot be null or empty");
     }
-    InputStream inputStream = plugin.getResource(type + "/" + language + ".json");
+    InputStream inputStream = QuickShop.instance().getResource(type + "/" + language + ".json");
     if (inputStream == null) {
       Util.debugLog("Using the default language because we can't get the InputStream.");
-      inputStream = plugin.getResource(type + "/" + "en" + ".json");
+      inputStream = QuickShop.instance().getResource(type + "/" + "en" + ".json");
     }
     return inputStream;
     // File name should call type-language.yml ---> config-zh.yml
@@ -66,7 +59,7 @@ public class Language {
    * @param fileName The filename you want write to the plugin datafolder.
    */
   public void saveFile(@NotNull String language, @NotNull String type, @NotNull String fileName) {
-    File targetFile = new File(plugin.getDataFolder(), fileName);
+    File targetFile = new File(QuickShop.instance().getDataFolder(), fileName);
     if (!targetFile.exists()) {
       try {
         targetFile.createNewFile();

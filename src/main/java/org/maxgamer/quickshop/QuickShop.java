@@ -123,7 +123,7 @@ public class QuickShop extends JavaPlugin {
   private DisplayProtectionListener inventoryListener;
   private ItemMatcher itemMatcher;
   /** Language manager, to select which language will loaded. */
-  private Language language;
+  private final ResourceAccessor language = new ResourceAccessor();
 
   /** Whether or not to limit players shop amounts */
   private boolean limit = false;
@@ -172,7 +172,7 @@ public class QuickShop extends JavaPlugin {
   private boolean enabledAsyncDisplayDespawn;
   
   @Getter
-  private ConfigurationManager configurationManager;
+  private final ConfigurationManager configurationManager = ConfigurationManager.createManager(this);
 
   /**
    * Returns QS version, this method only exist on QSRR forks If running other QSRR forks,, result
@@ -422,7 +422,6 @@ public class QuickShop extends JavaPlugin {
   @Override
   public void onEnable() {
     long start = System.currentTimeMillis();
-    configurationManager = ConfigurationManager.createManager(this);
     configurationManager.load(QuickShop.class);
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
     /* PreInit for BootError feature */
