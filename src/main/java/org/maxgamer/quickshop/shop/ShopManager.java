@@ -77,6 +77,7 @@ public class ShopManager {
     
     inChunk.put(Util.blockKey(shop.getLocation()), shop);
     shops.add(shop);
+    shop.onLoad();
   }
 
   /**
@@ -140,22 +141,9 @@ public class ShopManager {
    * on plugin disable ONLY.
    */
   public void clear() {
-    if (BaseConfig.displayItems) {
-      for (World world : Bukkit.getWorlds()) {
-        for (Chunk chunk : world.getLoadedChunks()) {
-          @Nullable Map<Long, Shop> inChunk = this.getShops(chunk);
-          if (inChunk == null || inChunk.isEmpty()) {
-            continue;
-          }
-          for (Shop shop : inChunk.values()) {
-            shop.onUnload();
-          }
-        }
-      }
-    }
-    ShopActionManager.instance().getActions().clear(); // FIXME
-    this.shops.clear();
-    this.shopsMap.clear();
+    shops.forEach(Shop::onUnload);
+    shops.clear();
+    shopsMap.clear();
   }
 
   /**
@@ -364,6 +352,7 @@ public class ShopManager {
       inChunk.remove(Util.blockKey(location));
     
     shops.remove(shop);
+    shop.onUnload();
   }
 
   /**

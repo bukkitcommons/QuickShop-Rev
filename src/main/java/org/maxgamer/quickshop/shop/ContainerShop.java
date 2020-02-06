@@ -749,7 +749,7 @@ public class ContainerShop implements Shop, Managed {
     }
     save();
     this.isLoaded = false;
-    ShopManager.instance().unload(this);
+    
     ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
     Bukkit.getPluginManager().callEvent(shopUnloadEvent);
   }

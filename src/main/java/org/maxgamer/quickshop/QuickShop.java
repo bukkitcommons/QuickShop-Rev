@@ -65,6 +65,7 @@ import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
+import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -401,6 +402,7 @@ public class QuickShop extends JavaPlugin {
     UpdateWatcher.uninit();
     Util.debugLog("Cleaning up resources and unloading all shops...");
     /* Remove all display items, and any dupes we can find */
+    ShopActionManager.instance().getActions().clear();
     ShopManager.instance().clear();
     /* Close Database */
     if (database != null) {
