@@ -1,6 +1,5 @@
 package org.maxgamer.quickshop.listeners;
 
-import java.util.Optional;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,7 +19,6 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -56,7 +54,8 @@ public class BlockListener implements Listener {
       viewer = ShopManager.instance().getShopAt(block);
     }
     
-    viewer.nonNull()
+    viewer
+    .nonNull()
     .accept(shop -> {
       boolean isOwner = shop.getModerator().isOwner(player.getUniqueId());
       if (!isOwner &&
@@ -84,21 +83,17 @@ public class BlockListener implements Listener {
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
   public void onInventoryMove(InventoryMoveItemEvent event) {
-    if (!BaseConfig.updateSignOnInvMove) {
-      return;
-    }
+    if (BaseConfig.updateSignOnInvMove) {
+      final Inventory inventory = event.getDestination();
+      final Location location = inventory.getLocation();
 
-    final Inventory inventory = event.getDestination();
-    final Location location = inventory.getLocation();
-
-    if (location == null) {
-      return;
-    }
-
-    // Delayed task. Event triggers when item is moved, not when it is received.
-    final ShopViewer shop = ShopManager.instance().getShopFrom(location);
-    if (shop.get() != null) {
-      QuickShop.instance().getSignUpdateWatcher().scheduleSignUpdate(shop.get());
+      if (location != null) {
+        // Delayed task. Event triggers when item is moved, not when it is received.
+        ShopManager
+        .instance()
+        .getShopFrom(location)
+        .ifPresent(shop -> QuickShop.instance().getSignUpdateWatcher().schedule(shop));
+      }
     }
   }
 
@@ -106,21 +101,20 @@ public class BlockListener implements Listener {
    * Listens for chest placement, so a doublechest shop can't be created.
    */
   @EventHandler(ignoreCancelled = true)
-  public void onPlace(BlockPlaceEvent e) {
-    final BlockState bs = e.getBlock().getState();
-
-    if (!(bs instanceof DoubleChest)) {
+  public void onPlace(BlockPlaceEvent event) {
+    final BlockState state = event.getBlock().getState();
+    if (!(state instanceof DoubleChest)) {
       return;
     }
 
-    final Block b = e.getBlock();
-    final Player p = e.getPlayer();
-    final Optional<Location> chest = Util.getSecondHalf(b);
-
-    if (chest.isPresent() && ShopManager.instance().getShopAt(chest.get()) != null
-        && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
-      e.setCancelled(true);
-      p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
-    }
+    Util.getSecondHalf(event.getBlock()).ifPresent(chest -> {
+      final Player player = event.getPlayer();
+      
+      if (!QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.double") &&
+          ShopManager.instance().hasShopAt(chest)) {
+        event.setCancelled(true);
+        player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
+      }
+    });
   }
 }

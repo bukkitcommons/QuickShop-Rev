@@ -586,7 +586,7 @@ public class Util {
    */
   public static int getShopsInWorld(@NotNull String worldName) {
     int cost = 0;
-    Iterator<Shop> iterator = ShopManager.instance().getShopIterator();
+    Iterator<Shop> iterator = QuickShop.instance().getShopLoader().getShopIterator();
     while (iterator.hasNext()) {
       Shop shop = iterator.next();
       if (Objects.requireNonNull(shop.getLocation().getWorld()).getName().equals(worldName)) {

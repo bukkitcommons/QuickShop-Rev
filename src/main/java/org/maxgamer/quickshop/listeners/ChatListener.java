@@ -4,26 +4,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ShopActionManager;
-import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.utils.Util;
 
 public class ChatListener implements Listener {
   @EventHandler(priority = EventPriority.LOWEST)
-  public void onChat(AsyncPlayerChatEvent e) {
-
-    if (e.isCancelled() && BaseConfig.ignoreChatCancelling) {
-      Util.debugLog("Ignored a chat event (Canceled by another plugin.)");
+  public void onChat(AsyncPlayerChatEvent event) {
+    if (event.isCancelled() && BaseConfig.ignoreChatCancelling)
       return;
-    }
-
-    if (!ShopActionManager.instance().hasAction(e.getPlayer().getUniqueId())) {
+    
+    if (!ShopActionManager.instance().hasAction(event.getPlayer().getUniqueId()))
       return;
-    }
+    
     // Fix stupid chat plugin will add a weird space before or after the number we want.
-    ShopActionManager.instance().handleChat(e.getPlayer(), e.getMessage().trim());
-    e.setCancelled(true);
+    ShopActionManager.instance().handleChat(event.getPlayer(), event.getMessage().trim());
+    event.setCancelled(true);
   }
 }

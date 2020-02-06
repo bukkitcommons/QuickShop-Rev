@@ -51,7 +51,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
     boolean ignoreUnlimited = BaseConfig.ongoingFeeIgnoreUnlimited;
     int perTaskFlow = 0;
     int parallelTasks = 0;
-    for (Shop shop : ShopManager.instance().getAllShops()) {
+    for (Shop shop : QuickShop.instance().getShopLoader().getAllShop()) {
       if (!shop.isUnlimited() || !ignoreUnlimited) {
         UUID shopOwner = shop.getOwner();
         parallelTasks++;

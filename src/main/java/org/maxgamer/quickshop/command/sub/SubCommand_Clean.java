@@ -49,7 +49,7 @@ public class SubCommand_Clean implements CommandProcesser {
 
     sender.sendMessage(MsgUtil.getMessage("command.cleaning", sender));
 
-    final Iterator<Shop> shIt = ShopManager.instance().getShopIterator();
+    final Iterator<Shop> shIt = QuickShop.instance().getShopLoader().getShopIterator();
     final ArrayList<Shop> pendingRemoval = new java.util.ArrayList<>();
     int i = 0;
 

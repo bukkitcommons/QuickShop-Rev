@@ -1,17 +1,25 @@
 package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Logger;
 import lombok.Data;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -19,9 +27,12 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
@@ -30,9 +41,121 @@ import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.viewer.ViewAction;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader implements Listener {
+  
+  @Getter
+  private final Map<String, Map<Long, Map<Long, Shop>>> allShops = Maps.newHashMap();
+  
+  /**
+   * Returns a new shop iterator object, allowing iteration over shops easily, instead of sorting
+   * through a 3D hashmap.
+   *
+   * @return a new shop iterator object.
+   */
+  public Iterator<Shop> getShopIterator() {
+    return new ShopIterator();
+  }
+
+  /**
+   * Returns all shops in the whole database, include unloaded.
+   *
+   * <p>
+   * Make sure you have caching this, because this need a while to get all shops
+   *
+   * @return All shop in the database
+   */
+  public Collection<Shop> getAllShop() {
+    // noinspection unchecked
+    Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(allShops);
+    Collection<Shop> shops = new ArrayList<>();
+    for (Map<Long, Map<Long, Shop>> shopMapData : worldsMap.values()) {
+      for (Map<Long, Shop> shopData : shopMapData.values()) {
+        shops.addAll(shopData.values());
+      }
+    }
+    return shops;
+  }
+  
+  public class ShopIterator implements Iterator<Shop> {
+    private Iterator<Map<Long, Shop>> chunks;
+    private Iterator<Shop> shops;
+    private Iterator<Map<Long, Map<Long, Shop>>> worlds;
+
+    public ShopIterator() {
+      // noinspection unchecked
+      Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(allShops);
+      
+      worlds = worldsMap.values().iterator();
+    }
+
+    /** Returns true if there is still more shops to iterate over. */
+    @Override
+    public boolean hasNext() {
+      if (shops == null || !shops.hasNext()) {
+        if (chunks == null || !chunks.hasNext()) {
+          if (!worlds.hasNext()) {
+            return false;
+          } else {
+            chunks = worlds.next().values().iterator();
+            return hasNext();
+          }
+        } else {
+          shops = chunks.next().values().iterator();
+          return hasNext();
+        }
+      }
+      return true;
+    }
+
+    /** Fetches the next shop. Throws NoSuchElementException if there are no more shops. */
+    @Override
+    public @NotNull Shop next() {
+      if (shops == null || !shops.hasNext()) {
+        if (chunks == null || !chunks.hasNext()) {
+          if (!worlds.hasNext()) {
+            throw new NoSuchElementException("No more shops to iterate over!");
+          }
+          chunks = worlds.next().values().iterator();
+        }
+        shops = chunks.next().values().iterator();
+      }
+      if (!shops.hasNext()) {
+        return this.next(); // Skip to the next one (Empty iterator?)
+      }
+      return shops.next();
+    }
+  }
+  
+  /**
+   * Returns a hashmap of Shops
+   *
+   * @param c The chunk to search. Referencing doesn't matter, only coordinates and world are used.
+   * @return Shops
+   */
+  public @Nullable Map<Long, Shop> getShops(@NotNull Chunk c) {
+    return getShops(c.getWorld().getName(), c.getX(), c.getZ());
+  }
+
+  public @Nullable Map<Long, Shop> getShops(@NotNull String world, int chunkX, int chunkZ) {
+    @Nullable Map<Long, Map<Long, Shop>> inWorld = this.getShops(world);
+    if (inWorld == null) {
+      return null;
+    }
+    return inWorld.get(Util.chunkKey(chunkX, chunkZ));
+  }
+
+  /**
+   * Returns a hashmap of Chunk - Shop
+   *
+   * @param world The name of the world (case sensitive) to get the list of shops from
+   * @return a hashmap of Chunk - Shop
+   */
+  public @Nullable Map<Long, Map<Long, Shop>> getShops(@NotNull String world) {
+    return this.allShops.get(world);
+  }
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onWorldUnload(WorldUnloadEvent event) {
@@ -45,11 +168,35 @@ public class ShopLoader implements Listener {
                .forEach(shop -> ShopManager.instance().unload(shop));
   }
   
-  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  @EventHandler(priority = EventPriority.MONITOR)
   public void onWorldLoad(WorldLoadEvent event) {
     loadShopsForWorld(event.getWorld());
   }
   
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onChunkLoad(ChunkLoadEvent event) {
+    if (event.isNewChunk())
+      return;
+
+    @Nullable Map<Long, Shop> inChunk = getShops(event.getChunk());
+    
+    if (inChunk != null && !inChunk.isEmpty())
+      Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+        inChunk.values().forEach(Shop::onLoad);
+      });
+  }
+  
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onChunkUnload(ChunkUnloadEvent e) {
+
+    @Nullable Map<Long, Shop> inChunk = QuickShop.instance().getShopLoader().getShops(e.getChunk());
+
+    if (inChunk != null && !inChunk.isEmpty())
+      Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+        inChunk.values().forEach(Shop::onUnload);
+      });
+  }
+
   /**
    * Load all shops
    *
@@ -93,7 +240,7 @@ public class ShopLoader implements Listener {
           // Load to World
           if (Util.canBeShop(shop.getLocation().getBlock())) {
             loadedShops++;
-            ShopManager.instance().load(data.world(), shop);
+            ShopManager.instance().load(shop);
             shop.onLoad();
           }
         }
@@ -109,31 +256,6 @@ public class ShopLoader implements Listener {
           "(Total: " + durLoad + "ms, Fetch: " + durFetch + "ms," +
           " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + "ns)");
       
-    } catch (Throwable t) {
-      exceptionHandler(t, null);
-    }
-  }
-  
-  public static void forEachShopFromDatabase(@NotNull Consumer<org.maxgamer.quickshop.shop.api.Shop> consumer) {
-    try {
-      ShopLogger.instance().info("Loading shops from the database..");
-      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
-      
-      while (rs.next()) {
-        ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
-        
-        if (!canLoad(data)) {
-          Util.debugLog("Somethings gone wrong, skipping the loading...");
-          continue;
-        }
-        
-        Shop shop = new ContainerShop(
-            new Location(Bukkit.getWorld(data.world()), data.x(), data.y(), data.z()),
-            data.price(), data.item(),
-            data.moderators(), data.unlimited(), data.type());
-        
-        consumer.accept(shop);
-      }
     } catch (Throwable t) {
       exceptionHandler(t, null);
     }

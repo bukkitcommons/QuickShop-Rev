@@ -49,7 +49,7 @@ public class ShopActionManager {
   /*
    * Action manager
    */
-  private Map<UUID, ShopData> actionData = Maps.newHashMap();
+  private Map<UUID, ShopData> actionData = Maps.newConcurrentMap();
   
   public boolean hasAction(@NotNull UUID player) {
     return actionData.containsKey(player);

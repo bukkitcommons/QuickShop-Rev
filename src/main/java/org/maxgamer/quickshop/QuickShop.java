@@ -49,7 +49,6 @@ import org.maxgamer.quickshop.integration.impl.TownyIntegration;
 import org.maxgamer.quickshop.integration.impl.WorldGuardIntegration;
 import org.maxgamer.quickshop.listeners.BlockListener;
 import org.maxgamer.quickshop.listeners.ChatListener;
-import org.maxgamer.quickshop.listeners.ChunkListener;
 import org.maxgamer.quickshop.listeners.ClearLaggListener;
 import org.maxgamer.quickshop.listeners.CustomInventoryListener;
 import org.maxgamer.quickshop.listeners.DisplayBugFixListener;
@@ -105,7 +104,6 @@ public class QuickShop extends JavaPlugin {
   private BootError bootError;
   // Listeners - We decide which one to use at runtime
   private ChatListener chatListener;
-  private ChunkListener chunkListener;
   private CommandManager commandManager;
   /** WIP */
   private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
@@ -170,7 +168,7 @@ public class QuickShop extends JavaPlugin {
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
   private HashSet<String> warnings = new HashSet<>();
 
-  private ShopLoader worldListener;
+  private ShopLoader shopLoader;
   private OngoingFeeWatcher ongoingFeeWatcher;
   private SignUpdateWatcher signUpdateWatcher;
   private BukkitWrapper bukkitAPIWrapper;
@@ -522,7 +520,7 @@ public class QuickShop extends JavaPlugin {
       }
     }
     this.databaseManager = new Dispatcher(database);
-    this.permissionChecker = new BuildPerms(this);
+    this.permissionChecker = new BuildPerms();
 
     ConfigurationSection limitCfg = this.getConfig().getConfigurationSection("limits");
     if (limitCfg != null) {
@@ -537,7 +535,7 @@ public class QuickShop extends JavaPlugin {
           .severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
     }
 
-    signUpdateWatcher = new SignUpdateWatcher(this);
+    signUpdateWatcher = new SignUpdateWatcher();
 
     /* Load all shops. */
     //ShopLoader.loadShops();
@@ -547,9 +545,8 @@ public class QuickShop extends JavaPlugin {
 
     blockListener = new BlockListener();
     playerListener = new PlayerListener(this);
-    worldListener = new ShopLoader();
+    shopLoader = new ShopLoader();
     chatListener = new ChatListener();
-    chunkListener = new ChunkListener(this);
     inventoryListener = new DisplayProtectionListener();
     customInventoryListener = new CustomInventoryListener(this);
     displayBugFixListener = new DisplayBugFixListener(this);
@@ -564,8 +561,7 @@ public class QuickShop extends JavaPlugin {
     Bukkit.getPluginManager().registerEvents(playerListener, this);
     Bukkit.getPluginManager().registerEvents(chatListener, this);
     Bukkit.getPluginManager().registerEvents(inventoryListener, this);
-    Bukkit.getPluginManager().registerEvents(chunkListener, this);
-    Bukkit.getPluginManager().registerEvents(worldListener, this);
+    Bukkit.getPluginManager().registerEvents(shopLoader, this);
     Bukkit.getPluginManager().registerEvents(customInventoryListener, this);
     Bukkit.getPluginManager().registerEvents(displayBugFixListener, this);
     Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
@@ -595,8 +591,7 @@ public class QuickShop extends JavaPlugin {
       }
     }.runTaskLater(this, 1);
     Util.debugLog("Registering shop watcher...");
-    // shopVaildWatcher.runTaskTimer(this, 0, 20 * 60); // Nobody use it
-    signUpdateWatcher.runTaskTimer(this, 0, 10);
+    Bukkit.getScheduler().runTaskTimer(this, signUpdateWatcher, 40, 40);
     if (logWatcher != null) {
       Bukkit.getScheduler().runTaskTimerAsynchronously(this, logWatcher, 0, 10);
       getLogger().info("Log actions is enabled, actions will log in the qs.log file!");
