@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
+@Deprecated
 @Accessors(fluent = true)
 public class ShopChunk {
   private final String world;

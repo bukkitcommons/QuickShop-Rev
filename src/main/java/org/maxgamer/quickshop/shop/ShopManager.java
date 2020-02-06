@@ -3,24 +3,20 @@ package org.maxgamer.quickshop.shop;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,24 +27,15 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopCreateEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
-import org.maxgamer.quickshop.event.ShopPurchaseEvent;
-import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopChunk;
-import org.maxgamer.quickshop.shop.api.ShopModerator;
-import org.maxgamer.quickshop.shop.api.ShopType;
-import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
-import org.maxgamer.quickshop.shop.api.data.ShopData;
-import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
@@ -71,7 +58,7 @@ public class ShopManager {
   /*
    * Shop containers
    */
-  private final Map<String, Map<ShopChunk, Map<Location, Shop>>> shops = Maps.newHashMap();
+  private final Map<String, Map<Long, Map<Location, Shop>>> shops = Maps.newHashMap();
   private final Set<Shop> loadedShops = QuickShop.instance().isEnabledAsyncDisplayDespawn() ? Sets.newConcurrentHashSet() : Sets.newHashSet();
 
   /**
@@ -82,22 +69,14 @@ public class ShopManager {
    * @param shop The shop to add
    */
   public void addShop(@NotNull String world, @NotNull Shop shop) {
-    Map<ShopChunk, Map<Location, Shop>> inWorld =
-        this.getShops().computeIfAbsent(world, k -> new HashMap<>(3));
-    // There's no world storage yet. We need to create that hashmap.
-    // Put it in the data universe
-    // Calculate the chunks coordinates. These are 1,2,3 for each chunk, NOT
-    // location rounded to the nearest 16.
-    int x = (int) Math.floor((shop.getLocation().getBlockX()) / 16.0);
-    int z = (int) Math.floor((shop.getLocation().getBlockZ()) / 16.0);
-    // Get the chunk set from the world info
-    ShopChunk shopChunk = new ShopChunk(world, x, z);
-    Map<Location, Shop> inChunk = inWorld.computeIfAbsent(shopChunk, k -> new HashMap<>(1));
-    // That chunk data hasn't been created yet - Create it!
-    // Put it in the world
-    // Put the shop in its location in the chunk list.
+    Map<Long, Map<Location, Shop>> inWorld =
+        shops.computeIfAbsent(world, k -> new HashMap<>(3));
+    
+    int chunkX = shop.getLocation().getBlockX() >> 4;
+    int chunkZ = shop.getLocation().getBlockZ() >> 4;
+    Map<Location, Shop> inChunk = inWorld.computeIfAbsent(Util.getChunkKey(chunkX, chunkZ), k -> new HashMap<>(1));
+    
     inChunk.put(shop.getLocation(), shop);
-    // shop.onLoad();
   }
 
   /**
@@ -115,7 +94,7 @@ public class ShopManager {
       if (QuickShop.instance().isLimit()) {
         int owned = 0;
         if (!QuickShop.instance().getConfig().getBoolean("limits.old-algorithm")) {
-          for (Map<ShopChunk, Map<Location, Shop>> shopmap : getShops().values()) {
+          for (Map<Long, Map<Location, Shop>> shopmap : getShops().values()) {
             for (Map<Location, Shop> shopLocs : shopmap.values()) {
               for (Shop shop : shopLocs.values()) {
                 if (shop.getOwner().equals(p.getUniqueId()) && !shop.isUnlimited()) {
@@ -345,7 +324,7 @@ public class ShopManager {
    * @param world The name of the world (case sensitive) to get the list of shops from
    * @return a hashmap of Chunk - Shop
    */
-  public @Nullable Map<ShopChunk, Map<Location, Shop>> getShops(@NotNull String world) {
+  public @Nullable Map<Long, Map<Location, Shop>> getShops(@NotNull String world) {
     return this.shops.get(world);
   }
 
@@ -360,12 +339,11 @@ public class ShopManager {
   }
 
   public @Nullable Map<Location, Shop> getShops(@NotNull String world, int chunkX, int chunkZ) {
-    @Nullable Map<ShopChunk, Map<Location, Shop>> inWorld = this.getShops(world);
+    @Nullable Map<Long, Map<Location, Shop>> inWorld = this.getShops(world);
     if (inWorld == null) {
       return null;
     }
-    ShopChunk shopChunk = new ShopChunk(world, chunkX, chunkZ);
-    return inWorld.get(shopChunk);
+    return inWorld.get(Util.getChunkKey(chunkX, chunkZ));
   }
 
   /**
@@ -389,11 +367,10 @@ public class ShopManager {
     // shop.onUnload();
     Location loc = shop.getLocation();
     String world = Objects.requireNonNull(loc.getWorld()).getName();
-    Map<ShopChunk, Map<Location, Shop>> inWorld = this.getShops().get(world);
-    int x = (int) Math.floor((shop.getLocation().getBlockX()) / 16.0);
-    int z = (int) Math.floor((shop.getLocation().getBlockZ()) / 16.0);
-    ShopChunk shopChunk = new ShopChunk(world, x, z);
-    Map<Location, Shop> inChunk = inWorld.get(shopChunk);
+    Map<Long, Map<Location, Shop>> inWorld = this.getShops().get(world);
+    int x = (int) Math.floor((shop.getLocation().getBlockX()) >> 4);
+    int z = (int) Math.floor((shop.getLocation().getBlockZ()) >> 4);
+    Map<Location, Shop> inChunk = inWorld.get(Util.getChunkKey(x, z));
     if (inChunk == null) {
       return;
     }
@@ -421,9 +398,9 @@ public class ShopManager {
    */
   public Collection<Shop> getAllShops() {
     // noinspection unchecked
-    Map<String, Map<ShopChunk, Map<Location, Shop>>> worldsMap = Maps.newHashMap(getShops());
+    Map<String, Map<Long, Map<Location, Shop>>> worldsMap = Maps.newHashMap(getShops());
     Collection<Shop> shops = new ArrayList<>();
-    for (Map<ShopChunk, Map<Location, Shop>> shopMapData : worldsMap.values()) {
+    for (Map<Long, Map<Location, Shop>> shopMapData : worldsMap.values()) {
       for (Map<Location, Shop> shopData : shopMapData.values()) {
         shops.addAll(shopData.values());
       }
@@ -437,7 +414,7 @@ public class ShopManager {
    * @return a hashmap of World - Chunk - Shop
    */
   @NotNull
-  public Map<String, Map<ShopChunk, Map<Location, Shop>>> getShops() {
+  public Map<String, Map<Long, Map<Location, Shop>>> getShops() {
     return this.shops;
   }
 
@@ -477,11 +454,11 @@ public class ShopManager {
   public class ShopIterator implements Iterator<Shop> {
     private Iterator<Map<Location, Shop>> chunks;
     private Iterator<Shop> shops;
-    private Iterator<Map<ShopChunk, Map<Location, Shop>>> worlds;
+    private Iterator<Map<Long, Map<Location, Shop>>> worlds;
 
     public ShopIterator() {
       // noinspection unchecked
-      Map<String, Map<ShopChunk, Map<Location, Shop>>> worldsMap = Maps.newHashMap(getShops());
+      Map<String, Map<Long, Map<Location, Shop>>> worldsMap = Maps.newHashMap(getShops());
       
       worlds = worldsMap.values().iterator();
     }

@@ -52,31 +52,6 @@ public class ShopLoader implements Listener {
     loadShopsForWorld(event.getWorld());
   }
   
-  public static void forEachShopFromDatabase(@NotNull Consumer<org.maxgamer.quickshop.shop.api.Shop> consumer) {
-    try {
-      ShopLogger.instance().info("Loading shops from the database..");
-      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
-      
-      while (rs.next()) {
-        ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
-        
-        if (!canLoad(data)) {
-          Util.debugLog("Somethings gone wrong, skipping the loading...");
-          continue;
-        }
-        
-        Shop shop = new ContainerShop(
-            new Location(Bukkit.getWorld(data.world()), data.x(), data.y(), data.z()),
-            data.price(), data.item(),
-            data.moderators(), data.unlimited(), data.type());
-        
-        consumer.accept(shop);
-      }
-    } catch (Throwable t) {
-      exceptionHandler(t, null);
-    }
-  }
-  
   /**
    * Load all shops
    *
@@ -139,6 +114,31 @@ public class ShopLoader implements Listener {
           "(Total: " + durLoad + "ms, Fetch: " + durFetch + "ms," +
           " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + "ns)");
       
+    } catch (Throwable t) {
+      exceptionHandler(t, null);
+    }
+  }
+  
+  public static void forEachShopFromDatabase(@NotNull Consumer<org.maxgamer.quickshop.shop.api.Shop> consumer) {
+    try {
+      ShopLogger.instance().info("Loading shops from the database..");
+      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
+      
+      while (rs.next()) {
+        ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
+        
+        if (!canLoad(data)) {
+          Util.debugLog("Somethings gone wrong, skipping the loading...");
+          continue;
+        }
+        
+        Shop shop = new ContainerShop(
+            new Location(Bukkit.getWorld(data.world()), data.x(), data.y(), data.z()),
+            data.price(), data.item(),
+            data.moderators(), data.unlimited(), data.type());
+        
+        consumer.accept(shop);
+      }
     } catch (Throwable t) {
       exceptionHandler(t, null);
     }

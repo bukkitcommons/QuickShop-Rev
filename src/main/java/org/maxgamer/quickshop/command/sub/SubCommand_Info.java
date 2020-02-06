@@ -48,14 +48,14 @@ public class SubCommand_Info implements CommandProcesser {
     buying = selling = doubles = chunks = worlds = doubleschests = 0;
     int nostock = 0;
 
-    for (Map<ShopChunk, Map<Location, Shop>> inWorld : ShopManager.instance().getShops()
+    for (Map<Long, Map<Location, Shop>> inWorld : ShopManager.instance().getShops()
         .values()) {
       worlds++;
 
       for (Map<Location, Shop> inChunk : inWorld.values()) {
         chunks++;
         // noinspection unchecked
-        for (Shop shop : (ArrayList<Shop>) new ArrayList<>(inChunk.values()).clone()) {
+        for (Shop shop : inChunk.values()) {
           if (shop.is(ShopType.BUYING)) {
             buying++;
           } else {

@@ -52,9 +52,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
-import org.bukkit.block.DoubleChest;
 import org.bukkit.block.EnderChest;
-import org.bukkit.block.data.Directional;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -67,7 +65,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.material.MaterialData;
 import org.bukkit.material.Sign;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
@@ -99,6 +96,18 @@ public class Util {
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
   private static boolean disableDebugLogger = false;
+  
+  /**
+   * Gets an unique key of a chunk based on its coordinates.
+   * 
+   * @param x X Coordinate
+   * @param z Z Coordinate
+   * @return Chunk coordinates packed into a long
+   * @author Aikar
+  */
+  public static long getChunkKey(int chunkX, int chunkZ) {
+    return (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
+  }
   
   /**
    * Gets the shop a sign is attached to
