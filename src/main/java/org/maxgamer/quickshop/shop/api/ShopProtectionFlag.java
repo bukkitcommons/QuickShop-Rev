@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class ShopProtectionFlag implements Serializable {
   private static final long serialVersionUID = 1L;
+  private static final String DEFAULT_MARK = "QuickShop DisplayItem";
   
   private final String shopItemStackData;
   private final String shopLocationData;
@@ -28,6 +29,6 @@ public class ShopProtectionFlag implements Serializable {
   }
 
   public static String defaultMark() {
-    return "QuickShop DisplayItem";
+    return DEFAULT_MARK;
   }
 }
