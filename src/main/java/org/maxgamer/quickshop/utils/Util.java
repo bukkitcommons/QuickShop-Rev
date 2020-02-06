@@ -100,6 +100,21 @@ public class Util {
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
   private static boolean disableDebugLogger = false;
+  
+  /**
+   * Gets the shop a sign is attached to
+   *
+   * @param b The location of the sign
+   * @return The shop
+   */
+  public static ShopViewer getShopBySign(@NotNull Block sign) {
+    final Optional<Block> shopBlock = Util.getSignAttached(sign);
+    
+    return shopBlock.isPresent() ?
+        ShopManager
+          .instance()
+          .getShopAt(shopBlock.get()) : ShopViewer.empty();
+  }
 
   /**
    * Convert strArray to String. E.g "Foo, Bar"
@@ -150,6 +165,21 @@ public class Util {
     }
     return true;
   }
+  
+  public static boolean canBeShop(@NotNull Block block) {
+    // Specificed types by configuration
+    if (isBlocklisted(block.getType()) || isBlacklistWorld(block.getWorld())) {
+      return false;
+    }
+    return canBeShop0(block.getState());
+  }
+  
+  public static boolean canBeShop(@NotNull BlockState state) {
+    if (isBlocklisted(state.getType()) || isBlacklistWorld(state.getWorld())) {
+      return false;
+    }
+    return canBeShop0(state);
+  }
 
   /**
    * Returns true if the given block could be used to make a shop out of.
@@ -157,23 +187,12 @@ public class Util {
    * @param b The block to check, Possibly a chest, dispenser, etc.
    * @return True if it can be made into a shop, otherwise false.
    */
-  public static boolean canBeShop(@NotNull Block b) {
-    BlockState bs = b.getState();
-
-    // Specificed types by configuration
-    if (isBlocklisted(b.getType())) {
-      return false;
-    }
-
-    if (isBlacklistWorld(b.getWorld())) {
-      return false;
-    }
-
-    if (bs instanceof EnderChest) { // BlockState for Mod supporting
+  private static boolean canBeShop0(@NotNull BlockState state) {
+    if (state instanceof EnderChest) { // BlockState for Mod supporting
       return plugin.getOpenInvPlugin() != null;
     }
 
-    return bs instanceof InventoryHolder;
+    return state instanceof InventoryHolder;
   }
 
   /**

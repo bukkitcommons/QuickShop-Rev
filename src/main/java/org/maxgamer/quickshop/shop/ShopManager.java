@@ -257,7 +257,7 @@ public class ShopManager {
       shop.setSignText();
     }
   }
-
+  
   public ShopViewer getShopAt(@NotNull Block block) {
     switch (block.getType()) {
       case CHEST:
@@ -300,34 +300,31 @@ public class ShopManager {
    * @return The shop at that location
    */
   public ShopViewer getShopFrom(@Nullable Location loc) {
-    return loc == null ? ShopViewer.empty() : getShopFrom0(loc);
+    return loc == null ? ShopViewer.empty() : getShopFrom(loc.getBlock());
   }
 
-  private ShopViewer getShopFrom0(@NotNull Location loc) {
+  private ShopViewer getShopFrom(@NotNull Block block) {
     boolean secondHalf = false;
-    Block block = loc.getBlock();
+    Location location = block.getLocation();
     
     switch (block.getType()) {
       case CHEST:
       case TRAPPED_CHEST:
-        ShopViewer shopViewer = getShopAt(loc);
+        ShopViewer shopViewer = getShopAt(location);
         if (shopViewer.isPresent())
           return shopViewer;
         else
           secondHalf = true;
         
       case ENDER_CHEST:
-        ShopViewer viewerAt = getShopAt(loc);
+        ShopViewer viewerAt = getShopAt(location);
         if (viewerAt.isPresent())
           return viewerAt;
         
       default:
-        Optional<Block> attached = Util.getSignAttached(block);
-        if (attached.isPresent()) {
-          ShopViewer viewer = getShopAt(attached.get());
-          if (viewer.isPresent())
-            return viewer;
-        }
+        ShopViewer bySign = Util.getShopBySign(block);
+        if (bySign.isPresent())
+          return bySign;
         
         if (secondHalf) {
           Optional<Location> half = Util.getSecondHalf(block);

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 
 @ToString
-public class JsonFile implements LocaleFile {
+public class JsonLocale implements LocaleFile {
   @NotNull
   protected final File file;
   @NotNull
@@ -40,7 +40,7 @@ public class JsonFile implements LocaleFile {
     }
   };
 
-  public JsonFile(@NotNull File file, @NotNull String resourcePath) {
+  public JsonLocale(@NotNull File file, @NotNull String resourcePath) {
     this.file = file;
     this.rewriter = new Rewriter(file);
     this.resourcePath = resourcePath;

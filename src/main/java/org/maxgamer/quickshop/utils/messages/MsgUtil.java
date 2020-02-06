@@ -39,7 +39,7 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.files.JsonFile;
+import org.maxgamer.quickshop.utils.files.JsonLocale;
 import org.maxgamer.quickshop.utils.files.LocaleFile;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
 import com.bekvon.bukkit.residence.commands.gset;
@@ -255,7 +255,7 @@ public class MsgUtil {
     languageCode = "en".equals(languageCode) ?
         languageCode :
           (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
-    json = new JsonFile(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json");
+    json = new JsonLocale(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json");
     json.create();
     
     if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {

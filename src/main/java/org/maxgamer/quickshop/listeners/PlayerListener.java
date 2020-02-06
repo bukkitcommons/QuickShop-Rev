@@ -109,7 +109,7 @@ public class PlayerListener implements Listener {
       return;
     }
 
-    if (!Util.canBeShop(b) && !Util.isWallSign(b.getType())) {
+    if (!Util.canBeShop(b.getState()) && !Util.isWallSign(b.getType())) {
       return;
     }
 
@@ -120,14 +120,8 @@ public class PlayerListener implements Listener {
     ShopViewer shop = ShopManager.instance().getShopAt(loc);
     // If that wasn't a shop, search nearby shops
     if (!shop.isPresent()) {
-      final Optional<Block> attached;
-
       if (Util.isWallSign(b.getType())) {
-        attached = Util.getSignAttached(b);
-
-        if (attached.isPresent()) {
-          shop = ShopManager.instance().getShopAt(attached.get());
-        }
+        shop = Util.getShopBySign(b);
       } else if (Util.isDoubleChest(b)) {
         Optional<Location> half = Util.getSecondHalf(b);
 
@@ -354,14 +348,9 @@ public class PlayerListener implements Listener {
       return;
     }
 
-    final Optional<Block> attachedBlock = Util.getSignAttached(block);
-
-    if (!attachedBlock.isPresent()
-        || !ShopManager.instance().getShopAt(attachedBlock.get()).isPresent()) {
-      return;
+    if (Util.getShopBySign(block).isPresent()) {
+      e.setCancelled(true);
+      Util.debugLog("Disallow " + e.getPlayer().getName() + " dye the shop sign.");
     }
-
-    e.setCancelled(true);
-    Util.debugLog("Disallow " + e.getPlayer().getName() + " dye the shop sign.");
   }
 }

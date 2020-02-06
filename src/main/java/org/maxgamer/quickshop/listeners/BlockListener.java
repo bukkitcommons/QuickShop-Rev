@@ -1,6 +1,5 @@
 package org.maxgamer.quickshop.listeners;
 
-import lombok.AllArgsConstructor;
 import java.util.Optional;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,120 +16,71 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
-import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
-@AllArgsConstructor
 public class BlockListener implements Listener {
-  /**
-   * Gets the shop a sign is attached to
-   *
-   * @param b The location of the sign
-   * @return The shop
-   */
-  private ShopViewer getShopBySign(@NotNull Block sign) {
-    final Optional<Block> shopBlock = Util.getSignAttached(sign);
-    return shopBlock.isPresent() ?
-        ShopManager
-          .instance()
-          .getShopAt(shopBlock.get()) : ShopViewer.empty();
-  }
-
   /*
    * Removes chests when they're destroyed.
    */
-  @EventHandler(priority = EventPriority.LOW)
-  public void onBreak(BlockBreakEvent e) {
-
-    final Block b = e.getBlock();
-
-    if (b.getState() instanceof Sign) {
-      Sign sign = (Sign) b.getState();
-      if (BaseConfig.locketteEnable && sign.getLine(0).equals(BaseConfig.lockettePrivateText)
-          || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
-        // Ignore break lockette sign
-        ShopLogger.instance().info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
-        return;
-      }
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+  public void onBreak(BlockBreakEvent event) {
+    Player player = event.getPlayer();
+    
+    if (event.isCancelled()) {
+      player.sendMessage(MsgUtil.getMessage("no-permission", player));
+      Util.debugLog("The action was cancelled by other plugin");
+      return;
     }
-
-    final Player p = e.getPlayer();
-    // If the shop was a chest
-    if (Util.canBeShop(b)) {
-      final ShopViewer shop = ShopManager.instance().getShopAt(b.getLocation());
-      if (shop.get() == null) {
+    
+    Block block = event.getBlock();
+    BlockState state = block.getState();
+    ShopViewer viewer;
+    
+    if (state instanceof Sign) {
+      Sign sign = (Sign) block.getState();
+      
+      if (BaseConfig.locketteEnable &&
+          sign.getLine(0).equals(BaseConfig.lockettePrivateText) ||
+          sign.getLine(0).equals(BaseConfig.locketteMoreUsersText))
+        return;
+      
+      viewer = Util.getShopBySign(block);
+    } else {
+      viewer = ShopManager.instance().getShopAt(block);
+    }
+    
+    viewer.nonNull()
+    .accept(shop -> {
+      boolean isOwner = shop.getModerator().isOwner(player.getUniqueId());
+      if (!isOwner &&
+          !QuickShop.getPermissionManager().hasPermission(player, "quickshop.other.destroy")) {
+        event.setCancelled(true);
+        player.sendMessage(MsgUtil.getMessage("no-permission", player));
         return;
       }
-      // If they're either survival or the owner, they can break it
-      if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.get().getOwner())) {
-        // Check SuperTool
-        if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
-          p.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", p));
+      
+      if (player.getGameMode() == GameMode.CREATIVE) {
+        if (player.getInventory().getItemInMainHand().getType() != Material.GOLDEN_AXE) {
+          event.setCancelled(true);
+          player.sendMessage(MsgUtil.getMessage("no-creative-break", player, MsgUtil.getLocalizedName(Material.GOLDEN_AXE.name())));
           return;
-        }
-        e.setCancelled(true);
-        p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
-            MsgUtil.getLocalizedName(Material.GOLDEN_AXE.name())));
-        return;
-      }
-
-      if (e.isCancelled()) {
-        p.sendMessage(MsgUtil.getMessage("no-permission", p));
-        Util.debugLog("The action was cancelled by other plugin");
-        return;
-      }
-
-      if (!shop.get().getModerator().isOwner(p.getUniqueId())
-          && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.other.destroy")) {
-        e.setCancelled(true);
-        p.sendMessage(MsgUtil.getMessage("no-permission", p));
-        return;
-      }
-      // Cancel their current menu... Doesnt cancel other's menu's.
-      ShopActionManager.instance().getActions().remove(p.getUniqueId());
-
-      shop.get().onUnload();
-      shop.get().delete();
-      p.sendMessage(MsgUtil.getMessage("success-removed-shop", p));
-    } else if (Util.isWallSign(b.getType())) {
-      if (b.getState() instanceof Sign) {
-        Sign sign = (Sign) b.getState();
-        if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
-            || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
-          // Ignore break lockette sign
-          return;
+        } else {
+          player.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", player));
         }
       }
-
-      ShopViewer viewer = getShopBySign(b);
-
-      viewer.nonNull()
-        .accept(shop -> {
-          // If they're in creative and not the owner, don't let them
-          // (accidents happen)
-          if (p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().equals(shop.getOwner())) {
-            // Check SuperTool
-            if (p.getInventory().getItemInMainHand().getType() == Material.GOLDEN_AXE) {
-              p.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", p));
-              shop.delete();
-              return;
-            }
-            e.setCancelled(true);
-            p.sendMessage(MsgUtil.getMessage("no-creative-break", p,
-                MsgUtil.getLocalizedName(Material.GOLDEN_AXE.name())));
-          }
-  
-          Util.debugLog("Cannot break the sign.");
-          e.setCancelled(true);
-        });
-    }
+      
+      ShopActionManager.instance().getActions().remove(player.getUniqueId());
+      shop.onUnload();
+      shop.delete();
+      player.sendMessage(MsgUtil.getMessage("success-removed-shop", player));
+    });
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -158,7 +108,6 @@ public class BlockListener implements Listener {
    */
   @EventHandler(ignoreCancelled = true)
   public void onPlace(BlockPlaceEvent e) {
-
     final BlockState bs = e.getBlock().getState();
 
     if (!(bs instanceof DoubleChest)) {
