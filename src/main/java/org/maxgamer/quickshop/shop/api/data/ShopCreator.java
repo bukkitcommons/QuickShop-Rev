@@ -27,6 +27,6 @@ public class ShopCreator implements ShopData {
 
   @Override
   public ShopAction action() {
-    return ShopAction.TRADE;
+    return ShopAction.CREATE;
   }
 }

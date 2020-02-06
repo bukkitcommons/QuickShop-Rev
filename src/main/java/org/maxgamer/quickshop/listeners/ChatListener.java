@@ -17,7 +17,7 @@ public class ChatListener implements Listener {
       return;
     
     // Fix stupid chat plugin will add a weird space before or after the number we want.
-    ShopActionManager.instance().handleChat(event.getPlayer(), event.getMessage().trim());
+    ShopActionManager.instance().handleChat(event.getPlayer(), event.getMessage().trim(), true);
     event.setCancelled(true);
   }
 }

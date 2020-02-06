@@ -67,7 +67,7 @@ public class SubCommand_Create implements CommandProcesser {
         return;
       }
 
-      if (!ShopManager.instance().canBuildShop(p, b)) {
+      if (!ShopManager.canBuildShop(p, b)) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
@@ -92,7 +92,7 @@ public class SubCommand_Create implements CommandProcesser {
           new ShopCreator(b.getLocation(), item, b.getRelative(p.getFacing().getOppositeFace())));
 
       if (cmdArg.length >= 1) {
-        ShopActionManager.instance().handleChat(p, cmdArg[0]);
+        ShopActionManager.instance().handleChat(p, cmdArg[0], false);
         Util.debugLog("Created by handle chat");
         return;
       }

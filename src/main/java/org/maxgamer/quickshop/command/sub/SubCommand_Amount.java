@@ -60,6 +60,6 @@ public class SubCommand_Amount implements CommandProcesser {
       return;
     }
 
-    ShopActionManager.instance().handleChat(player, cmdArg[0]);
+    ShopActionManager.instance().handleChat(player, cmdArg[0], false);
   }
 }

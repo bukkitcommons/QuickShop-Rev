@@ -521,14 +521,13 @@ public class ShopActionManager {
     }
   }
 
-  public void handleChat(@NotNull Player p, @NotNull String msg) {
-    handleChat(p, msg, false);
+  public void handleChat(@NotNull Player p, @NotNull String msg, boolean sync) {
+    handleChat(p, msg, false, sync);
   }
 
-  public void handleChat(@NotNull Player p, @NotNull String msg, boolean bypassProtectionChecks) {
+  public void handleChat(@NotNull Player p, @NotNull String msg, boolean bypassProtectionChecks, boolean sync) {
     final String message = ChatColor.stripColor(msg);
-    // Use from the main thread, because Bukkit hates life
-    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+    Runnable runnable = () -> {
       // They wanted to do something.
       ShopData info = actionData.remove(p.getUniqueId());
       
@@ -544,7 +543,18 @@ public class ShopActionManager {
       if (info.action() == ShopAction.TRADE) {
         actionTrade(p, (ShopSnapshot) info, message);
       }
-    });
+    };
+    
+    if (sync)
+      Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+        try {
+          runnable.run();
+        } catch (Throwable t) {
+          t.printStackTrace();
+        }
+      });
+    else
+      runnable.run();
   }
 
   /** @return Returns the HashMap. Info contains what their last question etc was. */
