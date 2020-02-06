@@ -8,9 +8,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 
 public interface Shop extends Managed {
+  @Deprecated
+  default public void delete() {
+    ShopManager.instance().delete(this);
+  }
+  
   default boolean is(@NotNull ShopType shopType) {
     return getShopType() == shopType;
   }

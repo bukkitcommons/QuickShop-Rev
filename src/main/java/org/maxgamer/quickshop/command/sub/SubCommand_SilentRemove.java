@@ -1,24 +1,7 @@
-/*
- * This file is a part of project QuickShop, the name is SubCommand_SilentRemove.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -27,14 +10,11 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_SilentRemove implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
 
   @NotNull
   @Override
@@ -53,7 +33,7 @@ public class SubCommand_SilentRemove implements CommandProcesser {
 
     final Player p = (Player) sender;
     final ShopViewer shop =
-        ShopManager.instance().getShopAt(new Location(plugin.getServer().getWorld(cmdArg[0]),
+        ShopManager.instance().getShopAt(new Location(QuickShop.instance().getServer().getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent()) {
@@ -67,7 +47,6 @@ public class SubCommand_SilentRemove implements CommandProcesser {
       return;
     }
 
-    ShopManager.instance().unload(shop.get());
-    shop.get().delete();
+    ShopManager.instance().delete(shop.get());
   }
 }
