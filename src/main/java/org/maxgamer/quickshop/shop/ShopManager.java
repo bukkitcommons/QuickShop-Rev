@@ -356,11 +356,7 @@ public class ShopManager {
    * @return Shops
    */
   public @Nullable Map<Location, Shop> getShops(@NotNull Chunk c) {
-    // long start = System.nanoTime();
     return getShops(c.getWorld().getName(), c.getX(), c.getZ());
-    // long end = System.nanoTime();
-    // QuickShopLogger.instance().log(Level.WARNING, "Chunk lookup in " + ((end - start)/1000000.0) +
-    // "ms.");
   }
 
   public @Nullable Map<Location, Shop> getShops(@NotNull String world, int chunkX, int chunkZ) {

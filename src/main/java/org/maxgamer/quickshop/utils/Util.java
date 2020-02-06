@@ -92,7 +92,6 @@ public class Util {
   @Getter
   private static List<String> debugLogs = new LinkedList<>();
   private static boolean devMode = true;
-  private static QuickShop plugin;
   private static EnumMap<Material, Entry<Double, Double>> restrictedPrices =
       new EnumMap<>(Material.class);
   private static Object serverInstance;
@@ -145,13 +144,13 @@ public class Util {
    * @return The result for backup
    */
   public static boolean backupDatabase() {
-    if (plugin.getDatabase().getConnector() instanceof MySQLConnector) {
+    if (QuickShop.instance().getDatabase().getConnector() instanceof MySQLConnector) {
       return true; // Backup and logs by MySQL
     }
-    File dataFolder = plugin.getDataFolder();
+    File dataFolder = QuickShop.instance().getDataFolder();
     File sqlfile = new File(dataFolder, "shops.db");
     if (!sqlfile.exists()) {
-      plugin.getLogger().warning("Failed to backup! (File not found)");
+      ShopLogger.instance().warning("Failed to backup! (File not found)");
       return false;
     }
     String uuid = UUID.randomUUID().toString().replaceAll("_", "");
@@ -160,7 +159,7 @@ public class Util {
       Files.copy(sqlfile, bksqlfile);
     } catch (Exception e1) {
       e1.printStackTrace();
-      plugin.getLogger().warning("Failed to backup the database.");
+      ShopLogger.instance().warning("Failed to backup the database.");
       return false;
     }
     return true;
@@ -189,7 +188,7 @@ public class Util {
    */
   private static boolean canBeShop0(@NotNull BlockState state) {
     if (state instanceof EnderChest) { // BlockState for Mod supporting
-      return plugin.getOpenInvPlugin() != null;
+      return QuickShop.instance().getOpenInvPlugin() != null;
     }
 
     return state instanceof InventoryHolder;
@@ -213,7 +212,7 @@ public class Util {
       if (iStack == null || iStack.getType() == Material.AIR) {
         continue;
       }
-      if (plugin.getItemMatcher().matches(item, iStack)) {
+      if (QuickShop.instance().getItemMatcher().matches(item, iStack)) {
         items += iStack.getAmount();
       }
     }
@@ -238,7 +237,7 @@ public class Util {
     for (ItemStack iStack : contents) {
       if (iStack == null || iStack.getType() == Material.AIR) {
         space += item.getMaxStackSize();
-      } else if (plugin.getItemMatcher().matches(item, iStack)) {
+      } else if (QuickShop.instance().getItemMatcher().matches(item, iStack)) {
         space += item.getMaxStackSize() - iStack.getAmount();
       }
     }
@@ -356,9 +355,9 @@ public class Util {
 
           Util.debugLog("Updated, we will try load as hacked ItemStack: " + config);
         } else {
-          plugin.getLogger().warning("Cannot load ItemStack " + config
+          ShopLogger.instance().warning("Cannot load ItemStack " + config
               + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
-          plugin.getLogger().warning(
+          ShopLogger.instance().warning(
               "You can try force load this ItemStack by our hacked ItemStack read util(shop.force-load-downgrade-items), but beware, the data may damaged if you load on this lower Minecraft server version, Please backup your world and database before enable!");
         }
       }
@@ -396,7 +395,7 @@ public class Util {
       return BaseConfig.currencySymbol + n;
     }
     try {
-      String formated = plugin.getEconomy().format(n);
+      String formated = QuickShop.instance().getEconomy().format(n);
       if (formated == null || formated.isEmpty()) {
         Util.debugLog(
             "Use alternate-currency-symbol to formatting, Cause economy plugin returned null");
@@ -555,34 +554,6 @@ public class Util {
   }
 
   /**
-   * Returns the chest attached to the given chest. The given block must be a chest.
-   *
-   * @param b he chest to check.
-   * @return the block which is also a chest and connected to b.
-   * @deprecated
-   */
-  @Nullable
-  @Deprecated
-  public static Block getSecondHalf_old(@NotNull Block b) {
-    // if (b.getType() != Material.CHEST && b.getType() != Material.TRAPPED_CHEST)
-    // // return null;
-    if (!isDoubleChest(b)) {
-      return null;
-    }
-    Block[] blocks = new Block[4];
-    blocks[0] = b.getRelative(1, 0, 0);
-    blocks[1] = b.getRelative(-1, 0, 0);
-    blocks[2] = b.getRelative(0, 0, 1);
-    blocks[3] = b.getRelative(0, 0, -1);
-    for (Block c : blocks) {
-      if (c.getType() == b.getType()) {
-        return c;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Get how many shop in the target world.
    *
    * @param worldName Target world.
@@ -643,7 +614,6 @@ public class Util {
     blockListedBlocks.clear();
     restrictedPrices.clear();
     worldBlacklist.clear();
-    plugin = QuickShop.instance;
     devMode = BaseConfig.developerMode;
 
     for (String s : BaseConfig.blacklist) {
@@ -652,7 +622,7 @@ public class Util {
         mat = Material.matchMaterial(s);
       }
       if (mat == null) {
-        plugin.getLogger().warning("Invalid shop-block: " + s);
+        ShopLogger.instance().warning("Invalid shop-block: " + s);
       } else {
         blockListedBlocks.add(mat);
       }
@@ -664,7 +634,7 @@ public class Util {
         mat = Material.matchMaterial(s);
       }
       if (mat == null) {
-        plugin.getLogger().warning(s + " is not a valid material.  Check your spelling or ID");
+        ShopLogger.instance().warning(s + " is not a valid material.  Check your spelling or ID");
         continue;
       }
       blacklist.add(mat);
@@ -676,14 +646,14 @@ public class Util {
         try {
           Material mat = Material.matchMaterial(sp[0]);
           if (mat == null) {
-            plugin.getLogger().warning("Material " + sp[0]
+            ShopLogger.instance().warning("Material " + sp[0]
                 + " in config.yml can't match with a valid Materials, check your config.yml!");
             continue;
           }
           restrictedPrices.put(mat,
               new SimpleEntry<>(Double.valueOf(sp[1]), Double.valueOf(sp[2])));
         } catch (Exception e) {
-          plugin.getLogger().warning("Invalid price restricted material: " + s);
+          ShopLogger.instance().warning("Invalid price restricted material: " + s);
         }
       }
     }
@@ -846,9 +816,9 @@ public class Util {
    * @return true if the given location is loaded or not.
    */
   public static boolean isChunkLoaded(@NotNull Location loc) {
-    // plugin.getLogger().log(Level.WARNING, "Checking isLoaded(Location loc)");
+    // ShopLogger.instance().log(Level.WARNING, "Checking isLoaded(Location loc)");
     if (loc.getWorld() == null) {
-      // plugin.getLogger().log(Level.WARNING, "Is not loaded. (No world)");
+      // ShopLogger.instance().log(Level.WARNING, "Is not loaded. (No world)");
       return false;
     }
     // Calculate the chunks coordinates. These are 1,2,3 for each chunk, NOT
@@ -1207,7 +1177,7 @@ public class Util {
   }
 
   /**
-   * Get the sign material using by plugin. With compatiabily process.
+   * Get the sign material using by QuickShop.instance(). With compatiabily process.
    *
    * @return The material now using.
    */
@@ -1226,7 +1196,7 @@ public class Util {
       return signMaterial;
     }
     // What the fuck!?
-    plugin.getLogger().warning(
+    ShopLogger.instance().warning(
         "QuickShop can't found any useable sign material, we will use default Sign Material.");
     try {
       return Material.OAK_WALL_SIGN;
