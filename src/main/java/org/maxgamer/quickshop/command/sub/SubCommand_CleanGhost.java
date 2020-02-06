@@ -41,21 +41,21 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
         if (shop.getItem().getType() == Material.AIR) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause item data is damaged.");
-          ShopManager.instance().delete(shop);
+          ShopLoader.instance().delete(shop);
           continue;
         }
         
         if (shop.getLocation().getWorld() == null) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause target world not loaded.");
-          ShopManager.instance().delete(shop);
+          ShopLoader.instance().delete(shop);
           continue;
         }
         
         if (shop.getOwner() == null) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause owner data is damaged.");
-          ShopManager.instance().delete(shop);
+          ShopLoader.instance().delete(shop);
           continue;
         }
         
@@ -67,7 +67,7 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
           if (!Util.canBeShop(shop.getLocation().getBlock())) {
             sender.sendMessage(ChatColor.YELLOW + "Shop " + shop
                 + " removing cause target location nolonger is a shop or disallow create the shop.");
-            ShopManager.instance().delete(shop);
+            ShopLoader.instance().delete(shop);
           }
         }); // Post to server main thread to check.
         

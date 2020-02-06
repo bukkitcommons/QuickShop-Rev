@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -32,12 +33,12 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
       .ifEmpty(notLookingAtShop)
       
       .forEach(block -> {
-        ShopViewer shop = ShopManager.instance().getShopAt(block);
+        ShopViewer shop = ShopManager.instance().getLoadedShopAt(block);
         
         if (shop.isPresent()) {
           if (shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
               || QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.destroy")) {
-            ShopManager.instance().delete(shop.get());
+            ShopLoader.instance().delete(shop.get());
           } else {
             sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
           }

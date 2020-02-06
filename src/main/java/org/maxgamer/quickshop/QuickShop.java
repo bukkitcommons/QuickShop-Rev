@@ -58,11 +58,10 @@ import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.PlayerListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.permission.impl.PermissionManager;
-import org.maxgamer.quickshop.scheduler.AsyncDisplayDespawner;
-import org.maxgamer.quickshop.scheduler.SyncDisplaySpawner;
+import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
-import org.maxgamer.quickshop.scheduler.SignUpdateWatcher;
+import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopLoader;
@@ -118,7 +117,6 @@ public class QuickShop extends JavaPlugin {
 
   private DisplayBugFixListener displayBugFixListener;
   private int displayItemCheckTicks;
-  private SyncDisplaySpawner displayWatcher;
   /** The economy we hook into for transactions */
   private Economy economy;
 
@@ -164,12 +162,12 @@ public class QuickShop extends JavaPlugin {
 
   private ShopProtector shopProtectListener;
   // private ShopVaildWatcher shopVaildWatcher;
-  private AsyncDisplayDespawner displayAutoDespawnWatcher;
+  private SyncDisplayDespawner displayAutoDespawnWatcher;
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
   private HashSet<String> warnings = new HashSet<>();
 
   private OngoingFeeWatcher ongoingFeeWatcher;
-  private SignUpdateWatcher signUpdateWatcher;
+  private ScheduledSignUpdater signUpdateWatcher;
   private BukkitWrapper bukkitAPIWrapper;
   private boolean enabledAsyncDisplayDespawn;
   
@@ -513,8 +511,8 @@ public class QuickShop extends JavaPlugin {
     // This should be inited before shop manager
     if (BaseConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
-        this.displayAutoDespawnWatcher = new AsyncDisplayDespawner(this);
-        Bukkit.getScheduler().runTaskTimerAsynchronously(QuickShop.instance(), this.displayAutoDespawnWatcher, 20,
+        this.displayAutoDespawnWatcher = new SyncDisplayDespawner();
+        Bukkit.getScheduler().runTaskTimer(QuickShop.instance(), this.displayAutoDespawnWatcher, 20,
             getConfig().getInt("shop.display-check-time"));
       }
     }
@@ -534,7 +532,7 @@ public class QuickShop extends JavaPlugin {
           .severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
     }
 
-    signUpdateWatcher = new SignUpdateWatcher();
+    signUpdateWatcher = new ScheduledSignUpdater();
 
     /* Load all shops. */
     //ShopLoader.loadShops();
@@ -549,7 +547,6 @@ public class QuickShop extends JavaPlugin {
     customInventoryListener = new CustomInventoryListener(this);
     displayBugFixListener = new DisplayBugFixListener(this);
     shopProtectListener = new ShopProtector();
-    displayWatcher = new SyncDisplaySpawner(this);
     // shopVaildWatcher = new ShopVaildWatcher(this);
     ongoingFeeWatcher = new OngoingFeeWatcher(this);
     lockListener = new LockListener(this);

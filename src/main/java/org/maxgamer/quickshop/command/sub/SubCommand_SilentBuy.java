@@ -19,6 +19,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -33,8 +34,6 @@ import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_SilentBuy implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
 
   @NotNull
   @Override
@@ -52,7 +51,7 @@ public class SubCommand_SilentBuy implements CommandProcesser {
     }
 
     final ShopViewer shop =
-        ShopManager.instance().getShopAt(new Location(plugin.getServer().getWorld(cmdArg[0]),
+        ShopManager.instance().getLoadedShopAt(new Location(Bukkit.getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {

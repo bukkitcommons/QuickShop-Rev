@@ -430,7 +430,7 @@ public class ContainerShop implements Shop, Managed {
     if (!c.isPresent()) {
       return null;
     }
-    ShopViewer shop = ShopManager.instance().getShopAt(c.get());
+    ShopViewer shop = ShopManager.instance().getLoadedShopAt(c.get());
     return (ContainerShop) shop.get();
   }
 
@@ -454,7 +454,7 @@ public class ContainerShop implements Shop, Managed {
       container = (InventoryHolder) this.location.getBlock().getState();
       return container.getInventory();
     } catch (Exception e) {
-      ShopManager.instance().delete(this);
+      ShopLoader.instance().delete(this);
       Util.debugLog("Inventory doesn't exist anymore: " + this + " shop was removed.");
       return null;
     }
@@ -671,7 +671,7 @@ public class ContainerShop implements Shop, Managed {
   /** Load ContainerShop. */
   @Override
   public void onLoad() {
-    if (this.isLoaded || Util.fireCancellableEvent(new ShopLoadEvent(this)))
+    if (Util.fireCancellableEvent(new ShopLoadEvent(this)))
       return;
 
     this.isLoaded = true;
@@ -694,10 +694,6 @@ public class ContainerShop implements Shop, Managed {
   /** Unload ContainerShop. */
   @Override
   public void onUnload() {
-    if (!this.isLoaded) {
-      Util.debugLog("Dupe unload request, canceled.");
-      return;
-    }
     if (this.getDisplayItem() != null) {
       this.getDisplayItem().remove();
     }

@@ -93,7 +93,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
    * @param shop The shop was remove cause no enough ongoing fee
    */
   public void removeShop(@NotNull Shop shop) {
-    Bukkit.getScheduler().runTask(plugin, () -> ShopManager.instance().delete(shop));
+    Bukkit.getScheduler().runTask(plugin, () -> ShopLoader.instance().delete(shop));
 
     MsgUtil.send(shop.getOwner(),
         MsgUtil.getMessagePlaceholder("shop-removed-cause-ongoing-fee",

@@ -19,6 +19,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -33,8 +34,6 @@ import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_SetOwner implements CommandProcesser {
-
-  private final QuickShop plugin = QuickShop.instance;
 
   @NotNull
   @Override
@@ -65,15 +64,15 @@ public class SubCommand_SetOwner implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = ShopManager.instance().getShopAt(b.getLocation());
+      final ShopViewer shop = ShopManager.instance().getLoadedShopAt(b.getLocation());
 
       if (!shop.isPresent()) {
         continue;
       }
 
       @SuppressWarnings("deprecation")
-      final OfflinePlayer p = plugin.getServer().getOfflinePlayer(cmdArg[0]);
-      final String shopOwner = plugin.getServer().getOfflinePlayer(shop.get().getOwner()).getName();
+      final OfflinePlayer p = Bukkit.getOfflinePlayer(cmdArg[0]);
+      final String shopOwner = Bukkit.getOfflinePlayer(shop.get().getOwner()).getName();
       if (shopOwner == null) {
         sender.sendMessage(MsgUtil.getMessage("unknown-player", null));
         return;

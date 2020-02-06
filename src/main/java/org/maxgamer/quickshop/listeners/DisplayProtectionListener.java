@@ -55,7 +55,7 @@ public class DisplayProtectionListener implements Listener {
     
     Block targetBlock = event.getToBlock();
     Block shopBlock = targetBlock.getRelative(BlockFace.DOWN);
-    ShopViewer shop = ShopManager.instance().getShopFrom(shopBlock.getLocation());
+    ShopViewer shop = ShopManager.instance().getLoadedShopFrom(shopBlock.getLocation());
     if (!shop.isPresent()) {
       return;
     }
@@ -86,7 +86,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    ShopViewer shop = ShopManager.instance().getShopFrom(block.getLocation());
+    ShopViewer shop = ShopManager.instance().getLoadedShopFrom(block.getLocation());
     if (shop.isPresent()) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -99,7 +99,7 @@ public class DisplayProtectionListener implements Listener {
     for (Block oBlock : event.getBlocks()) {
       Block otherBlock = oBlock.getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
       if (Util.canBeShop(otherBlock)) {
-        shop = ShopManager.instance().getShopFrom(otherBlock.getLocation());
+        shop = ShopManager.instance().getLoadedShopFrom(otherBlock.getLocation());
         if (shop != null) {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -119,7 +119,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    ShopViewer shop = ShopManager.instance().getShopFrom(block.getLocation());
+    ShopViewer shop = ShopManager.instance().getLoadedShopFrom(block.getLocation());
     if (shop.get() != null) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -132,7 +132,7 @@ public class DisplayProtectionListener implements Listener {
     for (Block oBlock : event.getBlocks()) {
       Block otherBlock = oBlock.getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
       if (Util.canBeShop(otherBlock)) {
-        shop = ShopManager.instance().getShopFrom(otherBlock.getLocation());
+        shop = ShopManager.instance().getLoadedShopFrom(otherBlock.getLocation());
         if (shop.get() != null) {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -453,7 +453,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     
     Block waterBlock = event.getBlockClicked().getRelative(event.getBlockFace());
-    ShopManager.instance().getShopAt(waterBlock.getRelative(BlockFace.DOWN).getLocation()).ifPresent(shop -> {
+    ShopManager.instance().getLoadedShopAt(waterBlock.getRelative(BlockFace.DOWN).getLocation()).ifPresent(shop -> {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Player  " + event.getPlayer().getName()
           + " trying use water to move somethings on the shop top, QuickShop already remove it.");

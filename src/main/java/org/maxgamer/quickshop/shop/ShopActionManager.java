@@ -198,7 +198,7 @@ public class ShopActionManager {
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
     }
 
-    if (ShopManager.instance().getShopAt(info.location()).isPresent()) {
+    if (ShopManager.instance().getLoadedShopAt(info.location()).isPresent()) {
       p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
       return;
     }
@@ -481,7 +481,7 @@ public class ShopActionManager {
 
     // Shop gone
     // Get the shop they interacted with
-    ShopViewer shopOp = ShopManager.instance().getShopAt(info.location());
+    ShopViewer shopOp = ShopManager.instance().getLoadedShopAt(info.location());
     // It's not valid anymore
     if (!shopOp.isPresent() || !Util.canBeShop(info.location().getBlock())) {
       p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));

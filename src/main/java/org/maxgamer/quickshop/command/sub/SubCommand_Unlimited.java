@@ -32,7 +32,7 @@ public class SubCommand_Unlimited extends SneakyTabs implements CommandProcesser
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = ShopManager.instance().getShopAt(b.getLocation());
+      final ShopViewer shop = ShopManager.instance().getLoadedShopAt(b.getLocation());
 
       if (!shop.isPresent()) {
         continue;

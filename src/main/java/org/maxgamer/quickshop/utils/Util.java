@@ -138,7 +138,7 @@ public class Util {
     return shopBlock.isPresent() ?
         ShopManager
           .instance()
-          .getShopAt(shopBlock.get()) : ShopViewer.empty();
+          .getLoadedShopAt(shopBlock.get()) : ShopViewer.empty();
   }
 
   /**
@@ -866,13 +866,13 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      ShopViewer firstShop = ShopManager.instance().getShopAt(c.getLocation());
+      ShopViewer firstShop = ShopManager.instance().getLoadedShopAt(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Optional<Location> secondHalf = getSecondHalf(c);
       ShopViewer secondShop =
           secondHalf.isPresent() ?
-              ShopManager.instance().getShopAt(secondHalf.get()) : ShopViewer.empty();
+              ShopManager.instance().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
       
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {

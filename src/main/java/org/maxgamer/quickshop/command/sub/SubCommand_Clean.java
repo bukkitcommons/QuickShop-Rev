@@ -75,7 +75,7 @@ public class SubCommand_Clean implements CommandProcesser {
     }
 
     for (Shop shop : pendingRemoval)
-      ShopManager.instance().delete(shop);
+      ShopLoader.instance().delete(shop);
 
     MsgUtil.clean();
     sender.sendMessage(MsgUtil.getMessage("command.cleaned", sender, "" + i));

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.shop.api.Shop;
 import com.google.common.collect.Sets;
 
-public class SignUpdateWatcher implements Runnable {
+public class ScheduledSignUpdater implements Runnable {
   private Set<Shop> signs = Sets.newHashSet();
 
   public void schedule(@NotNull Shop shop) {

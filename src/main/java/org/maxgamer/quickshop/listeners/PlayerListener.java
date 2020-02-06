@@ -80,7 +80,7 @@ public class PlayerListener implements Listener {
           block = e.getClickedBlock();
         }
         
-        ShopViewer optional = ShopManager.instance().getShopAt(block.getLocation());
+        ShopViewer optional = ShopManager.instance().getLoadedShopAt(block.getLocation());
 
         if (optional.isPresent()
             && (optional.get()
@@ -117,7 +117,7 @@ public class PlayerListener implements Listener {
     final Location loc = b.getLocation();
     final ItemStack item = e.getItem();
     // Get the shop
-    ShopViewer shop = ShopManager.instance().getShopAt(loc);
+    ShopViewer shop = ShopManager.instance().getLoadedShopAt(loc);
     // If that wasn't a shop, search nearby shops
     if (!shop.isPresent()) {
       if (Util.isWallSign(b.getType())) {
@@ -126,7 +126,7 @@ public class PlayerListener implements Listener {
         Optional<Location> half = Util.getSecondHalf(b);
 
         if (half.isPresent()) {
-          ShopViewer secondHalfShop = ShopManager.instance().getShopAt(half.get());
+          ShopViewer secondHalfShop = ShopManager.instance().getLoadedShopAt(half.get());
           if (secondHalfShop.isPresent() && !p.getUniqueId().equals(secondHalfShop.get().getOwner())) {
             // If player not the owner of the shop, make him select the second half of the
             // shop
@@ -281,7 +281,7 @@ public class PlayerListener implements Listener {
     if (location == null)
       return;
 
-    ShopManager.instance().getShopFrom(location).ifPresent(Shop::setSignText);
+    ShopManager.instance().getLoadedShopFrom(location).ifPresent(Shop::setSignText);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)

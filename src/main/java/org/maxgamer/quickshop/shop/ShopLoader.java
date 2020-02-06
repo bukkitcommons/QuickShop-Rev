@@ -8,13 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.logging.Logger;
 import lombok.Data;
 import lombok.Getter;
@@ -24,6 +24,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Sign;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -33,17 +34,16 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.checkerframework.checker.units.qual.s;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.viewer.ViewAction;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader implements Listener {
@@ -63,7 +63,7 @@ public class ShopLoader implements Listener {
   }
   
   @Getter
-  private final Map<String, Map<Long, Map<Long, Shop>>> allShops = Maps.newHashMap();
+  private final Map<String, Map<Long, Map<Long, Shop>>> allShops = Maps.newConcurrentMap();
   
   /**
    * Returns a new shop iterator object, allowing iteration over shops easily, instead of sorting
@@ -179,9 +179,50 @@ public class ShopLoader implements Listener {
     
     ShopManager.instance()
                .getLoadedShops()
-               .stream()
-               .filter(shop -> shop.getLocation().getWorld().getName().equals(world))
-               .forEach(shop -> ShopManager.instance().unload(shop));
+               .getOrDefault(world, Collections.emptyMap())
+               .values()
+               .forEach(blockMap -> blockMap.values().forEach(shop -> ShopManager.instance().unload(shop)));
+    // Note: we do not actually remove the shop from memory,
+    // to ensures it is able to get right data of existence when needed,
+    // such as shop cleaner.
+  }
+  
+  public void delete(@NotNull Shop shop) {
+    ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
+    if (Util.fireCancellableEvent(shopDeleteEvent)) {
+      Util.debugLog("Shop deletion was canceled because a plugin canceled it.");
+      return;
+    }
+    
+    @Nullable Map<Long, Shop> inChunk = getShops(shop.getLocation().getChunk());
+    if (inChunk != null && !inChunk.isEmpty())
+      inChunk.remove(Util.blockKey(shop.getLocation()));
+    
+    ShopManager.instance().unload(shop);
+    
+    // Delete the display item
+    if (shop.getDisplay() != null) {
+      shop.getDisplay().remove();
+    }
+    
+    // Delete the signs around it
+    for (Sign s : shop.getSigns())
+      s.getBlock().setType(Material.AIR);
+    
+    // Delete it from the database
+    int x = shop.getLocation().getBlockX();
+    int y = shop.getLocation().getBlockY();
+    int z = shop.getLocation().getBlockZ();
+    String world = shop.getLocation().getWorld().getName();
+    
+    try {
+      QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (BaseConfig.refundable)
+        QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
+    }
   }
   
   @EventHandler(priority = EventPriority.MONITOR)
@@ -198,7 +239,7 @@ public class ShopLoader implements Listener {
     
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-        inChunk.values().forEach(Shop::onLoad);
+        inChunk.values().forEach(shop -> ShopManager.instance().load(shop));
       });
   }
   
@@ -209,7 +250,7 @@ public class ShopLoader implements Listener {
 
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-        inChunk.values().forEach(Shop::onUnload);
+        inChunk.values().forEach(shop -> ShopManager.instance().unload(shop));
       });
   }
 
@@ -316,6 +357,7 @@ public class ShopLoader implements Listener {
     }
   }
 
+  @SuppressWarnings("deprecation")
   private static @Nullable ShopModerator deserializeModerator(@NotNull String moderatorJson) {
     ShopModerator shopModerator;
     if (Util.isUUID(moderatorJson)) {

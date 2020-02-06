@@ -1,12 +1,13 @@
 package org.maxgamer.quickshop.shop;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -17,16 +18,13 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Sign;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopCreateEvent;
-import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
@@ -52,7 +50,7 @@ public class ShopManager {
   /*
    * Shop containers
    */
-  private final Set<Shop> loadedShops = QuickShop.instance().isEnabledAsyncDisplayDespawn() ? Sets.newConcurrentHashSet() : Sets.newHashSet();
+  private final Map<String, Map<Long, Map<Long, Shop>>> loadedShops = Maps.newHashMap();
   
   /**
    * Adds a shop to the world. Does NOT require the chunk or world to be loaded Call shop.onLoad by
@@ -62,7 +60,18 @@ public class ShopManager {
    * @param shop The shop to add
    */
   public void load(@NotNull Shop shop) {
-    loadedShops.add(shop);
+    if (shop.isLoaded())
+      return;
+    
+    Location location = shop.getLocation();
+    
+    Map<Long, Map<Long, Shop>> inWorld =
+        loadedShops.computeIfAbsent(location.getWorld().getName(), s -> new HashMap<>(3));
+    
+    Map<Long, Shop> inChunk =
+        inWorld.computeIfAbsent(Util.chunkKey(location.getBlockX() >> 4, location.getBlockZ() >> 4), s -> Maps.newHashMap());
+    
+    inChunk.put(Util.blockKey(location), shop);
     shop.onLoad();
   }
 
@@ -115,8 +124,14 @@ public class ShopManager {
    * on plugin disable ONLY.
    */
   public void clear() {
-    loadedShops.forEach(Shop::onUnload);
+    viewLoadedShops(shops -> shops.forEach(Shop::onUnload));
     loadedShops.clear();
+  }
+  
+  public void viewLoadedShops(Consumer<Collection<Shop>> con) {
+    loadedShops.values()
+    .forEach(inChunk -> inChunk.values()
+        .forEach(blockMap -> con.accept(blockMap.values())));
   }
 
   /**
@@ -199,12 +214,12 @@ public class ShopManager {
     }
   }
   
-  public ShopViewer getShopAt(@NotNull Block block) {
+  public ShopViewer getLoadedShopAt(@NotNull Block block) {
     switch (block.getType()) {
       case CHEST:
       case TRAPPED_CHEST:
       case ENDER_CHEST:
-        return getShopAt(block.getLocation());
+        return getLoadedShopAt(block.getLocation());
       default:
         return ShopViewer.empty();
     }
@@ -216,7 +231,7 @@ public class ShopManager {
    * @param loc The location to get the shop from
    * @return The shop at that location
    */
-  public ShopViewer getShopAt(@NotNull Location loc) {
+  public ShopViewer getLoadedShopAt(@NotNull Location loc) {
     @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     if (inChunk == null)
       return ShopViewer.empty();
@@ -224,7 +239,7 @@ public class ShopManager {
     return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
   }
   
-  public boolean hasShopAt(@NotNull Location loc) {
+  public boolean hasLoadedShopAt(@NotNull Location loc) {
     @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     if (inChunk == null)
       return false;
@@ -232,7 +247,7 @@ public class ShopManager {
     return inChunk.containsKey(Util.blockKey(loc));
   }
 
-  public void accept(@NotNull Location loc, @NotNull Consumer<Shop> consumer) {
+  public void acceptLoaded(@NotNull Location loc, @NotNull Consumer<Shop> consumer) {
     @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     
     if (inChunk != null) {
@@ -248,25 +263,25 @@ public class ShopManager {
    * @param loc The location to get the shop from
    * @return The shop at that location
    */
-  public ShopViewer getShopFrom(@Nullable Location loc) {
-    return loc == null ? ShopViewer.empty() : getShopFrom(loc.getBlock());
+  public ShopViewer getLoadedShopFrom(@Nullable Location loc) {
+    return loc == null ? ShopViewer.empty() : getLoadedShopFrom(loc.getBlock());
   }
 
-  private ShopViewer getShopFrom(@NotNull Block block) {
+  private ShopViewer getLoadedShopFrom(@NotNull Block block) {
     boolean secondHalf = false;
     Location location = block.getLocation();
     
     switch (block.getType()) {
       case CHEST:
       case TRAPPED_CHEST:
-        ShopViewer shopViewer = getShopAt(location);
+        ShopViewer shopViewer = getLoadedShopAt(location);
         if (shopViewer.isPresent())
           return shopViewer;
         else
           secondHalf = true;
         
       case ENDER_CHEST:
-        ShopViewer viewerAt = getShopAt(location);
+        ShopViewer viewerAt = getLoadedShopAt(location);
         if (viewerAt.isPresent())
           return viewerAt;
         
@@ -278,7 +293,7 @@ public class ShopManager {
         if (secondHalf) {
           Optional<Location> half = Util.getSecondHalf(block);
           if (half.isPresent()) {
-            ShopViewer viewerHalf = getShopAt(half.get());
+            ShopViewer viewerHalf = getLoadedShopAt(half.get());
             if (viewerHalf.isPresent())
               return viewerHalf;
           }
@@ -289,48 +304,28 @@ public class ShopManager {
   }
 
   /**
-   * Removes a shop from the world. Does NOT remove it from the database. * REQUIRES * the world to
-   * be loaded Call shop.onUnload by your self.
+   * Removes a shop from the world. Does NOT remove it from the database.
    *
    * @param shop The shop to remove
    */
   public void unload(@NotNull Shop shop) {
-    loadedShops.remove(shop);
-    shop.onUnload();
-  }
-  
-  public void delete(@NotNull Shop shop) {
-    ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
-    if (Util.fireCancellableEvent(shopDeleteEvent)) {
-      Util.debugLog("Shop deletion was canceled because a plugin canceled it.");
+    if (!shop.isLoaded())
       return;
+    
+    Location location = shop.getLocation();
+    
+    Map<Long, Map<Long, Shop>> inWorld =
+        loadedShops.get(location.getWorld().getName());
+    
+    if (inWorld != null) {
+      Map<Long, Shop> inChunk =
+          inWorld.get(Util.chunkKey(location.getBlockX() >> 4, location.getBlockZ() >> 4));
+      
+      if (inChunk != null)
+        inChunk.remove(Util.blockKey(location));
     }
     
-    ShopManager.instance().unload(shop);
-    
-    // Delete the display item
-    if (shop.getDisplay() != null) {
-      shop.getDisplay().remove();
-    }
-    
-    // Delete the signs around it
-    for (Sign s : shop.getSigns())
-      s.getBlock().setType(Material.AIR);
-    
-    // Delete it from the database
-    int x = shop.getLocation().getBlockX();
-    int y = shop.getLocation().getBlockY();
-    int z = shop.getLocation().getBlockZ();
-    String world = shop.getLocation().getWorld().getName();
-    
-    try {
-      QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (BaseConfig.refundable)
-        QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
-    }
+    shop.onUnload();
   }
 
   /**
@@ -339,7 +334,7 @@ public class ShopManager {
    * @return All loaded shops.
    */
   @NotNull
-  public Set<Shop> getLoadedShops() {
+  public Map<String, Map<Long, Map<Long, Shop>>> getLoadedShops() {
     return this.loadedShops;
   }
 

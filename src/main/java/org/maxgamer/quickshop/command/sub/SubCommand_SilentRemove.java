@@ -2,6 +2,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -9,12 +10,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.command.SneakyTabs;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
-public class SubCommand_SilentRemove implements CommandProcesser {
+public class SubCommand_SilentRemove extends SneakyTabs implements CommandProcesser {
 
   @NotNull
   @Override
@@ -33,7 +36,7 @@ public class SubCommand_SilentRemove implements CommandProcesser {
 
     final Player p = (Player) sender;
     final ShopViewer shop =
-        ShopManager.instance().getShopAt(new Location(QuickShop.instance().getServer().getWorld(cmdArg[0]),
+        ShopManager.instance().getLoadedShopAt(new Location(Bukkit.getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent()) {
@@ -47,6 +50,6 @@ public class SubCommand_SilentRemove implements CommandProcesser {
       return;
     }
 
-    ShopManager.instance().delete(shop.get());
+    ShopLoader.instance().delete(shop.get());
   }
 }

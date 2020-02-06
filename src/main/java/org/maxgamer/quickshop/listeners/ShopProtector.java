@@ -18,6 +18,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
@@ -38,7 +39,7 @@ public class ShopProtector implements Listener {
 
     ShopManager
     .instance()
-    .getShopFrom(location) // FIXME
+    .getLoadedShopFrom(location)
 
     .ifPresent(shop -> {
       if (predicate)
@@ -56,7 +57,7 @@ public class ShopProtector implements Listener {
     for (Block block : event.blockList())
       handleProtection(block.getLocation(), BaseConfig.explosionProtection,
           () -> event.setCancelled(true),
-          shop -> ShopManager.instance().delete(shop));
+          shop -> ShopLoader.instance().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -64,7 +65,7 @@ public class ShopProtector implements Listener {
     for (Block block : event.blockList())
       handleProtection(block.getLocation(), BaseConfig.explosionProtection,
           () -> event.setCancelled(true),
-          shop -> ShopManager.instance().delete(shop));
+          shop -> ShopLoader.instance().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -99,7 +100,7 @@ public class ShopProtector implements Listener {
     if (BaseConfig.enhancedShopProtection)
 
       for (BlockState block : event.getBlocks()) {
-        ShopViewer viewer = ShopManager.instance().getShopFrom(block.getLocation());
+        ShopViewer viewer = ShopManager.instance().getLoadedShopFrom(block.getLocation());
 
         if (viewer.isPresent()) {
           event.setCancelled(true);
@@ -114,6 +115,6 @@ public class ShopProtector implements Listener {
       for (BlockState block : event.getBlocks())
         ShopManager
         .instance()
-        .getShopFrom(block.getLocation()).ifPresent(() -> event.setCancelled(true));
+        .getLoadedShopFrom(block.getLocation()).ifPresent(() -> event.setCancelled(true));
   }
 }
