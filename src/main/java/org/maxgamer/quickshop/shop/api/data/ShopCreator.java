@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
 @Data
 @Accessors(fluent = true)
 public class ShopCreator implements ShopData {
-  private final Block sign;
-  private final Location location;
-  private final ItemStack item;
+  @Nullable private final Block sign;
+  @NotNull private final Location location;
+  @Nullable private final ItemStack item;
 
   public ShopCreator(
       @NotNull Location loc,

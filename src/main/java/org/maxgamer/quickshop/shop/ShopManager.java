@@ -18,9 +18,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
+import org.bukkit.material.Sign;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
@@ -142,30 +144,44 @@ public class ShopManager {
    */
   public void createShop(@NotNull Shop shop, @NotNull ShopCreator info) {
     Player player = Bukkit.getPlayer(shop.getOwner());
-    if (player == null) {
-      throw new IllegalStateException("The owner creating the shop is offline or not exist");
-    }
-    ShopCreateEvent ssShopCreateEvent = new ShopCreateEvent(shop, player);
-    if (Util.fireCancellableEvent(ssShopCreateEvent)) {
-      Util.debugLog("Cancelled by plugin");
+    if (player == null)
       return;
-    }
-    Location loc = shop.getLocation();
+    
+    ShopCreateEvent event = new ShopCreateEvent(shop, player);
+    if (Util.fireCancellableEvent(event))
+      return;
+    
+    Location location = shop.getLocation();
     try {
-      // Write it to the database
-      QuickShop.instance().getDatabaseHelper().createShop(shop.getModerator().serialize(),
-          shop.getPrice(), shop.getItem(), (shop.isUnlimited() ? 1 : 0), shop.getShopType().toID(),
-          Objects.requireNonNull(loc.getWorld()).getName(), loc.getBlockX(), loc.getBlockY(),
-          loc.getBlockZ());
-      // Add it to the world
+      QuickShop
+        .instance()
+        .getDatabaseHelper()
+        .createShop(shop.getModerator().serialize(),
+                    shop.getPrice(), shop.getItem(),
+                    shop.isUnlimited() ? 1 : 0, shop.getShopType().toID(),
+                    location.getWorld().getName(),
+                    location.getBlockX(), location.getBlockY(), location.getBlockZ());
+      
+      Map<Long, Shop> inChunk =
+          ShopLoader
+            .instance()
+            .getAllShops()
+            .computeIfAbsent(location.getWorld().getName(),
+                s -> new HashMap<>(3))
+            .computeIfAbsent(Util.chunkKey(location.getBlockX() >> 4, location.getBlockZ() >> 4),
+                s -> Maps.newHashMap());
+      
+      inChunk.put(Util.blockKey(
+          location.getBlockX(), location.getBlockY(), location.getBlockZ()), shop);
+      
       load(shop);
     } catch (SQLException error) {
       ShopLogger.instance().warning("SQLException detected, trying to auto fix the database...");
       boolean backupSuccess = Util.backupDatabase();
       try {
         if (backupSuccess) {
-          QuickShop.instance().getDatabaseHelper().deleteShop(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(),
-              loc.getWorld().getName());
+          QuickShop.instance().getDatabaseHelper().deleteShop(location.getBlockX(), location.getBlockY(), location.getBlockZ(),
+              location.getWorld().getName());
         } else {
           ShopLogger.instance()
           .warning("Failed to backup the database, all changes will revert after a reboot.");
@@ -178,38 +194,46 @@ public class ShopManager {
       }
       error.printStackTrace();
     }
+    
     // Create sign
-    if (info.sign() != null && QuickShop.instance().getConfig().getBoolean("shop.auto-sign")) {
+    if (info.sign() != null /*&& QuickShop.instance().getConfig().getBoolean("shop.auto-sign")*/) {
       if (!Util.isAir(info.sign().getType())) {
         Util.debugLog("Sign cannot placed cause no enough space(Not air block)");
         return;
       }
-      boolean isWaterLogged = false;
-      if (info.sign().getType() == Material.WATER) {
-        isWaterLogged = true;
-      }
-
+      
+      boolean isWaterLogged = info.sign().getType() == Material.WATER;
       info.sign().setType(Util.getSignMaterial());
-      BlockState bs = info.sign().getState();
+      
+      BlockState signState = info.sign().getState();
       if (isWaterLogged) {
-        if (bs.getBlockData() instanceof Waterlogged) {
-          Waterlogged waterable = (Waterlogged) bs.getBlockData();
-          waterable.setWaterlogged(true); // Looks like sign directly put in water
+        try {
+          BlockData data = signState.getBlockData();
+          if (data instanceof Waterlogged) {
+            Waterlogged waterable = (Waterlogged) data;
+            waterable.setWaterlogged(true);
+          }
+        } catch (Throwable t) {
+          ;
         }
       }
-      if (bs.getBlockData() instanceof WallSign) {
-        org.bukkit.block.data.type.WallSign signBlockDataType =
-            (org.bukkit.block.data.type.WallSign) bs.getBlockData();
-        BlockFace bf = info.location().getBlock().getFace(info.sign());
-        if (bf != null) {
-          signBlockDataType.setFacing(bf);
-          bs.setBlockData(signBlockDataType);
-        }
-      } else {
-        ShopLogger.instance().warning("Sign material " + bs.getType().name()
-            + " not a WallSign, make sure you using correct sign material.");
+      
+      BlockFace chestFace = info.location().getBlock().getFace(info.sign());
+      assert chestFace != null;
+      
+      try {
+        org.bukkit.block.data.type.WallSign signData =
+            (org.bukkit.block.data.type.WallSign) signState.getBlockData();
+        
+        signData.setFacing(chestFace);
+        signState.setBlockData(signData);
+      } catch (Throwable t) {
+        Sign sign = (Sign) signState.getData();
+        sign.setFacingDirection(chestFace);
+        signState.setData(sign);
       }
-      bs.update(true);
+      
+      signState.update(true);
       shop.setSignText();
     }
   }

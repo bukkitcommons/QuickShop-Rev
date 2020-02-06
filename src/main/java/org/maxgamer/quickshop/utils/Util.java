@@ -1214,7 +1214,7 @@ public class Util {
   public static Material getSignMaterial() {
 
     Material signMaterial = Material.matchMaterial(BaseConfig.signMaterial);
-    if (signMaterial != null) {
+    if (signMaterial != null && signMaterial.name().endsWith("WALL_SIGN")) {
       return signMaterial;
     }
     signMaterial = Material.matchMaterial("OAK_WALL_SIGN"); // Fallback default sign in 1.14
@@ -1231,7 +1231,7 @@ public class Util {
     try {
       return Material.OAK_WALL_SIGN;
     } catch (Throwable e) {
-      return Material.matchMaterial("WALL_SIGN");
+      return Material.valueOf("WALL_SIGN");
     }
   }
 
