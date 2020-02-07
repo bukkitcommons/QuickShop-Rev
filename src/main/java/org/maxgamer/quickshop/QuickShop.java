@@ -540,7 +540,7 @@ public class QuickShop extends JavaPlugin {
     // Register events
 
     blockListener = new BlockListener();
-    playerListener = new ShopActionListener(this);
+    playerListener = new ShopActionListener();
     chatListener = new ChatListener();
     inventoryListener = new DisplayProtectionListener();
     customInventoryListener = new CustomInventoryListener(this);

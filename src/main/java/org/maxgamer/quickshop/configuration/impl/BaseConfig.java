@@ -73,15 +73,117 @@ public class BaseConfig {
 
   @Node(value = "settings.matcher.item.enchant")
   public static boolean enchant = true;
+  
+  @Node(value = "settings.matcher.item.localized-name")
+  public static boolean localizedName = true;
 
   @Node(value = "settings.matcher.item.flag")
   public static boolean flag = true;
+  
+  @Node(value = "settings.matcher.item.unbreakable")
+  public static boolean unbreakable = true;
+  
+  @Node(value = "settings.matcher.item.custom-tags")
+  public static boolean customTags = true;
 
   @Node(value = "settings.matcher.item.lore")
   public static boolean lore = true;
 
-  @Node(value = "settings.matcher.item.potion")
-  public static boolean potion = true;
+  @Node(value = "settings.matcher.item.type.potion.enable")
+  public static boolean matchesPotion = true;
+  
+  @Node(value = "settings.matcher.item.type.potion.attributes.data")
+  public static boolean matchesPotionData = true;
+  
+  @Node(value = "settings.matcher.item.type.potion.attributes.custom-effects")
+  public static boolean matchesPotionCustomEffects = true;
+  
+  @Node(value = "settings.matcher.item.type.potion.attributes.colour")
+  public static boolean matchesPotionColour = true;
+  
+  @Node(value = "settings.matcher.item.type.map.enable")
+  public static boolean matchesMap = true;
+  
+  @Node(value = "settings.matcher.item.type.map.attributes.scaling")
+  public static boolean matchesMapScaling = true;
+  
+  @Node(value = "settings.matcher.item.type.map.attributes.id")
+  public static boolean matchesMapId = true;
+  
+  @Node(value = "settings.matcher.item.type.map.attributes.location-name")
+  public static boolean matchesMapLocationName = true;
+  
+  @Node(value = "settings.matcher.item.type.map.attributes.colour")
+  public static boolean matchesMapColour = true;
+  
+  @Node(value = "settings.matcher.item.type.banner.enable")
+  public static boolean matchesBanner = true;
+  
+  @Node(value = "settings.matcher.item.type.banner.attributes.pattern")
+  public static boolean matchesBannerPattern = true;
+  
+  @Node(value = "settings.matcher.item.type.banner.attributes.base-colour")
+  public static boolean matchesBannerBaseColour = true;
+  
+  @Node(value = "settings.matcher.item.type.skull.enable")
+  public static boolean matchesSkull = true;
+  
+  @Node(value = "settings.matcher.item.type.spawn-egg.enable")
+  public static boolean matchesSpawnEgg = true;
+  
+  @Node(value = "settings.matcher.item.type.leather-armour.enable")
+  public static boolean matchesLeatherArmour = true;
+  
+  @Node(value = "settings.matcher.item.type.firework")
+  public static boolean matchesFirework = true;
+  
+  @Node(value = "settings.matcher.item.type.firework.attributes.power")
+  public static boolean matchesFireworkPower = true;
+  
+  @Node(value = "settings.matcher.item.type.firework.attributes.effects")
+  public static boolean matchesFireworkEffects = true;
+  
+  @Node(value = "settings.matcher.item.type.firework-charge.enable")
+  public static boolean matchesFireworkCharge = true;
+  
+  @Node(value = "settings.matcher.item.type.enchant-book.enable")
+  public static boolean matchesEnchantBook = true;
+  
+  @Node(value = "settings.matcher.item.type.book.enable")
+  public static boolean matchesBook = true;
+  
+  @Node(value = "settings.matcher.item.type.book.attributes.title")
+  public static boolean matchesBookTitle = true;
+  
+  @Node(value = "settings.matcher.item.type.book.attributes.author")
+  public static boolean matchesBookAuthor = true;
+  
+  @Node(value = "settings.matcher.item.type.book.attributes.pages")
+  public static boolean matchesBookPages = true;
+  
+  @Node(value = "settings.matcher.item.type.book.attributes.generation")
+  public static boolean matchesBookGeneration = true;
+  
+  @Node(value = "settings.matcher.item.type.crossbow.enable")
+  public static boolean matchesCrossbow = true;
+  
+  @Node(value = "settings.matcher.item.type.knowledge-book.enable")
+  public static boolean matchesKnowledgeBook = true;
+  
+  @Node(value = "settings.matcher.item.type.suspicious-stew.enable")
+  public static boolean matchesSuspiciousStew = true;
+  
+  @Node(value = "settings.matcher.item.type.tropical-fish-bucket.enable")
+  public static boolean matchesTropicalFishBucket = true;
+  
+  @Node(value = "settings.matcher.item.type.tropical-fish-bucket.attributes.pattern")
+  public static boolean matchesTropicalFishBucketPattern = true;
+  
+  @Node(value = "settings.matcher.item.type.tropical-fish-bucket.attributes.pattern-colour")
+  public static boolean matchesTropicalFishBucketPatternColour = true;
+  
+  @Node(value = "settings.matcher.item.type.tropical-fish-bucket.attributes.body-colour")
+  public static boolean matchesTropicalFishBucketBodyColour = true;
 
   @Node(value = "settings.matcher.item.repair-cost")
   public static boolean repairCost = true;

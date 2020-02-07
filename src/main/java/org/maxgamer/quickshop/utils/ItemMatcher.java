@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.utils;
 
 import java.util.Map;
-import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.ItemStack;
@@ -15,10 +14,13 @@ import com.google.common.collect.Multimap;
 
 /** A util allow quickshop check item matches easy and quick. */
 public class ItemMatcher {
-  private ItemMetaMatcher itemMetaMatcher;
+  private boolean bukkit;
 
   public ItemMatcher() {
-    itemMetaMatcher = new ItemMetaMatcher();
+    this.bukkit =
+        BaseConfig.damage && BaseConfig.repairCost && BaseConfig.displayName &&
+        BaseConfig.lore && BaseConfig.enchant && BaseConfig.matchesPotion &&
+        BaseConfig.attribute && BaseConfig.flag && BaseConfig.customModelData;
   }
 
   /**
@@ -30,22 +32,16 @@ public class ItemMatcher {
    * @return true if the itemstacks match. (Material, durability, enchants, name)
    */
   public boolean matches(@Nullable ItemStack requireStack, @Nullable ItemStack givenStack) {
-    if (requireStack == givenStack) {
-      return true; // Referring to the same thing, or both are null.
-    }
+    if (requireStack == givenStack)
+      return true;
 
-    if (requireStack == null || givenStack == null) {
-      Util.debugLog("Match failed: A stack is null: " + "requireStack[" + requireStack
-          + "] givenStack[" + givenStack + "]");
-      return false; // One of them is null (Can't be both, see above)
-    }
+    if (requireStack == null || givenStack == null)
+      return false;
 
     switch (BaseConfig.matcherWorkMode) {
       case 1:
       case 2:
-        Bukkit.getItemFactory().equals(null, null);
         return requireStack.isSimilar(givenStack);
-      case 0:
       default:;
     }
 
@@ -58,39 +54,14 @@ public class ItemMatcher {
       Util.debugLog("Meta existence not match.");
       return false;
     }
-
-    return requireStack.hasItemMeta() ?
-        itemMetaMatcher.matches(requireStack.getItemMeta(), givenStack.getItemMeta()) : true;
-  }
-}
-
-
-class ItemMetaMatcher {
-  private boolean repaircost;
-  private boolean attributes;
-  private boolean custommodeldata;
-  private boolean damage;
-  private boolean displayname;
-  private boolean enchs;
-  private boolean itemflags;
-  private boolean lores;
-  private boolean potions;
-  ///
-  private boolean bukkit;
-
-  public ItemMetaMatcher() {
-    this.damage = BaseConfig.damage;
-    this.repaircost = BaseConfig.repairCost;
-    this.displayname = BaseConfig.displayName;
-    this.lores = BaseConfig.lore;
-    this.enchs = BaseConfig.enchant;
-    this.potions = BaseConfig.potion;
-    this.attributes = BaseConfig.attribute;
-    this.itemflags = BaseConfig.flag;
-    this.custommodeldata = BaseConfig.customModelData;
-
-    this.bukkit = damage && repaircost && displayname && lores && enchs && potions && attributes
-        && itemflags && custommodeldata;
+    
+    if (requireStack.hasItemMeta()) {
+      return bukkit ?
+          requireStack.getItemMeta().equals(givenStack.getItemMeta()) :
+            matches(requireStack.getItemMeta(), givenStack.getItemMeta());
+    }
+    
+    return true;
   }
 
   /**
@@ -100,68 +71,87 @@ class ItemMetaMatcher {
    */
   public boolean equalsCommon(ItemMeta meta, ItemMeta that) {
     return
-        displayname ?
+        BaseConfig.displayName ?
             ((meta.hasDisplayName() ?
                 that.hasDisplayName() &&
                 meta.getDisplayName().equals(that.getDisplayName()) :
                   !that.hasDisplayName()))
         : true
 
-        && (meta.hasLocalizedName() ?
-            that.hasLocalizedName() &&
-            meta.getLocalizedName().equals(that.getLocalizedName()) :
-              !that.hasLocalizedName())
+        && BaseConfig.localizedName ?
+            (meta.hasLocalizedName() ?
+                that.hasLocalizedName() &&
+                meta.getLocalizedName().equals(that.getLocalizedName()) :
+                  !that.hasLocalizedName())
+           : true
 
-        && enchs ?
+        && BaseConfig.enchant ?
             (meta.hasEnchants() ?
                 that.hasEnchants() &&
                 meta.getEnchants().equals(that.getEnchants()) :
                   !that.hasEnchants())
            : true
 
-        && lores ?
+        && BaseConfig.lore ?
             (meta.hasLore() ?
                 that.hasLore() &&
                 meta.getLore().equals(that.getLore()) :
                   !that.hasLore())
            : true
 
-        && repaircost ?
+        && BaseConfig.repairCost ?
             (meta instanceof org.bukkit.inventory.meta.Repairable ?
                 that instanceof org.bukkit.inventory.meta.Repairable &&
                 ((org.bukkit.inventory.meta.Repairable) meta).getRepairCost() == ((org.bukkit.inventory.meta.Repairable) that).getRepairCost() :
                   !(that instanceof org.bukkit.inventory.meta.Repairable))
            : true
 
-        && attributes ?
+        && BaseConfig.attribute ?
             (meta.hasAttributeModifiers() ?
                 that.hasAttributeModifiers() &&
                 compareModifiers(meta.getAttributeModifiers(), that.getAttributeModifiers()) :
                   !that.hasAttributeModifiers())
            : true
 
-        && (meta.getPersistentDataContainer().equals(that.getPersistentDataContainer()))
+        && comparePersistentDataContainer(meta, that)
 
-        && itemflags ? (meta.getItemFlags().equals(that.getItemFlags())) : true
+        && BaseConfig.flag ? (meta.getItemFlags().equals(that.getItemFlags())) : true
 
-        && (meta.isUnbreakable() == that.isUnbreakable())
+        && BaseConfig.unbreakable ? (meta.isUnbreakable() == that.isUnbreakable()) : true
 
         // FIXME Missing NMS field: unhandledTags
         // FIXME Missing NMS field: version
         // FIXME Missing Paper API: destroyable & placeable
-        && damage ?
+        && BaseConfig.damage ?
             (meta instanceof Damageable ?
                 that instanceof Damageable &&
                 ((Damageable) meta).getDamage() == ((Damageable) that).getDamage() :
                   !(that instanceof Damageable))
            : true
         
-        && custommodeldata ?
-            (meta.hasCustomModelData() ?
-                that.hasCustomModelData() &&
-                meta.getCustomModelData() == that.getCustomModelData() :
-                  !that.hasCustomModelData())
-           : true;
+        && compareCustomModelData(meta, that);
+  }
+  
+  public boolean compareCustomModelData(ItemMeta meta, ItemMeta that) {
+    try {
+      return BaseConfig.customModelData ?
+          (meta.hasCustomModelData() ?
+              that.hasCustomModelData() &&
+              meta.getCustomModelData() == that.getCustomModelData() :
+                !that.hasCustomModelData())
+         : true;
+    } catch (Throwable t) {
+      return true; // since 1.13
+    }
+  }
+  
+  public boolean comparePersistentDataContainer(ItemMeta meta, ItemMeta that) {
+    try {
+      return BaseConfig.customTags ?
+          meta.getPersistentDataContainer().equals(that.getPersistentDataContainer()) : true;
+    } catch (Throwable t) {
+      return true; // since 1.14
+    }
   }
   
   public boolean matches(ItemMeta originMeta, ItemMeta testMeta) {
@@ -170,50 +160,49 @@ class ItemMetaMatcher {
         equalsCommon(originMeta, testMeta) && compareUncommon(originMeta, testMeta);
   }
 
-  public boolean compareUncommon(ItemMeta originMeta, ItemMeta testMeta) {
-    Class<? extends ItemMeta> clazz = originMeta.getClass();
-    if (isCommon(clazz))
+  public boolean compareUncommon(ItemMeta origin, ItemMeta test) {
+    Class<? extends ItemMeta> clazz = origin.getClass();
+    if (isCommon(origin.getClass())) // Skip common types
       return true;
-    if (clazz != testMeta.getClass())
+    if (clazz != test.getClass()) // Not same meta type, item type was same though
       return false;
     
     try {
       boolean matches;
       
-      matches = matchesBook(clazz, originMeta, testMeta);
-      matches = matches && matchesEnchantmentStorage(clazz, originMeta, testMeta);
-      matches = matches && matchesFirework(clazz, originMeta, testMeta);
-      matches = matches && matchesFireworkEffect(clazz, originMeta, testMeta);
-      matches = matches && matchesLeatherArmor(clazz, originMeta, testMeta);
-      matches = matches && matchesMap(clazz, originMeta, testMeta);
-      matches = matches && potions ? matchesPotion(clazz, originMeta, testMeta) : true;
-      matches = matches && matchesSkull(clazz, originMeta, testMeta);
-      matches = matches && matchesSpawnEgg(clazz, originMeta, testMeta);
+      matches = BaseConfig.matchesBook ? matchesBook(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesEnchantBook ? matchesEnchantmentStorage(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesFirework ? matchesFirework(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesFireworkCharge ? matchesFireworkEffect(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesLeatherArmour ? matchesLeatherArmor(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesMap ? matchesMap(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesPotion ? matchesPotion(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesSkull ? matchesSkull(clazz, origin, test) : true;
+      matches = matches && BaseConfig.matchesSpawnEgg ? matchesSpawnEgg(clazz, origin, test) : true;
       
       try {
-        matches = matches && matchesBanner(clazz, originMeta, testMeta);
+        matches = matches && BaseConfig.matchesBanner ? matchesBanner(clazz, origin, test) : true;
       } catch (Throwable t) {}
       
       try {
-        matches = matches && matchesCrossbow(clazz, originMeta, testMeta);
+        matches = matches && BaseConfig.matchesCrossbow ? matchesCrossbow(clazz, origin, test) : true;
       } catch (Throwable t) {}
       
       try {
-        matches = matches && matchesKnowledgeBook(clazz, originMeta, testMeta);
+        matches = matches && BaseConfig.matchesKnowledgeBook ? matchesKnowledgeBook(clazz, origin, test) : true;
       } catch (Throwable t) {}
       
       try {
-        matches = matches && matchesSuspiciousStew(clazz, originMeta, testMeta);
+        matches = matches && BaseConfig.matchesSuspiciousStew ? matchesSuspiciousStew(clazz, origin, test) : true;
       } catch (Throwable t) {}
       
       try {
-        matches = matches && matchesTropicalFishBucket(clazz, originMeta, testMeta);
+        matches = matches && BaseConfig.matchesTropicalFishBucket ? matchesTropicalFishBucket(clazz, origin, test) : true;
       } catch (Throwable t) {}
       
-      Util.debugLog("Found unknown uncommon meta type: " + clazz.getName());
-      return originMeta.equals(testMeta);
+      return matches;
     } catch (Throwable t) {
-      return originMeta.equals(testMeta);
+      return origin.equals(test);
     }
   }
 
@@ -224,24 +213,22 @@ class ItemMetaMatcher {
           clazz == org.bukkit.inventory.meta.BlockStateMeta.class ||
           clazz == org.bukkit.inventory.meta.BlockDataMeta.class;
     } catch (Throwable t) {
-      return false;
+      return false; // only throws on newer meta type, i.e. not ItemMeta
     }
   }
 
   private static boolean compareModifiers(Multimap<Attribute, AttributeModifier> first, Multimap<Attribute, AttributeModifier> second) {
-    if (first == null || second == null) {
+    if (first == null || second == null)
       return false;
-    }
-    for (Map.Entry<Attribute, AttributeModifier> entry : first.entries()) {
-      if (!second.containsEntry(entry.getKey(), entry.getValue())) {
+    
+    for (Map.Entry<Attribute, AttributeModifier> entry : first.entries())
+      if (!second.containsEntry(entry.getKey(), entry.getValue()))
         return false;
-      }
-    }
-    for (Map.Entry<Attribute, AttributeModifier> entry : second.entries()) {
-      if (!first.containsEntry(entry.getKey(), entry.getValue())) {
+    
+    for (Map.Entry<Attribute, AttributeModifier> entry : second.entries())
+      if (!first.containsEntry(entry.getKey(), entry.getValue()))
         return false;
-      }
-    }
+    
     return true;
   }
   
@@ -249,10 +236,17 @@ class ItemMetaMatcher {
     if (clazz == MapMeta.class) {
       MapMeta meta = (MapMeta) originMeta, that = (MapMeta) testMeta;
       
-      return meta.isScaling() == that.isScaling()
-          && (meta.hasMapId() ? that.hasMapId() && meta.getMapId() == that.getMapId() : !that.hasMapId())
-          && (meta.hasLocationName() ? that.hasLocationName() && meta.getLocationName().equals(that.getLocationName()) : !that.hasLocationName())
-          && (meta.hasColor() ? that.hasColor() && meta.getColor().equals(that.getColor()) : !that.hasColor());
+      return BaseConfig.matchesMapScaling ? meta.isScaling() == that.isScaling() : true
+          
+          && BaseConfig.matchesMapId ? (meta.hasMapId() ? that.hasMapId() && meta.getMapId() == that.getMapId() : !that.hasMapId()) : true
+              
+          && BaseConfig.matchesMapLocationName ?
+              (meta.hasLocationName() ?
+                  that.hasLocationName() && meta.getLocationName().equals(that.getLocationName())
+                  : !that.hasLocationName()) : true
+              
+          && BaseConfig.matchesMapColour ?
+              (meta.hasColor() ? that.hasColor() && meta.getColor().equals(that.getColor()) : !that.hasColor()) : true;
     } else {
       return true;
     }
@@ -260,11 +254,18 @@ class ItemMetaMatcher {
   
   public static boolean matchesPotion(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.PotionMeta.class) {
-      org.bukkit.inventory.meta.PotionMeta meta = (org.bukkit.inventory.meta.PotionMeta) originMeta, that = (org.bukkit.inventory.meta.PotionMeta) testMeta;
+      org.bukkit.inventory.meta.PotionMeta meta = (org.bukkit.inventory.meta.PotionMeta) originMeta,
+          that = (org.bukkit.inventory.meta.PotionMeta) testMeta;
       
-      return meta.getBasePotionData().equals(that.getBasePotionData())
-          && (meta.hasCustomEffects() ? that.hasCustomEffects() && meta.getCustomEffects().equals(that.getCustomEffects()) : !that.hasCustomEffects())
-          && (meta.hasColor() ? that.hasColor() && meta.getColor().equals(that.getColor()) : !that.hasColor());
+      return BaseConfig.matchesPotion ? meta.getBasePotionData().equals(that.getBasePotionData()) : true
+          
+          && BaseConfig.matchesPotionCustomEffects ?
+              (meta.hasCustomEffects() ?
+                  that.hasCustomEffects() && meta.getCustomEffects().equals(that.getCustomEffects())
+                  : !that.hasCustomEffects()) : true
+              
+          && BaseConfig.matchesPotionColour ?
+              (meta.hasColor() ? that.hasColor() && meta.getColor().equals(that.getColor()) : !that.hasColor()) : true;
     } else {
       return true;
     }
@@ -282,7 +283,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesSkull(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.SkullMeta.class) {
-      org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) originMeta, that = (org.bukkit.inventory.meta.SkullMeta) testMeta;
+      org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) originMeta,
+          that = (org.bukkit.inventory.meta.SkullMeta) testMeta;
       
       return meta.hasOwner() ? that.hasOwner() && meta.getOwner().equals(that.getOwner()) : !that.hasOwner();
     } else {
@@ -295,10 +297,17 @@ class ItemMetaMatcher {
       BookMeta meta = (BookMeta) originMeta, that = (BookMeta) testMeta;
       
       return
-          (meta.hasTitle() ? that.hasTitle() && meta.getTitle().equals(that.getTitle()) : !that.hasTitle())
-          && (meta.hasAuthor() ? that.hasAuthor() && meta.getAuthor().equals(that.getAuthor()) : !that.hasAuthor())
-          && (meta.hasPages() ? that.hasPages() && meta.getPages().equals(that.getPages()) : !that.hasPages())
-          && (meta.hasGeneration() ? that.hasGeneration() && meta.getGeneration().equals(that.getGeneration()) : !that.hasGeneration());
+          BaseConfig.matchesBookTitle ?
+              (meta.hasTitle() ? that.hasTitle() && meta.getTitle().equals(that.getTitle()) : !that.hasTitle()) : true
+              
+          && BaseConfig.matchesBookAuthor ?
+              (meta.hasAuthor() ? that.hasAuthor() && meta.getAuthor().equals(that.getAuthor()) : !that.hasAuthor()) : true
+              
+          && BaseConfig.matchesBookPages ?
+              (meta.hasPages() ? that.hasPages() && meta.getPages().equals(that.getPages()) : !that.hasPages()) : true
+              
+          && BaseConfig.matchesBookGeneration ?
+              (meta.hasGeneration() ? that.hasGeneration() && meta.getGeneration().equals(that.getGeneration()) : !that.hasGeneration()) : true;
     } else {
       return true;
     }
@@ -306,7 +315,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesLeatherArmor(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.LeatherArmorMeta.class) {
-      return ((org.bukkit.inventory.meta.LeatherArmorMeta) originMeta).getColor().equals(((org.bukkit.inventory.meta.LeatherArmorMeta) testMeta).getColor());
+      return ((org.bukkit.inventory.meta.LeatherArmorMeta) originMeta).getColor().equals(
+          ((org.bukkit.inventory.meta.LeatherArmorMeta) testMeta).getColor());
     } else {
       return true;
     }
@@ -314,7 +324,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesEnchantmentStorage(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.EnchantmentStorageMeta.class) {
-      org.bukkit.inventory.meta.EnchantmentStorageMeta meta = (org.bukkit.inventory.meta.EnchantmentStorageMeta) originMeta, that = (org.bukkit.inventory.meta.EnchantmentStorageMeta) testMeta;
+      org.bukkit.inventory.meta.EnchantmentStorageMeta meta = (org.bukkit.inventory.meta.EnchantmentStorageMeta) originMeta,
+          that = (org.bukkit.inventory.meta.EnchantmentStorageMeta) testMeta;
       
       return meta.hasStoredEnchants() ?
           that.hasStoredEnchants() && meta.getEnchants().equals(that.getEnchants()) : !that.hasStoredEnchants();
@@ -325,7 +336,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesFireworkEffect(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.FireworkEffectMeta.class) {
-      org.bukkit.inventory.meta.FireworkEffectMeta meta = (org.bukkit.inventory.meta.FireworkEffectMeta) originMeta, that = (org.bukkit.inventory.meta.FireworkEffectMeta) testMeta;
+      org.bukkit.inventory.meta.FireworkEffectMeta meta = (org.bukkit.inventory.meta.FireworkEffectMeta) originMeta,
+          that = (org.bukkit.inventory.meta.FireworkEffectMeta) testMeta;
       
       return meta.hasEffect() ?
           that.hasEffect() && meta.getEffect().equals(that.getEffect()) : !that.hasEffect();
@@ -336,10 +348,13 @@ class ItemMetaMatcher {
   
   public static boolean matchesFirework(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.FireworkMeta.class) {
-      org.bukkit.inventory.meta.FireworkMeta meta = (org.bukkit.inventory.meta.FireworkMeta) originMeta, that = (org.bukkit.inventory.meta.FireworkMeta) testMeta;
+      org.bukkit.inventory.meta.FireworkMeta meta = (org.bukkit.inventory.meta.FireworkMeta) originMeta,
+          that = (org.bukkit.inventory.meta.FireworkMeta) testMeta;
       
-      return meta.getPower() == that.getPower() &&
-          (meta.hasEffects() ? that.hasEffects() && meta.getEffects().equals(that.getEffects()) : !that.hasEffects());
+      return BaseConfig.matchesFireworkPower ? meta.getPower() == that.getPower() : true &&
+          
+          BaseConfig.matchesFireworkEffects ?
+              (meta.hasEffects() ? that.hasEffects() && meta.getEffects().equals(that.getEffects()) : !that.hasEffects()) : true;
     } else {
       return true;
     }
@@ -347,11 +362,12 @@ class ItemMetaMatcher {
   
   public static boolean matchesBanner(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.BannerMeta.class) {
-      org.bukkit.inventory.meta.BannerMeta meta = (org.bukkit.inventory.meta.BannerMeta) originMeta, that = (org.bukkit.inventory.meta.BannerMeta) testMeta;
+      org.bukkit.inventory.meta.BannerMeta meta = (org.bukkit.inventory.meta.BannerMeta) originMeta,
+          that = (org.bukkit.inventory.meta.BannerMeta) testMeta;
       
       return
-          (meta.getPatterns().equals(that.getPatterns())) ||
-          (meta.getBaseColor().equals(that.getBaseColor()));
+          (BaseConfig.matchesBannerPattern ? (meta.getPatterns().equals(that.getPatterns())) : true) ||
+          (BaseConfig.matchesBannerBaseColour ? (meta.getBaseColor().equals(that.getBaseColor())) : true);
     } else {
       return true;
     }
@@ -359,7 +375,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesKnowledgeBook(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.KnowledgeBookMeta.class) {
-      org.bukkit.inventory.meta.KnowledgeBookMeta meta = (org.bukkit.inventory.meta.KnowledgeBookMeta) originMeta, that = (org.bukkit.inventory.meta.KnowledgeBookMeta) testMeta;
+      org.bukkit.inventory.meta.KnowledgeBookMeta meta = (org.bukkit.inventory.meta.KnowledgeBookMeta) originMeta,
+          that = (org.bukkit.inventory.meta.KnowledgeBookMeta) testMeta;
       
       return meta.hasRecipes() ? that.hasRecipes() && meta.getRecipes().equals(that.getRecipes()) : !that.hasRecipes();
     } else {
@@ -369,7 +386,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesSuspiciousStew(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.SuspiciousStewMeta.class) {
-      org.bukkit.inventory.meta.SuspiciousStewMeta meta = (org.bukkit.inventory.meta.SuspiciousStewMeta) originMeta, that = (org.bukkit.inventory.meta.SuspiciousStewMeta) testMeta;
+      org.bukkit.inventory.meta.SuspiciousStewMeta meta = (org.bukkit.inventory.meta.SuspiciousStewMeta) originMeta,
+          that = (org.bukkit.inventory.meta.SuspiciousStewMeta) testMeta;
       
       return (meta.hasCustomEffects() ?
           that.hasCustomEffects() && meta.getCustomEffects().equals(that.getCustomEffects()) : !that.hasCustomEffects());
@@ -380,12 +398,19 @@ class ItemMetaMatcher {
   
   public static boolean matchesTropicalFishBucket(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.TropicalFishBucketMeta.class) {
-      org.bukkit.inventory.meta.TropicalFishBucketMeta meta = (org.bukkit.inventory.meta.TropicalFishBucketMeta) originMeta, that = (org.bukkit.inventory.meta.TropicalFishBucketMeta) testMeta;
+      org.bukkit.inventory.meta.TropicalFishBucketMeta meta = (org.bukkit.inventory.meta.TropicalFishBucketMeta) originMeta,
+          that = (org.bukkit.inventory.meta.TropicalFishBucketMeta) testMeta;
       
       return
           (meta.hasVariant() ? that.hasVariant() && (
-              meta.getPattern().equals(that.getPattern()) &&
-              meta.getPatternColor().equals(that.getPatternColor()) && meta.getBodyColor().equals(that.getBodyColor())
+              BaseConfig.matchesTropicalFishBucketPattern ? meta.getPattern().equals(that.getPattern()) : true &&
+                  
+              BaseConfig.matchesTropicalFishBucketPatternColour ?
+                  meta.getPatternColor().equals(that.getPatternColor()) : true &&
+                  
+              BaseConfig.matchesTropicalFishBucketBodyColour ?
+                  meta.getBodyColor().equals(that.getBodyColor()) : true
+
           ) : !that.hasVariant());
     } else {
       return true;
@@ -394,7 +419,8 @@ class ItemMetaMatcher {
   
   public static boolean matchesCrossbow(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.CrossbowMeta.class) {
-      org.bukkit.inventory.meta.CrossbowMeta meta = (org.bukkit.inventory.meta.CrossbowMeta) originMeta, that = (org.bukkit.inventory.meta.CrossbowMeta) testMeta;
+      org.bukkit.inventory.meta.CrossbowMeta meta = (org.bukkit.inventory.meta.CrossbowMeta) originMeta,
+          that = (org.bukkit.inventory.meta.CrossbowMeta) testMeta;
       // FIXME Missing NMS field: charged
       return meta.hasChargedProjectiles() ?
           that.hasChargedProjectiles() && meta.getChargedProjectiles().equals(that.getChargedProjectiles()) : !that.hasChargedProjectiles();
