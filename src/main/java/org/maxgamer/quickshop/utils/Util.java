@@ -240,7 +240,7 @@ public class Util {
       if (iStack == null || iStack.getType() == Material.AIR) {
         continue;
       }
-      if (QuickShop.instance().getItemMatcher().matches(item, iStack)) {
+      if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
         items += iStack.getAmount();
       }
     }
@@ -265,7 +265,7 @@ public class Util {
     for (ItemStack iStack : contents) {
       if (iStack == null || iStack.getType() == Material.AIR) {
         space += item.getMaxStackSize();
-      } else if (QuickShop.instance().getItemMatcher().matches(item, iStack)) {
+      } else if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
         space += item.getMaxStackSize() - iStack.getAmount();
       }
     }

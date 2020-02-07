@@ -22,6 +22,10 @@ public class ItemMatcher {
         BaseConfig.lore && BaseConfig.enchant && BaseConfig.matchesPotion &&
         BaseConfig.attribute && BaseConfig.flag && BaseConfig.customModelData;
   }
+  
+  public boolean matches(@Nullable ItemStack requireStack, @Nullable ItemStack givenStack) {
+    return matches(requireStack, givenStack, true);
+  }
 
   /**
    * Compares two items to each other. Returns true if they match. Rewrite it to use more faster
@@ -31,7 +35,7 @@ public class ItemMatcher {
    * @param givenStack The second item stack
    * @return true if the itemstacks match. (Material, durability, enchants, name)
    */
-  public boolean matches(@Nullable ItemStack requireStack, @Nullable ItemStack givenStack) {
+  public boolean matches(@Nullable ItemStack requireStack, @Nullable ItemStack givenStack, boolean matchesAmount) {
     if (requireStack == givenStack)
       return true;
 
@@ -41,12 +45,17 @@ public class ItemMatcher {
     switch (BaseConfig.matcherWorkMode) {
       case 1:
       case 2:
-        return requireStack.isSimilar(givenStack);
+        return matchesAmount ? requireStack.equals(givenStack) : requireStack.isSimilar(givenStack);
       default:;
     }
 
     if (requireStack.getType() != givenStack.getType()) {
       Util.debugLog("Type not match.");
+      return false;
+    }
+    
+    if (matchesAmount && requireStack.getAmount() != givenStack.getAmount()) {
+      Util.debugLog("Amount not match.");
       return false;
     }
     
