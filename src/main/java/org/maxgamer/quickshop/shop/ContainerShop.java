@@ -470,7 +470,6 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public void setSignText(@NotNull String[] lines) {
-    Bukkit.getLogger().warning("4.0");
     for (Sign sign : this.getShopSigns()) {
       if (Arrays.equals(sign.getLines(), lines)) {
         Util.debugLog("Skipped new sign text setup: Same content");
@@ -479,7 +478,6 @@ public class ContainerShop implements Shop, Managed {
       for (int i = 0; i < lines.length; i++) {
         sign.setLine(i, lines[i]);
       }
-      Bukkit.getLogger().warning("4");
       sign.update(true);
     }
   }
@@ -506,11 +504,9 @@ public class ContainerShop implements Shop, Managed {
   /** Updates signs attached to the shop */
   @Override
   public void setSignText() {
-    Bukkit.getLogger().warning("1");
     if (!Util.isChunkLoaded(this.location)) // FIXME check
       return;
     
-    Bukkit.getLogger().warning("2");
     String[] lines = new String[4];
     
     OfflinePlayer player =
@@ -540,7 +536,6 @@ public class ContainerShop implements Shop, Managed {
         player,
         Util.format(this.getPrice()));
     
-    Bukkit.getLogger().warning("3");
     this.setSignText(lines);
   }
 
@@ -569,11 +564,9 @@ public class ContainerShop implements Shop, Managed {
   @NotNull
   @Override
   public List<Sign> getShopSigns() {
-    Bukkit.getLogger().warning("5");
     if (this.getLocation().getWorld() == null)
       return Collections.emptyList();
     
-    Bukkit.getLogger().warning("6");
     OfflinePlayer player = Bukkit.getOfflinePlayer(this.getOwner());
     final String signHeader =
         MsgUtil.getMessagePlaceholder("sign.header", player, this.ownerName());

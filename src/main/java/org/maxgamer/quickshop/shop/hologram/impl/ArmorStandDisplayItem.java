@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopDisplayItemDespawnEvent;
 import org.maxgamer.quickshop.event.ShopDisplayItemSpawnEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -114,15 +115,11 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
         continue;
       }
       ArmorStand eArmorStand = (ArmorStand) entity;
-
-      if (!eArmorStand.getUniqueId().equals(this.entity.getUniqueId())) {
-        if (DisplayItem.isDisplayItem(eArmorStand.getItem(EquipmentSlot.HAND),
-            this.shop)) {
-          Util.debugLog("Removing dupes ArmorEntity " + eArmorStand.getUniqueId() + " at "
-              + eArmorStand.getLocation());
-          entity.remove();
-          removed = true;
-        }
+      if (DisplayItem.isDisplayItem(eArmorStand.getItem(EquipmentSlot.valueOf(DisplayData.getAttribute(data, DisplayAttribute.SLOT, "HEAD"))), this.shop)) {
+        Util.debugLog("Removing dupes ArmorEntity " + eArmorStand.getUniqueId() + " at "
+            + eArmorStand.getLocation());
+        entity.remove();
+        removed = true;
       }
     }
     return removed;

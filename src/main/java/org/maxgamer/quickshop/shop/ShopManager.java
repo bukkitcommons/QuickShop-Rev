@@ -2,6 +2,7 @@ package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Maps;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -151,6 +152,52 @@ public class ShopManager {
     if (Util.fireCancellableEvent(event))
       return;
     
+    // Create sign
+    if (info.sign() != null /*&& QuickShop.instance().getConfig().getBoolean("shop.auto-sign")*/) {
+      if (!Util.isAir(info.sign().getType()) &&
+          !(Util.isWallSign(info.sign().getType()) &&
+              Arrays.stream(((org.bukkit.block.Sign) info.sign().getState()).getLines())
+              .allMatch(String::isEmpty))) {
+        
+        Util.debugLog("Sign cannot placed cause no enough space(Not air block)");
+        return;
+      }
+      
+      boolean isWaterLogged = info.sign().getType() == Material.WATER;
+      info.sign().setType(Util.getSignMaterial());
+      
+      BlockState signState = info.sign().getState();
+      if (isWaterLogged) {
+        try {
+          BlockData data = signState.getBlockData();
+          if (data instanceof Waterlogged) {
+            Waterlogged waterable = (Waterlogged) data;
+            waterable.setWaterlogged(true);
+          }
+        } catch (Throwable t) {
+          ;
+        }
+      }
+      
+      BlockFace chestFace = info.location().getBlock().getFace(info.sign());
+      assert chestFace != null;
+      
+      try {
+        org.bukkit.block.data.type.WallSign signData =
+            (org.bukkit.block.data.type.WallSign) signState.getBlockData();
+        
+        signData.setFacing(chestFace);
+        signState.setBlockData(signData);
+      } catch (Throwable t) {
+        Sign sign = (Sign) signState.getData();
+        sign.setFacingDirection(chestFace);
+        signState.setData(sign);
+      }
+      
+      signState.update(true);
+      shop.setSignText();
+    }
+    
     Location location = shop.getLocation();
     try {
       QuickShop
@@ -193,48 +240,6 @@ public class ShopManager {
         error2.printStackTrace();
       }
       error.printStackTrace();
-    }
-    
-    // Create sign
-    if (info.sign() != null /*&& QuickShop.instance().getConfig().getBoolean("shop.auto-sign")*/) {
-      if (!Util.isAir(info.sign().getType())) {
-        Util.debugLog("Sign cannot placed cause no enough space(Not air block)");
-        return;
-      }
-      
-      boolean isWaterLogged = info.sign().getType() == Material.WATER;
-      info.sign().setType(Util.getSignMaterial());
-      
-      BlockState signState = info.sign().getState();
-      if (isWaterLogged) {
-        try {
-          BlockData data = signState.getBlockData();
-          if (data instanceof Waterlogged) {
-            Waterlogged waterable = (Waterlogged) data;
-            waterable.setWaterlogged(true);
-          }
-        } catch (Throwable t) {
-          ;
-        }
-      }
-      
-      BlockFace chestFace = info.location().getBlock().getFace(info.sign());
-      assert chestFace != null;
-      
-      try {
-        org.bukkit.block.data.type.WallSign signData =
-            (org.bukkit.block.data.type.WallSign) signState.getBlockData();
-        
-        signData.setFacing(chestFace);
-        signState.setBlockData(signData);
-      } catch (Throwable t) {
-        Sign sign = (Sign) signState.getData();
-        sign.setFacingDirection(chestFace);
-        signState.setData(sign);
-      }
-      
-      signState.update(true);
-      shop.setSignText();
     }
   }
   

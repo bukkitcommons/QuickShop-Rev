@@ -218,6 +218,7 @@ public class SentryErrorReporter {
       }
 
       if (!checkWasCauseByQS(throwable)) {
+        throwable.printStackTrace();
         Util.debugLog("Errors not sended, cause it not throw by QuickShop");
         return null;
       }

@@ -57,14 +57,11 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
         continue;
       }
       Item eItem = (Item) entity;
-      UUID displayUUID = this.entity.getUniqueId();
-      if (!eItem.getUniqueId().equals(displayUUID)) {
-        if (DisplayItem.isDisplayItem(eItem.getItemStack(), this.shop)) {
-          Util.debugLog(
-              "Removing a duped ItemEntity " + eItem.getUniqueId() + " at " + eItem.getLocation());
-          entity.remove();
-          removed = true;
-        }
+      if (DisplayItem.isDisplayItem(eItem.getItemStack(), this.shop)) {
+        Util.debugLog(
+            "Removing a duped ItemEntity " + eItem.getUniqueId() + " at " + eItem.getLocation());
+        entity.remove();
+        removed = true;
       }
     }
     return removed;
