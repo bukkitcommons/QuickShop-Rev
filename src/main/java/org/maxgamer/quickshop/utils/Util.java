@@ -91,14 +91,12 @@ public class Util {
   private static EnumSet<Material> blacklist = EnumSet.noneOf(Material.class);
   @Getter
   private static List<String> debugLogs = new LinkedList<>();
-  private static boolean devMode = true;
   private static EnumMap<Material, Entry<Double, Double>> restrictedPrices =
       new EnumMap<>(Material.class);
   private static Object serverInstance;
   private static EnumSet<Material> blockListedBlocks = EnumSet.noneOf(Material.class);
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
-  private static boolean disableDebugLogger = false;
 
   /**
    * Gets an unique key of a chunk based on its coordinates.
@@ -278,11 +276,6 @@ public class Util {
    * @param logs logs
    */
   public static void debugLog(@NotNull String... logs) {
-    if (!devMode) {
-      if (disableDebugLogger) {
-        return;
-      }
-    }
     long startTime = System.currentTimeMillis();
     StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
     String className = stackTraceElement.getClassName();
@@ -314,18 +307,15 @@ public class Util {
       if (debugLogs.size() > 500000) /* Keep debugLogs max can have 500k lines. */ {
         debugLogs.remove(0);
       }
-      if (devMode) {
-        ShopLogger.instance().info(text);
-      }
+      ShopLogger.instance().info(text);
     }
     long debugLogCost = System.currentTimeMillis() - startTime;
-    if (!devMode) {
+    if (false) {
       if (debugLogCost > 5) {
         tookLongTimeCostTimes++;
         if (tookLongTimeCostTimes > 15000) {
           BaseConfig.debugLogger = false;
           QuickShop.instance().getConfigurationManager().save(BaseConfig.class);
-          disableDebugLogger = true;
           QuickShop.instance().saveConfig();
           ShopLogger.instance().warning(
               "Detected the debug logger tooked time keep too lang, QuickShop already auto-disable debug logger, your server performance should back to normal. But you must re-enable it if you want to report any bugs.");
@@ -652,7 +642,6 @@ public class Util {
     blockListedBlocks.clear();
     restrictedPrices.clear();
     worldBlacklist.clear();
-    devMode = BaseConfig.developerMode;
 
     for (String s : BaseConfig.blacklist) {
       Material mat = Material.matchMaterial(s.toUpperCase());
@@ -696,7 +685,6 @@ public class Util {
       }
     }
     worldBlacklist = BaseConfig.blacklistWorld;
-    disableDebugLogger = BaseConfig.debugLogger;
   }
 
   /**
@@ -1284,7 +1272,7 @@ public class Util {
    * @return under dev-mode
    */
   public static boolean isDevMode() {
-    return devMode;
+    return true; // FIXME
   }
 
   /**
