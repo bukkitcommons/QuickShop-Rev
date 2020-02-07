@@ -21,7 +21,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.Nullable;
@@ -200,95 +199,76 @@ public class ShopActionListener implements Listener {
       });
   }
 
-  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onInventoryClose(InventoryCloseEvent e) {
-
-    @Nullable
-    Inventory inventory = e.getInventory(); // Possibly wrong tag
-    @Nullable
-    Location location = null;
-
+  @EventHandler
+  public void onInventoryClose(InventoryCloseEvent event) {
     try {
       // This will cause NPE when the internal getLocation method
       // itself NPE, which should be a server issue.
-      location = inventory.getLocation();
+      @Nullable Location chest = event.getInventory().getLocation();
+      
+      if (chest != null)
+        ShopManager.instance().getLoadedShopAt(chest).ifPresent(Shop::setSignText);
     } catch (NullPointerException npe) {
       return; // ignored as workaround, GH-303
     }
-
-    if (location == null)
-      return;
-
-    ShopManager.instance().getLoadedShopFrom(location).ifPresent(Shop::setSignText);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onJoin(PlayerJoinEvent event) {
-
-    // Notify the player any messages they were sent
-    if (BaseConfig.autoFetchShopMessages) {
+    if (BaseConfig.autoFetchShopMessages)
       MsgUtil.flushMessagesFor(event.getPlayer());
-    }
   }
 
   /*
    * Waits for a player to move too far from a shop, then cancels the menu.
    */
-  @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-  public void onMove(PlayerMoveEvent e) {
-
-    final ShopData info = ShopActionManager.instance().getActions().get(e.getPlayer().getUniqueId());
-
-    if (info == null) {
-      return;
-    }
-
-    final Player p = e.getPlayer();
-    final Location loc1 = info.location();
-    final Location loc2 = p.getLocation();
-
-    if (loc1.getWorld() != loc2.getWorld() || loc1.distanceSquared(loc2) > 25) {
-      if (info.action() == ShopAction.CREATE) {
-        p.sendMessage(MsgUtil.getMessage("shop-creation-cancelled", p));
-        Util.debugLog(p.getName() + " too far with the shop location.");
-      } else if (info.action() == ShopAction.TRADE) {
-        p.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", p));
-        Util.debugLog(p.getName() + " too far with the shop location.");
-      }
-      ShopActionManager.instance().getActions().remove(p.getUniqueId());
-    }
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onMove(PlayerMoveEvent event) {
+    handlePlayerMovement(event.getPlayer(), event.getTo());
   }
 
-  @EventHandler(ignoreCancelled = true)
-  public void onPlayerQuit(PlayerQuitEvent e) {
+  public void handlePlayerMovement(Player player, Location to) {
+    ShopData info = ShopActionManager.instance().getActions().get(player.getUniqueId());
+    if (info == null)
+      return;
 
-    // Remove them from the menu
+    final Location shopLoc = info.location();
+
+    if (shopLoc.getWorld() != to.getWorld() || shopLoc.distanceSquared(to) > 25) {
+      if (info.action() == ShopAction.CREATE)
+        player.sendMessage(MsgUtil.getMessage("shop-creation-cancelled", player));
+      else
+        player.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", player));
+      
+      Util.debugLog(player.getName() + " too far with the shop location.");
+      ShopActionManager.instance().getActions().remove(player.getUniqueId());
+    }
+  }
+  
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent e) {
     ShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
   }
 
-  @EventHandler(ignoreCancelled = true)
-  public void onTeleport(PlayerTeleportEvent e) {
-
-    PlayerMoveEvent me = new PlayerMoveEvent(e.getPlayer(), e.getFrom(), e.getTo());
-    onMove(me);
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onTeleport(PlayerTeleportEvent event) {
+    handlePlayerMovement(event.getPlayer(), event.getTo());
   }
 
-  @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-  public void onDyeing(PlayerInteractEvent e) {
-    if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null
-        || !Util.isDyes(e.getItem().getType())) {
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+  public void onDyeing(PlayerInteractEvent event) {
+    @Nullable Block block = event.getClickedBlock();
+    @Nullable ItemStack item = event.getItem();
+    
+    if (event.getAction() != Action.RIGHT_CLICK_BLOCK || block == null || item == null)
       return;
-    }
 
-    final Block block = e.getClickedBlock();
-
-    if (block == null || !Util.isWallSign(block.getType())) {
+    if (!Util.isDyes(item.getType()))
       return;
-    }
 
-    if (Util.getShopBySign(block).isPresent()) {
-      e.setCancelled(true);
-      Util.debugLog("Disallow " + e.getPlayer().getName() + " dye the shop sign.");
-    }
+    Util.getShopBySign(block).ifPresent(() -> {
+      event.setCancelled(true);
+      Util.debugLog("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
+    });
   }
 }

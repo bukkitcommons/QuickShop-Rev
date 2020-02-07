@@ -446,6 +446,9 @@ public class Util {
    * @return The block the sign is attached to
    */
   public static Optional<Block> getSignAttached(@NotNull Block sign) {
+    if (!Util.isWallSign(sign.getType()))
+      return Optional.empty();
+    
     try {
       org.bukkit.block.data.BlockData data = sign.getBlockData();
       if (data instanceof org.bukkit.block.data.type.WallSign) {
@@ -453,7 +456,6 @@ public class Util {
         return Optional.of(sign.getRelative(opposide));
       }
     } catch (Throwable t) {
-      if (sign.getType().name().equals("WALL_SIGN"))
         return Optional.of(sign.getRelative(
             ((Sign) sign.getState().getData()).getFacing().getOppositeFace()));
     }
@@ -1291,8 +1293,8 @@ public class Util {
    * @param material The material
    * @return yes or not
    */
-  public static boolean isDyes(@NotNull Material material) {
-    return material.name().toUpperCase().endsWith("_DYE");
+  public static boolean isDyes(@Nullable Material material) {
+    return material.name().endsWith("_DYE");
   }
 
   /**
