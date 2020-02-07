@@ -41,7 +41,8 @@ public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable 
     this.displayData = data;
     this.shop = shop;
     this.itemStack = itemStack;
-    this.displayType = data.type;
+    
+    this.displayType = data.type();
   }
 
   /**
@@ -50,8 +51,7 @@ public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable 
    * @param shop Target shop
    * @param itemStack The ItemStack for spawning the displayItem
    */
-  @Deprecated
   public ShopDisplayItemSpawnEvent(@NotNull Shop shop, @NotNull ItemStack itemStack) {
-    this(shop, itemStack, DisplayData.getDisplayData(itemStack));
+    this(shop, itemStack, DisplayData.create(itemStack));
   }
 }

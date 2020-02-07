@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is DisplayData.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.shop.hologram;
 
 import java.util.Collection;
@@ -21,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.apache.commons.lang.ObjectUtils;
-import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.ArmorStand;
@@ -36,50 +19,70 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Accessors(fluent = true)
 @AllArgsConstructor
 public class DisplayData {
-  public final DisplayType type;
-  public final Map<DisplayAttribute, Object> attribute = Maps.newEnumMap(DisplayAttribute.class);
-  @Deprecated
-  public final boolean needVaildate; // Bad design
-  public final boolean fixer;
+  @Getter
+  private final DisplayType type;
   
-  public static Location getCenter(Location loc) {
-    // This is always '+' instead of '-' even in negative pos
-    return new Location(loc.getWorld(), loc.getBlockX() + .5, loc.getBlockY() + .5,
-        loc.getBlockZ() + .5);
+  /**
+   * Stores specificed attribute data
+   * @see DisplayAttribute
+   */
+  private final Map<DisplayAttribute, Object> attribute = Maps.newEnumMap(DisplayAttribute.class);
+  
+  /**
+   * Indicates whether this data is a display fixer.
+   * A fixer menas only when the default display type matches,
+   * this data will be applied.
+   * @see BaseConfig#displayTypeId
+   */
+  private final boolean fixer;
+  
+  /**
+   * Sets pose for a armor stand using the current display data
+   * @param armorStand The armor stand to set pose for
+   */
+  public void setPoseForArmorStand(@NotNull ArmorStand armorStand) {
+    armorStand.setBodyPose(new EulerAngle(get(DisplayAttribute.POSE_BODY_X, 0d),
+        get(DisplayAttribute.POSE_BODY_Y, 0d),
+        get(DisplayAttribute.POSE_BODY_Z, 0d)));
+
+    armorStand.setHeadPose(new EulerAngle(get(DisplayAttribute.POSE_HEAD_X, 0d),
+        get(DisplayAttribute.POSE_HEAD_Y, 0d),
+        get(DisplayAttribute.POSE_HEAD_Z, 0d)));
+
+    armorStand.setRightArmPose(new EulerAngle(get(DisplayAttribute.POSE_ARM_RIGHT_X, 0d),
+        get(DisplayAttribute.POSE_ARM_RIGHT_Y, 0d),
+        get(DisplayAttribute.POSE_ARM_RIGHT_Z, 0d)));
+
+    armorStand.setLeftArmPose(new EulerAngle(get(DisplayAttribute.POSE_ARM_LEFT_X, 0d),
+        get(DisplayAttribute.POSE_ARM_LEFT_Y, 0d),
+        get(DisplayAttribute.POSE_ARM_LEFT_Z, 0d)));
+
+    armorStand.setRightLegPose(new EulerAngle(get(DisplayAttribute.POSE_LEG_RIGHT_X, 0d),
+        get(DisplayAttribute.POSE_LEG_RIGHT_Y, 0d),
+        get(DisplayAttribute.POSE_LEG_RIGHT_Z, 0d)));
+
+    armorStand.setLeftLegPose(new EulerAngle(get(DisplayAttribute.POSE_LEG_LEFT_X, 0d),
+        get(DisplayAttribute.POSE_LEG_LEFT_Y, 0d),
+        get(DisplayAttribute.POSE_LEG_LEFT_Z, 0d)));
   }
   
-  public static void setPoseForArmorStand(@NotNull DisplayData data, ArmorStand armorStand) {
-    armorStand.setBodyPose(new EulerAngle(getAttribute(data, DisplayAttribute.POSE_BODY_X, 0d),
-        getAttribute(data, DisplayAttribute.POSE_BODY_Y, 0d),
-        getAttribute(data, DisplayAttribute.POSE_BODY_Z, 0d)));
-
-    armorStand.setHeadPose(new EulerAngle(getAttribute(data, DisplayAttribute.POSE_HEAD_X, 0d),
-        getAttribute(data, DisplayAttribute.POSE_HEAD_Y, 0d),
-        getAttribute(data, DisplayAttribute.POSE_HEAD_Z, 0d)));
-
-    armorStand.setRightArmPose(new EulerAngle(getAttribute(data, DisplayAttribute.POSE_ARM_RIGHT_X, 0d),
-        getAttribute(data, DisplayAttribute.POSE_ARM_RIGHT_Y, 0d),
-        getAttribute(data, DisplayAttribute.POSE_ARM_RIGHT_Z, 0d)));
-
-    armorStand.setLeftArmPose(new EulerAngle(getAttribute(data, DisplayAttribute.POSE_ARM_LEFT_X, 0d),
-        getAttribute(data, DisplayAttribute.POSE_ARM_LEFT_Y, 0d),
-        getAttribute(data, DisplayAttribute.POSE_ARM_LEFT_Z, 0d)));
-
-    armorStand.setRightLegPose(new EulerAngle(getAttribute(data, DisplayAttribute.POSE_LEG_RIGHT_X, 0d),
-        getAttribute(data, DisplayAttribute.POSE_LEG_RIGHT_Y, 0d),
-        getAttribute(data, DisplayAttribute.POSE_LEG_RIGHT_Z, 0d)));
-
-    armorStand.setLeftLegPose(new EulerAngle(getAttribute(data, DisplayAttribute.POSE_LEG_LEFT_X, 0d),
-        getAttribute(data, DisplayAttribute.POSE_LEG_LEFT_Y, 0d),
-        getAttribute(data, DisplayAttribute.POSE_LEG_LEFT_Z, 0d)));
-  }
-  
+  /**
+   * Obtains a value in the specific attribute slot from the current display data
+   * @param <T> The object type in that attribute slot
+   * @param attr The attribute slot
+   * @param defaultValue The default value to return if no data specificed
+   * @return The value of that attribute, may be the default value
+   */
   @SuppressWarnings("unchecked")
-  public static <T> T getAttribute(@NotNull DisplayData data, DisplayAttribute attr, T defaultValue) {
-    Object value = data.attribute.get(attr);
+  public <T> T get(DisplayAttribute attr, T defaultValue) {
+    Object value = attribute.get(attr);
     if (value == ObjectUtils.NULL || value == null)
       return defaultValue;
     Util.debugLog("Attribute to cast: " + value);
@@ -108,73 +111,98 @@ public class DisplayData {
   }
   
   /**
-   * Get plugin now is using which one DisplayType
-   *
-   * @return Using displayType.
+   * Obtain an default display data with default display type. 
+   * @return The empty data
    */
-  public static DisplayData getDisplayData(@Nullable ItemStack item) {
+  public static DisplayData create() {
+    return new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId), false);
+  }
+  
+  /**
+   * Matches from configuration and creates the display data for the given item
+   * @param item The item to load display data for
+   * @return The display data of that item
+   */
+  public static DisplayData create(@NotNull ItemStack item) {
     try {
-      /*
-       * Nest structure as: armor-stand: - myStick: type: DEBUG_STICK lore: - mysterious item - gift
-       * strict: true attribute: yaw: 180 pitch: 0 small: false item-slot: HELMET offset: x: 1 y:
-       * 0.1 z: -1.1 pose-head: x: 1 pose-body: y: 0.2 pose-arm: left: z: 0.5 pose-leg: left: x:
-       * 0.14 right: x: 0.3 y: 0.1 z: 0.3 - grasses: type: - GLASS - GRASS - GRASS_BLOCK real-item:
-       * - 0: type: BOW lore: common mark
-       */
+      DisplayData def = new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId), false);
 
-      DisplayData def = new DisplayData(
-          DisplayType.fromID(BaseConfig.displayTypeId), false,
-          false);
+      YamlConfiguration conf =
+          QuickShop.instance().getConfigurationManager().get(BaseConfig.class).conf();
 
-      if (item != null) {
-        YamlConfiguration conf =
-            QuickShop.instance().getConfigurationManager().get(BaseConfig.class).conf();
+      if (conf != null) {
+        @Nullable DisplayDataMatchesResult dataArmourStand = DisplayData.matchDataFor(conf,
+            "shop.display-type-specifics.armor-stand", item, DisplayType.ARMORSTAND);
+        
+        // Return if vaildate is not need (accurate matches)
+        if (dataArmourStand != null && !dataArmourStand.needVaildate)
+          return dataArmourStand.data.fixer
+              ? (def.type == dataArmourStand.data.type ? dataArmourStand.data : def)
+              : dataArmourStand.data;
 
-        if (conf != null) {
-          DisplayData dataArmourStand = DisplayData.matchData(conf, "shop.display-type-specifics.armor-stand", item, true);
-          if (dataArmourStand != null && !dataArmourStand.needVaildate)
-            return dataArmourStand.fixer
-                ? (def.type == dataArmourStand.type ? dataArmourStand : def)
-                : dataArmourStand;
-
-          DisplayData dataDroppedItem = DisplayData.matchData(conf, "shop.display-type-specifics.dropped-item", item, false);
-          if (dataDroppedItem != null)
-            return dataDroppedItem.fixer
-                ? (def.type == dataDroppedItem.type ? dataDroppedItem : def)
-                : dataDroppedItem;
-          else if (dataArmourStand != null)
-            return dataArmourStand.fixer
-                ? (def.type == dataArmourStand.type ? dataArmourStand : def)
-                : dataArmourStand;
-        }
+        @Nullable DisplayDataMatchesResult dataDroppedItem = DisplayData.matchDataFor(conf,
+            "shop.display-type-specifics.dropped-item", item, DisplayType.REALITEM);
+        
+        // Return or consider the vaildate-need data if not exists. 
+        if (dataDroppedItem != null)
+          return dataDroppedItem.data.fixer
+              ? (def.type == dataDroppedItem.data.type ? dataDroppedItem.data : def)
+              : dataDroppedItem.data;
+        else if (dataArmourStand != null)
+          return dataArmourStand.data.fixer
+              ? (def.type == dataArmourStand.data.type ? dataArmourStand.data : def)
+              : dataArmourStand.data;
       }
 
       return def;
     } catch (Throwable e) {
       e.printStackTrace();
-      return new DisplayData(DisplayType.REALITEM, false, false);
+      return new DisplayData(DisplayType.REALITEM, false);
     }
   }
   
+  /*
+   * Data Matchers
+   * 
+   * The following methods are the matchers to match and load display data of that item,
+   * after that, a DisplayData object will be created with its data wrapped in.
+   */
+  @RequiredArgsConstructor
+  private static class DisplayDataMatchesResult {
+    @NotNull
+    private final DisplayData data;
+    
+    @NotNull
+    private final boolean needVaildate;
+  }
+  
   @Nullable
-  public static DisplayData matchData(@NotNull ConfigurationSection conf, @NotNull String rootType,
-      @NotNull ItemStack item, boolean armorStand) {
+  private static DisplayDataMatchesResult matchDataFor(
+      @NotNull ConfigurationSection conf,
+      @NotNull String rootType,
+      @NotNull ItemStack item,
+      @NotNull DisplayType displayType) {
+    
     List<?> specifics = conf.getList(rootType);
     // <Map>
     // Value: Specific Map
 
-    if (specifics instanceof List) {
-      return matchData0(specifics, item, armorStand);
-    }
-    Util.debugLog("Specifics Is Not A List: " + specifics);
-    return null;
+    if (specifics instanceof List)
+      return matchDataFor(specifics, item, displayType);
+    else if (specifics != null)
+      Util.debugLog("Specifics Is Not A List: " + specifics);
+    
+    return null; // Handled by upstream method
   }
 
   @Nullable
-  private static DisplayData matchData0(@NotNull List<?> specifics, @NotNull ItemStack item,
-      boolean armorStand) {
-    DisplayData vaildateData = null;
+  private static DisplayDataMatchesResult matchDataFor(
+      @NotNull List<?> specifics,
+      @NotNull ItemStack item,
+      @NotNull DisplayType displayType) {
+    
     boolean needVaildate = false;
+    
     for (Object o : specifics) {
       Util.debugLog("Specific: " + o);
       if (o instanceof Map) {
@@ -188,7 +216,7 @@ public class DisplayData {
 
           // Mode
           Object temp = attrMap.get("fixer");
-          Object fixer = temp == null ? false : true;
+          boolean fixer = temp == null ? false : (boolean) temp;
 
           // Type matcher
           temp = attrMap.get("type");
@@ -308,10 +336,12 @@ public class DisplayData {
             needVaildate = true;
           }
 
-          DisplayData data =
-              new DisplayData(armorStand ? DisplayType.ARMORSTAND : DisplayType.REALITEM,
-                  needVaildate, (boolean) fixer);
-          if (armorStand) {
+          DisplayData data = new DisplayData(displayType, fixer);
+          
+          /*
+           * Loads armor stand attributes
+           */
+          if (displayType == DisplayType.ARMORSTAND) {
             Map<?, ?> attributes = Map.class.cast(attrMap.get("attribute"));
 
             if (attributes instanceof Map) {
@@ -335,14 +365,11 @@ public class DisplayData {
             }
           }
 
-          if (needVaildate)
-            vaildateData = data;
-          else
-            return data;
+          return new DisplayDataMatchesResult(data, needVaildate);
         }
       }
     }
 
-    return vaildateData;
+    return null; // Handled by upstream method
   }
 }

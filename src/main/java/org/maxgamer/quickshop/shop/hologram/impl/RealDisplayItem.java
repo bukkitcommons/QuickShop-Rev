@@ -116,7 +116,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
       }
 
       ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-          new ShopDisplayItemSpawnEvent(shop, originalItemStack, DisplayData.getDisplayData(originalItemStack));
+          new ShopDisplayItemSpawnEvent(shop, originalItemStack, DisplayData.create(originalItemStack));
       Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
       if (shopDisplayItemSpawnEvent.isCancelled()) {
         Util.debugLog(

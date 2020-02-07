@@ -106,8 +106,8 @@ public class ContainerShop implements Shop, Managed {
     this.unlimited = unlimited;
 
     if (BaseConfig.displayItems) {
-      DisplayData data = DisplayData.getDisplayData(this.item);
-      switch (data.type) {
+      DisplayData data = DisplayData.create(this.item);
+      switch (data.type()) {
         case UNKNOWN:
           Util.debugLog(
               "Failed to create a ContainerShop displayItem, the type is unknown, fallback to RealDisplayItem");

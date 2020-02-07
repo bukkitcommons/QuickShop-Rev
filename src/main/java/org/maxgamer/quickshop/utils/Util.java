@@ -97,6 +97,12 @@ public class Util {
   private static EnumSet<Material> blockListedBlocks = EnumSet.noneOf(Material.class);
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
+  
+  public static Location getCenter(Location loc) {
+    // This is always '+' instead of '-' even in negative pos
+    return new Location(loc.getWorld(), loc.getBlockX() + .5, loc.getBlockY() + .5,
+        loc.getBlockZ() + .5);
+  }
 
   /**
    * Gets an unique key of a chunk based on its coordinates.

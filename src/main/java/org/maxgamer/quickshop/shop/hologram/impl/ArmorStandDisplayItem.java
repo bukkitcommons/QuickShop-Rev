@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.shop.hologram.impl;
 
 import lombok.ToString;
-import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -12,10 +11,8 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopDisplayItemDespawnEvent;
 import org.maxgamer.quickshop.event.ShopDisplayItemSpawnEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -43,7 +40,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
       return false;
     
     return DisplayItem.isDisplayItem(
-        ((ArmorStand) entity).getItem(DisplayData.getAttribute(data, DisplayAttribute.SLOT, EquipmentSlot.HEAD)), null);
+        ((ArmorStand) entity).getItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD)), null);
   }
 
   @Override
@@ -86,7 +83,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
             armorStand.setVisible(false);
             armorStand.setMarker(true);
             armorStand.setCollidable(false);
-            armorStand.setSmall(DisplayData.getAttribute(data, DisplayAttribute.SMALL, true));
+            armorStand.setSmall(data.get(DisplayAttribute.SMALL, true));
             armorStand.setArms(false);
             armorStand.setBasePlate(false);
             armorStand.setSilent(true);
@@ -94,7 +91,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
             armorStand.setCanMove(false);
             armorStand.setCanPickupItems(false);
             // Set pose
-            DisplayData.setPoseForArmorStand(data, armorStand);
+            data.setPoseForArmorStand(armorStand);
           });
       // Set safeGuard
       Util.debugLog("Spawned armor stand @ " + this.entity.getLocation() + " with UUID "
@@ -115,7 +112,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
         continue;
       }
       ArmorStand eArmorStand = (ArmorStand) entity;
-      if (DisplayItem.isDisplayItem(eArmorStand.getItem(EquipmentSlot.valueOf(DisplayData.getAttribute(data, DisplayAttribute.SLOT, "HEAD"))), this.shop)) {
+      if (DisplayItem.isDisplayItem(eArmorStand.getItem(EquipmentSlot.valueOf(data.get(DisplayAttribute.SLOT, "HEAD"))), this.shop)) {
         Util.debugLog("Removing dupes ArmorEntity " + eArmorStand.getUniqueId() + " at "
             + eArmorStand.getLocation());
         entity.remove();
@@ -135,7 +132,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     ArmorStand armorStand = (ArmorStand) entity;
     // Set item protect in the armorstand's hand
     this.guardedIstack = DisplayItem.createGuardItemStack(this.originalItemStack, this.shop);
-    armorStand.setItem(DisplayData.getAttribute(data, DisplayAttribute.SLOT, EquipmentSlot.HEAD), guardedIstack);
+    armorStand.setItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD), guardedIstack);
     try {
       armorStand.getPersistentDataContainer().set(new NamespacedKey(QuickShop.instance(), "displayMark"),
           DisplayItemPersistentDataType.INSTANCE,
@@ -182,7 +179,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
       }
     }
 
-    Location asloc = DisplayData.getCenter(this.shop.getLocation());
+    Location asloc = Util.getCenter(this.shop.getLocation());
     Util.debugLog("containerBlockFace " + containerBlockFace);
 
     if (this.originalItemStack.getType().isBlock()) {
@@ -214,11 +211,11 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
         break;
     }
 
-    asloc.setYaw(asloc.getYaw() + DisplayData.getAttribute(data, DisplayAttribute.OFFSET_YAW, 0f));
-    asloc.setPitch(asloc.getYaw() + DisplayData.getAttribute(data, DisplayAttribute.OFFSET_PITCH, 0f));
-    asloc.add(DisplayData.getAttribute(data, DisplayAttribute.OFFSET_X, 0d),
-        DisplayData.getAttribute(data, DisplayAttribute.OFFSET_Y, 0d),
-        DisplayData.getAttribute(data, DisplayAttribute.OFFSET_Z, 0d));
+    asloc.setYaw(asloc.getYaw() + data.get(DisplayAttribute.OFFSET_YAW, 0f));
+    asloc.setPitch(asloc.getYaw() + data.get(DisplayAttribute.OFFSET_PITCH, 0f));
+    asloc.add(data.get(DisplayAttribute.OFFSET_X, 0d),
+        data.get(DisplayAttribute.OFFSET_Y, 0d),
+        data.get(DisplayAttribute.OFFSET_Z, 0d));
 
     return asloc;
   }
