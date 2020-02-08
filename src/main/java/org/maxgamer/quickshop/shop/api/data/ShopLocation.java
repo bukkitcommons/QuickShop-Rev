@@ -12,8 +12,8 @@ import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@RequiredArgsConstructor
 @Accessors(fluent = true)
+@RequiredArgsConstructor(staticName = "from")
 public class ShopLocation implements Serializable {
   private static final long serialVersionUID = 1L;
   
@@ -28,8 +28,27 @@ public class ShopLocation implements Serializable {
   @Getter
   private final int z;
   
+  public static ShopLocation from(@NotNull World world, int x, int y, int z) {
+    return new ShopLocation(world, x, y, z);
+  }
+  
+  public ShopLocation(@NotNull World world, int x, int y, int z) {
+    this.world = world;
+    this.worldName = world.getName();
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+  
+  public static ShopLocation of(@NotNull Location location) {
+    return new ShopLocation(location);
+  }
+  
   public ShopLocation(@NotNull Location location) {
     world = location.getWorld();
+    // This will from events and player commands,
+    // in where the world won't be null.
+    assert world != null;
     worldName = world.getName();
     
     x = location.getBlockX();
@@ -40,12 +59,17 @@ public class ShopLocation implements Serializable {
   }
   
   /*
-   * Transient member with cache
+   * Transient members with cache
    */
-  @Nullable
+  @NotNull
   private transient World world;
   
-  @Nullable
+  /**
+   * This only guarantee that it will not be null
+   * on the aspect of plugin design.
+   * @return the world this location in
+   */
+  @NotNull
   public World world() {
     return world == null ? (world = Bukkit.getWorld(worldName)) : world;
   }

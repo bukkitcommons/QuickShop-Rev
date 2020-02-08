@@ -93,7 +93,6 @@ public class ShopActionListener implements Listener {
 
     Util.debug("STAGE 0");
     Player player = e.getPlayer();
-    ItemStack item = e.getItem();
     
     /*
      * Trade handling
@@ -151,6 +150,7 @@ public class ShopActionListener implements Listener {
       });
     
     Util.debug("STAGE 1");
+    ItemStack item = e.getItem();
     
     /*
      * Creation handling
@@ -190,9 +190,14 @@ public class ShopActionListener implements Listener {
             !Arrays.stream(((Sign) block.getState()).getLines()).allMatch(String::isEmpty))
           return;
         
+        if (item == null || item.getType() == Material.AIR) {
+          player.sendMessage(MsgUtil.getMessage("no-anythings-in-your-hand", player));
+          return;
+        }
+        
         // Finds out where the sign should be placed for the shop
         Block last = null;
-        final Location from = player.getLocation().clone();
+        final Location from = player.getLocation();
 
         from.setY(block.getY());
         from.setPitch(0);
@@ -207,8 +212,14 @@ public class ShopActionListener implements Listener {
 
           last = n;
         }
+        
+        if (last == null || !Util.canBeShop(last)) {
+          Util.debug("Block cannot be shop.");
+          return;
+        }
+        
         // Send creation menu.
-        final ShopCreator info = new ShopCreator(new ShopLocation(block.getLocation()), e.getItem(), last);
+        ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), last, item);
 
         ShopActionManager.instance().getActions().put(player.getUniqueId(), info);
         player.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", player,

@@ -191,6 +191,10 @@ public class ShopLoader implements Listener {
     // Note: we do not actually remove the shop from memory,
     // to ensures it is able to get right data of existence when needed,
     // such as shop cleaner.
+    
+    event.getWorld().getPlayers().forEach(player -> {
+      ShopActionManager.instance().getActions().remove(player.getUniqueId());
+    });
   }
   
   public void delete(@NotNull Shop shop) {
@@ -298,7 +302,7 @@ public class ShopLoader implements Listener {
         }
         
         Shop shop = new ContainerShop(
-            new ShopLocation(data.world(), data.x(), data.y(), data.z()),
+            ShopLocation.from(world, data.x(), data.y(), data.z()),
             data.price(), data.item(),
             data.moderators(), data.unlimited(), data.type());
         

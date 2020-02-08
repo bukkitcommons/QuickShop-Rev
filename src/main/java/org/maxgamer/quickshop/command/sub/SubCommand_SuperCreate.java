@@ -75,10 +75,11 @@ public class SubCommand_SuperCreate implements CommandProcesser {
       final Block b = bIt.next();
 
       if (!Util.canBeShop(b)) {
+        Util.debug("Block cannot be shop.");
         continue;
       }
 
-      if (!ShopManager.instance().canBuildShop(p, b)) {
+      if (!ShopManager.canBuildShop(p, b)) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
@@ -103,7 +104,7 @@ public class SubCommand_SuperCreate implements CommandProcesser {
         return;
       }
       // Send creation menu.
-      final ShopCreator info = new ShopCreator(new ShopLocation(b.getLocation()), item, b.getRelative(p.getFacing().getOppositeFace()));
+      final ShopCreator info = ShopCreator.create(ShopLocation.of(b.getLocation()), b.getRelative(p.getFacing().getOppositeFace()), item);
 
       ShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(

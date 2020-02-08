@@ -60,6 +60,7 @@ public class SubCommand_Create implements CommandProcesser {
       Util.debug("Checking block for shop creation: " + b);
 
       if (!Util.canBeShop(b)) {
+        Util.debug("Block cannot be shop.");
         continue;
       }
 
@@ -90,7 +91,7 @@ public class SubCommand_Create implements CommandProcesser {
 
       // Send creation menu.
       ShopActionManager.instance().setAction(p.getUniqueId(),
-          new ShopCreator(new ShopLocation(b.getLocation()), item, b.getRelative(p.getFacing().getOppositeFace())));
+          ShopCreator.create(ShopLocation.of(b.getLocation()), b.getRelative(p.getFacing().getOppositeFace()), item));
 
       if (cmdArg.length >= 1) {
         ShopActionManager.instance().handleChat(p, cmdArg[0], false);

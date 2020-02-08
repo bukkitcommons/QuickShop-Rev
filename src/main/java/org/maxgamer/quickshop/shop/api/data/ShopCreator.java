@@ -1,29 +1,22 @@
 package org.maxgamer.quickshop.shop.api.data;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @Data
 @Accessors(fluent = true)
+@RequiredArgsConstructor(staticName = "create")
 public class ShopCreator implements ShopData {
-  @Nullable private final Block sign;
-  @NotNull private final ShopLocation location;
-  @Nullable private final ItemStack item;
-
-  public ShopCreator(
-      @NotNull ShopLocation loc,
-      @Nullable ItemStack item,
-      @Nullable Block last) {
-    
-    this.location = loc;
-    this.sign = last;
-    this.item = new ItemStack(item);
-  }
+  @NotNull
+  private final ShopLocation location;
+  @NotNull
+  private final Block sign;
+  @NotNull
+  private final ItemStack item;
 
   @Override
   public ShopAction action() {

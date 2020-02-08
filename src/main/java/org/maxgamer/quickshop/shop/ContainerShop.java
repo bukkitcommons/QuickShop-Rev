@@ -97,7 +97,7 @@ public class ContainerShop implements Shop, Managed {
    */
   public ContainerShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
-    this.location = new ShopLocation(shopLocation.worldName(), shopLocation.x(), shopLocation.y(), shopLocation.z());
+    this.location = shopLocation;
     this.price = price;
     this.moderator = moderator;
     this.item = item;
