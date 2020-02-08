@@ -13,6 +13,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -261,45 +262,41 @@ public class ShopManager {
    * @return The shop at that location
    */
   public ShopViewer getLoadedShopAt(@NotNull ShopLocation loc) {
-    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
+    @Nullable Map<Long, Shop> inChunk = getLoadedShopsInChunk(loc.chunk());
     if (inChunk == null)
       return ShopViewer.empty();
     
     return ShopViewer.of(inChunk.get(loc.blockKey()));
   }
   
+  @Nullable
+  private Map<Long, Shop> getLoadedShopsInChunk(@NotNull Chunk c) {
+    return getLoadedShopsInWorld(c.getWorld().getName(), c.getX(), c.getZ());
+  }
+
+  @Nullable
+  private Map<Long, Shop> getLoadedShopsInWorld(@NotNull String world, int chunkX, int chunkZ) {
+    @Nullable Map<Long, Map<Long, Shop>> inWorld = loadedShops.get(world);
+    if (inWorld == null) {
+      return null;
+    }
+    return inWorld.get(Util.chunkKey(chunkX, chunkZ));
+  }
+  
   public ShopViewer getLoadedShopAt(Location loc) {
-    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
+    @Nullable Map<Long, Shop> inChunk = getLoadedShopsInChunk(loc.getChunk());
     if (inChunk == null)
       return ShopViewer.empty();
     
     return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
   }
   
-  public boolean hasLoadedShopAt(@NotNull ShopLocation loc) {
-    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
-    if (inChunk == null)
-      return false;
-    
-    return inChunk.containsKey(loc.blockKey());
-  }
-  
   public boolean hasLoadedShopAt(@NotNull Location loc) {
-    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
+    @Nullable Map<Long, Shop> inChunk = getLoadedShopsInChunk(loc.getChunk());
     if (inChunk == null)
       return false;
     
     return inChunk.containsKey(Util.blockKey(loc));
-  }
-
-  public void acceptLoaded(@NotNull ShopLocation loc, @NotNull Consumer<Shop> consumer) {
-    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
-    
-    if (inChunk != null) {
-      Shop shop = inChunk.get(loc.blockKey());
-      if (shop != null)
-        consumer.accept(shop);
-    }
   }
 
   /**
@@ -381,28 +378,5 @@ public class ShopManager {
   @NotNull
   public Map<String, Map<Long, Map<Long, Shop>>> getLoadedShops() {
     return this.loadedShops;
-  }
-
-  /**
-   * Get a players all shops.
-   *
-   * @param playerUUID The player's uuid.
-   * @return The list have this player's all shops.
-   */
-  public @NotNull List<Shop> getPlayerOweShops(@NotNull UUID playerUUID) {
-    return ShopLoader.instance().getAllShop().stream().filter(shop -> shop.getOwner().equals(playerUUID))
-        .collect(Collectors.toList());
-  }
-
-  /**
-   * Get the all shops in the world.
-   *
-   * @param world The world you want get the shops.
-   * @return The list have this world all shops
-   */
-  public @NotNull List<Shop> getShopsInWorld(@NotNull World world) {
-    return ShopLoader.instance().getAllShop().stream()
-        .filter(shop -> shop.getLocation().worldName().equals(world.getName()))
-        .collect(Collectors.toList());
   }
 }

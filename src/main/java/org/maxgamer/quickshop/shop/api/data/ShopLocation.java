@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.shop.api.data;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import java.io.Serializable;
 import org.bukkit.Bukkit;
