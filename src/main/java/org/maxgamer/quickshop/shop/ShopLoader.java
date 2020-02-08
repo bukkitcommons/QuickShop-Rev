@@ -55,20 +55,20 @@ public class ShopLoader implements Listener {
   }
   
   private ShopLoader() {
+    ShopLogger.instance().info("Loading shops..");
     Bukkit.getPluginManager().registerEvents(this, QuickShop.instance());
-    
-    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-      for (World world : Bukkit.getWorlds())
-        loadShopsForWorld(world);
-    });
+    Bukkit.getScheduler().runTask(QuickShop.instance(), this::loadShopsForAllWorlds);
   }
   
   public static ShopLoader instance() {
     return LazySingleton.INSTANCE;
   }
   
+  /**
+   * An memory reference of the database to hold all exist shops
+   */
   @Getter
-  private final Map<String, Map<Long, Map<Long, Shop>>> allShops = Maps.newConcurrentMap();
+  private final Map<String, Map<Long, Map<Long, Shop>>> shopsMap = Maps.newConcurrentMap();
   
   /**
    * Returns a new shop iterator object, allowing iteration over shops easily, instead of sorting
@@ -90,7 +90,7 @@ public class ShopLoader implements Listener {
    */
   public Collection<Shop> getAllShop() {
     // noinspection unchecked
-    Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(allShops);
+    Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(shopsMap);
     Collection<Shop> shops = new ArrayList<>();
     for (Map<Long, Map<Long, Shop>> shopMapData : worldsMap.values()) {
       for (Map<Long, Shop> shopData : shopMapData.values()) {
@@ -102,20 +102,17 @@ public class ShopLoader implements Listener {
   
   public class ShopIterator implements Iterator<Shop> {
     private Iterator<Map<Long, Shop>> chunks;
-    private Iterator<Shop> shops;
+    private Iterator<Shop> shopIterator;
     private Iterator<Map<Long, Map<Long, Shop>>> worlds;
 
     public ShopIterator() {
-      // noinspection unchecked
-      Map<String, Map<Long, Map<Long, Shop>>> worldsMap = allShops;
-      
-      worlds = worldsMap.values().iterator();
+      worlds = shopsMap.values().iterator();
     }
 
     /** Returns true if there is still more shops to iterate over. */
     @Override
     public boolean hasNext() {
-      if (shops == null || !shops.hasNext()) {
+      if (shopIterator == null || !shopIterator.hasNext()) {
         if (chunks == null || !chunks.hasNext()) {
           if (!worlds.hasNext()) {
             return false;
@@ -124,7 +121,7 @@ public class ShopLoader implements Listener {
             return hasNext();
           }
         } else {
-          shops = chunks.next().values().iterator();
+          shopIterator = chunks.next().values().iterator();
           return hasNext();
         }
       }
@@ -134,19 +131,19 @@ public class ShopLoader implements Listener {
     /** Fetches the next shop. Throws NoSuchElementException if there are no more shops. */
     @Override
     public @NotNull Shop next() {
-      if (shops == null || !shops.hasNext()) {
+      if (shopIterator == null || !shopIterator.hasNext()) {
         if (chunks == null || !chunks.hasNext()) {
           if (!worlds.hasNext()) {
             throw new NoSuchElementException("No more shops to iterate over!");
           }
           chunks = worlds.next().values().iterator();
         }
-        shops = chunks.next().values().iterator();
+        shopIterator = chunks.next().values().iterator();
       }
-      if (!shops.hasNext()) {
+      if (!shopIterator.hasNext()) {
         return this.next(); // Skip to the next one (Empty iterator?)
       }
-      return shops.next();
+      return shopIterator.next();
     }
   }
   
@@ -156,12 +153,12 @@ public class ShopLoader implements Listener {
    * @param c The chunk to search. Referencing doesn't matter, only coordinates and world are used.
    * @return Shops
    */
-  public @Nullable Map<Long, Shop> getShops(@NotNull Chunk c) {
-    return getShops(c.getWorld().getName(), c.getX(), c.getZ());
+  public @Nullable Map<Long, Shop> getShopsInChunk(@NotNull Chunk c) {
+    return getShopsInChunk(c.getWorld().getName(), c.getX(), c.getZ());
   }
 
-  public @Nullable Map<Long, Shop> getShops(@NotNull String world, int chunkX, int chunkZ) {
-    @Nullable Map<Long, Map<Long, Shop>> inWorld = this.getShops(world);
+  public @Nullable Map<Long, Shop> getShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
+    @Nullable Map<Long, Map<Long, Shop>> inWorld = this.getShopsInWorld(world);
     if (inWorld == null) {
       return null;
     }
@@ -174,8 +171,8 @@ public class ShopLoader implements Listener {
    * @param world The name of the world (case sensitive) to get the list of shops from
    * @return a hashmap of Chunk - Shop
    */
-  public @Nullable Map<Long, Map<Long, Shop>> getShops(@NotNull String world) {
-    return this.allShops.get(world);
+  public @Nullable Map<Long, Map<Long, Shop>> getShopsInWorld(@NotNull String world) {
+    return this.shopsMap.get(world);
   }
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -203,7 +200,7 @@ public class ShopLoader implements Listener {
       return;
     }
     
-    @Nullable Map<Long, Shop> inChunk = getShops(shop.getLocation().chunk());
+    @Nullable Map<Long, Shop> inChunk = getShopsInChunk(shop.getLocation().chunk());
     if (inChunk != null && !inChunk.isEmpty())
       inChunk.remove(shop.getLocation().blockKey());
     
@@ -235,18 +232,11 @@ public class ShopLoader implements Listener {
   }
   
   @EventHandler(priority = EventPriority.MONITOR)
-  public void onWorldLoad(WorldLoadEvent event) {
-    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-      loadShopsForWorld(event.getWorld());
-    });
-  }
-  
-  @EventHandler(priority = EventPriority.MONITOR)
   public void onChunkLoad(ChunkLoadEvent event) {
     if (event.isNewChunk())
       return;
 
-    @Nullable Map<Long, Shop> inChunk = getShops(event.getChunk());
+    @Nullable Map<Long, Shop> inChunk = getShopsInChunk(event.getChunk());
     
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
@@ -257,87 +247,98 @@ public class ShopLoader implements Listener {
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
 
-    @Nullable Map<Long, Shop> inChunk = getShops(e.getChunk());
+    @Nullable Map<Long, Shop> inChunk = getShopsInChunk(e.getChunk());
 
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
         inChunk.values().forEach(shop -> ShopManager.instance().unload(shop));
       });
   }
-
-  /**
-   * Load all shops
-   *
-   * @param worldName The world name
-   */
-  public void loadShopsForWorld(@NotNull World world) {
+  
+  @EventHandler
+  public void onWorldLoad(WorldLoadEvent event) {
+    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+      try {
+        loadShopsFor(fetchShops(), event.getWorld());
+      } catch (Throwable t) {
+        exceptionHandler(t, null);
+      }
+    });
+  }
+  
+  public void loadShopsForAllWorlds() {
     long onLoad = System.currentTimeMillis();
     
     try {
-      Map<Long, Map<Long, Shop>> inWorld = allShops.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
-      
-      ShopLogger.instance().info("Loading shops from the database..");
-      long onFetch = System.currentTimeMillis();
-      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
-      long durFetch = System.currentTimeMillis() - onFetch;
-      ShopLogger.instance().info("Fetched all shops from database by " + durFetch + " ms");
-      
-      long loadedShops = 0;
-      long durTotalShopsNano = 0;
-      
-      while (rs.next()) {
-        long onPerShop = System.nanoTime();
-        ShopDatabaseInfo data = new ShopDatabaseInfo(rs);
-        
-        if (!data.world().equals(world.getName())) {
-          durTotalShopsNano = System.nanoTime() - onPerShop;
-          continue;
-        }
-        
-        if (!canLoad(data)) {
-          Util.debug("Somethings gone wrong, skipping the loading...");
-          durTotalShopsNano = System.nanoTime() - onPerShop;
-          continue;
-        }
-        
-        Shop shop = new ContainerShop(
-            ShopLocation.from(world, data.x(), data.y(), data.z()),
-            data.price(), data.item(),
-            data.moderators(), data.unlimited(), data.type());
-        
-        Map<Long, Shop> inChunk =
-            inWorld.computeIfAbsent(Util.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
-        inChunk.put(Util.blockKey(data.x(), data.y(), data.z()), shop);
-        
-        if (Util.isChunkLoaded(shop.getLocation())) {
-          // Load to World
-          if (Util.canBeShop(shop.getLocation().block())) {
-            loadedShops++;
-            ShopManager.instance().load(shop);
-          }
-        }
-        
-        durTotalShopsNano = System.nanoTime() - onPerShop;
-      }
+      ResultSet set = fetchShops();
+      for (World world : Bukkit.getWorlds())
+        loadShopsFor(set, world);
       
       long durLoad = System.currentTimeMillis() - onLoad;
-      
-      if (loadedShops > 0) {
-        long averagePerShop = durTotalShopsNano / loadedShops;
-        
-        ShopLogger.instance().info(
-            "Successfully loaded " + loadedShops + " shops in " + world.getName() + " ! " +
-            "(Total: " + durLoad + " ms, Fetch: " + durFetch + " ms," +
-            " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
-      } else {
-        ShopLogger.instance().info(
-            "Done! No shop could be loaded. " +
-            "(Total: " + durLoad + " ms, Fetch: " + durFetch + " ms," +
-            " Load: " + (durTotalShopsNano / 1000000) + " ms)");
-      }
-      
+      ShopLogger.instance().info("Done! Loaded all shops in " + durLoad + " ms");
     } catch (Throwable t) {
       exceptionHandler(t, null);
+    }
+  }
+  
+  public ResultSet fetchShops() throws SQLException {
+    ShopLogger.instance().info("Fetching shops from database..");
+    long onFetch = System.currentTimeMillis();
+    ResultSet set = QuickShop.instance().getDatabaseHelper().selectAllShops();
+    long durFetch = System.currentTimeMillis() - onFetch;
+    ShopLogger.instance().info("Fetched all shops by " + durFetch + " ms");
+    return set;
+  }
+  
+  public void loadShopsFor(@NotNull ResultSet set, @NotNull World world) throws SQLException {
+    Map<Long, Map<Long, Shop>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
+    
+    long loadedShops = 0;
+    long durTotalShopsNano = 0;
+    
+    while (set.next()) {
+      long onPerShop = System.nanoTime();
+      ShopDatabaseInfo data = new ShopDatabaseInfo(set);
+      
+      if (!data.world().equals(world.getName())) {
+        durTotalShopsNano = System.nanoTime() - onPerShop;
+        continue;
+      }
+      
+      if (!canLoad(data)) {
+        Util.debug("Somethings gone wrong, skipping the loading...");
+        durTotalShopsNano = System.nanoTime() - onPerShop;
+        continue;
+      }
+      
+      Shop shop = new ContainerShop(
+          ShopLocation.from(world, data.x(), data.y(), data.z()),
+          data.price(), data.item(),
+          data.moderators(), data.unlimited(), data.type());
+      
+      Map<Long, Shop> inChunk =
+          inWorld.computeIfAbsent(Util.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
+      inChunk.put(Util.blockKey(data.x(), data.y(), data.z()), shop);
+      
+      if (Util.isChunkLoaded(shop.getLocation())) {
+        // Load to World
+        if (Util.canBeShop(shop.getLocation().block())) {
+          loadedShops++;
+          ShopManager.instance().load(shop);
+        }
+      }
+      
+      durTotalShopsNano = System.nanoTime() - onPerShop;
+    }
+    
+    if (loadedShops > 0) {
+      long averagePerShop = durTotalShopsNano / loadedShops;
+      
+      ShopLogger.instance().info(
+          "Loaded " + loadedShops + " shops in " + world.getName() + " ! " +
+          " Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
+    } else {
+      ShopLogger.instance().info("No shop could be loaded in " + world.getName() + " !");
     }
   }
 

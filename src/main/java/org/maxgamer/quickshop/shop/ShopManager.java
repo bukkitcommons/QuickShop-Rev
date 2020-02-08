@@ -5,26 +5,20 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
-import org.bukkit.block.data.type.WallSign;
 import org.bukkit.entity.Player;
-import org.bukkit.material.Sign;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
@@ -191,7 +185,7 @@ public class ShopManager {
         signData.setFacing(chestFace);
         signState.setBlockData(signData);
       } catch (Throwable t) {
-        Sign sign = (Sign) signState.getData();
+        org.bukkit.material.Sign sign = (org.bukkit.material.Sign) signState.getData();
         sign.setFacingDirection(chestFace);
         signState.setData(sign);
       }
@@ -214,7 +208,7 @@ public class ShopManager {
       Map<Long, Shop> inChunk =
           ShopLoader
             .instance()
-            .getAllShops()
+            .getShopsMap()
             .computeIfAbsent(location.world().getName(),
                 s -> new HashMap<>(3))
             .computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4),

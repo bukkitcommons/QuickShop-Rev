@@ -49,7 +49,7 @@ public class SubCommand_Info implements CommandProcesser {
     buying = selling = doubles = chunks = worlds = doubleschests = 0;
     int nostock = 0;
 
-    for (Map<Long, Map<Long, Shop>> inWorld : ShopLoader.instance().getAllShops().values()) {
+    for (Map<Long, Map<Long, Shop>> inWorld : ShopLoader.instance().getShopsMap().values()) {
       worlds++;
 
       for (Map<Long, Shop> inChunk : inWorld.values()) {
