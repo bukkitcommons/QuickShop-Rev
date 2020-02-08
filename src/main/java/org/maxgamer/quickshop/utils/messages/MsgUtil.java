@@ -171,7 +171,7 @@ public class MsgUtil {
     
     Optional<String> raw = messagei18n.getString(loc);
     if (!raw.isPresent()) {
-      Util.debugLog("ERR: MsgUtil cannot find the the phrase at " + loc
+      Util.debug("ERR: MsgUtil cannot find the the phrase at " + loc
           + ", printing the all readed datas: " + messagei18n);
 
       return loc;
@@ -181,7 +181,7 @@ public class MsgUtil {
       if (QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled()) {
         try {
           filled = PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
-          Util.debugLog("Processed message " + filled + " by PlaceHolderAPI.");
+          Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
         } catch (Exception ignored) {
           if (((OfflinePlayer) player).getPlayer() != null) {
             try {
@@ -216,7 +216,7 @@ public class MsgUtil {
     
     if (player != null) {
       filled = PlaceholderAPI.setPlaceholders(player, filled);
-      Util.debugLog("Processed message " + filled + " by PlaceHolderAPI.");
+      Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
     }
     
     return filled;

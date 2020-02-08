@@ -56,6 +56,11 @@ public class ShopLoader implements Listener {
   
   private ShopLoader() {
     Bukkit.getPluginManager().registerEvents(this, QuickShop.instance());
+    
+    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+      for (World world : Bukkit.getWorlds())
+        loadShopsForWorld(world);
+    });
   }
   
   public static ShopLoader instance() {
@@ -190,7 +195,7 @@ public class ShopLoader implements Listener {
   public void delete(@NotNull Shop shop) {
     ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
-      Util.debugLog("Shop deletion was canceled because a plugin canceled it.");
+      Util.debug("Shop deletion was canceled because a plugin canceled it.");
       return;
     }
     
@@ -227,7 +232,9 @@ public class ShopLoader implements Listener {
   
   @EventHandler(priority = EventPriority.MONITOR)
   public void onWorldLoad(WorldLoadEvent event) {
-    loadShopsForWorld(event.getWorld());
+    Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
+      loadShopsForWorld(event.getWorld());
+    });
   }
   
   @EventHandler(priority = EventPriority.MONITOR)
@@ -269,8 +276,7 @@ public class ShopLoader implements Listener {
       long onFetch = System.currentTimeMillis();
       ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllShops();
       long durFetch = System.currentTimeMillis() - onFetch;
-      long fetchSize = rs.getFetchSize();
-      ShopLogger.instance().info("Fetched" + fetchSize + "shops from database by " + durFetch + "ms");
+      ShopLogger.instance().info("Fetched all shops from database by " + durFetch + " ms");
       
       long loadedShops = 0;
       long durTotalShopsNano = 0;
@@ -285,7 +291,7 @@ public class ShopLoader implements Listener {
         }
         
         if (!canLoad(data)) {
-          Util.debugLog("Somethings gone wrong, skipping the loading...");
+          Util.debug("Somethings gone wrong, skipping the loading...");
           durTotalShopsNano = System.nanoTime() - onPerShop;
           continue;
         }
@@ -311,12 +317,20 @@ public class ShopLoader implements Listener {
       }
       
       long durLoad = System.currentTimeMillis() - onLoad;
-      long averagePerShop = durTotalShopsNano / loadedShops;
       
-      ShopLogger.instance().info(
-          "Successfully loaded " + loadedShops + " of " + fetchSize + " shops in" + world.getName() + "! " +
-          "(Total: " + durLoad + "ms, Fetch: " + durFetch + "ms," +
-          " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + "ns)");
+      if (loadedShops > 0) {
+        long averagePerShop = durTotalShopsNano / loadedShops;
+        
+        ShopLogger.instance().info(
+            "Successfully loaded " + loadedShops + " shops in " + world.getName() + " ! " +
+            "(Total: " + durLoad + " ms, Fetch: " + durFetch + " ms," +
+            " Load: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
+      } else {
+        ShopLogger.instance().info(
+            "Done! No shop could be loaded. " +
+            "(Total: " + durLoad + " ms, Fetch: " + durFetch + " ms," +
+            " Load: " + (durTotalShopsNano / 1000000) + " ms)");
+      }
       
     } catch (Throwable t) {
       exceptionHandler(t, null);
@@ -352,7 +366,7 @@ public class ShopLoader implements Listener {
       e.printStackTrace();
       ShopLogger.instance().warning(
           "Failed load shop data, because target config can't deserialize the ItemStack.");
-      Util.debugLog("Failed to load data to the ItemStack: " + itemConfig);
+      Util.debug("Failed to load data to the ItemStack: " + itemConfig);
       return null;
     }
   }
@@ -361,13 +375,13 @@ public class ShopLoader implements Listener {
   private static @Nullable ShopModerator deserializeModerator(@NotNull String moderatorJson) {
     ShopModerator shopModerator;
     if (Util.isUUID(moderatorJson)) {
-      Util.debugLog("Updating old shop data... for " + moderatorJson);
+      Util.debug("Updating old shop data... for " + moderatorJson);
       shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
     } else {
       try {
         shopModerator = ShopModerator.deserialize(moderatorJson);
       } catch (JsonSyntaxException ex) {
-        Util.debugLog("Updating old shop data... for " + moderatorJson);
+        Util.debug("Updating old shop data... for " + moderatorJson);
         moderatorJson = Bukkit.getOfflinePlayer(moderatorJson).getUniqueId().toString();
         shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
       }

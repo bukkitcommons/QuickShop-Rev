@@ -235,19 +235,19 @@ public class Util {
    * @return The number of items that match in this inventory.
    */
   public static int countItems(@Nullable Inventory inv, @NotNull ItemStack item) {
-    if (inv == null) {
+    if (inv == null)
       return 0;
-    }
+    
     int items = 0;
     for (ItemStack iStack : inv.getStorageContents()) {
-      // noinspection ConstantConditions
-      if (iStack == null || iStack.getType() == Material.AIR) {
+      if (iStack == null || iStack.getType() == Material.AIR)
         continue;
-      }
+      
       if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
         items += iStack.getAmount();
       }
     }
+    
     return items;
   }
 
@@ -260,9 +260,9 @@ public class Util {
    * @return The number of items that can be given to the inventory safely.
    */
   public static int countSpace(@Nullable Inventory inv, @NotNull ItemStack item) {
-    if (inv == null) {
+    if (inv == null)
       return 0;
-    }
+    
     int space = 0;
 
     ItemStack[] contents = inv.getStorageContents();
@@ -270,9 +270,10 @@ public class Util {
       if (iStack == null || iStack.getType() == Material.AIR) {
         space += item.getMaxStackSize();
       } else if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
-        space += item.getMaxStackSize() - iStack.getAmount();
+        space += (item.getMaxStackSize() - iStack.getAmount());
       }
     }
+    
     return space;
   }
 
@@ -281,7 +282,7 @@ public class Util {
    *
    * @param logs logs
    */
-  public static void debugLog(@NotNull String... logs) {
+  public static void debug(@NotNull String... logs) {
     long startTime = System.currentTimeMillis();
     StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
     String className = stackTraceElement.getClassName();
@@ -294,7 +295,7 @@ public class Util {
     } catch (ClassNotFoundException e) {
       // Ignore
     }
-    String methodName = stackTraceElement.getMethodName();
+    //String methodName = stackTraceElement.getMethodName();
     int codeLine = stackTraceElement.getLineNumber();
 
     for (String log : logs) {
@@ -331,15 +332,6 @@ public class Util {
   }
 
   /**
-   * Print debug log when plugin running on dev mode.
-   *
-   * @param logs logs
-   */
-  public static void debugLogHeavy(@NotNull String... logs) {
-    debugLog(logs);
-  }
-
-  /**
    * Covert YAML string to ItemStack.
    *
    * @param config serialized ItemStack
@@ -361,11 +353,11 @@ public class Util {
       // Try load the itemDataVersion to do some checks.
       // noinspection deprecation
       if (itemDataVersion > Bukkit.getUnsafe().getDataVersion()) {
-        Util.debugLog("WARNING: DataVersion not matched with ItemStack: " + config);
+        Util.debug("WARNING: DataVersion not matched with ItemStack: " + config);
         // okay we need some things to do
         if (BaseConfig.forceLoadDowngradeItems) {
           // okay it enabled
-          Util.debugLog("QuickShop is trying force loading " + config);
+          Util.debug("QuickShop is trying force loading " + config);
           if (BaseConfig.forceLoadDowngradeItemsMethod == 0) { // Mode 0
             // noinspection deprecation
             item.put("v", Bukkit.getUnsafe().getDataVersion() - 1);
@@ -377,7 +369,7 @@ public class Util {
           root.put("item", item);
           config = yaml.dump(root);
 
-          Util.debugLog("Updated, we will try load as hacked ItemStack: " + config);
+          Util.debug("Updated, we will try load as hacked ItemStack: " + config);
         } else {
           ShopLogger.instance().warning("Cannot load ItemStack " + config
               + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
@@ -421,15 +413,15 @@ public class Util {
     try {
       String formated = QuickShop.instance().getEconomy().format(n);
       if (formated == null || formated.isEmpty()) {
-        Util.debugLog(
+        Util.debug(
             "Use alternate-currency-symbol to formatting, Cause economy plugin returned null");
         return BaseConfig.currencySymbol + n;
       } else {
         return formated;
       }
     } catch (NumberFormatException e) {
-      Util.debugLog("format", e.getMessage());
-      Util.debugLog("format",
+      Util.debug("format", e.getMessage());
+      Util.debug("format",
           "Use alternate-currency-symbol to formatting, Cause NumberFormatException");
       return BaseConfig.currencySymbol + n;
     }
@@ -613,7 +605,7 @@ public class Util {
    */
   public static String getToolPercentage(@NotNull ItemStack item) {
     if (!(item.getItemMeta() instanceof Damageable)) {
-      Util.debugLog(item.getType().name() + " not Damageable.");
+      Util.debug(item.getType().name() + " not Damageable.");
       return "Error: NaN";
     }
     double dura = ((Damageable) item.getItemMeta()).getDamage();
@@ -738,7 +730,7 @@ public class Util {
       return;
     }
     if (inv.getHolder() == null) {
-      Util.debugLog("Skipped plugin gui inventory check.");
+      Util.debug("Skipped plugin gui inventory check.");
       return;
     }
     try {
@@ -754,7 +746,7 @@ public class Util {
             return; // Virtual GUI
           }
           inv.setItem(i, new ItemStack(Material.AIR));
-          Util.debugLog("Found a displayitem in an inventory, Scheduling to removal...");
+          Util.debug("Found a displayitem in an inventory, Scheduling to removal...");
           MsgUtil.sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
               + location + ", Item is " + itemStack.getType().name());
         }

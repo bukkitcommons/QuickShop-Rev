@@ -60,10 +60,10 @@ public class SentryErrorReporter {
   public SentryErrorReporter(@NotNull QuickShop plugin) {
     this.plugin = plugin;
     // sentryClient = Sentry.init(dsn);
-    Util.debugLog("Loading SentryErrorReporter");
+    Util.debug("Loading SentryErrorReporter");
     sentryClient = SentryClientFactory.sentryClient(dsn);;
     context = sentryClient.getContext();
-    Util.debugLog("Setting basic report data...");
+    Util.debug("Setting basic report data...");
     // context.addTag("plugin_version", QuickShop.getVersion());
     context.addTag("system_os", System.getProperty("os.name"));
     context.addTag("system_arch", System.getProperty("os.arch"));
@@ -95,10 +95,10 @@ public class SentryErrorReporter {
     ignoredException.add(UnsupportedClassVersionError.class);
     ignoredException.add(LinkageError.class);
 
-    Util.debugLog("Sentry error reporter success loaded.");
+    Util.debug("Sentry error reporter success loaded.");
     enabled = true;
     if (!BaseConfig.eanbleErrorReporter) {
-      Util.debugLog("Sentry error report was disabled, unloading...");
+      Util.debug("Sentry error report was disabled, unloading...");
       unit();
       return;
     }
@@ -202,33 +202,33 @@ public class SentryErrorReporter {
         return null; // Don't report any errors if boot failed.
       }
       if (tempDisable) {
-        Util.debugLog("Ignore a throw, cause this throw flagged not reporting.");
+        Util.debug("Ignore a throw, cause this throw flagged not reporting.");
         this.tempDisable = true;
         return null;
       }
       if (disable) {
-        Util.debugLog("Ignore a throw, cause report now is disabled.");
+        Util.debug("Ignore a throw, cause report now is disabled.");
         this.disable = true;
         return null;
       }
-      Util.debugLog("Preparing for reporting errors...");
+      Util.debug("Preparing for reporting errors...");
       if (!enabled) {
-        Util.debugLog("Errors not sended, cause ErrorReport not enabled.");
+        Util.debug("Errors not sended, cause ErrorReport not enabled.");
         return null;
       }
 
       if (!checkWasCauseByQS(throwable)) {
         throwable.printStackTrace();
-        Util.debugLog("Errors not sended, cause it not throw by QuickShop");
+        Util.debug("Errors not sended, cause it not throw by QuickShop");
         return null;
       }
 
       if (!canReport(throwable)) {
-        Util.debugLog("This errors not sended, cause it disallow send.(Already sended?)");
+        Util.debug("This errors not sended, cause it disallow send.(Already sended?)");
         return null;
       }
       if (ignoredException.contains(throwable.getClass())) {
-        Util.debugLog("Errors not sended, cause type is blocked.");
+        Util.debug("Errors not sended, cause type is blocked.");
         return null;
       }
       for (String record : context) {
@@ -323,7 +323,7 @@ public class SentryErrorReporter {
         return true;
       }
       if (record.getThrown() == null) {
-        Util.debugLog("Error not sended cause thrown is null");
+        Util.debug("Error not sended cause thrown is null");
         return true;
       }
       if (Util.isDevMode()) {

@@ -25,7 +25,7 @@ public class ShopProtectionFlag implements Serializable {
   public static ShopProtectionFlag create(
       @NotNull ItemStack itemStack,
       @NotNull Shop shop) {
-    return new ShopProtectionFlag(shop.getLocation().toString(), Util.serialize(itemStack));
+    return new ShopProtectionFlag(Util.serialize(itemStack), shop.getLocation().toString());
   }
 
   public static String defaultMark() {

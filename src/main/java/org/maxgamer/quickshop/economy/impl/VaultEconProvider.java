@@ -94,7 +94,7 @@ public class VaultEconProvider implements EconomyCore, Listener {
       ShopLogger.instance().info("Using economy system: " + this.vault.getName());
     }
     Bukkit.getPluginManager().registerEvents(this, QuickShop.instance());
-    Util.debugLog("Economy service listener was registered.");
+    Util.debug("Economy service listener was registered.");
     return true;
   }
 

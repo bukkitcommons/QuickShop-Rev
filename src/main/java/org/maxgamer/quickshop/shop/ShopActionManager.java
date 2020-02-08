@@ -113,7 +113,7 @@ public class ShopActionManager {
     double totalPrice = amount * shop.getPrice();
     if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.tax")) {
       tax = 0;
-      Util.debugLog("Disable the Tax for player " + p.getName()
+      Util.debug("Disable the Tax for player " + p.getName()
       + " cause they have permission quickshop.tax");
     }
     if (shop.getModerator().isModerator(p.getUniqueId())) {
@@ -182,18 +182,18 @@ public class ShopActionManager {
       @NotNull String message,
       boolean bypassProtectionChecks) {
 
-    Util.debugLog("actionCreate");
+    Util.debug("actionCreate");
     if (!bypassProtectionChecks) {
-      Util.debugLog("Calling for protection check...");
+      Util.debug("Calling for protection check...");
 
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(false, p);
       if (!QuickShop.instance().getPermissionChecker().canBuild(p, info.location())) {
         p.sendMessage(MsgUtil.getMessage("no-permission", p)
             + ": Some 3rd party plugin denied the permission checks, did you have permission built in there?");
-        Util.debugLog("Failed to create shop: Protection check failed:");
+        Util.debug("Failed to create shop: Protection check failed:");
         for (RegisteredListener belisteners : BlockBreakEvent.getHandlerList()
             .getRegisteredListeners()) {
-          Util.debugLog(belisteners.getPlugin().getName());
+          Util.debug(belisteners.getPlugin().getName());
         }
         return;
       }
@@ -260,7 +260,7 @@ public class ShopActionManager {
           price = Integer.parseInt(message);
         } catch (NumberFormatException ex2) {
           // input is number, but not Integer
-          Util.debugLog(ex2.getMessage());
+          Util.debug(ex2.getMessage());
           p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));
           return;
         }
@@ -281,7 +281,7 @@ public class ShopActionManager {
 
     } catch (NumberFormatException ex) {
       // No number input
-      Util.debugLog(ex.getMessage());
+      Util.debug(ex.getMessage());
       p.sendMessage(MsgUtil.getMessage("not-a-number", p, message));
       return;
     }
@@ -362,7 +362,7 @@ public class ShopActionManager {
     }
     if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location())) {
       ShopManager.instance().unload(shop);
-      Util.debugLog("Cancelled by integrations");
+      Util.debug("Cancelled by integrations");
       return;
     }
 
@@ -422,7 +422,7 @@ public class ShopActionManager {
     double total = amount * shop.getPrice();
     if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.tax")) {
       tax = 0;
-      Util.debugLog("Disable the Tax for player " + p.getName()
+      Util.debug("Disable the Tax for player " + p.getName()
       + " cause they have permission quickshop.tax");
     }
     if (tax < 0) {
@@ -491,7 +491,7 @@ public class ShopActionManager {
     }
 
     if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanTrade(p, info.location())) {
-      Util.debugLog("Cancel by integrations.");
+      Util.debug("Cancel by integrations.");
       return;
     }
 
@@ -526,7 +526,7 @@ public class ShopActionManager {
         amount = -1;
 
       p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));
-      Util.debugLog("Receive the chat " + message + " and it format failed: " + e.getMessage());
+      Util.debug("Receive the chat " + message + " and it format failed: " + e.getMessage());
       return;
     }
 

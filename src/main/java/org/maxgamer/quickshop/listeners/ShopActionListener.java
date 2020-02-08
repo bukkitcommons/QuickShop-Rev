@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.listeners;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,6 +52,7 @@ public class ShopActionListener implements Listener {
     @Nullable Block block = e.getClickedBlock();
     if (block == null)
       return;
+    Util.debug(ChatColor.YELLOW + "> Handling interact");
     
     ShopViewer viewer = ShopManager.instance().getLoadedShopFrom(block);
     /*
@@ -68,6 +70,8 @@ public class ShopActionListener implements Listener {
      * Control handling
      */
     if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+      Util.debug("STAGE -1");
+      
       viewer
         .nonNull()
         .filter(shop ->
@@ -76,6 +80,8 @@ public class ShopActionListener implements Listener {
           shop.getOwner().equals(e.getPlayer().getUniqueId()) || e.getPlayer().isOp())
         
         .accept(shop -> {
+          Util.debug(ChatColor.GREEN + "Handling control");
+          
           MsgUtil.sendControlPanelInfo(e.getPlayer(), shop);
           //shop.setSignText();
         });
@@ -83,6 +89,7 @@ public class ShopActionListener implements Listener {
       return;
     }
 
+    Util.debug("STAGE 0");
     Player player = e.getPlayer();
     ItemStack item = e.getItem();
     
@@ -97,6 +104,8 @@ public class ShopActionListener implements Listener {
         QuickShop.getPermissionManager().hasPermission(player, "quickshop.use"))    
       
       .accept(shop -> {
+        Util.debug(ChatColor.GREEN + "Handling trade");
+        
         shop.onClick();
         MsgUtil.sendShopInfo(player, shop);
         //shop.setSignText();
@@ -105,17 +114,19 @@ public class ShopActionListener implements Listener {
         double money = QuickShop.instance().getEconomy().getBalance(player.getUniqueId());
 
         if (shop.is(ShopType.SELLING)) {
-          int itemAmount = Math.min(Util.countSpace(player.getInventory(), shop.getItem()),
+          // Consider player inv space, money afforable
+          int afforable = Math.min(Util.countSpace(player.getInventory(), shop.getItem()),
               (int) Math.floor(money / price));
 
+          // Consider shop remaining stock
           if (!shop.isUnlimited()) {
-            itemAmount = Math.min(itemAmount, shop.getRemainingStock());
+            afforable = Math.min(afforable, shop.getRemainingStock());
           }
 
-          if (itemAmount < 0)
-            itemAmount = 0;
+          if (afforable < 0)
+            afforable = 0;
 
-          player.sendMessage(MsgUtil.getMessage("how-many-buy", player, "" + itemAmount));
+          player.sendMessage(MsgUtil.getMessage("how-many-buy", player, "" + afforable));
         } else {
           double ownerBalance = QuickShop.instance().getEconomy().getBalance(shop.getOwner());
           int items = Util.countItems(player.getInventory(), shop.getItem());
@@ -137,6 +148,8 @@ public class ShopActionListener implements Listener {
         ShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));
       });
     
+    Util.debug("STAGE 1");
+    
     /*
      * Creation handling
      */
@@ -152,6 +165,8 @@ public class ShopActionListener implements Listener {
       .filter(shop -> ShopManager.canBuildShop(player, block))
       
       .accept(shop -> {
+        Util.debug(ChatColor.GREEN + "Handling creation.");
+        
         if (Util.getSecondHalf(block).isPresent() &&
             !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.double")) {
           player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
@@ -197,6 +212,8 @@ public class ShopActionListener implements Listener {
         player.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", player,
             Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
       });
+    
+    Util.debug(ChatColor.YELLOW + "> Handled interact");
   }
 
   @EventHandler
@@ -240,7 +257,7 @@ public class ShopActionListener implements Listener {
       else
         player.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", player));
       
-      Util.debugLog(player.getName() + " too far with the shop location.");
+      Util.debug(player.getName() + " too far with the shop location.");
       ShopActionManager.instance().getActions().remove(player.getUniqueId());
     }
   }
@@ -268,7 +285,7 @@ public class ShopActionListener implements Listener {
 
     Util.getShopBySign(block).ifPresent(() -> {
       event.setCancelled(true);
-      Util.debugLog("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
+      Util.debug("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
     });
   }
 }

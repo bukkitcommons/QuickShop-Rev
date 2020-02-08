@@ -62,7 +62,7 @@ public class SubCommand_Paste implements CommandProcesser {
               new File(file, "paste-" + UUID.randomUUID().toString().replaceAll("-", "") + ".txt");
           try {
             final boolean createResult = file.createNewFile();
-            Util.debugLog("Create paste file: " + file.getCanonicalPath() + " " + createResult);
+            Util.debug("Create paste file: " + file.getCanonicalPath() + " " + createResult);
             final FileWriter fwriter = new FileWriter(file);
             fwriter.write(pasteText);
             fwriter.flush();

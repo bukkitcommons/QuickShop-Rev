@@ -74,7 +74,7 @@ public class AsyncLogWatcher implements Runnable {
         }
         logFileWriter.flush();
       } catch (IOException ioe) {
-        Util.debugLog("Failed to flush log to disk: " + ioe.getMessage());
+        Util.debug("Failed to flush log to disk: " + ioe.getMessage());
       }
     }
   }

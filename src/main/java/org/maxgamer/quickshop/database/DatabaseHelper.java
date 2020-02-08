@@ -131,6 +131,8 @@ public class DatabaseHelper {
   public void createShop(@NotNull String owner, double price, @NotNull ItemStack item,
       int unlimited, int shopType, @NotNull String world, int x, int y, int z) throws SQLException {
     deleteShop(x, y, z, world); // First purge old exist shop before create new shop.
+    
+    Util.debug("Creates shop");
     String sqlString = "INSERT INTO " + BaseConfig.databasePrefix
         + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     // QuickShop.instance().getDB().execute(q, owner, price, Util.serialize(item), x, y, z, world,
@@ -161,11 +163,8 @@ public class DatabaseHelper {
   }
 
   public boolean deleteShop(int x, int y, int z, @NotNull String worldName) throws SQLException {
-    // db.getConnection().createStatement()
-    // .executeUpdate("DELETE FROM " + QuickShop.instance().getDbPrefix() + "shops WHERE x = " + x + "
-    // AND y = " + y
-    // + " AND z = " + z + " AND world = \"" + worldName + "\""
-    // + (db.getCore() instanceof MySQLCore ? " LIMIT 1" : ""));
+    Util.debug("Deletes shop");
+    
     String sqlString = "DELETE FROM " + BaseConfig.databasePrefix
         + "shops WHERE x = ? AND y = ? AND z = ? AND world = ?"
         + (db.getConnector() instanceof MySQLConnector ? " LIMIT 1" : "");

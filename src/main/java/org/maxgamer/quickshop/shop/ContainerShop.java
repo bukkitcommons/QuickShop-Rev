@@ -48,6 +48,7 @@ import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
+import org.maxgamer.quickshop.shop.hologram.impl.EntityDisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.RealDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -64,7 +65,7 @@ public class ContainerShop implements Shop, Managed {
   @NotNull
   private final Location location;
   @Nullable
-  private DisplayItem displayItem;
+  private EntityDisplayItem displayItem;
   
   @EqualsAndHashCode.Exclude
   private boolean isLoaded = false;
@@ -109,7 +110,7 @@ public class ContainerShop implements Shop, Managed {
       DisplayData data = DisplayData.create(this.item);
       switch (data.type()) {
         case UNKNOWN:
-          Util.debugLog(
+          Util.debug(
               "Failed to create a ContainerShop displayItem, the type is unknown, fallback to RealDisplayItem");
           this.displayItem = new RealDisplayItem(this);
           break;
@@ -120,13 +121,13 @@ public class ContainerShop implements Shop, Managed {
           this.displayItem = new ArmorStandDisplayItem(this, data);
           break;
         default:
-          Util.debugLog(
+          Util.debug(
               "Warning: Failed to create a ContainerShop displayItem, the type we didn't know, fallback to RealDisplayItem");
           this.displayItem = new RealDisplayItem(this);
           break;
       }
     } else {
-      Util.debugLog("The display was disabled.");
+      Util.debug("The display was disabled.");
     }
   }
 
@@ -159,7 +160,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingStock() {
-    return unlimited ? -1 : Util.countItems(this.getInventory(), this.getItem());
+    return unlimited ? Integer.MAX_VALUE : Util.countItems(this.getInventory(), this.getItem());
   }
 
   /**
@@ -169,7 +170,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingSpace() {
-    return unlimited ? -1 : Util.countSpace(this.getInventory(), this.getItem());
+    return unlimited ? Integer.MAX_VALUE : Util.countSpace(this.getInventory(), this.getItem());
   }
 
   /**
@@ -307,13 +308,13 @@ public class ContainerShop implements Shop, Managed {
   }
 
   private void checkDisplay0() {
-    if (!BaseConfig.displayItems || !this.isLoaded) { // FIXME: Reinit scheduler on reloading config
+    if (!BaseConfig.displayItems || !this.isLoaded) {
       return;
     }
 
     if (this.displayItem == null) {
-      Util.debugLog("Warning: DisplayItem is null, this shouldn't happend...");
-      Util.debugLog("Call from: " + Thread.currentThread().getStackTrace()[2].getClassName() + "#"
+      Util.debug("Warning: DisplayItem is null, this shouldn't happend...");
+      Util.debug("Call from: " + Thread.currentThread().getStackTrace()[2].getClassName() + "#"
           + Thread.currentThread().getStackTrace()[2].getMethodName() + "%"
           + Thread.currentThread().getStackTrace()[2].getLineNumber());
       return;
@@ -321,7 +322,7 @@ public class ContainerShop implements Shop, Managed {
 
     if (!this.displayItem.isSpawned()) {
       /* Not spawned yet. */
-      Util.debugLog("Target item not spawned, spawning...");
+      Util.debug("Target item not spawned, spawning...");
       this.displayItem.spawn();
     } else {
       this.displayItem.fixPosition();
@@ -449,7 +450,7 @@ public class ContainerShop implements Shop, Managed {
             Bukkit.getOfflinePlayer((this.moderator.getOwner())).isOnline()).getBukkitInventory();
       }
     } catch (Exception e) {
-      Util.debugLog(e.getMessage());
+      Util.debug(e.getMessage());
       return null;
     }
     InventoryHolder container;
@@ -458,7 +459,7 @@ public class ContainerShop implements Shop, Managed {
       return container.getInventory();
     } catch (Exception e) {
       ShopLoader.instance().delete(this);
-      Util.debugLog("Inventory doesn't exist anymore: " + this + " shop was removed.");
+      Util.debug("Inventory doesn't exist anymore: " + this + " shop was removed.");
       return null;
     }
   }
@@ -472,7 +473,7 @@ public class ContainerShop implements Shop, Managed {
   public void setSignText(@NotNull String[] lines) {
     for (Sign sign : this.getShopSigns()) {
       if (Arrays.equals(sign.getLines(), lines)) {
-        Util.debugLog("Skipped new sign text setup: Same content");
+        Util.debug("Skipped new sign text setup: Same content");
         continue;
       }
       for (int i = 0; i < lines.length; i++) {
@@ -650,7 +651,7 @@ public class ContainerShop implements Shop, Managed {
       return;
     }
     if (!Util.canBeShop(this.getLocation().getBlock())) {
-      Util.debugLog("Shop at " + this.getLocation() + " container was missing, remove...");
+      Util.debug("Shop at " + this.getLocation() + " container was missing, remove...");
       ShopManager.instance().unload(this);
     }
   }
@@ -695,7 +696,7 @@ public class ContainerShop implements Shop, Managed {
   public void onClick() {
     ShopClickEvent event = new ShopClickEvent(this);
     if (Util.fireCancellableEvent(event)) {
-      Util.debugLog("Ignore shop click, because some plugin cancel it.");
+      Util.debug("Ignore shop click, because some plugin cancel it.");
       return;
     }
     this.setSignText();

@@ -5,6 +5,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.utils.Util;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -22,27 +23,44 @@ public class ShopViewer {
   
   private boolean fails;
   
+  public ShopViewer reset() {
+    Util.debug("Viewer rest, before: " + fails);
+    fails = false;
+    return this;
+  }
+  
   public ShopViewer nonNull() {
+    if (shop == null)
+      Util.debug("Shop not found, before: " + fails);
+    
     fails = shop == null;
     return this;
   }
   
   public ShopViewer accept(Consumer<Shop> consumer) {
-    if (!fails)
-      consumer.accept(shop);
+    Util.debug("Accept, fails: " + fails);
+    
+    if (!fails) consumer.accept(shop);
     return this;
   }
   
   public boolean test(Predicate<Shop> predicate, boolean def) {
-    return fails ? def : predicate.test(shop);
+    Util.debug("Test, fails: " + fails);
+    
+    return fails ? def : !predicate.test(shop);
   }
   
   public <R> R apply(Function<Shop, R> function, R def) {
+    Util.debug("Apply, fails: " + fails);
+    
     return fails ? def : function.apply(shop);
   }
   
   public ShopViewer filter(Predicate<Shop> predicate) {
-    fails = fails ? true : predicate.test(shop);
+    boolean before = fails;
+    fails = fails ? true : !predicate.test(shop);
+    
+    Util.debug("Filter, fails: " + fails + ", before: " + fails);
     return this;
   }
   
@@ -50,19 +68,17 @@ public class ShopViewer {
     return shop == null;
   }
   
-  public ShopViewer ifEmpty(Runnable runnable) {
-    if (!fails && shop == null)
-      runnable.run();
-    return this;
-  }
-  
   public ShopViewer ifPresent(Consumer<Shop> consumer) {
+    Util.debug("isPresent, fails: " + fails + ", present: " + isPresent());
+    
     if (!fails && shop != null)
       consumer.accept(shop);
     return this;
   }
   
   public ShopViewer ifPresent(Runnable runnable) {
+    Util.debug("isPresent, fails: " + fails + ", present: " + isPresent());
+    
     if (!fails && shop != null)
       runnable.run();
     return this;

@@ -50,7 +50,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
       registry.register(this.createFlag);
       registry.register(this.tradeFlag);
       ShopLogger.instance().info(ChatColor.GREEN + getName() + " flags register successfully.");
-      Util.debugLog("Success register " + getName() + " flags.");
+      Util.debug("Success register " + getName() + " flags.");
     } catch (FlagConflictException e) {
       e.printStackTrace();
     }
@@ -71,7 +71,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
     boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager()
         .hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
     if (canBypass) {
-      Util.debugLog("Player " + player.getName()
+      Util.debug("Player " + player.getName()
           + " bypassing the protection checks, because player have bypass permission in WorldGuard");
       return true;
     }
@@ -111,7 +111,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
     boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager()
         .hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
     if (canBypass) {
-      Util.debugLog("Player " + player.getName()
+      Util.debug("Player " + player.getName()
           + " bypassing the protection checks, because player have bypass permission in WorldGuard");
       return true;
     }

@@ -25,7 +25,7 @@ public class SubCommand_SilentPreview extends SneakyTabs implements CommandProce
     }
 
     if (cmdArg.length < 4) {
-      Util.debugLog("Exception on command, cancel.");
+      Util.debug("Exception on command, cancel.");
       return;
     }
 

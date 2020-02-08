@@ -107,7 +107,7 @@ public class ShopManager {
       
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(false, player);
       if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
-        Util.debugLog("PermissionChecker canceled shop creation");
+        Util.debug("PermissionChecker canceled shop creation");
         return false;
       }
       
@@ -159,7 +159,7 @@ public class ShopManager {
               Arrays.stream(((org.bukkit.block.Sign) info.sign().getState()).getLines())
               .allMatch(String::isEmpty))) {
         
-        Util.debugLog("Sign cannot placed cause no enough space(Not air block)");
+        Util.debug("Sign cannot placed cause no enough space(Not air block)");
         return;
       }
       

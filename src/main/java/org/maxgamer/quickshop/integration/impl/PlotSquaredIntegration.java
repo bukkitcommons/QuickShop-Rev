@@ -67,7 +67,7 @@ public class PlotSquaredIntegration implements IntegratedPlugin {
     Flags.registerFlag(this.createFlag);
     Flags.registerFlag(this.tradeFlag);
     ShopLogger.instance().info(ChatColor.GREEN + getName() + " flags register successfully.");
-    Util.debugLog("Success register " + getName() + " flags.");
+    Util.debug("Success register " + getName() + " flags.");
   }
 
   @Override

@@ -86,7 +86,7 @@ public class VersionUpdater {
     if (uurl == null) {
       throw new IOException("Failed read the URL, cause it is empty.");
     }
-    Util.debugLog("Downloading from " + uurl);
+    Util.debug("Downloading from " + uurl);
     InputStream is = HttpRequest.get(new URL(uurl))
         .header("User-Agent", "QuickShop-Reremake " + QuickShop.getVersion()).execute()
         .getInputStream();
@@ -100,14 +100,14 @@ public class VersionUpdater {
     while ((len = is.read(buff)) != -1) {
       os.write(buff, 0, len);
       downloaded += len;
-      Util.debugLog("File Downloader:  " + downloaded + "/" + uurlSize + " bytes.");
+      Util.debug("File Downloader:  " + downloaded + "/" + uurlSize + " bytes.");
     }
-    Util.debugLog("Downloaded: " + downloaded + " Server:" + uurlSize);
+    Util.debug("Downloaded: " + downloaded + " Server:" + uurlSize);
     if (!(uurlSize < 1) && downloaded != uurlSize) {
-      Util.debugLog("Size not match, download may broken.");
+      Util.debug("Size not match, download may broken.");
       throw new IOException("Size not match, download mayb broken, aborting.");
     }
-    Util.debugLog("Download complete.");
+    Util.debug("Download complete.");
     return os.toByteArray();
   }
 
@@ -131,7 +131,7 @@ public class VersionUpdater {
         if (!desc.getName().equals(QuickShop.instance().getDescription().getName())) {
           continue;
         }
-        Util.debugLog("Selected: " + plugin.getPath());
+        Util.debug("Selected: " + plugin.getPath());
         quickshop = plugin;
         break;
       } catch (InvalidDescriptionException e) { // Ignore }

@@ -2,17 +2,25 @@ package org.maxgamer.quickshop.shop.hologram;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import lombok.SneakyThrows;
 import java.util.ArrayList;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopProtectionFlag;
+import org.maxgamer.quickshop.shop.hologram.impl.EntityDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /**
  * @author Netherfoam A display item, that spawns a block above the chest and cannot be interacted
@@ -23,6 +31,77 @@ public interface DisplayItem {
   
   public static boolean isDisplayItem(@Nullable ItemStack itemStack) {
     return isDisplayItem(itemStack, null);
+  }
+  
+  @SneakyThrows
+  public static void fixesDisplayItem(@Nullable Item item) {
+    ItemStack itemStack = item.getItemStack();
+    if (itemStack == null || !itemStack.hasItemMeta())
+      return;
+    
+    ItemMeta iMeta = itemStack.getItemMeta();
+    if (!iMeta.hasLore())
+      return;
+    
+    for (String lore : iMeta.getLore()) {
+      try {
+        if (!lore.startsWith("{")) {
+          continue;
+        }
+        ShopProtectionFlag shopProtectionFlag = GSON.fromJson(lore, ShopProtectionFlag.class);
+        if (shopProtectionFlag == null)
+          continue;
+        
+        if (shopProtectionFlag.getShopLocationData() != null) {
+          ShopViewer viewer =
+              ShopManager.instance().getLoadedShopAt(deserialize(shopProtectionFlag.getShopLocationData()));
+          
+          viewer.ifPresent(shop -> {
+            if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {
+              item.remove();
+              Util.debug("Removed a duped item display entity.1");
+              shop.checkDisplay();
+              return;
+            }
+            
+            if (shop.getDisplay().getDisplay() == null)
+              return;
+            
+            if (!shop.getDisplay().getDisplay().getUniqueId().equals(item.getUniqueId())) {
+              item.remove();
+              Util.debug("Removed a duped item display entity.2");
+              return;
+            }
+            
+            if (((EntityDisplayItem) shop.getDisplay()).data().type().entityType() != item.getType()) {
+              item.remove();
+              Util.debug("Removed a duped item display entity.3");
+              return;
+            }
+          });
+        } else if (shopProtectionFlag.getShopItemStackData() != null) {
+          ItemStack displayItem = Util.deserialize(shopProtectionFlag.getShopItemStackData());
+          
+          if (!QuickShop.instance().getItemMatcher().matches(itemStack, displayItem)) {
+            item.remove();
+            Util.debug("Removed a duped item display entity.");
+          }
+        }
+      } catch (JsonSyntaxException e) {
+        return;
+      }
+    }
+  }
+  
+  static Location deserialize(@NotNull String location) {
+    Util.debug("will deserilize: " + location);
+    String[] sections = location.split(",");
+    String worldName = StringUtils.substringBetween(sections[0], "{name=", "}");
+    String x = sections[1].substring(2);
+    String y = sections[2].substring(2);
+    String z = sections[3].substring(2);
+    
+    return new Location(Bukkit.getWorld(worldName), Double.valueOf(x), Double.valueOf(y), Double.valueOf(z));
   }
 
   /**
@@ -40,7 +119,6 @@ public interface DisplayItem {
       return false;
     
     String defaultMark = ShopProtectionFlag.defaultMark();
-    // noinspection ConstantConditions
     for (String lore : iMeta.getLore()) {
       try {
         if (!lore.startsWith("{")) {
@@ -63,6 +141,7 @@ public interface DisplayItem {
         // Ignore
       }
     }
+    
     return false;
   }
 
@@ -111,13 +190,6 @@ public interface DisplayItem {
 
   /** Remove the display entity. */
   void remove();
-
-  /**
-   * Remove this shop's display in the whole world.(Not whole server)
-   *
-   * @return Success
-   */
-  boolean removeDupe();
 
   /** Respawn the displays, if it not exist, it will spawn new one. */
   void respawn();

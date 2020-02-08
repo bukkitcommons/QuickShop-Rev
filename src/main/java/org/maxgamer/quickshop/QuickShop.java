@@ -146,7 +146,9 @@ public class QuickShop extends JavaPlugin {
   /** A util to call to check some actions permission */
   private BuildPerms permissionChecker;
 
-  private ShopActionListener playerListener;
+  @NotNull
+  private final ShopActionListener playerListener = new ShopActionListener();
+  
   private InternalListener internalListener;
   /**
    * Whether we players are charged a fee to change the price on their shop (To help deter endless
@@ -274,14 +276,14 @@ public class QuickShop extends JavaPlugin {
           return false;
         case VAULT:
           core = new VaultEconProvider();
-          Util.debugLog("Now using the Vault economy system.");
+          Util.debug("Now using the Vault economy system.");
           break;
         case RESERVE:
           core = new ReserveEconProvider();
-          Util.debugLog("Now using the Reserve economy system.");
+          Util.debug("Now using the Reserve economy system.");
           break;
         default:
-          Util.debugLog("No any economy provider selected.");
+          Util.debug("No any economy provider selected.");
           break;
       }
       if (core == null) {
@@ -351,9 +353,9 @@ public class QuickShop extends JavaPlugin {
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
     if (getConfig().getBoolean("integration.worldguard.enable")) {
       Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
-      Util.debugLogHeavy("Check WG plugin...");
+      Util.debug("Check WG plugin...");
       if (wg != null) {
-        Util.debugLogHeavy("Loading WG modules.");
+        Util.debug("Loading WG modules.");
         this.integrationHelper.register(new WorldGuardIntegration()); // WG require register
                                                                           // flags when onLoad
                                                                           // called.
@@ -365,29 +367,29 @@ public class QuickShop extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    if (noopDisable) {
+    if (noopDisable)
       return;
-    }
+    
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.UNLOAD);
     getLogger().info("QuickShop is finishing remaining work, this may need a while...");
 
-    Util.debugLog("Closing all GUIs...");
+    Util.debug("Closing all GUIs...");
     for (Player player : Bukkit.getOnlinePlayers()) {
       player.closeInventory();
     }
-    Util.debugLog("Unloading all shops...");
+    Util.debug("Unloading all shops...");
     try {
       ShopManager.instance().clear();
     } catch (Throwable th) {
       // ignore, we didn't care that
     }
 
-    Util.debugLog("Cleaning up database queues...");
+    Util.debug("Cleaning up database queues...");
     if (this.getDatabaseManager() != null) {
       this.getDatabaseManager().flush();
     }
 
-    Util.debugLog("Unregistering tasks...");
+    Util.debug("Unregistering tasks...");
     // if (itemWatcherTask != null)
     // itemWatcherTask.cancel();
     if (logWatcher != null) {
@@ -395,7 +397,7 @@ public class QuickShop extends JavaPlugin {
     }
     /* Unload UpdateWatcher */
     UpdateWatcher.uninit();
-    Util.debugLog("Cleaning up resources and unloading all shops...");
+    Util.debug("Cleaning up resources and unloading all shops...");
     /* Remove all display items, and any dupes we can find */
     ShopActionManager.instance().getActions().clear();
     ShopManager.instance().clear();
@@ -414,9 +416,9 @@ public class QuickShop extends JavaPlugin {
       warnings.clear();
     }
     // this.reloadConfig();
-    Util.debugLog("Calling integrations...");
+    Util.debug("Calling integrations...");
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
-    Util.debugLog("All shutdown work is finished.");
+    Util.debug("All shutdown work is finished.");
   }
 
   @Override
@@ -501,7 +503,13 @@ public class QuickShop extends JavaPlugin {
     load3rdParty();
 
     setupDBonEnableding = true;
-    setupDatabase(); // Load the database
+    boolean success = setupDatabase(); // Load the database
+    if (!success) {
+      noopDisable = true;
+      ShopLogger.instance().severe("Fatal error: Failed to setup database");
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
     setupDBonEnableding = false;
 
     /* Initalize the tools */
@@ -540,7 +548,6 @@ public class QuickShop extends JavaPlugin {
     // Register events
 
     blockListener = new BlockListener();
-    playerListener = new ShopActionListener();
     chatListener = new ChatListener();
     inventoryListener = new DisplayProtectionListener();
     customInventoryListener = new CustomInventoryListener(this);
@@ -576,14 +583,14 @@ public class QuickShop extends JavaPlugin {
     getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
     /* Delay the Ecoonomy system load, give a chance to let economy system regiser. */
     /* And we have a listener to listen the ServiceRegisterEvent :) */
-    Util.debugLog("Loading economy system...");
+    Util.debug("Loading economy system...");
     new BukkitRunnable() {
       @Override
       public void run() {
         loadEcon();
       }
     }.runTaskLater(this, 1);
-    Util.debugLog("Registering shop watcher...");
+    Util.debug("Registering shop watcher...");
     Bukkit.getScheduler().runTaskTimer(this, signUpdateWatcher, 40, 40);
     if (logWatcher != null) {
       Bukkit.getScheduler().runTaskTimerAsynchronously(this, logWatcher, 0, 10);
@@ -720,6 +727,7 @@ public class QuickShop extends JavaPlugin {
       this.database = new Database(dbCore);
       // Make the database up to date
       databaseHelper = new DatabaseHelper(this, database);
+      ShopLogger.instance().info("Database Connector: " + dbCore.getClass().getSimpleName());
     } catch (ConnectionException e) {
       e.printStackTrace();
       if (setupDBonEnableding) {

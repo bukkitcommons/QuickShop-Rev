@@ -34,7 +34,7 @@ public class BlockListener implements Listener {
     
     if (event.isCancelled()) {
       player.sendMessage(MsgUtil.getMessage("no-permission", player));
-      Util.debugLog("The action was cancelled by other plugin");
+      Util.debug("The action was cancelled by other plugin");
       return;
     }
     

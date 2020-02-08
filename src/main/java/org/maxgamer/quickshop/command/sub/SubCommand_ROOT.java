@@ -47,7 +47,7 @@ public class SubCommand_ROOT implements CommandProcesser {
         for (String requirePermission : requirePermissions) {
           if (requirePermission != null && !requirePermission.isEmpty()
               && !QuickShop.getPermissionManager().hasPermission(sender, requirePermission)) {
-            Util.debugLog("Sender " + sender.getName() + " trying tab-complete the command: "
+            Util.debug("Sender " + sender.getName() + " trying tab-complete the command: "
                 + commandLabel + ", but no permission " + requirePermission);
             return new ArrayList<>();
           }

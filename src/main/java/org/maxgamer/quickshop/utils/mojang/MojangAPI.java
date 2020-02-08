@@ -53,7 +53,7 @@ public class MojangAPI {
           return HttpRequest.get(new URL(mcv.getUrl())).execute().expectResponseCode(200)
               .returnContent().asString("UTF-8").trim();
         } catch (IOException e) {
-          Util.debugLog(e.getMessage());
+          Util.debug(e.getMessage());
           return null;
         }
       }
@@ -70,17 +70,17 @@ public class MojangAPI {
     JsonObject rootObj = new JsonParser().parse(versionJson).getAsJsonObject();
     JsonObject assetIndex = rootObj.getAsJsonObject("assetIndex");
     if (assetIndex == null) {
-      Util.debugLog("Cannot get assetIndex obj.");
+      Util.debug("Cannot get assetIndex obj.");
       return null;
     }
     JsonPrimitive urlObj = assetIndex.getAsJsonPrimitive("url");
     if (urlObj == null) {
-      Util.debugLog("Cannot get asset url obj.");
+      Util.debug("Cannot get asset url obj.");
       return null;
     }
     String url = urlObj.getAsString();
     if (url == null) {
-      Util.debugLog("Cannot get asset url.");
+      Util.debug("Cannot get asset url.");
       return null;
     }
     return HttpRequest.get(new URL(url)).execute().expectResponseCode(200).returnContent()

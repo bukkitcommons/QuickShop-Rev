@@ -52,18 +52,18 @@ public class SubCommand_Create implements CommandProcesser {
     }
 
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
-    Util.debugLog("Creating shop");
+    Util.debug("Creating shop");
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      Util.debugLog("Checking block for shop creation: " + b);
+      Util.debug("Checking block for shop creation: " + b);
 
       if (!Util.canBeShop(b)) {
         continue;
       }
 
       if (p.isOnline() && !QuickShop.instance().getPermissionChecker().canBuild(p, b)) {
-        Util.debugLog("Failed permission build check, canceled");
+        Util.debug("Failed permission build check, canceled");
         return;
       }
 
@@ -71,7 +71,7 @@ public class SubCommand_Create implements CommandProcesser {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.
-        Util.debugLog("Util report you can't build shop there.");
+        Util.debug("Util report you can't build shop there.");
         return;
       }
 
@@ -93,13 +93,13 @@ public class SubCommand_Create implements CommandProcesser {
 
       if (cmdArg.length >= 1) {
         ShopActionManager.instance().handleChat(p, cmdArg[0], false);
-        Util.debugLog("Created by handle chat");
+        Util.debug("Created by handle chat");
         return;
       }
 
       p.sendMessage(
           MsgUtil.getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
-      Util.debugLog("Created by wait chat");
+      Util.debug("Created by wait chat");
       return;
     }
   }

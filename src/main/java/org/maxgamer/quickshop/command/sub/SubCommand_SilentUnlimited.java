@@ -16,7 +16,7 @@ public class SubCommand_SilentUnlimited extends SneakyTabs implements CommandPro
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (cmdArg.length < 4) {
-      Util.debugLog("Exception on command, cancel.");
+      Util.debug("Exception on command, cancel.");
       return;
     }
 

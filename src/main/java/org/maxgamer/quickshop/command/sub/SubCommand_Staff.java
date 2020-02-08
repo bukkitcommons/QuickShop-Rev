@@ -45,7 +45,7 @@ public class SubCommand_Staff implements CommandProcesser {
       @NotNull String[] cmdArg) {
     final ArrayList<String> tabList = new ArrayList<>();
 
-    Util.debugLog(Util.array2String(cmdArg));
+    Util.debug(Util.array2String(cmdArg));
 
     if (cmdArg.length < 2) {
       if (cmdArg.length == 1) {
@@ -82,7 +82,7 @@ public class SubCommand_Staff implements CommandProcesser {
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
-    Util.debugLog(Util.array2String(cmdArg));
+    Util.debug(Util.array2String(cmdArg));
     if (!(sender instanceof Player)) {
       sender.sendMessage("Only player can execute this command.");
       return;
@@ -163,7 +163,7 @@ public class SubCommand_Staff implements CommandProcesser {
 
           break;
         default:
-          Util.debugLog("No any args matched");
+          Util.debug("No any args matched");
           break;
       }
     }

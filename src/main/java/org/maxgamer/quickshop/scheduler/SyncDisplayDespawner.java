@@ -24,7 +24,7 @@ public class SyncDisplayDespawner implements Runnable {
 
           if (anyPlayerInRegion) {
             if (!shop.getDisplay().isSpawned()) {
-              Util.debugLog("Respawning the shop " + shop
+              Util.debug("Respawning the shop " + shop
                   + " the display, cause it was despawned and a player close it");
               Bukkit.getScheduler().runTask(QuickShop.instance(), shop::checkDisplay);
             }
@@ -38,12 +38,12 @@ public class SyncDisplayDespawner implements Runnable {
   public boolean removeDisplayItemDelayed(Shop shop) {
     if (shop.getDisplay().isPendingRemoval()) {
       // Actually remove the pending display
-      Util.debugLog("Removing the shop " + shop + " the display, cause nobody can see it");
+      Util.debug("Removing the shop " + shop + " the display, cause nobody can see it");
       shop.getDisplay().remove();
       return true;
     } else {
       // Delayed to next calling
-      Util.debugLog("Pending to remove the shop " + shop + " the display, cause nobody can see it");
+      Util.debug("Pending to remove the shop " + shop + " the display, cause nobody can see it");
       shop.getDisplay().pendingRemoval();
       return false;
     }

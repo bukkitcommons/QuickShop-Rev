@@ -142,7 +142,7 @@ public class LockListener implements Listener {
         if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
             || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
           // Ignore break lockette sign
-          Util.debugLog("Skipped a dead-lock shop sign.(Lockette)");
+          Util.debug("Skipped a dead-lock shop sign.(Lockette)");
           return;
         }
       }

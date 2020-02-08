@@ -61,7 +61,7 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
         
         // Shop exist check
         QuickShop.instance().getServer().getScheduler().runTask(QuickShop.instance(), () -> {
-          Util.debugLog(
+          Util.debug(
               "Posted to main server thread to continue access Bukkit API for shop " + shop);
           
           if (!Util.canBeShop(shop.getLocation().getBlock())) {

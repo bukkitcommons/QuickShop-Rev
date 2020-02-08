@@ -46,28 +46,27 @@ public class ItemMatcher {
       case 1:
       case 2:
         return matchesAmount ? requireStack.equals(givenStack) : requireStack.isSimilar(givenStack);
-      default:;
+      default:
+        ;
     }
 
     if (requireStack.getType() != givenStack.getType()) {
-      Util.debugLog("Type not match.");
+      //Util.debugLog("Type not match.");
       return false;
     }
     
     if (matchesAmount && requireStack.getAmount() != givenStack.getAmount()) {
-      Util.debugLog("Amount not match.");
+      Util.debug("Amount not match.");
       return false;
     }
     
     if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
-      Util.debugLog("Meta existence not match.");
+      Util.debug("Meta existence not match.");
       return false;
     }
     
     if (requireStack.hasItemMeta()) {
-      return bukkit ?
-          requireStack.getItemMeta().equals(givenStack.getItemMeta()) :
-            matches(requireStack.getItemMeta(), givenStack.getItemMeta());
+      return matches(requireStack.getItemMeta(), givenStack.getItemMeta());
     }
     
     return true;
@@ -80,65 +79,65 @@ public class ItemMatcher {
    */
   public boolean equalsCommon(ItemMeta meta, ItemMeta that) {
     return
-        BaseConfig.displayName ?
-            ((meta.hasDisplayName() ?
+        (BaseConfig.displayName ?
+            (meta.hasDisplayName() ?
                 that.hasDisplayName() &&
                 meta.getDisplayName().equals(that.getDisplayName()) :
-                  !that.hasDisplayName()))
-        : true
+                  !that.hasDisplayName())
+        : true)
 
-        && BaseConfig.localizedName ?
+        && (BaseConfig.localizedName ?
             (meta.hasLocalizedName() ?
                 that.hasLocalizedName() &&
                 meta.getLocalizedName().equals(that.getLocalizedName()) :
                   !that.hasLocalizedName())
-           : true
+           : true)
 
-        && BaseConfig.enchant ?
+        && (BaseConfig.enchant ?
             (meta.hasEnchants() ?
                 that.hasEnchants() &&
                 meta.getEnchants().equals(that.getEnchants()) :
                   !that.hasEnchants())
-           : true
+           : true)
 
-        && BaseConfig.lore ?
+        && (BaseConfig.lore ?
             (meta.hasLore() ?
                 that.hasLore() &&
                 meta.getLore().equals(that.getLore()) :
                   !that.hasLore())
-           : true
+           : true)
 
-        && BaseConfig.repairCost ?
+        && (BaseConfig.repairCost ?
             (meta instanceof org.bukkit.inventory.meta.Repairable ?
                 that instanceof org.bukkit.inventory.meta.Repairable &&
                 ((org.bukkit.inventory.meta.Repairable) meta).getRepairCost() == ((org.bukkit.inventory.meta.Repairable) that).getRepairCost() :
                   !(that instanceof org.bukkit.inventory.meta.Repairable))
-           : true
+           : true)
 
-        && BaseConfig.attribute ?
+        && (BaseConfig.attribute ?
             (meta.hasAttributeModifiers() ?
                 that.hasAttributeModifiers() &&
                 compareModifiers(meta.getAttributeModifiers(), that.getAttributeModifiers()) :
                   !that.hasAttributeModifiers())
-           : true
+           : true)
 
-        && comparePersistentDataContainer(meta, that)
+        && (comparePersistentDataContainer(meta, that))
 
-        && BaseConfig.flag ? (meta.getItemFlags().equals(that.getItemFlags())) : true
+        && (BaseConfig.flag ? (meta.getItemFlags().equals(that.getItemFlags())) : true)
 
-        && BaseConfig.unbreakable ? (meta.isUnbreakable() == that.isUnbreakable()) : true
+        && (BaseConfig.unbreakable ? (meta.isUnbreakable() == that.isUnbreakable()) : true)
 
         // FIXME Missing NMS field: unhandledTags
         // FIXME Missing NMS field: version
         // FIXME Missing Paper API: destroyable & placeable
-        && BaseConfig.damage ?
+        && (BaseConfig.damage ?
             (meta instanceof Damageable ?
                 that instanceof Damageable &&
                 ((Damageable) meta).getDamage() == ((Damageable) that).getDamage() :
                   !(that instanceof Damageable))
-           : true
+           : true)
         
-        && compareCustomModelData(meta, that);
+        && (compareCustomModelData(meta, that));
   }
   
   public boolean compareCustomModelData(ItemMeta meta, ItemMeta that) {

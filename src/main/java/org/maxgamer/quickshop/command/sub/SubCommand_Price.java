@@ -73,7 +73,7 @@ public class SubCommand_Price implements CommandProcesser {
           price = Long.parseLong(cmdArg[0]);
         } catch (NumberFormatException ex2) {
           // input is number, but not Integer
-          Util.debugLog(ex2.getMessage());
+          Util.debug(ex2.getMessage());
           p.sendMessage(MsgUtil.getMessage("not-a-integer", p, cmdArg[0]));
           return;
         }
@@ -83,7 +83,7 @@ public class SubCommand_Price implements CommandProcesser {
 
     } catch (NumberFormatException ex) {
       // No number input
-      Util.debugLog(ex.getMessage());
+      Util.debug(ex.getMessage());
       p.sendMessage(MsgUtil.getMessage("not-a-number", p, cmdArg[0]));
       return;
     }

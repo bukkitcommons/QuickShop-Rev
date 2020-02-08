@@ -42,9 +42,9 @@ public class OngoingFeeWatcher extends BukkitRunnable {
 
   @Override
   public void run() {
-    Util.debugLog("Run task for ongoing fee...");
+    Util.debug("Run task for ongoing fee...");
     if (plugin.getEconomy() == null) {
-      Util.debugLog("Economy hadn't get ready.");
+      Util.debug("Economy hadn't get ready.");
       return;
     }
     int cost = BaseConfig.ongoingFeeCostPerShop;
@@ -80,7 +80,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
           }
         }, perTaskFlow);
       } else {
-        Util.debugLog(
+        Util.debug(
             "Shop was ignored for ongoing fee cause it is unlimited and ignoreUnlimited = true : "
                 + shop);
       }

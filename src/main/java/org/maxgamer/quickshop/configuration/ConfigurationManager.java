@@ -40,11 +40,11 @@ public class ConfigurationManager {
     if (data != null) {
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
-        Util.debugLog("rewrite: " + field.getName() + ", value " + data.conf().get(path));
+        Util.debug("rewrite: " + field.getName() + ", value " + data.conf().get(path));
         if (node.rewrite()) {
           data.conf().set(path, getStatic(field));
         }
-        Util.debugLog("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
+        Util.debug("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
       });
 
       data.conf().save(data.file());
@@ -82,10 +82,10 @@ public class ConfigurationManager {
   @SneakyThrows
   public ConfigurationData load(@NotNull Class<?> confClass) {
     Configuration filePath = confClass.getAnnotation(Configuration.class);
-    Util.debugLog("Loading configuration for " + confClass.getName());
+    Util.debug("Loading configuration for " + confClass.getName());
     
     if (filePath != null) {
-      Util.debugLog("Path of configuration " + confClass.getName() + " is " + filePath.value());
+      Util.debug("Path of configuration " + confClass.getName() + " is " + filePath.value());
       File file = createConfigurationFile(new File(parent, filePath.value()));
       YamlConfiguration conf = YamlConfiguration.loadConfiguration(file);
 
@@ -95,13 +95,13 @@ public class ConfigurationManager {
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
         Object value = conf.get(path);
-        Util.debugLog("field: " + field.getName() + ", value " + value);
+        Util.debug("field: " + field.getName() + ", value " + value);
         if (value == null) {
           value = getStatic(field);
         } else {
           setStatic(field, value);
         }
-        Util.debugLog("field: " + field.getName() + ", value (fixed) " + value);
+        Util.debug("field: " + field.getName() + ", value (fixed) " + value);
       });
 
       return data;
@@ -126,7 +126,7 @@ public class ConfigurationManager {
       }
 
       for (File parent : Lists.reverse(parents)) {
-        Util.debugLog("Making dir for parent: " + parent.getCanonicalPath());
+        Util.debug("Making dir for parent: " + parent.getCanonicalPath());
         parent.mkdir();
       }
     }

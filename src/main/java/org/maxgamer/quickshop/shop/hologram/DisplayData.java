@@ -36,14 +36,6 @@ public class DisplayData {
   private final Map<DisplayAttribute, Object> attribute = Maps.newEnumMap(DisplayAttribute.class);
   
   /**
-   * Indicates whether this data is a display fixer.
-   * A fixer menas only when the default display type matches,
-   * this data will be applied.
-   * @see BaseConfig#displayTypeId
-   */
-  private final boolean fixer;
-  
-  /**
    * Sets pose for a armor stand using the current display data
    * @param armorStand The armor stand to set pose for
    */
@@ -85,7 +77,7 @@ public class DisplayData {
     Object value = attribute.get(attr);
     if (value == ObjectUtils.NULL || value == null)
       return defaultValue;
-    Util.debugLog("Attribute to cast: " + value);
+    Util.debug("Attribute to cast: " + value);
 
     try {
       if (defaultValue instanceof EquipmentSlot) {
@@ -115,7 +107,7 @@ public class DisplayData {
    * @return The empty data
    */
   public static DisplayData create() {
-    return new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId), false);
+    return new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId));
   }
   
   /**
@@ -125,7 +117,7 @@ public class DisplayData {
    */
   public static DisplayData create(@NotNull ItemStack item) {
     try {
-      DisplayData def = new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId), false);
+      DisplayData def = new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId));
 
       YamlConfiguration conf =
           QuickShop.instance().getConfigurationManager().get(BaseConfig.class).conf();
@@ -136,7 +128,7 @@ public class DisplayData {
         
         // Return if vaildate is not need (accurate matches)
         if (dataArmourStand != null && !dataArmourStand.needVaildate)
-          return dataArmourStand.data.fixer
+          return dataArmourStand.fixer
               ? (def.type == dataArmourStand.data.type ? dataArmourStand.data : def)
               : dataArmourStand.data;
 
@@ -145,11 +137,11 @@ public class DisplayData {
         
         // Return or consider the vaildate-need data if not exists. 
         if (dataDroppedItem != null)
-          return dataDroppedItem.data.fixer
+          return dataDroppedItem.fixer
               ? (def.type == dataDroppedItem.data.type ? dataDroppedItem.data : def)
               : dataDroppedItem.data;
         else if (dataArmourStand != null)
-          return dataArmourStand.data.fixer
+          return dataArmourStand.fixer
               ? (def.type == dataArmourStand.data.type ? dataArmourStand.data : def)
               : dataArmourStand.data;
       }
@@ -157,7 +149,7 @@ public class DisplayData {
       return def;
     } catch (Throwable e) {
       e.printStackTrace();
-      return new DisplayData(DisplayType.REALITEM, false);
+      return new DisplayData(DisplayType.REALITEM);
     }
   }
   
@@ -174,6 +166,15 @@ public class DisplayData {
     
     @NotNull
     private final boolean needVaildate;
+    
+    /**
+     * Indicates whether this data is a display fixer.
+     * A fixer menas only when the default display type matches,
+     * this data will be applied.
+     * @see BaseConfig#displayTypeId
+     */
+    @NotNull
+    private final boolean fixer;
   }
   
   @Nullable
@@ -190,7 +191,7 @@ public class DisplayData {
     if (specifics instanceof List)
       return matchDataFor(specifics, item, displayType);
     else if (specifics != null)
-      Util.debugLog("Specifics Is Not A List: " + specifics);
+      Util.debug("Specifics Is Not A List: " + specifics);
     
     return null; // Handled by upstream method
   }
@@ -204,7 +205,7 @@ public class DisplayData {
     boolean needVaildate = false;
     
     for (Object o : specifics) {
-      Util.debugLog("Specific: " + o);
+      Util.debug("Specific: " + o);
       if (o instanceof Map) {
         Map<?, ?> specificMap = Map.class.cast(o);
         // <String, Map<String, ?>>
@@ -336,7 +337,7 @@ public class DisplayData {
             needVaildate = true;
           }
 
-          DisplayData data = new DisplayData(displayType, fixer);
+          DisplayData data = new DisplayData(displayType);
           
           /*
            * Loads armor stand attributes
@@ -365,7 +366,7 @@ public class DisplayData {
             }
           }
 
-          return new DisplayDataMatchesResult(data, needVaildate);
+          return new DisplayDataMatchesResult(data, needVaildate, fixer);
         }
       }
     }

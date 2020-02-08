@@ -18,7 +18,7 @@ public class SubCommand_SilentSell extends SneakyTabs implements CommandProcesse
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (cmdArg.length < 4) {
-      Util.debugLog("Exception on command, cancel.");
+      Util.debug("Exception on command, cancel.");
       return;
     }
 

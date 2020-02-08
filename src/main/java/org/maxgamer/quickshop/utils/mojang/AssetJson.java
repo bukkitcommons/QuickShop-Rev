@@ -23,28 +23,28 @@ public class AssetJson {
     languageCode = languageCode.replace("-", "_").toLowerCase().trim();
     JsonObject json = new JsonParser().parse(this.gameAssets).getAsJsonObject();
     if (json == null || json.isJsonNull()) {
-      Util.debugLog("Cannot parse the json: " + this.gameAssets);
+      Util.debug("Cannot parse the json: " + this.gameAssets);
       return null;
     }
     JsonElement obje = json.get("objects");
     if (obje == null) {
-      Util.debugLog("Json element is null for json " + this.gameAssets);
+      Util.debug("Json element is null for json " + this.gameAssets);
       return null;
     }
     JsonObject objs = obje.getAsJsonObject();
     if (objs == null || objs.isJsonNull()) {
-      Util.debugLog("Json object is null.");
+      Util.debug("Json object is null.");
       return null;
     }
     JsonObject langObj = objs.getAsJsonObject(MsgUtil.fillArgs(pathTemplate, languageCode));
     if (langObj == null || langObj.isJsonNull()) {
-      Util.debugLog("Cannot find request path.");
-      Util.debugLog(this.gameAssets);
+      Util.debug("Cannot find request path.");
+      Util.debug(this.gameAssets);
       return null;
     }
     JsonPrimitive hashObj = langObj.getAsJsonPrimitive("hash");
     if (hashObj == null || hashObj.isJsonNull()) {
-      Util.debugLog("Cannot get hash.");
+      Util.debug("Cannot get hash.");
       return null;
     }
     return hashObj.getAsString();

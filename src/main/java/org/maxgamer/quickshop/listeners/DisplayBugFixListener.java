@@ -54,7 +54,7 @@ public class DisplayBugFixListener implements Listener {
       }
 
       e.setBuildable(true);
-      Util.debugLog(
+      Util.debug(
           "Re-set the allowed build flag here because it found the cause of the display-item blocking it before.");
       return;
     }

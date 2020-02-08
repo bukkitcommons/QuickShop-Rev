@@ -26,34 +26,28 @@ public class SQLiteConnector implements DatabaseConnector {
   public Connection getConnection() {
     try {
       // If we have a current connection, fetch it
-      if (this.connection != null && !this.connection.isClosed()) {
+      if (connection != null && !connection.isClosed())
         return this.connection;
-      }
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    if (this.dbFile.exists()) {
-      // So we need a new connection
-      try {
-        Class.forName("org.sqlite.JDBC");
-        this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.dbFile);
-        return this.connection;
-      } catch (ClassNotFoundException | SQLException e) {
-        e.printStackTrace();
-        return null;
-      }
-    } else {
-      // So we need a new file too.
+    
+    if (!this.dbFile.exists()) {
       try {
         // Create the file
         this.dbFile.createNewFile();
-        // Now we won't need a new file, just a connection.
-        // This will return that new connection.
-        return this.getConnection();
       } catch (IOException e) {
         e.printStackTrace();
-        return null;
+        return getConnection();
       }
+    }
+
+    try {
+      Class.forName("org.sqlite.JDBC");
+      return (connection = DriverManager.getConnection("jdbc:sqlite:" + dbFile));
+    } catch (ClassNotFoundException | SQLException e) {
+      e.printStackTrace();
+      return null;
     }
   }
 }

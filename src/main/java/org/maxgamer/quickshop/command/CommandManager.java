@@ -160,7 +160,7 @@ public class CommandManager implements TabCompleter, CommandExecutor {
       System.arraycopy(cmdArg, 1, passthroughArgs, 0, passthroughArgs.length);
     } else {
       passthroughArgs = new String[0];
-      Util.debugLog("Print help cause no args (/qs)");
+      Util.debug("Print help cause no args (/qs)");
       rootContainer.getExecutor().onCommand(sender, commandLabel, passthroughArgs);
       return true;
     }
@@ -176,7 +176,7 @@ public class CommandManager implements TabCompleter, CommandExecutor {
 
           if (requirePermission != null && !requirePermission.isEmpty()
               && !QuickShop.getPermissionManager().hasPermission(sender, requirePermission)) {
-            Util.debugLog(
+            Util.debug(
                 "Sender " + sender.getName() + " trying execute the command: " + commandLabel + " "
                     + Util.array2String(cmdArg) + ", but no permission " + requirePermission);
             sender.sendMessage(MsgUtil.getMessage("no-permission", sender));
@@ -184,11 +184,11 @@ public class CommandManager implements TabCompleter, CommandExecutor {
           }
         }
       }
-      Util.debugLog("Execute container: " + container.getPrefix() + " - " + cmdArg[0]);
+      Util.debug("Execute container: " + container.getPrefix() + " - " + cmdArg[0]);
       container.getExecutor().onCommand(sender, commandLabel, passthroughArgs);
       return true;
     }
-    Util.debugLog("All checks failed, print helps");
+    Util.debug("All checks failed, print helps");
     rootContainer.getExecutor().onCommand(sender, commandLabel, passthroughArgs);
     return true;
   }
@@ -223,14 +223,14 @@ public class CommandManager implements TabCompleter, CommandExecutor {
         for (String requirePermission : requirePermissions) {
           if (requirePermission != null && !requirePermission.isEmpty()
               && !QuickShop.getPermissionManager().hasPermission(sender, requirePermission)) {
-            Util.debugLog(
+            Util.debug(
                 "Sender " + sender.getName() + " trying tab-complete the command: " + commandLabel
                     + " " + Util.array2String(cmdArg) + ", but no permission " + requirePermission);
             return null;
           }
         }
       }
-      Util.debugLog("Execute container: " + container.getPrefix());
+      Util.debug("Execute container: " + container.getPrefix());
       return container.getExecutor().onTabComplete(sender, commandLabel, passthroughArgs);
     }
 

@@ -9,7 +9,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
@@ -26,12 +25,8 @@ import org.maxgamer.quickshop.utils.Util;
 
 @ToString
 public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayItem {
-  @NotNull
-  private DisplayData data;
-
   public ArmorStandDisplayItem(@NotNull Shop shop, @NotNull DisplayData data) {
-    super(shop);
-    this.data = data;
+    super(shop, data);
   }
 
   @Override
@@ -46,86 +41,62 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
   @Override
   public void spawn() {
     if (shop.getLocation().getWorld() == null) {
-      Util.debugLog("Canceled the displayItem spawning because the location in the world is null.");
+      Util.debug("Canceled the displayItem spawning because the location in the world is null.");
       return;
     }
 
     if (originalItemStack == null) {
-      Util.debugLog("Canceled the displayItem spawning because the ItemStack is null.");
+      Util.debug("Canceled the displayItem spawning because the ItemStack is null.");
       return;
     }
 
-    synchronized (this) {
-      if (entity != null && entity.isValid() && !entity.isDead()) {
-        Util.debugLog(
-            "Warning: Spawning the armorStand for DisplayItem when there is already an existing armorStand may cause a duplicated armorStand!");
-        StackTraceElement[] traces = Thread.currentThread().getStackTrace();
-        for (StackTraceElement trace : traces) {
-          Util.debugLog(
-              trace.getClassName() + "#" + trace.getMethodName() + "#" + trace.getLineNumber());
-        }
-      }
-
-      ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-          new ShopDisplayItemSpawnEvent(shop, originalItemStack, data);
-      Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
-      if (shopDisplayItemSpawnEvent.isCancelled()) {
-        Util.debugLog(
-            "Canceled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
-        return;
-      }
-
-      Location location = getDisplayLocation();
-      this.entity = (ArmorStand) this.shop.getLocation().getWorld().spawn(location,
-          ArmorStand.class, armorStand -> {
-            // Set basic armorstand datas.
-            armorStand.setGravity(false);
-            armorStand.setVisible(false);
-            armorStand.setMarker(true);
-            armorStand.setCollidable(false);
-            armorStand.setSmall(data.get(DisplayAttribute.SMALL, true));
-            armorStand.setArms(false);
-            armorStand.setBasePlate(false);
-            armorStand.setSilent(true);
-            armorStand.setAI(false);
-            armorStand.setCanMove(false);
-            armorStand.setCanPickupItems(false);
-            // Set pose
-            data.setPoseForArmorStand(armorStand);
-          });
-      // Set safeGuard
-      Util.debugLog("Spawned armor stand @ " + this.entity.getLocation() + " with UUID "
-          + this.entity.getUniqueId());
-      safeGuard(this.entity); // Helmet must be set after spawning
-    }
-  }
-
-  @Override
-  public boolean removeDupe() {
-    if (this.entity == null) {
-      Util.debugLog("Warning: Trying to removeDupe for a null display shop.");
-      return false;
-    }
-    boolean removed = false;
-    for (Entity entity : entity.getNearbyEntities(1.5, 1.5, 1.5)) {
-      if (entity.getType() != EntityType.ARMOR_STAND) {
-        continue;
-      }
-      ArmorStand eArmorStand = (ArmorStand) entity;
-      if (DisplayItem.isDisplayItem(eArmorStand.getItem(EquipmentSlot.valueOf(data.get(DisplayAttribute.SLOT, "HEAD"))), this.shop)) {
-        Util.debugLog("Removing dupes ArmorEntity " + eArmorStand.getUniqueId() + " at "
-            + eArmorStand.getLocation());
-        entity.remove();
-        removed = true;
+    if (entity != null && entity.isValid() && !entity.isDead()) {
+      Util.debug(
+          "Warning: Spawning the armorStand for DisplayItem when there is already an existing armorStand may cause a duplicated armorStand!");
+      StackTraceElement[] traces = Thread.currentThread().getStackTrace();
+      for (StackTraceElement trace : traces) {
+        Util.debug(
+            trace.getClassName() + "#" + trace.getMethodName() + "#" + trace.getLineNumber());
       }
     }
-    return removed;
+
+    ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
+        new ShopDisplayItemSpawnEvent(shop, originalItemStack, data);
+    Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
+    if (shopDisplayItemSpawnEvent.isCancelled()) {
+      Util.debug(
+          "Canceled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
+      return;
+    }
+
+    Location location = getDisplayLocation();
+    this.entity = (ArmorStand) this.shop.getLocation().getWorld().spawn(location,
+        ArmorStand.class, armorStand -> {
+          // Set basic armorstand datas.
+          armorStand.setGravity(false);
+          armorStand.setVisible(false);
+          armorStand.setMarker(true);
+          armorStand.setCollidable(false);
+          armorStand.setSmall(data.get(DisplayAttribute.SMALL, true));
+          armorStand.setArms(false);
+          armorStand.setBasePlate(false);
+          armorStand.setSilent(true);
+          armorStand.setAI(false);
+          armorStand.setCanMove(false);
+          armorStand.setCanPickupItems(false);
+          // Set pose
+          data.setPoseForArmorStand(armorStand);
+        });
+    // Set safeGuard
+    Util.debug("Spawned armor stand @ " + this.entity.getLocation() + " with UUID "
+        + this.entity.getUniqueId());
+    safeGuard(this.entity); // Helmet must be set after spawning
   }
 
   @Override
   public void safeGuard(@NotNull Entity entity) {
     if (!(entity instanceof ArmorStand)) {
-      Util.debugLog(
+      Util.debug(
           "Failed to safeGuard " + entity.getLocation() + ", cause target not a ArmorStand");
       return;
     }
@@ -180,7 +151,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     }
 
     Location asloc = Util.getCenter(this.shop.getLocation());
-    Util.debugLog("containerBlockFace " + containerBlockFace);
+    Util.debug("containerBlockFace " + containerBlockFace);
 
     if (this.originalItemStack.getType().isBlock()) {
       asloc.add(0, 0.5, 0);
@@ -190,22 +161,22 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
       case SOUTH:
         asloc.add(0, -0.5, 0);
         asloc.setYaw(0);
-        Util.debugLog("Block face as SOUTH");
+        Util.debug("Block face as SOUTH");
         break;
       case WEST:
         asloc.add(0, -0.5, 0);
         asloc.setYaw(90);
-        Util.debugLog("Block face as WEST");
+        Util.debug("Block face as WEST");
         break;
       case EAST:
         asloc.add(0, -0.5, 0);
         asloc.setYaw(-90);
-        Util.debugLog("Block face as EAST");
+        Util.debug("Block face as EAST");
         break;
       case NORTH:
         asloc.add(0, -0.5, 0);
         asloc.setYaw(180);
-        Util.debugLog("Block face as NORTH");
+        Util.debug("Block face as NORTH");
         break;
       default:
         break;
