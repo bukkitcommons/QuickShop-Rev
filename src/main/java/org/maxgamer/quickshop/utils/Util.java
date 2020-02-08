@@ -77,6 +77,7 @@ import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -98,10 +99,10 @@ public class Util {
   private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
   
-  public static Location getCenter(Location loc) {
+  public static Location getCenter(@NotNull ShopLocation shopLocation) {
     // This is always '+' instead of '-' even in negative pos
-    return new Location(loc.getWorld(), loc.getBlockX() + .5, loc.getBlockY() + .5,
-        loc.getBlockZ() + .5);
+    return new Location(shopLocation.world(), shopLocation.x() + .5, shopLocation.y() + .5,
+        shopLocation.z() + .5);
   }
 
   /**
@@ -128,8 +129,12 @@ public class Util {
     return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
   }
   
-  public static long blockKey(Location location) {
-    return blockKey(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+  public static long blockKey(@NotNull ShopLocation loc) {
+    return blockKey(loc.x(), loc.y(), loc.z());
+  }
+  
+  public static Object blockKey(Location loc) {
+    return blockKey(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
   }
 
   /**
@@ -590,7 +595,7 @@ public class Util {
     Iterator<Shop> iterator = ShopLoader.instance().getShopIterator();
     while (iterator.hasNext()) {
       Shop shop = iterator.next();
-      if (Objects.requireNonNull(shop.getLocation().getWorld()).getName().equals(worldName)) {
+      if (Objects.requireNonNull(shop.getLocation().world()).getName().equals(worldName)) {
         cost++;
       }
     }
@@ -844,6 +849,13 @@ public class Util {
     int chunkZ = location.getBlockZ() >> 4;
     
     return location.getWorld().isChunkLoaded(chunkX, chunkZ);
+  }
+  
+  public static boolean isChunkLoaded(@NotNull ShopLocation location) {
+    int chunkX = location.x() >> 4;
+    int chunkZ = location.y() >> 4;
+    
+    return location.world().isChunkLoaded(chunkX, chunkZ);
   }
 
   /**

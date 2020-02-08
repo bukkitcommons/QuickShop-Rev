@@ -19,6 +19,7 @@ import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -89,7 +90,7 @@ public class SubCommand_Create implements CommandProcesser {
 
       // Send creation menu.
       ShopActionManager.instance().setAction(p.getUniqueId(),
-          new ShopCreator(b.getLocation(), item, b.getRelative(p.getFacing().getOppositeFace())));
+          new ShopCreator(new ShopLocation(b.getLocation()), item, b.getRelative(p.getFacing().getOppositeFace())));
 
       if (cmdArg.length >= 1) {
         ShopActionManager.instance().handleChat(p, cmdArg[0], false);

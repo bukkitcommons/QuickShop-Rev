@@ -14,7 +14,7 @@ import org.maxgamer.quickshop.utils.ItemMatcher;
 @Accessors(fluent = true)
 public class ShopSnapshot implements ShopData {
   private final ItemStack item;
-  private final Location location;
+  private final ShopLocation location;
   private final ShopModerator moderator;
   private final double price;
   private final ShopType shopType;

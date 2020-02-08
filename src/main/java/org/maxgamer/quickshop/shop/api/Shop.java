@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 
 public interface Shop extends Managed {
@@ -153,7 +154,7 @@ public interface Shop extends Managed {
    * @return Shop's location
    */
   @NotNull
-  Location getLocation();
+  ShopLocation getLocation();
 
   /**
    * Get shop's price

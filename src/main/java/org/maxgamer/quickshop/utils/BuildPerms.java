@@ -13,17 +13,18 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ProtectionCheckStatus;
 import org.maxgamer.quickshop.event.ShopProtectionCheckEvent;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 
 public class BuildPerms {
   /**
    * Check player can build in target location
    *
    * @param player Target player
-   * @param location Target location
+   * @param shopLocation Target location
    * @return Success
    */
-  public boolean canBuild(@NotNull Player player, @NotNull Location location) {
-    return canBuild(player, location.getBlock());
+  public boolean canBuild(@NotNull Player player, @NotNull ShopLocation shopLocation) {
+    return canBuild(player, shopLocation.block());
   }
 
   /**

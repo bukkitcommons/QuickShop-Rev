@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.event.ShopCreateEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
@@ -66,13 +67,13 @@ public class ShopManager {
     if (shop.isLoaded())
       return;
     
-    Location location = shop.getLocation();
+    @NotNull ShopLocation location = shop.getLocation();
     
     Map<Long, Map<Long, Shop>> inWorld =
-        loadedShops.computeIfAbsent(location.getWorld().getName(), s -> new HashMap<>(3));
+        loadedShops.computeIfAbsent(location.worldName(), s -> new HashMap<>(3));
     
     Map<Long, Shop> inChunk =
-        inWorld.computeIfAbsent(Util.chunkKey(location.getBlockX() >> 4, location.getBlockZ() >> 4), s -> Maps.newHashMap());
+        inWorld.computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4), s -> Maps.newHashMap());
     
     inChunk.put(Util.blockKey(location), shop);
     shop.onLoad();
@@ -179,7 +180,7 @@ public class ShopManager {
         }
       }
       
-      BlockFace chestFace = info.location().getBlock().getFace(info.sign());
+      BlockFace chestFace = info.location().block().getFace(info.sign());
       assert chestFace != null;
       
       try {
@@ -198,7 +199,7 @@ public class ShopManager {
       shop.setSignText();
     }
     
-    Location location = shop.getLocation();
+    @NotNull ShopLocation location = shop.getLocation();
     try {
       QuickShop
         .instance()
@@ -206,20 +207,20 @@ public class ShopManager {
         .createShop(shop.getModerator().serialize(),
                     shop.getPrice(), shop.getItem(),
                     shop.isUnlimited() ? 1 : 0, shop.getShopType().toID(),
-                    location.getWorld().getName(),
-                    location.getBlockX(), location.getBlockY(), location.getBlockZ());
+                    location.world().getName(),
+                    location.x(), location.y(), location.z());
       
       Map<Long, Shop> inChunk =
           ShopLoader
             .instance()
             .getAllShops()
-            .computeIfAbsent(location.getWorld().getName(),
+            .computeIfAbsent(location.world().getName(),
                 s -> new HashMap<>(3))
-            .computeIfAbsent(Util.chunkKey(location.getBlockX() >> 4, location.getBlockZ() >> 4),
+            .computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4),
                 s -> Maps.newHashMap());
       
       inChunk.put(Util.blockKey(
-          location.getBlockX(), location.getBlockY(), location.getBlockZ()), shop);
+          location.x(), location.y(), location.z()), shop);
       
       load(shop);
     } catch (SQLException error) {
@@ -227,8 +228,8 @@ public class ShopManager {
       boolean backupSuccess = Util.backupDatabase();
       try {
         if (backupSuccess) {
-          QuickShop.instance().getDatabaseHelper().deleteShop(location.getBlockX(), location.getBlockY(), location.getBlockZ(),
-              location.getWorld().getName());
+          QuickShop.instance().getDatabaseHelper().deleteShop(location.x(), location.y(), location.z(),
+              location.worldName());
         } else {
           ShopLogger.instance()
           .warning("Failed to backup the database, all changes will revert after a reboot.");
@@ -260,12 +261,28 @@ public class ShopManager {
    * @param loc The location to get the shop from
    * @return The shop at that location
    */
-  public ShopViewer getLoadedShopAt(@NotNull Location loc) {
+  public ShopViewer getLoadedShopAt(@NotNull ShopLocation loc) {
+    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
+    if (inChunk == null)
+      return ShopViewer.empty();
+    
+    return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
+  }
+  
+  public ShopViewer getLoadedShopAt(Location loc) {
     @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
     if (inChunk == null)
       return ShopViewer.empty();
     
     return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
+  }
+  
+  public boolean hasLoadedShopAt(@NotNull ShopLocation loc) {
+    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
+    if (inChunk == null)
+      return false;
+    
+    return inChunk.containsKey(Util.blockKey(loc));
   }
   
   public boolean hasLoadedShopAt(@NotNull Location loc) {
@@ -276,8 +293,8 @@ public class ShopManager {
     return inChunk.containsKey(Util.blockKey(loc));
   }
 
-  public void acceptLoaded(@NotNull Location loc, @NotNull Consumer<Shop> consumer) {
-    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.getChunk());
+  public void acceptLoaded(@NotNull ShopLocation loc, @NotNull Consumer<Shop> consumer) {
+    @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
     
     if (inChunk != null) {
       Shop shop = inChunk.get(Util.blockKey(loc));
@@ -341,14 +358,14 @@ public class ShopManager {
     if (!shop.isLoaded())
       return;
     
-    Location location = shop.getLocation();
+    @NotNull ShopLocation location = shop.getLocation();
     
     Map<Long, Map<Long, Shop>> inWorld =
-        loadedShops.get(location.getWorld().getName());
+        loadedShops.get(location.worldName());
     
     if (inWorld != null) {
       Map<Long, Shop> inChunk =
-          inWorld.get(Util.chunkKey(location.getBlockX() >> 4, location.getBlockZ() >> 4));
+          inWorld.get(Util.chunkKey(location.x() >> 4, location.z() >> 4));
       
       if (inChunk != null)
         inChunk.remove(Util.blockKey(location));
@@ -386,7 +403,7 @@ public class ShopManager {
    */
   public @NotNull List<Shop> getShopsInWorld(@NotNull World world) {
     return ShopLoader.instance().getAllShop().stream()
-        .filter(shop -> Objects.equals(shop.getLocation().getWorld(), world))
+        .filter(shop -> Objects.equals(shop.getLocation().world(), world))
         .collect(Collectors.toList());
   }
 }

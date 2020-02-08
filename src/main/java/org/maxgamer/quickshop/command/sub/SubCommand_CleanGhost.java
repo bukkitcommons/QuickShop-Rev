@@ -45,7 +45,7 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
           continue;
         }
         
-        if (shop.getLocation().getWorld() == null) {
+        if (shop.getLocation().world() == null) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause target world not loaded.");
           ShopLoader.instance().delete(shop);
@@ -64,7 +64,7 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
           Util.debug(
               "Posted to main server thread to continue access Bukkit API for shop " + shop);
           
-          if (!Util.canBeShop(shop.getLocation().getBlock())) {
+          if (!Util.canBeShop(shop.getLocation().block())) {
             sender.sendMessage(ChatColor.YELLOW + "Shop " + shop
                 + " removing cause target location nolonger is a shop or disallow create the shop.");
             ShopLoader.instance().delete(shop);

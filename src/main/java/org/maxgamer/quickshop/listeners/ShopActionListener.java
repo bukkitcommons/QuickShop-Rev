@@ -27,6 +27,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.event.ShopLoadEvent;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -34,6 +35,7 @@ import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
 import org.maxgamer.quickshop.shop.api.data.ShopData;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -63,7 +65,7 @@ public class ShopActionListener implements Listener {
       .filter(shop -> BaseConfig.clickSound)
       .accept(shop -> {
         e.getPlayer().playSound(
-            shop.getLocation(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
+            shop.getLocation().bukkit(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
       });
     
     /*
@@ -206,7 +208,7 @@ public class ShopActionListener implements Listener {
           last = n;
         }
         // Send creation menu.
-        final ShopCreator info = new ShopCreator(block.getLocation(), e.getItem(), last);
+        final ShopCreator info = new ShopCreator(new ShopLocation(block.getLocation()), e.getItem(), last);
 
         ShopActionManager.instance().getActions().put(player.getUniqueId(), info);
         player.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", player,
@@ -249,7 +251,7 @@ public class ShopActionListener implements Listener {
     if (info == null)
       return;
 
-    final Location shopLoc = info.location();
+    final Location shopLoc = info.location().bukkit();
 
     if (shopLoc.getWorld() != to.getWorld() || shopLoc.distanceSquared(to) > 25) {
       if (info.action() == ShopAction.CREATE)

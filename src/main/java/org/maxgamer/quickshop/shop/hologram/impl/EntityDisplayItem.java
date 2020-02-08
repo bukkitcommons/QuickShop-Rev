@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.shop.hologram.impl;
 import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.event.ShopDisplayItemDespawnEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.hologram.DisplayAttribute;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
@@ -18,18 +20,23 @@ import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.DisplayType;
 import org.maxgamer.quickshop.utils.Util;
 
-@Getter
 @ToString
 @Accessors(fluent = true)
 public abstract class EntityDisplayItem implements DisplayItem {
+  @Getter
   @Nullable
-  protected volatile Entity entity;
+  protected Entity entity;
+  
+  @Getter
   @NotNull
   protected Shop shop;
+  @Getter
   @NotNull
   protected DisplayData data;
   @NotNull
   protected ItemStack displayItemStack;
+  @Nullable
+  protected Location location;
   
   protected boolean pendingRemoval;
   
@@ -66,13 +73,13 @@ public abstract class EntityDisplayItem implements DisplayItem {
   
   @Override
   public void fixPosition() {
-    if (this.entity == null)
+    if (entity == null)
       return;
     
-    if (!this.entity.isValid() || this.entity.isDead())
+    if (!entity.isValid() || this.entity.isDead()) {
       respawn();
-    else {
-      Location location = this.getDisplayLocation();
+    } else {
+      Location location = getDisplayLocation();
       boolean fix = data.type() == DisplayType.REALITEM ?
           entity.getLocation().distance(location) > 0.6 :
           entity.getLocation().equals(location);
@@ -111,7 +118,6 @@ public abstract class EntityDisplayItem implements DisplayItem {
   public synchronized boolean isSpawned() {
     return this.entity == null ? false : this.entity.isValid();
   }
-  
 
   @Override
   public void remove() {
@@ -120,6 +126,9 @@ public abstract class EntityDisplayItem implements DisplayItem {
     
     this.entity.remove();
     this.entity = null;
-    this.displayItemStack = null;
+    
+    ShopDisplayItemDespawnEvent shopDisplayItemDespawnEvent =
+        new ShopDisplayItemDespawnEvent(this.shop, displayItemStack, data.type());
+    Bukkit.getPluginManager().callEvent(shopDisplayItemDespawnEvent);
   }
 }

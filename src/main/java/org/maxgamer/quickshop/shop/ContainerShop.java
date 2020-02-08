@@ -2,7 +2,6 @@ package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Lists;
 import com.lishid.openinv.OpenInv;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,13 +27,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.checkerframework.checker.units.qual.s;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopClickEvent;
-import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.event.ShopLoadEvent;
 import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
 import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
@@ -45,6 +42,7 @@ import org.maxgamer.quickshop.shop.api.Managed;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
@@ -63,7 +61,7 @@ public class ContainerShop implements Shop, Managed {
   @NotNull
   private final ItemStack item;
   @NotNull
-  private final Location location;
+  private final ShopLocation location;
   @Nullable
   private EntityDisplayItem displayItem;
   
@@ -89,7 +87,7 @@ public class ContainerShop implements Shop, Managed {
   /**
    * Adds a new shop.
    *
-   * @param location The location of the chest block
+   * @param shopLocation The location of the chest block
    * @param price The cost per item
    * @param item The itemstack with the properties we want. This is .cloned, no need to worry about
    *        references
@@ -97,9 +95,9 @@ public class ContainerShop implements Shop, Managed {
    * @param type The shop type
    * @param unlimited The unlimited
    */
-  public ContainerShop(@NotNull Location location, double price, @NotNull ItemStack item,
+  public ContainerShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
-    this.location = location;
+    this.location = new ShopLocation(shopLocation.worldName(), shopLocation.x(), shopLocation.y(), shopLocation.z());
     this.price = price;
     this.moderator = moderator;
     this.item = item;
@@ -215,10 +213,10 @@ public class ContainerShop implements Shop, Managed {
                   unlimited ? 1 : 0,
                   shopType.toID(),
                   price,
-                  location.getBlockX(),
-                  location.getBlockY(),
-                  location.getBlockZ(),
-                  location.getWorld().getName());
+                  location.x(),
+                  location.y(),
+                  location.z(),
+                  location.world().getName());
       
     } catch (Throwable t) {
       ShopLogger.instance().severe(
@@ -328,9 +326,7 @@ public class ContainerShop implements Shop, Managed {
       this.displayItem.fixPosition();
     }
 
-    /* Dupe is always need check, if enabled display */
     this.displayItem.removeDupe();
-    // plugin.getDisplayDupeRemoverWatcher().add(this.displayItem);
   }
 
   /**
@@ -341,9 +337,9 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public void remove(@NotNull ItemStack item, int amount) {
-    if (this.unlimited) {
+    if (this.unlimited)
       return;
-    }
+    
     Inventory inv = this.getInventory();
     int remains = amount;
     while (remains > 0) {
@@ -430,7 +426,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Nullable
   public ContainerShop getAttachedShop() {
-    Optional<Location> c = Util.getSecondHalf(this.getLocation().getBlock());
+    Optional<Location> c = Util.getSecondHalf(location.block());
     if (!c.isPresent()) {
       return null;
     }
@@ -441,7 +437,7 @@ public class ContainerShop implements Shop, Managed {
   /** @return The chest this shop is based on. */
   public @Nullable Inventory getInventory() {
     try {
-      if (location.getBlock().getState().getType() == Material.ENDER_CHEST
+      if (location.block().getState().getType() == Material.ENDER_CHEST
           && QuickShop.instance().getOpenInvPlugin() != null) {
         OpenInv openInv = ((OpenInv) QuickShop.instance().getOpenInvPlugin());
         return openInv.getSpecialEnderChest(
@@ -455,7 +451,7 @@ public class ContainerShop implements Shop, Managed {
     }
     InventoryHolder container;
     try {
-      container = (InventoryHolder) this.location.getBlock().getState();
+      container = (InventoryHolder) location.block().getState();
       return container.getInventory();
     } catch (Exception e) {
       ShopLoader.instance().delete(this);
@@ -505,8 +501,8 @@ public class ContainerShop implements Shop, Managed {
   /** Updates signs attached to the shop */
   @Override
   public void setSignText() {
-    if (!Util.isChunkLoaded(this.location)) // FIXME check
-      return;
+    //if (!Util.isChunkLoaded(location)) // FIXME
+    //  return;
     
     String[] lines = new String[4];
     
@@ -543,8 +539,8 @@ public class ContainerShop implements Shop, Managed {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder("Shop "
-        + (location.getWorld() == null ? "unloaded world" : location.getWorld().getName()) + "("
-        + location.getBlockX() + ", " + location.getBlockY() + ", " + location.getBlockZ() + ")");
+        + (location.world() == null ? "unloaded world" : location.world().getName()) + "("
+        + location.x() + ", " + location.y() + ", " + location.z() + ")");
     sb.append(" Owner: ").append(this.ownerName()).append(" - ").append(getOwner());
     if (isUnlimited()) {
       sb.append(" Unlimited: true");
@@ -565,7 +561,7 @@ public class ContainerShop implements Shop, Managed {
   @NotNull
   @Override
   public List<Sign> getShopSigns() {
-    if (this.getLocation().getWorld() == null)
+    if (this.getLocation().world() == null)
       return Collections.emptyList();
     
     OfflinePlayer player = Bukkit.getOfflinePlayer(this.getOwner());
@@ -574,7 +570,7 @@ public class ContainerShop implements Shop, Managed {
     
     List<Sign> signs = Lists.newArrayListWithCapacity(4);
 
-    Block chest = location.getBlock();
+    Block chest = location.block();
     for (BlockFace face : SIGN_FACES) {
       Block block = chest.getRelative(face);
       
@@ -626,7 +622,7 @@ public class ContainerShop implements Shop, Managed {
    * @return true if create on double chest.
    */
   public boolean isDoubleChestShop() {
-    return Util.isDoubleChest(this.getLocation().getBlock());
+    return Util.isDoubleChest(this.getLocation().block());
   }
 
   /**
@@ -637,7 +633,7 @@ public class ContainerShop implements Shop, Managed {
   @Override
   public boolean isValid() {
     this.checkDisplay();
-    return Util.canBeShop(this.getLocation().getBlock());
+    return Util.canBeShop(this.getLocation().block());
   }
 
   @Override
@@ -650,7 +646,7 @@ public class ContainerShop implements Shop, Managed {
     if (!this.isLoaded) {
       return;
     }
-    if (!Util.canBeShop(this.getLocation().getBlock())) {
+    if (!Util.canBeShop(this.getLocation().block())) {
       Util.debug("Shop at " + this.getLocation() + " container was missing, remove...");
       ShopManager.instance().unload(this);
     }
@@ -716,7 +712,6 @@ public class ContainerShop implements Shop, Managed {
     }
     return name;
   }
-  
   
   /*
    * Shop Moderator

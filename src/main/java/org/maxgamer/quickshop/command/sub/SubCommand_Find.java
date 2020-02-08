@@ -100,12 +100,12 @@ public class SubCommand_Find implements CommandProcesser {
             continue;
           }
 
-          if (shop.getLocation().distanceSquared(loc) >= minDistanceSquared) {
+          if (shop.getLocation().bukkit().distanceSquared(loc) >= minDistanceSquared) {
             continue;
           }
 
           closest = shop;
-          minDistanceSquared = shop.getLocation().distanceSquared(loc);
+          minDistanceSquared = shop.getLocation().bukkit().distanceSquared(loc);
         }
       }
     }
@@ -115,7 +115,7 @@ public class SubCommand_Find implements CommandProcesser {
       return;
     }
 
-    final Location lookat = closest.getLocation().clone().add(0.5, 0.5, 0.5);
+    final Location lookat = closest.getLocation().bukkit().clone().add(0.5, 0.5, 0.5);
     // Hack fix to make /qs find not used by /back
     plugin.getBukkitAPIWrapper().teleportEntity(p, Util.lookAt(loc, lookat).add(0, -1.62, 0),
         PlayerTeleportEvent.TeleportCause.UNKNOWN);

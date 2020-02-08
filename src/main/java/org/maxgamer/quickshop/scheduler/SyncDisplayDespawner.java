@@ -19,8 +19,8 @@ public class SyncDisplayDespawner implements Runnable {
         .filter(shop -> shop.getDisplay() != null).forEach(shop -> {
           // Check the range has player?
           boolean anyPlayerInRegion = Bukkit.getOnlinePlayers().stream()
-              .filter(player -> player.getWorld() == shop.getLocation().getWorld())
-              .anyMatch(player -> player.getLocation().distance(shop.getLocation()) < range);
+              .filter(player -> player.getWorld() == shop.getLocation().world())
+              .anyMatch(player -> player.getLocation().distance(shop.getLocation().bukkit()) < range);
 
           if (anyPlayerInRegion) {
             if (!shop.getDisplay().isSpawned()) {

@@ -471,10 +471,10 @@ public class MsgUtil {
           MsgUtil.getMessage("controlpanel.unlimited", sender, translateBoolean(shop.isUnlimited()));
       String hoverText = MsgUtil.getMessage("controlpanel.unlimited-hover", sender);
       String clickCommand = MsgUtil.getMessage("controlpanel.commands.unlimited", sender,
-          Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-          String.valueOf(shop.getLocation().getBlockX()),
-          String.valueOf(shop.getLocation().getBlockY()),
-          String.valueOf(shop.getLocation().getBlockZ()));
+          shop.getLocation().worldName(),
+          String.valueOf(shop.getLocation().x()),
+          String.valueOf(shop.getLocation().y()),
+          String.valueOf(shop.getLocation().z()));
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Buying/Selling Mode
@@ -484,19 +484,19 @@ public class MsgUtil {
         String text = MsgUtil.getMessage("controlpanel.mode-selling", sender);
         String hoverText = MsgUtil.getMessage("controlpanel.mode-selling-hover", sender);
         String clickCommand = MsgUtil.getMessage("controlpanel.commands.buy", sender,
-            Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-            String.valueOf(shop.getLocation().getBlockX()),
-            String.valueOf(shop.getLocation().getBlockY()),
-            String.valueOf(shop.getLocation().getBlockZ()));
+            shop.getLocation().worldName(),
+            String.valueOf(shop.getLocation().x()),
+            String.valueOf(shop.getLocation().y()),
+            String.valueOf(shop.getLocation().z()));
         chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
       } else {
         String text = MsgUtil.getMessage("controlpanel.mode-buying", sender);
         String hoverText = MsgUtil.getMessage("controlpanel.mode-buying-hover", sender);
         String clickCommand = MsgUtil.getMessage("controlpanel.commands.sell", sender,
-            Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-            String.valueOf(shop.getLocation().getBlockX()),
-            String.valueOf(shop.getLocation().getBlockY()),
-            String.valueOf(shop.getLocation().getBlockZ()));
+            shop.getLocation().worldName(),
+            String.valueOf(shop.getLocation().x()),
+            String.valueOf(shop.getLocation().y()),
+            String.valueOf(shop.getLocation().z()));
         chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
       }
     }
@@ -524,10 +524,10 @@ public class MsgUtil {
           MsgUtil.getMessage("controlpanel.empty", sender, String.valueOf(shop.getPrice()));
       String hoverText = MsgUtil.getMessage("controlpanel.empty-hover", sender);
       String clickCommand = MsgUtil.getMessage("controlpanel.commands.empty", sender,
-          Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-          String.valueOf(shop.getLocation().getBlockX()),
-          String.valueOf(shop.getLocation().getBlockY()),
-          String.valueOf(shop.getLocation().getBlockZ()));
+          shop.getLocation().worldName(),
+          String.valueOf(shop.getLocation().x()),
+          String.valueOf(shop.getLocation().y()),
+          String.valueOf(shop.getLocation().z()));
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Remove
@@ -537,10 +537,10 @@ public class MsgUtil {
           MsgUtil.getMessage("controlpanel.remove", sender, String.valueOf(shop.getPrice()));
       String hoverText = MsgUtil.getMessage("controlpanel.remove-hover", sender);
       String clickCommand = MsgUtil.getMessage("controlpanel.commands.remove", sender,
-          Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-          String.valueOf(shop.getLocation().getBlockX()),
-          String.valueOf(shop.getLocation().getBlockY()),
-          String.valueOf(shop.getLocation().getBlockZ()));
+          shop.getLocation().worldName(),
+          String.valueOf(shop.getLocation().x()),
+          String.valueOf(shop.getLocation().y()),
+          String.valueOf(shop.getLocation().z()));
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
 
@@ -579,10 +579,10 @@ public class MsgUtil {
       if (QuickShop.getPermissionManager().hasPermission(player, "quickshop.preview")) {
         normalmessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
             MsgUtil.getMessage("menu.commands.preview", player,
-                Objects.requireNonNull(shop.getLocation().getWorld()).getName(),
-                String.valueOf(shop.getLocation().getBlockX()),
-                String.valueOf(shop.getLocation().getBlockY()),
-                String.valueOf(shop.getLocation().getBlockZ()))));
+                shop.getLocation().worldName(),
+                String.valueOf(shop.getLocation().x()),
+                String.valueOf(shop.getLocation().y()),
+                String.valueOf(shop.getLocation().z()))));
       }
       normalmessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, cBuilder.create()));
       player.spigot().sendMessage(normalmessage);

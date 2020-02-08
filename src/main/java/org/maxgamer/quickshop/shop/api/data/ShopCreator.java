@@ -12,11 +12,11 @@ import org.jetbrains.annotations.Nullable;
 @Accessors(fluent = true)
 public class ShopCreator implements ShopData {
   @Nullable private final Block sign;
-  @NotNull private final Location location;
+  @NotNull private final ShopLocation location;
   @Nullable private final ItemStack item;
 
   public ShopCreator(
-      @NotNull Location loc,
+      @NotNull ShopLocation loc,
       @Nullable ItemStack item,
       @Nullable Block last) {
     

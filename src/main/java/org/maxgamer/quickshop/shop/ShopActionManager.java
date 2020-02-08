@@ -161,8 +161,8 @@ public class ShopActionManager {
 
     int space = shop.getRemainingSpace();
     if (space == amount) {
-      msg += "\n" + MsgUtil.getMessage("shop-out-of-space", p, "" + shop.getLocation().getBlockX(),
-          "" + shop.getLocation().getBlockY(), "" + shop.getLocation().getBlockZ());
+      msg += "\n" + MsgUtil.getMessage("shop-out-of-space", p, "" + shop.getLocation().x(),
+          "" + shop.getLocation().y(), "" + shop.getLocation().z());
     }
 
     MsgUtil.send(shop.getOwner(), msg, shop.isUnlimited());
@@ -205,16 +205,16 @@ public class ShopActionManager {
       return;
     }
 
-    if (Util.getSecondHalf(info.location().getBlock()) != null
+    if (Util.getSecondHalf(info.location().block()) != null
         && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
       return;
     }
-    if (!Util.canBeShop(info.location().getBlock())) {
+    if (!Util.canBeShop(info.location().block())) {
       p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
       return;
     }
-    if (info.location().getBlock().getType() == Material.ENDER_CHEST) {
+    if (info.location().block().getType() == Material.ENDER_CHEST) {
       if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.enderchest")) {
         return;
       }
@@ -360,7 +360,7 @@ public class ShopActionManager {
       ShopManager.instance().unload(shop);
       return;
     }
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location())) {
+    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location().bukkit())) {
       ShopManager.instance().unload(shop);
       Util.debug("Cancelled by integrations");
       return;
@@ -468,8 +468,8 @@ public class ShopActionManager {
     }
     // Transfers the item from A to B
     if (stock == amount) {
-      msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", p, "" + shop.getLocation().getBlockX(),
-          "" + shop.getLocation().getBlockY(), "" + shop.getLocation().getBlockZ(),
+      msg += "\n" + MsgUtil.getMessage("shop-out-of-stock", p, "" + shop.getLocation().x(),
+          "" + shop.getLocation().y(), "" + shop.getLocation().z(),
           Util.getItemStackName(shop.getItem()));
     }
 
@@ -490,7 +490,7 @@ public class ShopActionManager {
       return;
     }
 
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanTrade(p, info.location())) {
+    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanTrade(p, info.location().bukkit())) {
       Util.debug("Cancel by integrations.");
       return;
     }
@@ -499,7 +499,7 @@ public class ShopActionManager {
     // Get the shop they interacted with
     ShopViewer shopOp = ShopManager.instance().getLoadedShopAt(info.location());
     // It's not valid anymore
-    if (!shopOp.isPresent() || !Util.canBeShop(info.location().getBlock())) {
+    if (!shopOp.isPresent() || !Util.canBeShop(info.location().block())) {
       p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
       return;
     }
@@ -547,8 +547,8 @@ public class ShopActionManager {
       // They wanted to do something.
       ShopData info = actionData.remove(p.getUniqueId());
       
-      if (info.location().getWorld() != p.getLocation().getWorld()
-          || info.location().distanceSquared(p.getLocation()) > 25) {
+      if (info.location().world() != p.getLocation().getWorld()
+          || info.location().bukkit().distanceSquared(p.getLocation()) > 25) {
         p.sendMessage(MsgUtil.getMessage("not-looking-at-shop", p));
         return;
       }

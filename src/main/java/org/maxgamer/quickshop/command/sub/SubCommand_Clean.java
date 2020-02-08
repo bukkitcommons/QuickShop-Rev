@@ -58,7 +58,7 @@ public class SubCommand_Clean implements CommandProcesser {
       final Shop shop = shIt.next();
 
       try {
-        if (shop.getLocation().getWorld() != null && shop.is(ShopType.SELLING)
+        if (shop.getLocation().world() != null && shop.is(ShopType.SELLING)
             && shop.getRemainingStock() == 0 && shop instanceof ContainerShop) {
           ContainerShop cs = (ContainerShop) shop;
           if (cs.isDoubleShop()) {

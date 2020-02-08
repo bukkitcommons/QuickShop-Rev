@@ -33,6 +33,7 @@ import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
 import org.maxgamer.quickshop.shop.api.data.ShopCreator;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -102,7 +103,7 @@ public class SubCommand_SuperCreate implements CommandProcesser {
         return;
       }
       // Send creation menu.
-      final ShopCreator info = new ShopCreator(b.getLocation(), item, b.getRelative(p.getFacing().getOppositeFace()));
+      final ShopCreator info = new ShopCreator(new ShopLocation(b.getLocation()), item, b.getRelative(p.getFacing().getOppositeFace()));
 
       ShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(

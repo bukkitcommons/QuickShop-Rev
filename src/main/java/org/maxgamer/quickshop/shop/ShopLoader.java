@@ -42,6 +42,7 @@ import org.maxgamer.quickshop.event.ShopDeleteEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
+import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
@@ -199,7 +200,7 @@ public class ShopLoader implements Listener {
       return;
     }
     
-    @Nullable Map<Long, Shop> inChunk = getShops(shop.getLocation().getChunk());
+    @Nullable Map<Long, Shop> inChunk = getShops(shop.getLocation().chunk());
     if (inChunk != null && !inChunk.isEmpty())
       inChunk.remove(Util.blockKey(shop.getLocation()));
     
@@ -215,10 +216,10 @@ public class ShopLoader implements Listener {
       s.getBlock().setType(Material.AIR);
     
     // Delete it from the database
-    int x = shop.getLocation().getBlockX();
-    int y = shop.getLocation().getBlockY();
-    int z = shop.getLocation().getBlockZ();
-    String world = shop.getLocation().getWorld().getName();
+    int x = shop.getLocation().x();
+    int y = shop.getLocation().y();
+    int z = shop.getLocation().z();
+    String world = shop.getLocation().world().getName();
     
     try {
       QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
@@ -297,7 +298,7 @@ public class ShopLoader implements Listener {
         }
         
         Shop shop = new ContainerShop(
-            new Location(Bukkit.getWorld(data.world()), data.x(), data.y(), data.z()),
+            new ShopLocation(data.world(), data.x(), data.y(), data.z()),
             data.price(), data.item(),
             data.moderators(), data.unlimited(), data.type());
         
@@ -307,7 +308,7 @@ public class ShopLoader implements Listener {
         
         if (Util.isChunkLoaded(shop.getLocation())) {
           // Load to World
-          if (Util.canBeShop(shop.getLocation().getBlock())) {
+          if (Util.canBeShop(shop.getLocation().block())) {
             loadedShops++;
             ShopManager.instance().load(shop);
           }
