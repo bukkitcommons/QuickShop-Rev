@@ -63,7 +63,7 @@ public class ContainerShop implements Shop, Managed {
   @NotNull
   private final ShopLocation location;
   @Nullable
-  private EntityDisplayItem displayItem;
+  private EntityDisplayItem display;
   
   @EqualsAndHashCode.Exclude
   private boolean isLoaded = false;
@@ -74,7 +74,7 @@ public class ContainerShop implements Shop, Managed {
   private boolean unlimited;
 
   private ContainerShop(@NotNull ContainerShop s) {
-    this.displayItem = s.displayItem;
+    this.display = s.display;
     this.shopType = s.shopType;
     this.item = s.item;
     this.location = s.location;
@@ -110,18 +110,18 @@ public class ContainerShop implements Shop, Managed {
         case UNKNOWN:
           Util.debug(
               "Failed to create a ContainerShop displayItem, the type is unknown, fallback to RealDisplayItem");
-          this.displayItem = new RealDisplayItem(this);
+          this.display = new RealDisplayItem(this);
           break;
         case REALITEM:
-          this.displayItem = new RealDisplayItem(this);
+          this.display = new RealDisplayItem(this);
           break;
         case ARMORSTAND:
-          this.displayItem = new ArmorStandDisplayItem(this, data);
+          this.display = new ArmorStandDisplayItem(this, data);
           break;
         default:
           Util.debug(
               "Warning: Failed to create a ContainerShop displayItem, the type we didn't know, fallback to RealDisplayItem");
-          this.displayItem = new RealDisplayItem(this);
+          this.display = new RealDisplayItem(this);
           break;
       }
     } else {
@@ -310,7 +310,7 @@ public class ContainerShop implements Shop, Managed {
       return;
     }
 
-    if (this.displayItem == null) {
+    if (this.display == null) {
       Util.debug("Warning: DisplayItem is null, this shouldn't happend...");
       Util.debug("Call from: " + Thread.currentThread().getStackTrace()[2].getClassName() + "#"
           + Thread.currentThread().getStackTrace()[2].getMethodName() + "%"
@@ -318,15 +318,15 @@ public class ContainerShop implements Shop, Managed {
       return;
     }
 
-    if (!this.displayItem.isSpawned()) {
+    if (!this.display.isSpawned()) {
       /* Not spawned yet. */
       Util.debug("Target item not spawned, spawning...");
-      this.displayItem.spawn();
+      this.display.spawn();
     } else {
-      this.displayItem.fixPosition();
+      this.display.fixPosition();
     }
 
-    this.displayItem.removeDupe();
+    this.display.removeDupe();
   }
 
   /**
@@ -632,13 +632,12 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public boolean isValid() {
-    this.checkDisplay();
-    return Util.canBeShop(this.getLocation().block());
+    return Util.canBeShop(location.block());
   }
 
   @Override
   public @Nullable DisplayItem getDisplay() {
-    return this.displayItem;
+    return this.display;
   }
 
   /** Check the container still there and we can keep use it. */
@@ -678,9 +677,10 @@ public class ContainerShop implements Shop, Managed {
   /** Unload ContainerShop. */
   @Override
   public void onUnload() {
-    if (this.getDisplayItem() != null) {
-      this.getDisplayItem().remove();
+    if (this.display != null) {
+      this.display.remove();
     }
+    
     save();
     this.isLoaded = false;
     

@@ -28,9 +28,18 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
       return location;
     
     BlockFace containerBlockFace = BlockFace.NORTH; // Set default vaule
-    if (shop.getLocation().block().getBlockData() instanceof Directional)
-      containerBlockFace =
-          ((Directional) this.shop.getLocation().block().getBlockData()).getFacing();
+    
+    try {
+      if (shop.getLocation().block().getBlockData() instanceof Directional)
+        containerBlockFace = ((Directional) shop.getLocation().block().getBlockData()).getFacing();
+      
+    } catch (Throwable t) {
+      org.bukkit.material.MaterialData data = shop.getLocation().block().getState().getData();
+      if (data instanceof org.bukkit.material.Chest)
+        containerBlockFace = ((org.bukkit.material.Chest) data).getFacing();
+      else if (data instanceof org.bukkit.material.EnderChest)
+        containerBlockFace = ((org.bukkit.material.EnderChest) data).getFacing();
+    }
 
     Location asloc = Util.getCenter(shop.getLocation());
     if (!displayItemStack.getType().isBlock())
