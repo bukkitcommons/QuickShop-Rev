@@ -116,11 +116,7 @@ public class Util {
     return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
   }
   
-  public static long blockKey(@NotNull ShopLocation loc) {
-    return blockKey(loc.x(), loc.y(), loc.z());
-  }
-  
-  public static Object blockKey(Location loc) {
+  public static long blockKey(Location loc) {
     return blockKey(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
   }
 

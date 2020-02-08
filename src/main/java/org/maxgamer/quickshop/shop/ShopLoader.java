@@ -206,7 +206,7 @@ public class ShopLoader implements Listener {
     
     @Nullable Map<Long, Shop> inChunk = getShops(shop.getLocation().chunk());
     if (inChunk != null && !inChunk.isEmpty())
-      inChunk.remove(Util.blockKey(shop.getLocation()));
+      inChunk.remove(shop.getLocation().blockKey());
     
     ShopManager.instance().unload(shop);
     

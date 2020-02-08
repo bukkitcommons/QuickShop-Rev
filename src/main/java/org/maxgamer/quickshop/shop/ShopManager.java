@@ -75,7 +75,7 @@ public class ShopManager {
     Map<Long, Shop> inChunk =
         inWorld.computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4), s -> Maps.newHashMap());
     
-    inChunk.put(Util.blockKey(location), shop);
+    inChunk.put(location.blockKey(), shop);
     shop.onLoad();
   }
 
@@ -219,8 +219,7 @@ public class ShopManager {
             .computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4),
                 s -> Maps.newHashMap());
       
-      inChunk.put(Util.blockKey(
-          location.x(), location.y(), location.z()), shop);
+      inChunk.put(location.blockKey(), shop);
       
       load(shop);
     } catch (SQLException error) {
@@ -266,7 +265,7 @@ public class ShopManager {
     if (inChunk == null)
       return ShopViewer.empty();
     
-    return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
+    return ShopViewer.of(inChunk.get(loc.blockKey()));
   }
   
   public ShopViewer getLoadedShopAt(Location loc) {
@@ -282,7 +281,7 @@ public class ShopManager {
     if (inChunk == null)
       return false;
     
-    return inChunk.containsKey(Util.blockKey(loc));
+    return inChunk.containsKey(loc.blockKey());
   }
   
   public boolean hasLoadedShopAt(@NotNull Location loc) {
@@ -297,7 +296,7 @@ public class ShopManager {
     @Nullable Map<Long, Shop> inChunk = ShopLoader.instance().getShops(loc.chunk());
     
     if (inChunk != null) {
-      Shop shop = inChunk.get(Util.blockKey(loc));
+      Shop shop = inChunk.get(loc.blockKey());
       if (shop != null)
         consumer.accept(shop);
     }
@@ -368,7 +367,7 @@ public class ShopManager {
           inWorld.get(Util.chunkKey(location.x() >> 4, location.z() >> 4));
       
       if (inChunk != null)
-        inChunk.remove(Util.blockKey(location));
+        inChunk.remove(location.blockKey());
     }
     
     shop.onUnload();

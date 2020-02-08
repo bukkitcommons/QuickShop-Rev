@@ -11,9 +11,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.utils.Util;
 
 @Accessors(fluent = true)
-@RequiredArgsConstructor(staticName = "from")
 public class ShopLocation implements Serializable {
   private static final long serialVersionUID = 1L;
   
@@ -28,6 +28,17 @@ public class ShopLocation implements Serializable {
   @Getter
   private final int z;
   
+  @Getter
+  private final long blockKey;
+  
+  public ShopLocation(@NotNull String world, int x, int y, int z) {
+    this.worldName = world;
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.blockKey = Util.blockKey(x, y, z);
+  }
+  
   public static ShopLocation from(@NotNull World world, int x, int y, int z) {
     return new ShopLocation(world, x, y, z);
   }
@@ -38,6 +49,7 @@ public class ShopLocation implements Serializable {
     this.x = x;
     this.y = y;
     this.z = z;
+    this.blockKey = Util.blockKey(x, y, z);
   }
   
   public static ShopLocation of(@NotNull Location location) {
@@ -56,6 +68,7 @@ public class ShopLocation implements Serializable {
     z = location.getBlockZ();
     
     bukkit = location;
+    blockKey = Util.blockKey(x, y, z);
   }
   
   /*
