@@ -595,7 +595,7 @@ public class Util {
     Iterator<Shop> iterator = ShopLoader.instance().getShopIterator();
     while (iterator.hasNext()) {
       Shop shop = iterator.next();
-      if (Objects.requireNonNull(shop.getLocation().world()).getName().equals(worldName)) {
+      if (shop.getLocation().worldName().equals(worldName)) {
         cost++;
       }
     }

@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.shop.api;
 
 import java.util.List;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;

@@ -207,7 +207,7 @@ public class ShopManager {
         .createShop(shop.getModerator().serialize(),
                     shop.getPrice(), shop.getItem(),
                     shop.isUnlimited() ? 1 : 0, shop.getShopType().toID(),
-                    location.world().getName(),
+                    location.worldName(),
                     location.x(), location.y(), location.z());
       
       Map<Long, Shop> inChunk =
@@ -403,7 +403,7 @@ public class ShopManager {
    */
   public @NotNull List<Shop> getShopsInWorld(@NotNull World world) {
     return ShopLoader.instance().getAllShop().stream()
-        .filter(shop -> Objects.equals(shop.getLocation().world(), world))
+        .filter(shop -> shop.getLocation().worldName().equals(world.getName()))
         .collect(Collectors.toList());
   }
 }

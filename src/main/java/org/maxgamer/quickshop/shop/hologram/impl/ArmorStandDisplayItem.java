@@ -23,6 +23,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
   }
   
   @Override
+  @SuppressWarnings("deprecation")
   public Location getDisplayLocation() {
     if (location != null)
       return location;

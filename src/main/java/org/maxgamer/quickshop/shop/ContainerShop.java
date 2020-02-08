@@ -216,7 +216,7 @@ public class ContainerShop implements Shop, Managed {
                   location.x(),
                   location.y(),
                   location.z(),
-                  location.world().getName());
+                  location.worldName());
       
     } catch (Throwable t) {
       ShopLogger.instance().severe(

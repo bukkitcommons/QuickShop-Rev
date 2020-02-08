@@ -547,7 +547,7 @@ public class ShopActionManager {
       // They wanted to do something.
       ShopData info = actionData.remove(p.getUniqueId());
       
-      if (info.location().world() != p.getLocation().getWorld()
+      if (info.location().worldName().equals(p.getLocation().getWorld().getName())
           || info.location().bukkit().distanceSquared(p.getLocation()) > 25) {
         p.sendMessage(MsgUtil.getMessage("not-looking-at-shop", p));
         return;

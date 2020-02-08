@@ -219,7 +219,7 @@ public class ShopLoader implements Listener {
     int x = shop.getLocation().x();
     int y = shop.getLocation().y();
     int z = shop.getLocation().z();
-    String world = shop.getLocation().world().getName();
+    String world = shop.getLocation().worldName();
     
     try {
       QuickShop.instance().getDatabaseHelper().deleteShop(x, y, z, world);
