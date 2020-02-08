@@ -41,7 +41,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
     if (entity != null && entity.isValid() && !entity.isDead())
       return;
     
-    if (!Util.isDisplayAllowBlock(getDisplayLocation().getBlock().getType()))
+    if (!Util.hasSpaceForDisplay(getDisplayLocation().getBlock().getType()))
       return;
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =

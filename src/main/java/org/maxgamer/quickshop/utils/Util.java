@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is Util.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.utils;
 
 import com.google.common.io.Files;
@@ -53,8 +37,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
 import org.bukkit.block.EnderChest;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -67,7 +49,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.material.Sign;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,6 +68,12 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /** @author MACHENIKE */
+/**
+ * Utility class for plugin generally helper methods
+ * 
+ * @author Ghost_chu
+ * @author Sotr
+ */
 public class Util {
   static short tookLongTimeCostTimes;
   private static EnumSet<Material> blacklist = EnumSet.noneOf(Material.class);
@@ -450,22 +437,10 @@ public class Util {
       }
     } catch (Throwable t) {
         return Optional.of(sign.getRelative(
-            ((Sign) sign.getState().getData()).getFacing().getOppositeFace()));
+            ((org.bukkit.material.Sign) sign.getState().getData()).getFacing().getOppositeFace()));
     }
     
     return Optional.empty();
-  }
-
-  /**
-   * Return the Class name.
-   *
-   * @param c The class to get name
-   * @return The class prefix
-   */
-  public static String getClassPrefix(@NotNull Class<?> c) {
-    String callClassName = Thread.currentThread().getStackTrace()[2].getClassName();
-    String customClassName = c.getSimpleName();
-    return "[" + callClassName + "-" + customClassName + "] ";
   }
 
   public static String getItemStackName(@NotNull ItemStack itemStack) {
@@ -473,24 +448,6 @@ public class Util {
       return itemStack.getItemMeta().getDisplayName();
     
     return MsgUtil.getLocalizedName(itemStack.getType().name());
-  }
-
-  /**
-   * Get ItemStack's local name, return null if failed to get.
-   *
-   * @param itemStack Target ItemStack
-   * @return LocalName or NULL
-   */
-  @Nullable
-  public static String getLocalizedName(@NotNull ItemStack itemStack) {
-    ItemMeta itemMeta = itemStack.getItemMeta();
-    if (itemMeta == null) {
-      return null;
-    }
-    if (!itemMeta.hasLocalizedName()) {
-      return null;
-    }
-    return itemMeta.getLocalizedName();
   }
 
   public static Class<?> getNMSClass(@Nullable String className) {
@@ -503,53 +460,6 @@ public class Util {
       return Class.forName("net.minecraft.server." + version + "." + className);
     } catch (ClassNotFoundException e) {
       throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * @param iStack itemstack
-   * @return potion data, readable
-   */
-  @Nullable
-  public static String getPotiondata(@NotNull ItemStack iStack) {
-    if ((iStack.getType() != Material.POTION) && (iStack.getType() != Material.LINGERING_POTION)
-        && (iStack.getType() != Material.SPLASH_POTION)) {
-      return null;
-    }
-    if (!(iStack.getItemMeta() instanceof PotionMeta)) {
-      return null;
-    }
-    List<String> pEffects = new ArrayList<>();
-    PotionMeta pMeta = (PotionMeta) iStack.getItemMeta();
-    // if (pMeta.getBasePotionData().getType() != null) {
-    if (!(pMeta.getBasePotionData().isUpgraded())) {
-      pEffects.add(ChatColor.BLUE + MsgUtil.getPotioni18n(
-          Objects.requireNonNull(pMeta.getBasePotionData().getType().getEffectType())));
-    } else {
-      pEffects
-          .add(ChatColor.BLUE
-              + MsgUtil.getPotioni18n(
-                  Objects.requireNonNull(pMeta.getBasePotionData().getType().getEffectType()))
-              + " II");
-    }
-
-    // }
-    if (pMeta.hasCustomEffects()) {
-      List<PotionEffect> cEffects = pMeta.getCustomEffects();
-      for (PotionEffect potionEffect : cEffects) {
-        pEffects.add(MsgUtil.getPotioni18n(potionEffect.getType()) + " "
-            + RomanNumber.toRoman(potionEffect.getAmplifier()));
-      }
-    }
-    if (!pEffects.isEmpty()) {
-      StringBuilder result = new StringBuilder();
-      for (String effectString : pEffects) {
-        result.append(effectString);
-        result.append("\n");
-      }
-      return result.toString();
-    } else {
-      return null;
     }
   }
 
@@ -619,26 +529,6 @@ public class Util {
     return formatter.format((1 - dura / max) * 100.0);
   }
 
-  /**
-   * Use yaw to calc the BlockFace
-   *
-   * @param yaw Yaw (Player.getLocation().getYaw())
-   * @return BlockFace blockFace
-   * @deprecated Use Bukkit util not this one.
-   */
-  @Deprecated
-  public static BlockFace getYawFace(float yaw) {
-    if (yaw > 315 && yaw <= 45) {
-      return BlockFace.NORTH;
-    } else if (yaw > 45 && yaw <= 135) {
-      return BlockFace.EAST;
-    } else if (yaw > 135 && yaw <= 225) {
-      return BlockFace.SOUTH;
-    } else {
-      return BlockFace.WEST;
-    }
-  }
-
   /** Initialize the Util tools. */
   public static void initialize() {
     blacklist.clear();
@@ -702,23 +592,6 @@ public class Util {
       InputStream in = new FileInputStream(filePath);
       byte[] data = toByteArray(in);
       in.close();
-      return data;
-    } catch (IOException e) {
-      return null;
-    }
-  }
-
-  /**
-   * Read the InputStream to the byte array.
-   *
-   * @param inputStream Target stream
-   * @return Byte array
-   */
-  @Nullable
-  public static byte[] inputStream2ByteArray(@NotNull InputStream inputStream) {
-    try {
-      byte[] data = toByteArray(inputStream);
-      inputStream.close();
       return data;
     } catch (IOException e) {
       return null;
@@ -820,11 +693,8 @@ public class Util {
     }
   }
 
-  public static boolean isDisplayAllowBlock(@NotNull Material mat) {
-    if (isAir(mat)) {
-      return true;
-    }
-    return isWallSign(mat);
+  public static boolean hasSpaceForDisplay(@NotNull Material mat) {
+    return isAir(mat) || isWallSign(mat);
   }
 
   public static boolean isDoubleChest(@Nullable Block b) {
@@ -906,7 +776,7 @@ public class Util {
    * @param mat The material to check
    * @return Returns true if the item is a tool (Has durability) or false if it doesn't.
    */
-  public static boolean isTool(@NotNull Material mat) {
+  public static boolean hasDurability(@NotNull Material mat) {
     return !(mat.getMaxDurability() == 0);
   }
 
@@ -1002,44 +872,6 @@ public class Util {
   }
 
   /**
-   * Match the both map1 and map2
-   *
-   * @param map1 Map1
-   * @param map2 Map2
-   * @return Map1 match Map2 and Map2 match Map1
-   */
-  @Deprecated
-  public static boolean mapDuoMatches(@NotNull Map<?, ?> map1, @NotNull Map<?, ?> map2) {
-    boolean result = mapMatches(map1, map2);
-    if (!result) {
-      return false;
-    }
-    return mapMatches(map2, map1);
-  }
-
-  /**
-   * Match the map1 and map2
-   *
-   * @param map1 Map1
-   * @param map2 Map2
-   * @return Map1 match Map2
-   */
-  public static boolean mapMatches(@NotNull Map<?, ?> map1, @NotNull Map<?, ?> map2) {
-    return map2.entrySet().containsAll(map1.entrySet());
-  }
-
-  /**
-   * Match the list1 and list2
-   *
-   * @param list1 requireList
-   * @param list2 givenList
-   * @return Map1 match Map2
-   */
-  public static boolean listMatches(@NotNull List<?> list1, @NotNull List<?> list2) {
-    return list2.containsAll(list1);
-  }
-
-  /**
    * Parse colors for the YamlConfiguration.
    *
    * @param config yaml config
@@ -1078,7 +910,6 @@ public class Util {
    */
   public static List<String> parseColours(@NotNull List<String> list) {
     final List<String> newList = new ArrayList<>();
-
     list.forEach(s -> newList.add(parseColours(s)));
 
     return newList;
@@ -1144,26 +975,13 @@ public class Util {
     return new String(filecontent, StandardCharsets.UTF_8);
   }
 
-  /** Send warning message when some plugin calling deprecated method... With the trace. */
-  public static void sendDeprecatedMethodWarn() {
-    ShopLogger.instance().warning(
-        "Some plugin is calling a Deprecated method, Please contact the author to tell them to use the new api!");
-    StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-    for (StackTraceElement stackTraceElement : stackTraceElements) {
-      ShopLogger.instance()
-          .warning("at " + stackTraceElement.getClassName() + "#"
-              + stackTraceElement.getMethodName() + " (" + stackTraceElement.getFileName() + ":"
-              + stackTraceElement.getLineNumber() + ")");
-    }
-  }
-
   /**
    * Covert ItemStack to YAML string.
    *
    * @param iStack target ItemStack
    * @return String serialized itemStack
    */
-  public static String serialize(@NotNull ItemStack iStack) {
+  public static String serialize(@NotNull ItemStack iStack) { // FIXME move
     YamlConfiguration cfg = new YamlConfiguration();
     cfg.set("item", iStack);
     return cfg.saveToString();
@@ -1180,27 +998,6 @@ public class Util {
     return out.toByteArray();
   }
 
-  /**
-   * Return the Class name.
-   *
-   * @return The class prefix
-   */
-  public static String getClassPrefix() {
-
-    String className = Thread.currentThread().getStackTrace()[2].getClassName();
-    try {
-      Class<?> c = Class.forName(className);
-      className = c.getSimpleName();
-      if (!c.getSimpleName().isEmpty()) {
-        className = c.getSimpleName();
-      }
-    } catch (ClassNotFoundException e) {
-      // Ignore
-    }
-    String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-    return "[" + className + "-" + methodName + "] ";
-  }
-
   public static String getNMSVersion() {
     String name = Bukkit.getServer().getClass().getPackage().getName();
     return name.substring(name.lastIndexOf('.') + 1);
@@ -1211,7 +1008,7 @@ public class Util {
    *
    * @return The material now using.
    */
-  public static Material getSignMaterial() {
+  public static Material getSignMaterial() { // FIXME cache
 
     Material signMaterial = Material.matchMaterial(BaseConfig.signMaterial);
     if (signMaterial != null && signMaterial.name().endsWith("WALL_SIGN")) {
@@ -1255,14 +1052,6 @@ public class Util {
       throw new RuntimeException(e);
     }
   }
-  //
-  // public static void shoppablesCheck(@NotNull Shop shop) {
-  // if (!Util.canBeShop(shop.getLocation().getBlock())) {
-  // Util.debugLog("This shopblock can't be a shop, deleting...");
-  // shop.onUnload();
-  // shop.delete();
-  // }
-  // }
 
   /**
    * Check QuickShop is running on dev edition or not.
@@ -1293,35 +1082,6 @@ public class Util {
    */
   public static boolean isDyes(@Nullable Material material) {
     return material.name().endsWith("_DYE");
-  }
-
-  /**
-   * Calc the string md5
-   *
-   * @param s string
-   * @return md5
-   */
-  @NotNull
-  public static String md5(final String s) {
-    try {
-      final MessageDigest instance = MessageDigest.getInstance("MD5");
-      instance.update(s.getBytes(StandardCharsets.UTF_8));
-      final byte[] digest = instance.digest();
-      final StringBuilder sb = new StringBuilder();
-      for (int b : digest) {
-        int n = b;
-        if (n < 0) {
-          n += 256;
-        }
-        if (n < 16) {
-          sb.append("0");
-        }
-        sb.append(Integer.toHexString(n));
-      }
-      return sb.toString().toLowerCase();
-    } catch (Exception ex) {
-      return "";
-    }
   }
 
   /**

@@ -27,7 +27,6 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.event.ShopLoadEvent;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -41,8 +40,6 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
-// import com.griefcraft.lwc.LWC;
-// import com.griefcraft.lwc.LWCPlugin;
 @AllArgsConstructor
 public class ShopActionListener implements Listener {
 
@@ -232,15 +229,20 @@ public class ShopActionListener implements Listener {
 
   @EventHandler
   public void onInventoryClose(InventoryCloseEvent event) {
+    /*
+     * Workaround for GH-303
+     * 
+     * This will cause NPE when the internal getLocation method
+     * itself NPE, which should be a server issue.
+     */
     try {
-      // This will cause NPE when the internal getLocation method
-      // itself NPE, which should be a server issue.
       @Nullable Location chest = event.getInventory().getLocation();
       
       if (chest != null)
         ShopManager.instance().getLoadedShopAt(chest).ifPresent(Shop::setSignText);
+      
     } catch (NullPointerException npe) {
-      return; // ignored as workaround, GH-303
+      return;
     }
   }
 
@@ -249,15 +251,44 @@ public class ShopActionListener implements Listener {
     if (BaseConfig.autoFetchShopMessages)
       MsgUtil.flushMessagesFor(event.getPlayer());
   }
+  
+  @EventHandler
+  public void onPlayerQuit(PlayerQuitEvent e) {
+    ShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
+  }
+  
+  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+  public void onDyingSign(PlayerInteractEvent event) {
+    @Nullable Block block = event.getClickedBlock();
+    @Nullable ItemStack item = event.getItem();
+    
+    if (event.getAction() != Action.RIGHT_CLICK_BLOCK || block == null || item == null)
+      return;
 
+    // This method will only match by using modern material name,
+    // since this will only happen after 1.14
+    if (!Util.isDyes(item.getType()))
+      return;
+
+    Util.getShopBySign(block).ifPresent(() -> {
+      event.setCancelled(true);
+      Util.debug("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
+    });
+  }
+  
   /*
-   * Waits for a player to move too far from a shop, then cancels the menu.
+   * Movement handlers
    */
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onMove(PlayerMoveEvent event) {
     handlePlayerMovement(event.getPlayer(), event.getTo());
   }
 
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+  public void onTeleport(PlayerTeleportEvent event) {
+    handlePlayerMovement(event.getPlayer(), event.getTo());
+  }
+  
   public void handlePlayerMovement(Player player, Location to) {
     ShopData info = ShopActionManager.instance().getActions().get(player.getUniqueId());
     if (info == null)
@@ -274,32 +305,5 @@ public class ShopActionListener implements Listener {
       Util.debug(player.getName() + " too far with the shop location.");
       ShopActionManager.instance().getActions().remove(player.getUniqueId());
     }
-  }
-  
-  @EventHandler
-  public void onPlayerQuit(PlayerQuitEvent e) {
-    ShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
-  }
-
-  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-  public void onTeleport(PlayerTeleportEvent event) {
-    handlePlayerMovement(event.getPlayer(), event.getTo());
-  }
-
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-  public void onDyeing(PlayerInteractEvent event) {
-    @Nullable Block block = event.getClickedBlock();
-    @Nullable ItemStack item = event.getItem();
-    
-    if (event.getAction() != Action.RIGHT_CLICK_BLOCK || block == null || item == null)
-      return;
-
-    if (!Util.isDyes(item.getType()))
-      return;
-
-    Util.getShopBySign(block).ifPresent(() -> {
-      event.setCancelled(true);
-      Util.debug("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
-    });
   }
 }

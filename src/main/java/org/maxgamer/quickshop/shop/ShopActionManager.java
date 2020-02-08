@@ -36,6 +36,7 @@ import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class ShopActionManager {
+  // TODO delayed remove
   /*
    * Singleton
    */

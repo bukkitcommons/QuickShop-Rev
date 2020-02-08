@@ -708,7 +708,7 @@ public class MsgUtil {
     sendItemholochat(shop, items, p,
         ChatColor.DARK_PURPLE + MsgUtil.getMessage("tableformat.left_begin", p) + " "
             + MsgUtil.getMessage("menu.item", p, Util.getItemStackName(items)));
-    if (Util.isTool(items.getType())) {
+    if (Util.hasDurability(items.getType())) {
       chatSheetPrinter.printLine(
           MsgUtil.getMessage("menu.damage-percent-remaining", p, Util.getToolPercentage(items)));
     }
