@@ -85,7 +85,7 @@ public class ShopManager {
     try {
       if (QuickShop.instance().isLimit()) {
         UUID uuid = player.getUniqueId();
-        long owned = ShopLoader.instance().getAllShop()
+        long owned = ShopLoader.instance().getAllShops()
             .stream()
             .filter(shop -> shop.getOwner().equals(uuid))
             .count();

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import lombok.Data;
 import lombok.Getter;
@@ -69,16 +70,6 @@ public class ShopLoader implements Listener {
    */
   @Getter
   private final Map<String, Map<Long, Map<Long, Shop>>> shopsMap = Maps.newConcurrentMap();
-  
-  /**
-   * Returns a new shop iterator object, allowing iteration over shops easily, instead of sorting
-   * through a 3D hashmap.
-   *
-   * @return a new shop iterator object.
-   */
-  public Iterator<Shop> getShopIterator() {
-    return new ShopIterator();
-  }
 
   /**
    * Returns all shops in the whole database, include unloaded.
@@ -88,62 +79,23 @@ public class ShopLoader implements Listener {
    *
    * @return All shop in the database
    */
-  public Collection<Shop> getAllShop() {
-    // noinspection unchecked
-    Map<String, Map<Long, Map<Long, Shop>>> worldsMap = Maps.newHashMap(shopsMap);
-    Collection<Shop> shops = new ArrayList<>();
-    for (Map<Long, Map<Long, Shop>> shopMapData : worldsMap.values()) {
-      for (Map<Long, Shop> shopData : shopMapData.values()) {
+  public List<Shop> getAllShops() {
+    List<Shop> shops = Lists.newArrayList();
+    
+    for (Map<Long, Map<Long, Shop>> worldShops : shopsMap.values()) {
+      for (Map<Long, Shop> shopData : worldShops.values()) {
         shops.addAll(shopData.values());
       }
     }
+    
     return shops;
   }
   
-  public class ShopIterator implements Iterator<Shop> {
-    private Iterator<Map<Long, Shop>> chunks;
-    private Iterator<Shop> shopIterator;
-    private Iterator<Map<Long, Map<Long, Shop>>> worlds;
-
-    public ShopIterator() {
-      worlds = shopsMap.values().iterator();
-    }
-
-    /** Returns true if there is still more shops to iterate over. */
-    @Override
-    public boolean hasNext() {
-      if (shopIterator == null || !shopIterator.hasNext()) {
-        if (chunks == null || !chunks.hasNext()) {
-          if (!worlds.hasNext()) {
-            return false;
-          } else {
-            chunks = worlds.next().values().iterator();
-            return hasNext();
-          }
-        } else {
-          shopIterator = chunks.next().values().iterator();
-          return hasNext();
-        }
+  public void forEachShops(Consumer<Shop> consumer) {
+    for (Map<Long, Map<Long, Shop>> worldShops : shopsMap.values()) {
+      for (Map<Long, Shop> chunkShops : worldShops.values()) {
+        chunkShops.values().forEach(shop -> consumer.accept(shop));
       }
-      return true;
-    }
-
-    /** Fetches the next shop. Throws NoSuchElementException if there are no more shops. */
-    @Override
-    public @NotNull Shop next() {
-      if (shopIterator == null || !shopIterator.hasNext()) {
-        if (chunks == null || !chunks.hasNext()) {
-          if (!worlds.hasNext()) {
-            throw new NoSuchElementException("No more shops to iterate over!");
-          }
-          chunks = worlds.next().values().iterator();
-        }
-        shopIterator = chunks.next().values().iterator();
-      }
-      if (!shopIterator.hasNext()) {
-        return this.next(); // Skip to the next one (Empty iterator?)
-      }
-      return shopIterator.next();
     }
   }
   

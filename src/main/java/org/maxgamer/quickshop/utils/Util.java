@@ -491,24 +491,6 @@ public class Util {
   }
 
   /**
-   * Get how many shop in the target world.
-   *
-   * @param worldName Target world.
-   * @return The shops.
-   */
-  public static int getShopsInWorld(@NotNull String worldName) {
-    int cost = 0;
-    Iterator<Shop> iterator = ShopLoader.instance().getShopIterator();
-    while (iterator.hasNext()) {
-      Shop shop = iterator.next();
-      if (shop.getLocation().worldName().equals(worldName)) {
-        cost++;
-      }
-    }
-    return cost;
-  }
-
-  /**
    * Gets the percentage (Without trailing %) damage on a tool.
    *
    * @param item The ItemStack of tools to check

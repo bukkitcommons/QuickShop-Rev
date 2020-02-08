@@ -37,26 +37,26 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
       sender.sendMessage(ChatColor.GREEN + "Async thread is started, please wait...");
       //Util.backupDatabase(); // Already warn the user, don't care about backup result.
       
-      for (Shop shop : ShopLoader.instance().getAllShop()) {
+      ShopLoader.instance().forEachShops(shop -> {
         if (shop.getItem().getType() == Material.AIR) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause item data is damaged.");
           ShopLoader.instance().delete(shop);
-          continue;
+          return;
         }
         
         if (shop.getLocation().world() == null) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause target world not loaded.");
           ShopLoader.instance().delete(shop);
-          continue;
+          return;
         }
         
         if (shop.getOwner() == null) {
           sender.sendMessage(
               ChatColor.YELLOW + "Shop " + shop + " removing cause owner data is damaged.");
           ShopLoader.instance().delete(shop);
-          continue;
+          return;
         }
         
         // Shop exist check
@@ -70,9 +70,9 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
             ShopLoader.instance().delete(shop);
           }
         }); // Post to server main thread to check.
-        
-        sender.sendMessage(ChatColor.GREEN + "All shops completed checks.");
-      }
+      });
+      
+      sender.sendMessage(ChatColor.GREEN + "All shops completed checks.");
     });
   }
 }

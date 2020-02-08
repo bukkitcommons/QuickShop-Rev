@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is SubCommand_Clean.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
@@ -22,11 +6,9 @@ import java.util.List;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.ShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -50,34 +32,31 @@ public class SubCommand_Clean implements CommandProcesser {
 
     sender.sendMessage(MsgUtil.getMessage("command.cleaning", sender));
 
-    final Iterator<Shop> shIt = ShopLoader.instance().getShopIterator();
     final ArrayList<Shop> pendingRemoval = new java.util.ArrayList<>();
-    int i = 0;
-
-    while (shIt.hasNext()) {
-      final Shop shop = shIt.next();
-
+    int[] count = {0};
+    
+    ShopLoader.instance().forEachShops(shop -> {
       try {
         if (shop.getLocation().world() != null && shop.is(ShopType.SELLING)
             && shop.getRemainingStock() == 0 && shop instanceof ContainerShop) {
           ContainerShop cs = (ContainerShop) shop;
           if (cs.isDoubleShop()) {
-            continue;
+            return;
           }
           pendingRemoval.add(shop); // Is selling, but has no stock, and is a chest shop, but is not
                                     // a double shop.
           // Can be deleted safely.
-          i++;
+          count[0]++;
         }
       } catch (IllegalStateException e) {
         pendingRemoval.add(shop); // The shop is not there anymore, remove it
       }
-    }
+    });
 
     for (Shop shop : pendingRemoval)
       ShopLoader.instance().delete(shop);
 
     MsgUtil.clean();
-    sender.sendMessage(MsgUtil.getMessage("command.cleaned", sender, "" + i));
+    sender.sendMessage(MsgUtil.getMessage("command.cleaned", sender, "" + count[0]));
   }
 }

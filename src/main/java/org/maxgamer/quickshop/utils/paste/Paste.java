@@ -109,8 +109,6 @@ public class Paste {
       finalReport.append("\t\tEnvironment: ").append(world.getEnvironment().name()).append("\n");
       finalReport.append("\t\tLoaded Chunks: ").append(world.getLoadedChunks().length).append("\n");
       finalReport.append("\t\tPlayer In World: ").append(world.getPlayers().size()).append("\n");
-      finalReport.append("\t\tShops In World: ").append(Util.getShopsInWorld(world.getName()))
-          .append("\n");
     }
     finalReport.append("\t*********************************\n"); // Add a line after last world
     finalReport.append("================================================\n");
