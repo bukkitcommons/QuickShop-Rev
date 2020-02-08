@@ -35,8 +35,7 @@ import org.maxgamer.quickshop.database.Database.ConnectionException;
 import org.maxgamer.quickshop.database.connector.DatabaseConnector;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.database.connector.SQLiteConnector;
-import org.maxgamer.quickshop.economy.Economy;
-import org.maxgamer.quickshop.economy.EconomyCore;
+import org.maxgamer.quickshop.economy.EconomyProvider;
 import org.maxgamer.quickshop.economy.EconomyType;
 import org.maxgamer.quickshop.economy.impl.ReserveEconProvider;
 import org.maxgamer.quickshop.economy.impl.VaultEconProvider;
@@ -118,7 +117,7 @@ public class QuickShop extends JavaPlugin {
   private DisplayBugFixListener displayBugFixListener;
   private int displayItemCheckTicks;
   /** The economy we hook into for transactions */
-  private Economy economy;
+  private EconomyProvider economy;
 
   private DisplayProtectionListener inventoryListener;
   private ItemMatcher itemMatcher;
@@ -268,7 +267,7 @@ public class QuickShop extends JavaPlugin {
   private boolean loadEcon() {
     try {
       // EconomyCore core = new Economy_Vault();
-      EconomyCore core = null;
+      EconomyProvider core = null;
       switch (EconomyType.fromID(BaseConfig.economyType)) {
         case UNKNOWN:
           bootError =
@@ -296,7 +295,7 @@ public class QuickShop extends JavaPlugin {
         // getLogger().severe("(Does Vault have an Economy to hook into?!)");
         return false;
       } else {
-        this.economy = new Economy(core);
+        this.economy = core;
         return true;
       }
     } catch (Exception e) {
@@ -785,7 +784,7 @@ public class QuickShop extends JavaPlugin {
         sneak_action = "Disabled";
       }
       String shop_find_distance = String.valueOf(BaseConfig.findDistance);
-      String economyType = Economy.getNowUsing().name();
+      String economyType = EconomyType.fromID(BaseConfig.economyType).name();
       String useDisplayAutoDespawn =
           String.valueOf(BaseConfig.enableDespawner);
       String useEnhanceDisplayProtect =

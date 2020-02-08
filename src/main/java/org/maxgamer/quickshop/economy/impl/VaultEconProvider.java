@@ -16,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.economy.EconomyCore;
+import org.maxgamer.quickshop.economy.EconomyProvider;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
-public class VaultEconProvider implements EconomyCore, Listener {
+public class VaultEconProvider implements EconomyProvider, Listener {
 
   @Getter
   @Setter

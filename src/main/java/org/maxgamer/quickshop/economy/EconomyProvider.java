@@ -19,7 +19,7 @@ package org.maxgamer.quickshop.economy;
 import java.util.UUID;
 
 /** @author netherfoam Represents an economy. */
-public interface EconomyCore {
+public interface EconomyProvider {
   /**
    * Deposits a given amount of money from thin air to the given username.
    *

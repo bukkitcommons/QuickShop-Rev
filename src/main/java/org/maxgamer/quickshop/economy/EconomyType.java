@@ -22,7 +22,10 @@ public enum EconomyType {
   /*
    * UNKNOWN = FALLBACK TO VAULT VAULT = USE VAULT API RESERVE = USE RESERVE API
    */
-  UNKNOWN(-1), VAULT(0), RESERVE(1), MIXED(2);
+  UNKNOWN(-1),
+  VAULT(0),
+  RESERVE(1),
+  MIXED(2);
 
   private int id;
 

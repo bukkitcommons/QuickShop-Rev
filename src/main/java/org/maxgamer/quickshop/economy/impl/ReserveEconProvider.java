@@ -27,11 +27,11 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.economy.EconomyCore;
+import org.maxgamer.quickshop.economy.EconomyProvider;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 /** @author creatorfromhell */
-public class ReserveEconProvider implements EconomyCore {
+public class ReserveEconProvider implements EconomyProvider {
 
   private final String errorMsg =
       "QuickShop got an error when calling your Economy system, this is NOT a QuickShop error, please do not report this issue to the QuickShop's Issue tracker, ask your Economy plugin's author.";

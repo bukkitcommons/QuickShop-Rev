@@ -18,8 +18,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.economy.Economy;
-import org.maxgamer.quickshop.economy.EconomyCore;
+import org.maxgamer.quickshop.economy.EconomyProvider;
+import org.maxgamer.quickshop.economy.EconomyType;
 import org.maxgamer.quickshop.economy.impl.VaultEconProvider;
 import org.maxgamer.quickshop.utils.Util;
 
@@ -50,8 +50,8 @@ public class Paste {
         .append(plugin.getOpenInvPlugin() == null ? "Disabled" : "Enabled").append("\n");
     finalReport.append("\tEconomy System: ");
     try {
-      EconomyCore economyCore = plugin.getEconomy().getCore();
-      switch (Economy.getNowUsing()) {
+      EconomyProvider economyCore = plugin.getEconomy();
+      switch (EconomyType.fromID(BaseConfig.economyType)) {
         case VAULT:
           finalReport.append("Vault").append("%")
               .append(((VaultEconProvider) economyCore).getProviderName());
@@ -60,6 +60,7 @@ public class Paste {
           finalReport.append("Reserve").append("%").append("No details");
           break;
         case UNKNOWN:
+        default:
           finalReport.append("Unknown").append("%").append("Unknown error");
           break;
       }
