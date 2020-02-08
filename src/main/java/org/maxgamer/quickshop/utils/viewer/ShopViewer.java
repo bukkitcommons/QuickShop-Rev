@@ -24,7 +24,7 @@ public class ShopViewer {
   private boolean fails;
   
   public ShopViewer reset() {
-    Util.debug("Viewer rest, before: " + fails);
+    Util.debug("Viewer reset, before: " + fails);
     fails = false;
     return this;
   }

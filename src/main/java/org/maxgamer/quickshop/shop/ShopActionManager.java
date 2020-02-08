@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
-import javax.swing.text.AbstractDocument.BranchElement;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -547,7 +546,7 @@ public class ShopActionManager {
       // They wanted to do something.
       ShopData info = actionData.remove(p.getUniqueId());
       
-      if (info.location().worldName().equals(p.getLocation().getWorld().getName())
+      if (!info.location().worldName().equals(p.getLocation().getWorld().getName())
           || info.location().bukkit().distanceSquared(p.getLocation()) > 25) {
         p.sendMessage(MsgUtil.getMessage("not-looking-at-shop", p));
         return;

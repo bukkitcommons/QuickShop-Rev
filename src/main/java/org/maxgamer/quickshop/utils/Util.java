@@ -207,14 +207,14 @@ public class Util {
     if (isBlocklisted(block.getType()) || isBlacklistWorld(block.getWorld())) {
       return false;
     }
-    return canBeShop0(block.getState());
+    return canBeShopIgnoreBlocklist(block.getState());
   }
   
   public static boolean canBeShop(@NotNull BlockState state) {
     if (isBlocklisted(state.getType()) || isBlacklistWorld(state.getWorld())) {
       return false;
     }
-    return canBeShop0(state);
+    return canBeShopIgnoreBlocklist(state);
   }
 
   /**
@@ -223,7 +223,7 @@ public class Util {
    * @param b The block to check, Possibly a chest, dispenser, etc.
    * @return True if it can be made into a shop, otherwise false.
    */
-  private static boolean canBeShop0(@NotNull BlockState state) {
+  public static boolean canBeShopIgnoreBlocklist(@NotNull BlockState state) {
     if (state instanceof EnderChest) { // BlockState for Mod supporting
       return QuickShop.instance().getOpenInvPlugin() != null;
     }

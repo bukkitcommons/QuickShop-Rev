@@ -1,10 +1,8 @@
 package org.maxgamer.quickshop.shop.hologram;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import lombok.SneakyThrows;
-import java.util.ArrayList;
 import java.util.Collections;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;

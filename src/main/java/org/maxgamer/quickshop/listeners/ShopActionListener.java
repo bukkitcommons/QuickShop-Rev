@@ -156,9 +156,10 @@ public class ShopActionListener implements Listener {
      * Creation handling
      */
     viewer
-      .nonNull()
+      .reset() // Reset but do not check null
       .filter(shop ->
-        e.useInteractedBlock() == Result.ALLOW && item != null && item.getType() != Material.AIR)
+        e.useInteractedBlock() == Result.ALLOW)
+      
       .filter(shop ->
         player.getGameMode() != GameMode.CREATIVE &&
         QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.sell"))
@@ -169,34 +170,35 @@ public class ShopActionListener implements Listener {
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling creation.");
         
+        if (item == null || item.getType() == Material.AIR) {
+          player.sendMessage(MsgUtil.getMessage("no-anythings-in-your-hand", player));
+          return;
+        }
+        
         if (Util.getSecondHalf(block).isPresent() &&
             !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.double")) {
           player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
           return;
         }
-
-        if (Util.isBlacklisted(item) &&
-            !QuickShop.getPermissionManager().hasPermission(player, "quickshop.bypass." + item.getType().name())) {
-          player.sendMessage(MsgUtil.getMessage("blacklisted-item", player));
+        
+        if (!Util.canBeShopIgnoreBlocklist(block.getState())) {
+          Util.debug("Block cannot be shop.");
           return;
+          /*
+          if (!QuickShop.getPermissionManager().hasPermission(player, "quickshop.bypass." + item.getType().name())) {
+            player.sendMessage(MsgUtil.getMessage("blacklisted-item", player));
+            return;
+          }
+          */
         }
 
         if (block.getType() == Material.ENDER_CHEST &&
             !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.enderchest")) {
           return;
         }
-
-        if (Util.isWallSign(block.getType()) &&
-            !Arrays.stream(((Sign) block.getState()).getLines()).allMatch(String::isEmpty))
-          return;
-        
-        if (item == null || item.getType() == Material.AIR) {
-          player.sendMessage(MsgUtil.getMessage("no-anythings-in-your-hand", player));
-          return;
-        }
         
         // Finds out where the sign should be placed for the shop
-        Block last = null;
+        Block expectedSign = null;
         final Location from = player.getLocation();
 
         from.setY(block.getY());
@@ -210,16 +212,15 @@ public class ShopActionListener implements Listener {
             break;
           }
 
-          last = n;
+          expectedSign = n;
         }
         
-        if (last == null || !Util.canBeShop(last)) {
-          Util.debug("Block cannot be shop.");
+        if (expectedSign != null && Util.isWallSign(expectedSign.getType()) &&
+            !Arrays.stream(((Sign) expectedSign.getState()).getLines()).allMatch(String::isEmpty))
           return;
-        }
         
         // Send creation menu.
-        ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), last, item);
+        ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), expectedSign, item);
 
         ShopActionManager.instance().getActions().put(player.getUniqueId(), info);
         player.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", player,

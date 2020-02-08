@@ -590,7 +590,7 @@ public class ContainerShop implements Shop, Managed {
 
   @Override
   public boolean isAttached(@NotNull Block sign) {
-    return location.equals(Util.getSignAttached(sign).get().getLocation());
+    return location.bukkit().equals(Util.getSignAttached(sign).get().getLocation());
   }
 
   /**

@@ -331,7 +331,7 @@ public class BaseConfig {
   public static boolean autoFetchShopMessages = false;
   
   @Node(value = "shop.display-name-visible")
-  public static boolean displayNameVisible = true;
+  public static boolean displayNameVisible = false;
   
   @Node(value = "shop.pay-unlimited-shop-owners")
   public static boolean payUnlimitedShopOwners = false;
