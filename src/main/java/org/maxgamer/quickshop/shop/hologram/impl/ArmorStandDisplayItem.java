@@ -19,7 +19,6 @@ import org.maxgamer.quickshop.shop.api.ShopProtectionFlag;
 import org.maxgamer.quickshop.shop.hologram.DisplayAttribute;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
-import org.maxgamer.quickshop.shop.hologram.DisplayItemPersistentDataType;
 import org.maxgamer.quickshop.shop.hologram.DisplayType;
 import org.maxgamer.quickshop.utils.Util;
 
@@ -104,12 +103,6 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     // Set item protect in the armorstand's hand
     this.guardedIstack = DisplayItem.createGuardItemStack(this.originalItemStack, this.shop);
     armorStand.setItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD), guardedIstack);
-    try {
-      armorStand.getPersistentDataContainer().set(new NamespacedKey(QuickShop.instance(), "displayMark"),
-          DisplayItemPersistentDataType.INSTANCE,
-          ShopProtectionFlag.create(this.originalItemStack, shop));
-    } catch (Throwable ignored) {
-    }
   }
 
   @Override
