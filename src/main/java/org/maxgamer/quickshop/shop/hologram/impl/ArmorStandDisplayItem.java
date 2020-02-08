@@ -3,19 +3,15 @@ package org.maxgamer.quickshop.shop.hologram.impl;
 import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Directional;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.event.ShopDisplayItemDespawnEvent;
 import org.maxgamer.quickshop.event.ShopDisplayItemSpawnEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.ShopProtectionFlag;
 import org.maxgamer.quickshop.shop.hologram.DisplayAttribute;
 import org.maxgamer.quickshop.shop.hologram.DisplayData;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
@@ -44,7 +40,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
       return;
     }
 
-    if (originalItemStack == null) {
+    if (displayItemStack == null) {
       Util.debug("Canceled the displayItem spawning because the ItemStack is null.");
       return;
     }
@@ -60,7 +56,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     }
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-        new ShopDisplayItemSpawnEvent(shop, originalItemStack, data);
+        new ShopDisplayItemSpawnEvent(shop, displayItemStack, data);
     Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
     if (shopDisplayItemSpawnEvent.isCancelled()) {
       Util.debug(
@@ -92,24 +88,17 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     safeGuard(this.entity); // Helmet must be set after spawning
   }
 
-  @Override
-  public void safeGuard(@NotNull Entity entity) {
-    if (!(entity instanceof ArmorStand)) {
-      Util.debug(
-          "Failed to safeGuard " + entity.getLocation() + ", cause target not a ArmorStand");
-      return;
-    }
+  private void safeGuard(@NotNull Entity entity) {
     ArmorStand armorStand = (ArmorStand) entity;
-    // Set item protect in the armorstand's hand
-    this.guardedIstack = DisplayItem.createGuardItemStack(this.originalItemStack, this.shop);
-    armorStand.setItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD), guardedIstack);
+    armorStand.setItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD), displayItemStack);
   }
 
   @Override
   public void remove() {
     super.remove();
+    
     ShopDisplayItemDespawnEvent shopDisplayItemDespawnEvent =
-        new ShopDisplayItemDespawnEvent(this.shop, this.originalItemStack, DisplayType.ARMORSTAND);
+        new ShopDisplayItemDespawnEvent(this.shop, displayItemStack, DisplayType.ARMORSTAND);
     Bukkit.getPluginManager().callEvent(shopDisplayItemDespawnEvent);
   }
 
@@ -118,69 +107,36 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     BlockFace containerBlockFace = BlockFace.NORTH; // Set default vaule
     if (this.shop.getLocation().getBlock().getBlockData() instanceof Directional) {
       containerBlockFace =
-          ((Directional) this.shop.getLocation().getBlock().getBlockData()).getFacing(); // Replace
-                                                                                         // by
-                                                                                         // container
-                                                                                         // face.
+          ((Directional) this.shop.getLocation().getBlock().getBlockData()).getFacing();
     }
 
-    // Fix specific block facing
-    Material type = this.shop.getLocation().getBlock().getType();
-    if (type.name().contains("ANVIL") || type.name().contains("FENCE")
-        || type.name().contains("WALL")) {
-      switch (containerBlockFace) {
-        case SOUTH:
-          containerBlockFace = BlockFace.WEST;
-          break;
-        case NORTH:
-          containerBlockFace = BlockFace.EAST;
-        case EAST:
-          containerBlockFace = BlockFace.NORTH;
-        case WEST:
-          containerBlockFace = BlockFace.SOUTH;
-        default:
-          break;
-      }
-    }
-
-    Location asloc = Util.getCenter(this.shop.getLocation());
-    Util.debug("containerBlockFace " + containerBlockFace);
-
-    if (this.originalItemStack.getType().isBlock()) {
-      asloc.add(0, 0.5, 0);
-    }
+    Location asloc = Util.getCenter(shop.getLocation());
+    if (!displayItemStack.getType().isBlock())
+      asloc.add(0, -0.5, 0);
 
     switch (containerBlockFace) {
-      case SOUTH:
-        asloc.add(0, -0.5, 0);
-        asloc.setYaw(0);
-        Util.debug("Block face as SOUTH");
-        break;
       case WEST:
-        asloc.add(0, -0.5, 0);
         asloc.setYaw(90);
-        Util.debug("Block face as WEST");
         break;
       case EAST:
-        asloc.add(0, -0.5, 0);
         asloc.setYaw(-90);
-        Util.debug("Block face as EAST");
         break;
       case NORTH:
-        asloc.add(0, -0.5, 0);
         asloc.setYaw(180);
-        Util.debug("Block face as NORTH");
         break;
+      case SOUTH:
       default:
         break;
     }
-
+    
     asloc.setYaw(asloc.getYaw() + data.get(DisplayAttribute.OFFSET_YAW, 0f));
     asloc.setPitch(asloc.getYaw() + data.get(DisplayAttribute.OFFSET_PITCH, 0f));
-    asloc.add(data.get(DisplayAttribute.OFFSET_X, 0d),
+    
+    asloc.add(
+        data.get(DisplayAttribute.OFFSET_X, 0d),
         data.get(DisplayAttribute.OFFSET_Y, 0d),
         data.get(DisplayAttribute.OFFSET_Z, 0d));
-
+    
     return asloc;
   }
 }

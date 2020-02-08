@@ -1,9 +1,11 @@
 package org.maxgamer.quickshop.shop.hologram;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import lombok.SneakyThrows;
 import java.util.ArrayList;
+import java.util.Collections;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -155,25 +157,21 @@ public interface DisplayItem {
   static ItemStack createGuardItemStack(@NotNull ItemStack itemStack, @NotNull Shop shop) {
     itemStack = new ItemStack(itemStack);
     itemStack.setAmount(1);
-    ItemMeta iMeta = itemStack.getItemMeta();
+    
+    ItemMeta meta = itemStack.getItemMeta();
     if (BaseConfig.displayNameVisible) {
-      if (iMeta.hasDisplayName()) {
-        iMeta.setDisplayName(iMeta.getDisplayName());
-      } else {
-        iMeta.setDisplayName(Util.getItemStackName(itemStack));
-      }
+      if (meta.hasDisplayName())
+        meta.setDisplayName(meta.getDisplayName());
+      else
+        meta.setDisplayName(Util.getItemStackName(itemStack));
     } else {
-      iMeta.setDisplayName(null);
+      meta.setDisplayName("");
     }
-    java.util.List<String> lore = new ArrayList<>();
+    
     ShopProtectionFlag shopProtectionFlag = ShopProtectionFlag.create(itemStack, shop);
-    String protectFlag = GSON.toJson(shopProtectionFlag);
-    for (int i = 0; i < 21; i++) {
-      lore.add(protectFlag); // Create 20 lines lore to make sure no stupid plugin accident remove
-                             // mark.
-    }
-    iMeta.setLore(lore);
-    itemStack.setItemMeta(iMeta);
+    meta.setLore(Collections.singletonList(GSON.toJson(shopProtectionFlag)));
+    
+    itemStack.setItemMeta(meta);
     return itemStack;
   }
 
@@ -193,14 +191,6 @@ public interface DisplayItem {
 
   /** Respawn the displays, if it not exist, it will spawn new one. */
   void respawn();
-
-  /**
-   * Add the protect flags for entity or entity's hand item. Target entity will got protect by
-   * QuickShop
-   *
-   * @param entity Target entity
-   */
-  void safeGuard(Entity entity);
 
   /** Spawn new Displays */
   void spawn();

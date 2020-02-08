@@ -28,10 +28,8 @@ public abstract class EntityDisplayItem implements DisplayItem {
   protected Shop shop;
   @NotNull
   protected DisplayData data;
-  
-  @Nullable
-  protected ItemStack guardedIstack;
-  protected ItemStack originalItemStack;
+  @NotNull
+  protected ItemStack displayItemStack;
   
   protected boolean pendingRemoval;
   
@@ -39,8 +37,9 @@ public abstract class EntityDisplayItem implements DisplayItem {
     this.shop = shop;
     this.data = data;
     
-    this.originalItemStack = new ItemStack(shop.getItem());
-    this.originalItemStack.setAmount(1);
+    this.displayItemStack = new ItemStack(shop.getItem());
+    this.displayItemStack.setAmount(1);
+    this.displayItemStack = DisplayItem.createGuardItemStack(this.displayItemStack, this.shop);
   }
   
   @Override
@@ -121,6 +120,6 @@ public abstract class EntityDisplayItem implements DisplayItem {
     
     this.entity.remove();
     this.entity = null;
-    this.guardedIstack = null;
+    this.displayItemStack = null;
   }
 }
