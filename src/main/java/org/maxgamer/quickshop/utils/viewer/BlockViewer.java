@@ -4,33 +4,28 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.BlockIterator;
 
 public class BlockViewer {
   private final Location from;
   private final int to;
   
-  public BlockViewer(Location origin, int distance) {
+  public BlockViewer(Location origin, double offset, int distance) {
     from = origin  ;
     to   = distance;
-    iterator = new BlockIterator(from, 0, to);
+    iterator = new BlockIterator(from, offset, to);
   }
   
   private BlockIterator iterator;
   private boolean none;
   
-  public static BlockViewer get(Player player, int to) {
-    return new BlockViewer(player.getLocation(), to);
+  public static BlockViewer get(LivingEntity entity, int to) {
+    return new BlockViewer(entity.getLocation(), entity.getEyeHeight(), to);
   }
   
-  public static BlockViewer get(Entity entity, int to) {
-    return new BlockViewer(entity.getLocation(), to);
-  }
-  
-  public static BlockViewer get(Location at, int to) {
-    return new BlockViewer(at, to);
+  public static BlockViewer get(Location eye, int to) {
+    return new BlockViewer(eye, 0, to);
   }
   
   public BlockViewer ifEmpty(Runnable runnable) {

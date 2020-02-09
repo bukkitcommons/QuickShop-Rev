@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import lombok.Cleanup;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.database.connector.DatabaseConnector;
 
@@ -34,7 +35,7 @@ public class Database {
    * @throws SQLException If the database isn't connected
    */
   public boolean hasColumn(@NotNull String table, @NotNull String column) throws SQLException {
-    @Cleanup Connection conn = connector.getConnection();
+    Connection conn = connector.getConnection();
     if (!hasTable(conn, table))
       return false;
     
@@ -52,6 +53,7 @@ public class Database {
     }
   }
   
+  @SneakyThrows
   public boolean hasTable(@NotNull String table) {
     return hasTable(connector.getConnection(),  table);
   }

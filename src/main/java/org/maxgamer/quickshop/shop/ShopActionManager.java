@@ -75,7 +75,7 @@ public class ShopActionManager {
 
     // No enough shop space
     int space = shop.getRemainingSpace();
-    if (space != -1 && space < amount) {
+    if (!shop.isUnlimited() && space < amount) {
       p.sendMessage(
           MsgUtil.getMessage("shop-has-no-space", p, "" + space,
               Util.getItemStackName(shop.getItem())));
@@ -84,6 +84,7 @@ public class ShopActionManager {
 
     // Not enough items
     int count = Util.countItems(p.getInventory(), shop.getItem());
+    amount = amount == -1 ? count : amount;
     if (amount > count) {
       p.sendMessage(MsgUtil.getMessage("you-dont-have-that-many-items", p, "" + count,
           Util.getItemStackName(shop.getItem())));
@@ -199,8 +200,6 @@ public class ShopActionManager {
       }
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
     }
-    
-    Util.debug("235");
 
     if (ShopManager.instance().getLoadedShopAt(info.location()).isPresent()) {
       p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
@@ -218,15 +217,11 @@ public class ShopActionManager {
       return;
     }
     
-    Util.debug("236");
-    
     if (info.location().block().getType() == Material.ENDER_CHEST) {
       if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.enderchest")) {
         return;
       }
     }
-    
-    Util.debug("234");
 
     // allow-shop-without-space-for-sign check
     if (QuickShop.instance().getConfig().getBoolean("shop.auto-sign")
@@ -261,8 +256,6 @@ public class ShopActionManager {
     // Price per item
     double price;
     double minPrice = QuickShop.instance().getConfig().getDouble("shop.minimum-price");
-    
-    Util.debug("233");
 
     try {
       if (QuickShop.instance().getConfig().getBoolean("whole-number-prices-only")) {
@@ -349,8 +342,6 @@ public class ShopActionManager {
       }
     }
     
-    Util.debug("23");
-    
     /*
      * Creates the shop
      */
@@ -369,8 +360,6 @@ public class ShopActionManager {
     if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.bypasscreatefee")) {
       createCost = 0;
     }
-    
-    Util.debug("231");
 
     if (createCost > 0) {
       if (!QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), createCost)) {
@@ -413,6 +402,7 @@ public class ShopActionManager {
       @NotNull ShopSnapshot info) {
 
     int stock = shop.getRemainingStock();
+    amount = amount == -1 ? stock : amount;
     stock = shop.isUnlimited() ? Integer.MAX_VALUE : stock;
     String stacks = info.item().getAmount() > 1 ? " * " + info.item().getAmount() : "";
     if (stock < amount) {
@@ -539,12 +529,13 @@ public class ShopActionManager {
       }
     } catch (NumberFormatException e) {
       if (message.equalsIgnoreCase(
-          QuickShop.instance().getConfig().getString("shop.word-for-trade-all-items", "all")))
+          QuickShop.instance().getConfig().getString("shop.word-for-trade-all-items", "all"))) {
         amount = -1;
-
-      p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));
-      Util.debug("Receive the chat " + message + " and it format failed: " + e.getMessage());
-      return;
+      } else {
+        p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));
+        Util.debug("Receive the chat " + message + " and it format failed: " + e.getMessage());
+        return;
+      }
     }
 
     if (shop.getShopType() == ShopType.BUYING) {

@@ -13,6 +13,7 @@ import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
+import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class SubCommand_Clean implements CommandProcesser {
@@ -41,6 +42,11 @@ public class SubCommand_Clean implements CommandProcesser {
       try {
         if (shop.getLocation().world() != null && shop.is(ShopType.SELLING)
             && shop.getRemainingStock() == 0 && shop instanceof ContainerShop) {
+          // FIXME load air shop
+          if (!Util.canBeShopIgnoreBlocklist(shop.getLocation().block().getState())) {
+            pendingRemoval.add(shop);
+            return;
+          }
           
           ItemStack[] contents = ((InventoryHolder) shop.getLocation().block().getState()).getInventory().getContents();
           for (ItemStack i : contents)

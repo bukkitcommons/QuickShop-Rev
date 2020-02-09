@@ -109,7 +109,7 @@ public class ShopLoader implements Listener {
   }
 
   public @Nullable Map<Long, Shop> getShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
-    @Nullable Map<Long, Map<Long, Shop>> inWorld = this.getShopsInWorld(world);
+    @Nullable Map<Long, Map<Long, Shop>> inWorld = getShopsInWorld(world);
     if (inWorld == null) {
       return null;
     }
@@ -145,6 +145,8 @@ public class ShopLoader implements Listener {
   }
   
   public void delete(@NotNull Shop shop) {
+    Util.debug("Deleteing shop: " + shop.getLocation());
+    
     ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
       Util.debug("Shop deletion was canceled because a plugin canceled it.");
@@ -188,16 +190,23 @@ public class ShopLoader implements Listener {
       return;
 
     @Nullable Map<Long, Shop> inChunk = getShopsInChunk(event.getChunk());
+    if (inChunk != null)
     
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-        inChunk.values().forEach(shop -> ShopManager.instance().load(shop));
+        inChunk.values().forEach(shop -> {
+          if (Util.canBeShop(shop.getLocation().block())) {
+            Util.debug("Loading from chunk loading: " + shop.getLocation());
+            ShopManager.instance().load(shop);
+          } else {
+            Util.debug("Cannot be a shop on chunk loading: " + shop.getLocation());
+          }
+        });
       });
   }
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
-
     @Nullable Map<Long, Shop> inChunk = getShopsInChunk(e.getChunk());
 
     if (inChunk != null && !inChunk.isEmpty())
@@ -271,12 +280,17 @@ public class ShopLoader implements Listener {
           inWorld.computeIfAbsent(Util.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
       inChunk.put(Util.blockKey(data.x(), data.y(), data.z()), shop);
       
+      loadedShops++;
+      
       if (Util.isChunkLoaded(shop.getLocation())) {
         // Load to World
         if (Util.canBeShop(shop.getLocation().block())) {
-          loadedShops++;
           ShopManager.instance().load(shop);
+        } else {
+          Util.debug("Cannot be a shop on world loading: " + shop.getLocation());
         }
+      } else {
+        Util.debug("Ignored shop at unloaded chunk: " + shop.getLocation());
       }
       
       durTotalShopsNano = System.nanoTime() - onPerShop;

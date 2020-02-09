@@ -656,8 +656,9 @@ public class MsgUtil {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.successfully-sold", p));
+    String stackMessage = shop.getItem().getAmount() > 1 ? " * " + shop.getItem().getAmount() : "";
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.item-name-and-price", p, "" + amount,
-        Util.getItemStackName(shop.getItem()), Util.format((amount * shop.getPrice()))));
+        Util.getItemStackName(shop.getItem()) + stackMessage, Util.format((amount * shop.getPrice()))));
     if (QuickShop.instance().getConfig().getBoolean("show-tax")) {
       double tax = QuickShop.instance().getConfig().getDouble("tax");
       double total = amount * shop.getPrice();
@@ -709,9 +710,10 @@ public class MsgUtil {
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.shop-information", p));
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.owner", p, shop.ownerName()));
     // Enabled
+    String stackMessage = shop.getItem().getAmount() > 1 ? " * " + shop.getItem().getAmount() : "";
     sendItemholochat(shop, items, p,
         ChatColor.DARK_PURPLE + MsgUtil.getMessage("tableformat.left_begin", p) + " "
-            + MsgUtil.getMessage("menu.item", p, Util.getItemStackName(items)));
+            + MsgUtil.getMessage("menu.item", p, Util.getItemStackName(items) + stackMessage));
     if (Util.hasDurability(items.getType())) {
       chatSheetPrinter.printLine(
           MsgUtil.getMessage("menu.damage-percent-remaining", p, Util.getToolPercentage(items)));
@@ -725,7 +727,7 @@ public class MsgUtil {
             .printLine(MsgUtil.getMessage("menu.stock", p, "" + shop.getRemainingStock()));
       }
     } else {
-      if (shop.getRemainingSpace() == -1) {
+      if (shop.isUnlimited()) {
         chatSheetPrinter.printLine(
             MsgUtil.getMessage("menu.space", p, "" + MsgUtil.getMessage("signs.unlimited", p)));
       } else {

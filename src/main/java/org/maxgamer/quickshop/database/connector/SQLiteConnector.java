@@ -15,7 +15,7 @@ public class SQLiteConnector implements DatabaseConnector {
   public SQLiteConnector(@NotNull File dbFile) {
     this.dbFile = dbFile;
   }
-
+  
   /**
    * Gets the database connection for executing queries on.
    *
@@ -49,5 +49,11 @@ public class SQLiteConnector implements DatabaseConnector {
       e.printStackTrace();
       return null;
     }
+  }
+
+  @Override
+  public void close() throws SQLException {
+    if (connection != null)
+      connection.close();
   }
 }

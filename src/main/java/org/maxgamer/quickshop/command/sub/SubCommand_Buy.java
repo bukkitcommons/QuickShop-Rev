@@ -29,7 +29,7 @@ public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
         MsgUtil.getMessage("not-looking-at-shop", sender));
 
     BlockViewer
-        .get((Entity) sender, 10)
+        .get((Player) sender, 10)
         .ifEmpty(notLookingAtShop)
         
         .forEach(block -> {

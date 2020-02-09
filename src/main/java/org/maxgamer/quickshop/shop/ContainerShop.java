@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -158,7 +159,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingStock() {
-    return unlimited ? Integer.MAX_VALUE : Util.countItems(this.getInventory(), this.getItem()) / item.getAmount();
+    return unlimited ? -1 : Util.countItems(this.getInventory(), this.getItem()) / item.getAmount();
   }
 
   /**
@@ -168,7 +169,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingSpace() {
-    return unlimited ? Integer.MAX_VALUE : Util.countSpace(this.getInventory(), this.getItem());
+    return unlimited ? -1 : Util.countSpace(this.getInventory(), this.getItem());
   }
 
   /**
@@ -581,7 +582,7 @@ public class ContainerShop implements Shop, Managed {
       Sign sign = (Sign) block.getState();
       String[] lines = sign.getLines();
       
-      Util.debug("Line: " + lines[0] + ", Header" + signHeader);
+      Util.debug("Line: " + lines[0] + ChatColor.RESET + ", Header: " + signHeader);
       
       if (lines[0].equals(signHeader) ||
           Arrays.stream(lines).allMatch(String::isEmpty))

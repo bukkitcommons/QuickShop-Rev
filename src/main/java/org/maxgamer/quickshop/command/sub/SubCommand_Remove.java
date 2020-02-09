@@ -1,6 +1,6 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.util.Optional;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -10,7 +10,6 @@ import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.BlockViewer;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
@@ -42,6 +41,8 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
           } else {
             sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
           }
+          
+          return ViewAction.BREAK;
         }
         
         return ViewAction.NEXT;

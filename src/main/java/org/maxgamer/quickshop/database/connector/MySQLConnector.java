@@ -38,6 +38,13 @@ public class MySQLConnector implements DatabaseConnector {
     this.url = "jdbc:mysql://" + host + ":" + port + "/" + database;
     POOL = new Connection[MAX_CONNECTIONS];
   }
+  
+  @Override
+  public void close() throws SQLException {
+    for (Connection conn : POOL)
+      if (conn != null)
+        conn.close();
+  }
 
   /**
    * Gets the database connection for executing queries on.

@@ -236,7 +236,7 @@ public class Util {
       }
     }
     
-    return items;
+    return items / item.getAmount();
   }
 
   /**
@@ -701,7 +701,7 @@ public class Util {
   
   public static boolean isChunkLoaded(@NotNull ShopLocation location) {
     int chunkX = location.x() >> 4;
-    int chunkZ = location.y() >> 4;
+    int chunkZ = location.z() >> 4;
     
     return location.world().isChunkLoaded(chunkX, chunkZ);
   }

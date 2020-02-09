@@ -196,7 +196,10 @@ public class SentryErrorReporter {
    * @param context BreadCrumb
    * @return Event Uniqud ID
    */
-  public @Nullable UUID sendError(@NotNull Throwable throwable, @NotNull String... context) {
+  public @Nullable UUID sendError(@Nullable Throwable throwable, @NotNull String... context) {
+    if (throwable == null)
+      return null;
+    
     try {
       if (QuickShop.instance().getBootError() != null) {
         return null; // Don't report any errors if boot failed.

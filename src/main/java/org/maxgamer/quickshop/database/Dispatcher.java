@@ -21,6 +21,8 @@ public class Dispatcher implements Runnable {
   private final WarningSender warningSender;
   @Nullable
   private volatile boolean running = true;
+  @NotNull
+  private final Thread dispatcherThread;
 
   /**
    * Queued database manager. Use queue to solve run SQL make server lagg issue.
@@ -32,10 +34,10 @@ public class Dispatcher implements Runnable {
     warningSender = new WarningSender(QuickShop.instance(), 600000);
     database = db;
     
-    Thread thread = new Thread(this);
-           thread.setName("QuickShop Database Dispatcher");
-           thread.setPriority(Thread.MIN_PRIORITY);
-           thread.start();
+    dispatcherThread = new Thread(this);
+    dispatcherThread.setName("QuickShop Database Dispatcher");
+    dispatcherThread.setPriority(Thread.MIN_PRIORITY);
+    dispatcherThread.start();
   }
 
   /**
@@ -56,7 +58,7 @@ public class Dispatcher implements Runnable {
       while (running)
         execute(sqlQueue.take());
     } catch (InterruptedException interrupted) {
-      run();
+      running = false;
     }
   }
   
@@ -87,8 +89,15 @@ public class Dispatcher implements Runnable {
   }
   
   public void flush() {
-    running = false;
+    dispatcherThread.interrupt();
     ShopLogger.instance().info("Please wait for the data to flush...");
     sqlQueue.forEach(statement -> execute(statement));
+    sqlQueue.clear();
+    
+    try {
+      database.getConnector().close();
+    } catch (Throwable t) {
+      ;
+    }
   }
 }

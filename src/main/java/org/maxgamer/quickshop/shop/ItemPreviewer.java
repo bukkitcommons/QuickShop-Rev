@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +35,11 @@ public class ItemPreviewer implements Listener {
    * @param player Target player.
    */
   public ItemPreviewer(@NotNull ItemStack itemStack, @NotNull Player player) {
-    this.itemStack = new ItemStack(itemStack);
     this.player = player;
     
-    NBTItem nbtItem = new NBTItem(this.itemStack);
+    NBTItem nbtItem = new NBTItem(itemStack);
     nbtItem.setBoolean("isQuickShopPreview", Boolean.TRUE);
+    this.itemStack = nbtItem.getItem();
   }
 
   public static boolean isPreviewItem(@Nullable ItemStack stack) {
