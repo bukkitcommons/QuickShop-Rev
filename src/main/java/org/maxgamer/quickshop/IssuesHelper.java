@@ -1,17 +1,38 @@
 package org.maxgamer.quickshop;
 
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
-/** A class to check known issue cause plugin failed enable. */
-class BuiltInSolution {
+/** BootError class contains print errors on /qs command when plugin failed launched. */
+@EqualsAndHashCode
+@ToString
+public class IssuesHelper {
+  private static boolean errored;
+  
+  public static boolean hasErrored() {
+    return errored;
+  }
+
+  protected static void error(@NotNull String... errors) {
+    errored = true;
+    ShopLogger.instance().severe("#####################################################");
+    ShopLogger.instance().severe(" QuickShop is disabled, Please fix any errors and restart");
+    for (String err : errors)
+      ShopLogger.instance().severe(err);
+    ShopLogger.instance().severe("#####################################################");
+  }
+  
   /**
    * Call when failed load database, and use this to check the reason.
    *
    * @return The reason of error.
    */
-  static BootError databaseError() {
-    return new BootError("Error connecting to the database",
+  static void databaseError() {
+    IssuesHelper.error("Error connecting to the database",
         "Make sure your database service is running.",
         "Or check the configuration in your config.yml");
   }
@@ -21,12 +42,12 @@ class BuiltInSolution {
    *
    * @return The reason of error.
    */
-  static BootError econError() {
+  static void econError() {
     // Check Vault is installed
     if (Bukkit.getPluginManager().getPlugin("Vault") == null
         && Bukkit.getPluginManager().getPlugin("Reserve") == null) {
       // Vault not installed
-      return new BootError("Vault or Reserve is not installed or loaded!",
+      IssuesHelper.error("Vault or Reserve is not installed or loaded!",
           "Make sure you installed Vault or Reserve.");
     }
     // if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
@@ -37,14 +58,14 @@ class BuiltInSolution {
     // Vault is installed
     if (Bukkit.getPluginManager().getPlugin("CMI") != null) {
       // Found may in-compatiable plugin
-      return new BootError(
+      IssuesHelper.error(
           "No Economy plugin detected, did you installed and loaded them? Make sure they loaded before QuickShop.",
           "Make sure you have an economy plugin hooked into Vault or Reserve.",
           ChatColor.YELLOW + "Incompatibility detected: CMI Installed",
           "Download CMI Edition of Vault might fix this.");
     }
 
-    return new BootError(
+    IssuesHelper.error(
         "No Economy plugin detected, did you installed and loaded them? Make sure they loaded before QuickShop.",
         "Install an economy plugin to get Vault or Reserve working.");
   }

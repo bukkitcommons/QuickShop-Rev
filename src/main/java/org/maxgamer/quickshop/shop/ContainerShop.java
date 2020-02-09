@@ -237,63 +237,40 @@ public class ContainerShop implements Shop, Managed {
    * Buys amount of item from Player p. Does NOT check our inventory, or balances
    *
    * @param p The player to buy from
-   * @param amount The amount to buy
+   * @param stackAmount The amount to buy
    */
   @Override
-  public void buy(@NotNull Player p, int amount) {
-    if (amount < 0) {
-      this.sell(p, -amount);
+  public void buy(@NotNull Player p, int stackAmount) {
+    if (stackAmount < 0)
+      sell(p, -stackAmount);
+    
+    int totalAmount = stackAmount * item.getAmount();
+    ItemStack[] contents = p.getInventory().getStorageContents();
+    
+    for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
+      ItemStack playerItem = contents[i];
+      
+      if (playerItem == null || !isShoppingItem(playerItem)) {
+        continue;
+      }
+      
+      int buyAmount = Math.min(totalAmount, playerItem.getAmount());
+      playerItem.setAmount(playerItem.getAmount() - buyAmount);
+      totalAmount -= buyAmount;
     }
-    amount = amount * this.item.getAmount();
-    if (this.isUnlimited()) {
-      ItemStack[] contents = p.getInventory().getContents();
-      for (int i = 0; amount > 0 && i < contents.length; i++) {
-        ItemStack stack = contents[i];
-        if (stack == null || stack.getType() == Material.AIR) {
-          continue; // No item
-        }
-        if (isShoppingItem(stack)) {
-          int stackSize = Math.min(amount, stack.getAmount());
-          stack.setAmount(stack.getAmount() - stackSize);
-          amount -= stackSize;
-        }
-      }
-      // Send the players new inventory to them
-      p.getInventory().setContents(contents);
-      this.setSignText();
-      // This should not happen.
-      if (amount > 0) {
-        ShopLogger.instance().log(Level.WARNING,
-            "Could not take all items from a players inventory on purchase! " + p.getName()
-                + ", missing: " + amount + ", item: " + Util.getItemStackName(this.getItem())
-                + "!");
-      }
-    } else {
-      ItemStack[] playerContents = p.getInventory().getContents();
-      Inventory chestInv = this.getInventory();
-      for (int i = 0; amount > 0 && i < playerContents.length; i++) {
-        ItemStack item = playerContents[i];
-        if (item != null && this.isShoppingItem(item)) {
-          // Copy it, we don't want to interfere
-          item = new ItemStack(item);
-          // Amount = total, item.getAmount() = how many items in the
-          // stack
-          int stackSize = Math.min(amount, item.getAmount());
-          // If Amount is item.getAmount(), then this sets the amount
-          // to 0
-          // Else it sets it to the remainder
-          playerContents[i].setAmount(playerContents[i].getAmount() - stackSize);
-          // We can modify this, it is a copy.
-          item.setAmount(stackSize);
-          // Add the items to the players inventory
-          Objects.requireNonNull(chestInv).addItem(item);
-          amount -= stackSize;
-        }
-      }
-      // Now update the players inventory.
-      p.getInventory().setContents(playerContents);
-      this.setSignText();
+    
+    p.getInventory().setContents(contents);
+    if (totalAmount > 0) {
+      ShopLogger.instance().severe("Could not take all items from a players inventory on purchase! " + p.getName()
+              + ", missing: " + stackAmount + ", item: " + Util.getItemStackName(this.getItem())
+              + "!");
+    } else if (!unlimited) {
+      ItemStack offer = new ItemStack(item);
+      offer.setAmount(stackAmount * item.getAmount());
+      getInventory().addItem(offer);
     }
+    
+    setSignText();
   }
 
   @Override

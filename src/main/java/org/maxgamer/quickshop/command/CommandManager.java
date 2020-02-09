@@ -141,11 +141,6 @@ public class CommandManager implements TabCompleter, CommandExecutor {
   @Override
   public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
       @NotNull String commandLabel, @NotNull String[] cmdArg) {
-    if (QuickShop.instance().getBootError() != null) {
-      QuickShop.instance().getBootError().printErrors(sender);
-      return true;
-    }
-
     if (sender instanceof Player) {
       if (BaseConfig.tabCompleteSound) {
         Player player = (Player) sender;

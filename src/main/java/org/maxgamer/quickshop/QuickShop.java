@@ -99,7 +99,7 @@ public class QuickShop extends JavaPlugin {
   private BlockListener blockListener;
   /** The BootError, if it not NULL, plugin will stop loading and show setted errors when use /qs */
   @Nullable
-  private BootError bootError;
+  private IssuesHelper bootError;
   // Listeners - We decide which one to use at runtime
   private ChatListener chatListener;
   private CommandManager commandManager;
@@ -270,8 +270,7 @@ public class QuickShop extends JavaPlugin {
       EconomyProvider core = null;
       switch (EconomyType.fromID(BaseConfig.economyType)) {
         case UNKNOWN:
-          bootError =
-              new BootError("Can't load the Economy provider, invalid value in config.yml.");
+          IssuesHelper.error("Can't load the Economy provider, invalid value in config.yml.");
           return false;
         case VAULT:
           core = new VaultEconProvider();
@@ -290,7 +289,7 @@ public class QuickShop extends JavaPlugin {
       }
       if (!core.isValid()) {
         // getLogger().severe("Economy is not valid!");
-        bootError = BuiltInSolution.econError();
+        IssuesHelper.econError();
         // if(econ.equals("Vault"))
         // getLogger().severe("(Does Vault have an Economy to hook into?!)");
         return false;
@@ -303,7 +302,7 @@ public class QuickShop extends JavaPlugin {
       e.printStackTrace();
       getLogger().severe("QuickShop could not hook into a economy/Not found Vault or Reserve!");
       getLogger().severe("QuickShop CANNOT start!");
-      bootError = BuiltInSolution.econError();
+      IssuesHelper.econError();
       HandlerList.unregisterAll(this);
       getLogger().severe("Plugin listeners was disabled, please fix the economy issue.");
       return false;
@@ -494,7 +493,7 @@ public class QuickShop extends JavaPlugin {
     try {
       runtimeCheck(this);
     } catch (RuntimeException e) {
-      bootError = new BootError(e.getMessage());
+      IssuesHelper.error(e.getMessage());
       return;
     }
 
@@ -730,7 +729,7 @@ public class QuickShop extends JavaPlugin {
     } catch (ConnectionException e) {
       e.printStackTrace();
       if (setupDBonEnableding) {
-        bootError = BuiltInSolution.databaseError();
+        IssuesHelper.databaseError();
         return false;
       } else {
         getLogger().severe("Error connecting to the database.");
@@ -740,7 +739,7 @@ public class QuickShop extends JavaPlugin {
       e.printStackTrace();
       getServer().getPluginManager().disablePlugin(this);
       if (setupDBonEnableding) {
-        bootError = BuiltInSolution.databaseError();
+        IssuesHelper.databaseError();
         return false;
       } else {
         getLogger().severe("Error setting up the database.");
