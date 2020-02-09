@@ -176,7 +176,7 @@ public class SubCommand_Price implements CommandProcesser {
 
       final ContainerShop cs = (ContainerShop) shop.get();
 
-      if (!cs.isDoubleShop()) {
+      if (!cs.isDualShop()) {
         return;
       }
 

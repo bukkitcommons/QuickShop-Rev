@@ -62,7 +62,7 @@ public class SubCommand_Info implements CommandProcesser {
             selling++;
           }
 
-          if (shop instanceof ContainerShop && ((ContainerShop) shop).isDoubleShop()) {
+          if (shop instanceof ContainerShop && ((ContainerShop) shop).isDualShop()) {
             doubles++;
           } else if (shop.is(ShopType.SELLING) && shop.getRemainingStock() == 0) {
             nostock++;

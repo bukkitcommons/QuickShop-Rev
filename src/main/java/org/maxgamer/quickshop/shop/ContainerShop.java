@@ -1,19 +1,13 @@
 package org.maxgamer.quickshop.shop;
 
-import com.bekvon.bukkit.residence.commands.command;
-import com.bekvon.bukkit.residence.commands.contract;
 import com.google.common.collect.Lists;
-import com.lishid.openinv.OpenInv;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.Level;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,14 +71,25 @@ public class ContainerShop implements Shop, Managed {
   private boolean unlimited;
 
   private ContainerShop(@NotNull ContainerShop s) {
-    this.display = s.display;
     this.shopType = s.shopType;
-    this.item = new ItemStack(s.item);
-    this.location = s.location;
     this.unlimited = s.unlimited;
-    this.moderator = s.moderator;
     this.price = s.price;
-    this.isLoaded = s.isLoaded;
+    
+    this.item = new ItemStack(s.item);
+    this.location = s.location.clone();
+    this.moderator = s.moderator.clone();
+    
+    if (BaseConfig.displayItems) {
+      DisplayData data = DisplayData.create(this.item);
+      switch (data.type()) {
+        case ARMORSTAND:
+          display = new ArmorStandDisplayItem(this, data);
+          break;
+        default:
+          display = new RealDisplayItem(this);
+          break;
+      }
+    }
   }
 
   /**
@@ -110,25 +115,13 @@ public class ContainerShop implements Shop, Managed {
     if (BaseConfig.displayItems) {
       DisplayData data = DisplayData.create(this.item);
       switch (data.type()) {
-        case UNKNOWN:
-          Util.debug(
-              "Failed to create a ContainerShop displayItem, the type is unknown, fallback to RealDisplayItem");
-          this.display = new RealDisplayItem(this);
-          break;
-        case REALITEM:
-          this.display = new RealDisplayItem(this);
-          break;
         case ARMORSTAND:
-          this.display = new ArmorStandDisplayItem(this, data);
+          display = new ArmorStandDisplayItem(this, data);
           break;
         default:
-          Util.debug(
-              "Warning: Failed to create a ContainerShop displayItem, the type we didn't know, fallback to RealDisplayItem");
-          this.display = new RealDisplayItem(this);
+          display = new RealDisplayItem(this);
           break;
       }
-    } else {
-      Util.debug("The display was disabled.");
     }
   }
 
@@ -315,13 +308,6 @@ public class ContainerShop implements Shop, Managed {
     this.display.removeDupe();
   }
 
-  /**
-   * Returns a clone of this shop. References to the same display item, itemstack, location and
-   * owner as this shop does. Do not modify them or you will modify this shop.
-   *
-   * <p>
-   * **NOT A DEEP CLONE**
-   */
   @Override
   @NotNull
   public ContainerShop clone() {
@@ -388,9 +374,9 @@ public class ContainerShop implements Shop, Managed {
   @Nullable
   public ContainerShop getAttachedShop() {
     Optional<Location> c = Util.getSecondHalf(location.block());
-    if (!c.isPresent()) {
+    if (!c.isPresent())
       return null;
-    }
+    
     ShopViewer shop = ShopManager.instance().getLoadedShopAt(c.get());
     return (ContainerShop) shop.get();
   }
@@ -430,16 +416,14 @@ public class ContainerShop implements Shop, Managed {
    *
    * @param lines The array of lines to change. Index is line number.
    */
-  @Override
-  public void setSignText(@NotNull String[] lines) {
-    for (Sign sign : this.getShopSigns()) {
-      if (Arrays.equals(sign.getLines(), lines)) {
-        Util.debug("Skipped new sign text setup: Same content");
+  private void setSignText(@NotNull String[] lines) {
+    for (Sign sign : getShopSigns()) {
+      if (Arrays.equals(sign.getLines(), lines))
         continue;
-      }
-      for (int i = 0; i < lines.length; i++) {
+      
+      for (int i = 0; i < lines.length; i++)
         sign.setLine(i, lines[i]);
-      }
+      
       sign.update(true);
     }
   }
@@ -447,7 +431,7 @@ public class ContainerShop implements Shop, Managed {
   @Override
   public void setUnlimited(boolean unlimited) {
     this.unlimited = unlimited;
-    this.setSignText();
+    setSignText();
     save();
   }
 
@@ -459,21 +443,21 @@ public class ContainerShop implements Shop, Managed {
   @Override
   public void setShopType(@NotNull ShopType shopType) {
     this.shopType = shopType;
-    this.setSignText();
+    setSignText();
     save();
   }
 
   /** Updates signs attached to the shop */
   @Override
   public void setSignText() {
-    //if (!Util.isChunkLoaded(location)) // FIXME
-    //  return;
+    if (!Util.isChunkLoaded(location))
+      return;
     
     String[] lines = new String[4];
     
     OfflinePlayer player =
         QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled() ?
-        Bukkit.getOfflinePlayer(this.getOwner()) : null;
+        Bukkit.getOfflinePlayer(getOwner()) : null;
     
     lines[0] = MsgUtil.getMessagePlaceholder(
         "signs.header",
@@ -499,7 +483,7 @@ public class ContainerShop implements Shop, Managed {
         player,
         Util.format(price));
     
-    this.setSignText(lines);
+    setSignText(lines);
   }
 
   @Override
@@ -568,17 +552,13 @@ public class ContainerShop implements Shop, Managed {
    * @return true if this shop is a double chest, and the other half is selling/buying the same as
    *         this is buying/selling.
    */
-  public boolean isDoubleShop() {
-    ContainerShop nextTo = this.getAttachedShop();
-    if (nextTo == null) {
+  public boolean isDualShop() {
+    ContainerShop nextTo = getAttachedShop();
+    if (nextTo == null)
       return false;
-    }
-    if (nextTo.isShoppingItem(this.getItem())) {
-      // They're both trading the same item
-      // They're both buying or both selling => Not a double shop,
-      // just two shops.
-      // One is buying, one is selling.
-      return this.getShopType() != nextTo.getShopType();
+    
+    if (nextTo.isShoppingItem(getItem())) {
+      return getShopType() != nextTo.getShopType();
     } else {
       return false;
     }
@@ -604,19 +584,9 @@ public class ContainerShop implements Shop, Managed {
   }
 
   @Override
-  public @Nullable DisplayItem getDisplay() {
+  @Nullable
+  public DisplayItem getDisplay() {
     return this.display;
-  }
-
-  /** Check the container still there and we can keep use it. */
-  public void checkContainer() { // FIXME not here
-    if (!this.isLoaded) {
-      return;
-    }
-    if (!Util.canBeShop(this.getLocation().block())) {
-      Util.debug("Shop at " + this.getLocation() + " container was missing, remove...");
-      ShopManager.instance().unload(this);
-    }
   }
 
   /** Load ContainerShop. */
@@ -659,25 +629,26 @@ public class ContainerShop implements Shop, Managed {
   @Override
   public void onClick() {
     ShopClickEvent event = new ShopClickEvent(this);
-    if (Util.fireCancellableEvent(event)) {
-      Util.debug("Ignore shop click, because some plugin cancel it.");
+    if (Util.fireCancellableEvent(event))
       return;
-    }
-    this.setSignText();
-    this.checkDisplay();
+    
+    setSignText();
+    checkDisplay();
   }
 
   @Override
   public @NotNull String ownerName() {
-    if (this.isUnlimited()) {
+    if (unlimited) {
       return MsgUtil.getMessagePlaceholder("admin-shop",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
-    String name = Bukkit.getOfflinePlayer(this.getOwner()).getName();
+    
+    String name = Bukkit.getOfflinePlayer(getOwner()).getName();
     if (name == null || name.isEmpty()) {
       return MsgUtil.getMessagePlaceholder("unknown-owner",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
+    
     return name;
   }
   

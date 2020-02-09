@@ -385,7 +385,7 @@ public class ShopActionManager {
     // Figures out which way we should put the sign on and
     // sets its text.
 
-    if (shop.isDoubleShop()) {
+    if (shop.isDualShop()) {
       Shop nextTo = shop.getAttachedShop();
       if (Objects.requireNonNull(nextTo).getPrice() > shop.getPrice()) {
         // The one next to it must always be a

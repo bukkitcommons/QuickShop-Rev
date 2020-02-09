@@ -42,6 +42,21 @@ public class ShopLocation implements Serializable {
     return new ShopLocation(world, x, y, z);
   }
   
+  @NotNull
+  @Override
+  public ShopLocation clone() {
+    return new ShopLocation(this);
+  }
+  
+  public ShopLocation(@NotNull ShopLocation location) {
+    worldName = location.worldName;
+    world = location.world;
+    x = location.x;
+    y = location.y;
+    z = location.z;
+    blockKey = location.blockKey;
+  }
+  
   public ShopLocation(@NotNull World world, int x, int y, int z) {
     this.world = world;
     this.worldName = world.getName();

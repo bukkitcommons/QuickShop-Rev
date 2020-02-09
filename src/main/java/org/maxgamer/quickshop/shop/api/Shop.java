@@ -127,13 +127,6 @@ public interface Shop extends Managed {
   ItemStack getItem();
 
   /**
-   * Set texts on shop's sign
-   *
-   * @param paramArrayOfString The texts you want set
-   */
-  void setSignText(String[] paramArrayOfString);
-
-  /**
    * Get shop's location
    *
    * @return Shop's location

@@ -51,8 +51,8 @@ public class ShopModerator implements Managed {
     staffs.clear();
   }
 
-  @Override
   @NotNull
+  @Override
   public ShopModerator clone() {
     ShopModerator copy = new ShopModerator(owner);
     copy.staffs.addAll(staffs);

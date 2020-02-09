@@ -54,7 +54,7 @@ public class SubCommand_Clean implements CommandProcesser {
               return;
           
           ContainerShop cs = (ContainerShop) shop;
-          if (cs.isDoubleShop()) {
+          if (cs.isDualShop()) {
             return;
           }
           pendingRemoval.add(shop); // Is selling, but has no stock, and is a chest shop, but is not
