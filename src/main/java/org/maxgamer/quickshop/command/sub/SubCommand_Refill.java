@@ -66,7 +66,7 @@ public class SubCommand_Refill implements CommandProcesser {
         continue;
       }
 
-      shop.get().add(shop.get().getItem(), add);
+      shop.get().fill(add);
       sender.sendMessage(MsgUtil.getMessage("refill-success", sender));
       return;
     }

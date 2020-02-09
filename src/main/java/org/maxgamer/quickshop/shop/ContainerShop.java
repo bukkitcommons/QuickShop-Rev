@@ -1,5 +1,7 @@
 package org.maxgamer.quickshop.shop;
 
+import com.bekvon.bukkit.residence.commands.command;
+import com.bekvon.bukkit.residence.commands.contract;
 import com.google.common.collect.Lists;
 import com.lishid.openinv.OpenInv;
 import java.util.ArrayList;
@@ -137,19 +139,22 @@ public class ContainerShop implements Shop, Managed {
    * @param amount The amount to add to the shop.
    */
   @Override
-  public void add(@NotNull ItemStack item, int amount) {
-    if (this.unlimited) {
+  public void fill(int amount) {
+    if (this.unlimited)
       return;
-    }
-    Inventory inv = this.getInventory();
-    int remains = amount;
+    
+    Inventory inv = getInventory();
+    ItemStack offer = new ItemStack(item);
+    int remains = amount * offer.getAmount();
+    
     while (remains > 0) {
-      int stackSize = Math.min(remains, item.getMaxStackSize());
-      item.setAmount(stackSize);
-      inv.addItem(item);
+      int stackSize = Math.min(remains, offer.getMaxStackSize());
+      offer.setAmount(stackSize);
+      inv.addItem(offer);
       remains -= stackSize;
     }
-    this.setSignText();
+    
+    setSignText();
   }
 
   /**
@@ -390,27 +395,32 @@ public class ContainerShop implements Shop, Managed {
     return (ContainerShop) shop.get();
   }
 
-  /** @return The chest this shop is based on. */
-  public @Nullable Inventory getInventory() {
+  @Nullable
+  public Inventory getInventory() {
     try {
-      if (location.block().getState().getType() == Material.ENDER_CHEST
-          && QuickShop.instance().getOpenInvPlugin() != null) {
-        OpenInv openInv = ((OpenInv) QuickShop.instance().getOpenInvPlugin());
+      if (QuickShop.instance().getOpenInvPlugin() != null ||
+          location.block().getType() == Material.ENDER_CHEST) {
+        
+        com.lishid.openinv.OpenInv openInv = ((com.lishid.openinv.OpenInv) QuickShop.instance().getOpenInvPlugin());
+        
         return openInv.getSpecialEnderChest(
-            openInv.loadPlayer(Bukkit.getOfflinePlayer(this.moderator.getOwner())),
-            Bukkit.getOfflinePlayer((this.moderator.getOwner())).isOnline()).getBukkitInventory();
+            openInv.loadPlayer(Bukkit.getOfflinePlayer(moderator.getOwner())),
+            Bukkit.getOfflinePlayer((moderator.getOwner())).isOnline()).getBukkitInventory();
       }
-    } catch (Exception e) {
-      Util.debug(e.getMessage());
-      return null;
+    } catch (InstantiationException ex) {
+      ShopLogger.instance().warning("This exception was throwed by OpenInv and probably not a QuickShop issue.");
+      ex.printStackTrace();
     }
-    InventoryHolder container;
+    
     try {
-      container = (InventoryHolder) location.block().getState();
+      InventoryHolder container = (InventoryHolder) location.block().getState();
       return container.getInventory();
-    } catch (Exception e) {
-      ShopLoader.instance().delete(this);
-      Util.debug("Inventory doesn't exist anymore: " + this + " shop was removed.");
+    } catch (Throwable t) {
+      ShopLogger.instance().warning("The container of a shop have probably gone: " + location);
+      ShopLogger.instance().warning("Details of this exception:");
+      t.printStackTrace();
+      
+      ShopManager.instance().unload(this);
       return null;
     }
   }

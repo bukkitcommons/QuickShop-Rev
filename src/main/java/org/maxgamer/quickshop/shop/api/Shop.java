@@ -57,13 +57,7 @@ public interface Shop extends Managed {
    */
   void onUnload();
   
-  /**
-   * Add x ItemStack to the shop inventory
-   *
-   * @param paramItemStack The ItemStack you want add
-   * @param paramInt How many you want add
-   */
-  void add(ItemStack paramItemStack, int paramInt);
+  void fill(int paramInt);
 
   /**
    * Execute buy action for player with x items.

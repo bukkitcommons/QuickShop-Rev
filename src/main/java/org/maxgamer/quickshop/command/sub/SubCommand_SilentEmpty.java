@@ -1,19 +1,14 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
