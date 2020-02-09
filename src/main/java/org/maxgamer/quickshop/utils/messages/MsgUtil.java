@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.SneakyThrows;
-import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -37,10 +36,12 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
+import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.JsonLocale;
 import org.maxgamer.quickshop.utils.files.LocaleFile;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
+import com.bekvon.bukkit.residence.commands.info;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
@@ -180,12 +181,12 @@ public class MsgUtil {
     if (player instanceof OfflinePlayer) {
       if (QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled()) {
         try {
-          filled = PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
+          filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
           Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
         } catch (Exception ignored) {
           if (((OfflinePlayer) player).getPlayer() != null) {
             try {
-              filled = PlaceholderAPI.setPlaceholders(((OfflinePlayer) player).getPlayer(), filled);
+              filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(((OfflinePlayer) player).getPlayer(), filled);
             } catch (Exception ignore) {
             }
           }
@@ -214,8 +215,9 @@ public class MsgUtil {
     
     String filled = fillArgs(raw.get(), args);
     
-    if (player != null) {
-      filled = PlaceholderAPI.setPlaceholders(player, filled);
+    if (player != null &&
+        QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled()) {
+      filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, filled);
       Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
     }
     
@@ -610,12 +612,14 @@ public class MsgUtil {
    * @param shop Target shop
    * @param amount Trading item amounts.
    */
-  public static void sendPurchaseSuccess(@NotNull Player p, @NotNull Shop shop, int amount) {
+  public static void sendPurchaseSuccess(@NotNull Player p, @NotNull Shop shop, int amount, @NotNull ShopSnapshot info) {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.successful-purchase", p));
+    int stacks = info.item().getAmount();
+    String stackMessage = stacks > 1 ? " * " + stacks : "";
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.item-name-and-price", p, "" + amount,
-        Util.getItemStackName(shop.getItem()), Util.format((amount * shop.getPrice()))));
+        Util.getItemStackName(shop.getItem()) + stackMessage, Util.format((amount * shop.getPrice()))));
     Map<Enchantment, Integer> enchs = new HashMap<>();
     if (shop.getItem().hasItemMeta()
         && Objects.requireNonNull(shop.getItem().getItemMeta()).hasEnchants()) {
@@ -713,7 +717,7 @@ public class MsgUtil {
           MsgUtil.getMessage("menu.damage-percent-remaining", p, Util.getToolPercentage(items)));
     }
     if (shop.is(ShopType.SELLING)) {
-      if (shop.getRemainingStock() == -1) {
+      if (shop.isUnlimited()) {
         chatSheetPrinter.printLine(
             MsgUtil.getMessage("menu.stock", p, "" + MsgUtil.getMessage("signs.unlimited", p)));
       } else {
@@ -729,8 +733,9 @@ public class MsgUtil {
             .printLine(MsgUtil.getMessage("menu.space", p, "" + shop.getRemainingSpace()));
       }
     }
+    Util.debug("Item type " + shop.getItem().getType());
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.price-per", p,
-        Util.getItemStackName(shop.getItem()), Util.format(shop.getPrice())));
+        Util.getItemStackName(shop.getItem()), Util.format(shop.getPrice() / shop.getItem().getAmount())));
     if (shop.is(ShopType.BUYING)) {
       chatSheetPrinter.printLine(MsgUtil.getMessage("menu.this-shop-is-buying", p));
     } else {

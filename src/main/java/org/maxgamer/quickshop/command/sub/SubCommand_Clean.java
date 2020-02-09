@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ContainerShop;
@@ -35,10 +37,16 @@ public class SubCommand_Clean implements CommandProcesser {
     final ArrayList<Shop> pendingRemoval = new java.util.ArrayList<>();
     int[] count = {0};
     
-    ShopLoader.instance().forEachShops(shop -> {
+    ShopLoader.instance().getAllShops().forEach(shop -> {
       try {
         if (shop.getLocation().world() != null && shop.is(ShopType.SELLING)
             && shop.getRemainingStock() == 0 && shop instanceof ContainerShop) {
+          
+          ItemStack[] contents = ((InventoryHolder) shop.getLocation().block().getState()).getInventory().getContents();
+          for (ItemStack i : contents)
+            if (i != null)
+              return;
+          
           ContainerShop cs = (ContainerShop) shop;
           if (cs.isDoubleShop()) {
             return;

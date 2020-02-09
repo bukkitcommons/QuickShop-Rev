@@ -73,7 +73,7 @@ public class ItemPreviewer implements Listener {
       return;
     
     final int size = 9;
-    inventory = Bukkit.createInventory(null, InventoryType.BEACON, MsgUtil.getMessage("menu.preview", player));
+    inventory = Bukkit.createInventory(null, 9, MsgUtil.getMessage("menu.preview", player));
     for (int i = 0; i < size; i++) {
       inventory.setItem(i, shopInventoryPreview.getItemStack());
     }

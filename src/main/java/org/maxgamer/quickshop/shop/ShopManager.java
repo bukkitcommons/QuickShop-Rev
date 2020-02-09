@@ -59,8 +59,10 @@ public class ShopManager {
    * @param shop The shop to add
    */
   public void load(@NotNull Shop shop) {
-    if (shop.isLoaded())
+    if (shop.isLoaded()) {
+      Util.debug("Already loaded shop: " + shop.getLocation());
       return;
+    }
     
     @NotNull ShopLocation location = shop.getLocation();
     
@@ -209,11 +211,12 @@ public class ShopManager {
           ShopLoader
             .instance()
             .getShopsMap()
-            .computeIfAbsent(location.world().getName(),
+            .computeIfAbsent(location.worldName(),
                 s -> new HashMap<>(3))
             .computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4),
                 s -> Maps.newHashMap());
       
+      Util.debug("Putting into memory shop database: " + location.toString());
       inChunk.put(location.blockKey(), shop);
       
       load(shop);
@@ -272,15 +275,19 @@ public class ShopManager {
   private Map<Long, Shop> getLoadedShopsInWorld(@NotNull String world, int chunkX, int chunkZ) {
     @Nullable Map<Long, Map<Long, Shop>> inWorld = loadedShops.get(world);
     if (inWorld == null) {
+      Util.debug("World map not found: " + world);
       return null;
     }
+    
     return inWorld.get(Util.chunkKey(chunkX, chunkZ));
   }
   
   public ShopViewer getLoadedShopAt(Location loc) {
     @Nullable Map<Long, Shop> inChunk = getLoadedShopsInChunk(loc.getChunk());
-    if (inChunk == null)
+    if (inChunk == null) {
+      Util.debug("Chunk not found: " + loc);
       return ShopViewer.empty();
+    }
     
     return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
   }

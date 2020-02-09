@@ -82,7 +82,7 @@ public class ShopActionListener implements Listener {
           Util.debug(ChatColor.GREEN + "Handling control");
           
           MsgUtil.sendControlPanelInfo(e.getPlayer(), shop);
-          //shop.setSignText();
+          shop.setSignText();
         });
       
       return;
@@ -106,7 +106,7 @@ public class ShopActionListener implements Listener {
         
         shop.onClick();
         MsgUtil.sendShopInfo(player, shop);
-        //shop.setSignText();
+        shop.setSignText();
         
         double price = shop.getPrice();
         double money = QuickShop.instance().getEconomy().getBalance(player.getUniqueId());
@@ -167,17 +167,6 @@ public class ShopActionListener implements Listener {
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling creation.");
         
-        if (item == null || item.getType() == Material.AIR) {
-          player.sendMessage(MsgUtil.getMessage("no-anythings-in-your-hand", player));
-          return;
-        }
-        
-        if (Util.getSecondHalf(block).isPresent() &&
-            !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.double")) {
-          player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
-          return;
-        }
-        
         if (!Util.canBeShopIgnoreBlocklist(block.getState())) {
           Util.debug("Block cannot be shop.");
           return;
@@ -187,6 +176,17 @@ public class ShopActionListener implements Listener {
             return;
           }
           */
+        }
+        
+        if (item == null || item.getType() == Material.AIR) {
+          player.sendMessage(MsgUtil.getMessage("no-anythings-in-your-hand", player));
+          return;
+        }
+        
+        if (Util.getSecondHalf(block).isPresent() &&
+            !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.double")) {
+          player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
+          return;
         }
 
         if (block.getType() == Material.ENDER_CHEST &&

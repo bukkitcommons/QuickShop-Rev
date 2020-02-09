@@ -541,7 +541,7 @@ public class QuickShop extends JavaPlugin {
     signUpdateWatcher = new ScheduledSignUpdater();
 
     /* Load all shops. */
-    //ShopLoader.loadShops();
+    ShopLoader.instance().loadShops();
 
     getLogger().info("Registering Listeners...");
     // Register events

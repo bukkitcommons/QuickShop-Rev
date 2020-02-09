@@ -76,7 +76,7 @@ public class ContainerShop implements Shop, Managed {
   private ContainerShop(@NotNull ContainerShop s) {
     this.display = s.display;
     this.shopType = s.shopType;
-    this.item = s.item;
+    this.item = new ItemStack(s.item);
     this.location = s.location;
     this.unlimited = s.unlimited;
     this.moderator = s.moderator;
@@ -100,7 +100,7 @@ public class ContainerShop implements Shop, Managed {
     this.location = shopLocation;
     this.price = price;
     this.moderator = moderator;
-    this.item = item;
+    this.item = new ItemStack(item);
     this.shopType = type;
     this.unlimited = unlimited;
 
@@ -158,7 +158,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingStock() {
-    return unlimited ? Integer.MAX_VALUE : Util.countItems(this.getInventory(), this.getItem());
+    return unlimited ? Integer.MAX_VALUE : Util.countItems(this.getInventory(), this.getItem()) / item.getAmount();
   }
 
   /**
@@ -179,7 +179,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public boolean isShoppingItem(@Nullable ItemStack item) {
-    return QuickShop.instance().getItemMatcher().matches(this.item, item);
+    return QuickShop.instance().getItemMatcher().matches(this.item, item, false);
   }
 
   /**
@@ -521,17 +521,18 @@ public class ContainerShop implements Shop, Managed {
         player,
         unlimited ?
             MsgUtil.getMessagePlaceholder("signs.unlimited", player) :
-            String.valueOf(getRemainingSpace()));
+            String.valueOf(shopType == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()));
     
+    String stacks = item.getAmount() > 1 ? " * " + item.getAmount() : "";
     lines[2] = MsgUtil.getMessagePlaceholder(
         "signs.item",
         player,
-        Util.getItemStackName(getItem()));
+        Util.getItemStackName(getItem()) + stacks);
     
     lines[3] = MsgUtil.getMessagePlaceholder(
         "signs.price",
         player,
-        Util.format(this.getPrice()));
+        Util.format(price));
     
     this.setSignText(lines);
   }
@@ -564,9 +565,9 @@ public class ContainerShop implements Shop, Managed {
     if (this.getLocation().world() == null)
       return Collections.emptyList();
     
-    OfflinePlayer player = Bukkit.getOfflinePlayer(this.getOwner());
-    final String signHeader =
-        MsgUtil.getMessagePlaceholder("sign.header", player, this.ownerName());
+    OfflinePlayer player = Bukkit.getOfflinePlayer(getOwner());
+    String signHeader =
+        MsgUtil.getMessagePlaceholder("signs.header", player, ownerName());
     
     List<Sign> signs = Lists.newArrayListWithCapacity(4);
 
@@ -580,7 +581,9 @@ public class ContainerShop implements Shop, Managed {
       Sign sign = (Sign) block.getState();
       String[] lines = sign.getLines();
       
-      if (lines[0].contains(signHeader) ||
+      Util.debug("Line: " + lines[0] + ", Header" + signHeader);
+      
+      if (lines[0].equals(signHeader) ||
           Arrays.stream(lines).allMatch(String::isEmpty))
         signs.add(sign);
     }

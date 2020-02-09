@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 
@@ -16,7 +15,7 @@ public class BlockViewer {
   public BlockViewer(Location origin, int distance) {
     from = origin  ;
     to   = distance;
-    iterator = new BlockIterator(from, to);
+    iterator = new BlockIterator(from, 0, to);
   }
   
   private BlockIterator iterator;

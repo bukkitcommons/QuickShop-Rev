@@ -39,7 +39,7 @@ public class SubCommand_Unlimited extends SneakyTabs implements CommandProcesser
       }
 
       shop.get().setUnlimited(!shop.get().isUnlimited());
-      // shop.setSignText();
+      shop.get().setSignText();
       shop.get().save();
 
       if (shop.get().isUnlimited()) {

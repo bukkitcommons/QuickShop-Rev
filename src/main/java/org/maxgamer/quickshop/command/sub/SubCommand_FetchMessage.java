@@ -20,6 +20,8 @@ public class SubCommand_FetchMessage extends SneakyTabs implements CommandProces
     }
 
     QuickShop.instance()
-             .getServer().getScheduler().runTask(QuickShop.instance(), () -> MsgUtil.flushMessagesFor((Player) sender));
+             .getServer()
+             .getScheduler()
+             .runTask(QuickShop.instance(), () -> MsgUtil.flushMessagesFor((Player) sender));
   }
 }

@@ -45,7 +45,7 @@ public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
               
               .apply(shop -> {
                 shop.setShopType(ShopType.BUYING);
-                // shop.setSignText();
+                shop.setSignText();
                 shop.save();
                 sender.sendMessage(
                     MsgUtil.getMessage("command.now-buying", sender, Util.getItemStackName(shop.getItem())));

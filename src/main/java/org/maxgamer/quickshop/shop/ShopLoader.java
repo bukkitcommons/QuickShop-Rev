@@ -6,14 +6,10 @@ import com.google.gson.JsonSyntaxException;
 import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -56,9 +52,12 @@ public class ShopLoader implements Listener {
   }
   
   private ShopLoader() {
-    ShopLogger.instance().info("Loading shops..");
     Bukkit.getPluginManager().registerEvents(this, QuickShop.instance());
-    Bukkit.getScheduler().runTask(QuickShop.instance(), this::loadShopsForAllWorlds);
+  }
+  
+  public void loadShops() {
+    ShopLogger.instance().info("Loading shops..");
+    loadShopsForAllWorlds();
   }
   
   public static ShopLoader instance() {
@@ -287,10 +286,10 @@ public class ShopLoader implements Listener {
       long averagePerShop = durTotalShopsNano / loadedShops;
       
       ShopLogger.instance().info(
-          "Loaded " + loadedShops + " shops in " + world.getName() + " ! " +
-          " Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
+          "Loaded " + loadedShops + " shops in " + world.getName() +
+          " (Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
     } else {
-      ShopLogger.instance().info("No shop could be loaded in " + world.getName() + " !");
+      ShopLogger.instance().info("No shop could be loaded in " + world.getName());
     }
   }
 

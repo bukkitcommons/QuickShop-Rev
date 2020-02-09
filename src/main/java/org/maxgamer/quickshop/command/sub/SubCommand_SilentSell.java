@@ -32,7 +32,7 @@ public class SubCommand_SilentSell extends SneakyTabs implements CommandProcesse
     }
 
     shop.get().setShopType(ShopType.SELLING);
-    // shop.setSignText();
+    shop.get().setSignText();
     shop.get().save();
     MsgUtil.sendControlPanelInfo(sender, shop.get());
     sender.sendMessage(

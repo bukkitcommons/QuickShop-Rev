@@ -70,8 +70,8 @@ public class ShopActionManager {
   private boolean actionBuy(
       @NotNull Player p,
       @NotNull String message,
-      @NotNull Shop shop,
-      int amount) {
+      @NotNull Shop shop, int amount,
+      @NotNull ShopSnapshot info) {
 
     // No enough shop space
     int space = shop.getRemainingSpace();
@@ -96,14 +96,14 @@ public class ShopActionManager {
       return false;
 
     amount = e.getAmount();
-    return actionBuy0(p, message, shop, amount);
+    return actionBuy0(p, message, shop, amount, info);
   }
 
   private boolean actionBuy0(
       @NotNull Player p,
       @NotNull String message,
-      @NotNull Shop shop,
-      int amount) {
+      @NotNull Shop shop, int amount,
+      @NotNull ShopSnapshot info) {
 
     // Tax handling
     double tax = BaseConfig.taxRate;
@@ -199,6 +199,8 @@ public class ShopActionManager {
       }
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
     }
+    
+    Util.debug("235");
 
     if (ShopManager.instance().getLoadedShopAt(info.location()).isPresent()) {
       p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
@@ -210,15 +212,21 @@ public class ShopActionManager {
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
       return;
     }
+    
     if (!Util.canBeShop(info.location().block())) {
       p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
       return;
     }
+    
+    Util.debug("236");
+    
     if (info.location().block().getType() == Material.ENDER_CHEST) {
       if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.enderchest")) {
         return;
       }
     }
+    
+    Util.debug("234");
 
     // allow-shop-without-space-for-sign check
     if (QuickShop.instance().getConfig().getBoolean("shop.auto-sign")
@@ -253,6 +261,8 @@ public class ShopActionManager {
     // Price per item
     double price;
     double minPrice = QuickShop.instance().getConfig().getDouble("shop.minimum-price");
+    
+    Util.debug("233");
 
     try {
       if (QuickShop.instance().getConfig().getBoolean("whole-number-prices-only")) {
@@ -322,11 +332,36 @@ public class ShopActionManager {
             String.valueOf(priceRestriction.getValue())));
       }
     }
-
-    double createCost = QuickShop.instance().getConfig().getDouble("shop.cost");
-    // Create the sample shop.
+    
+    Util.debug("232");
+    
+    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location().bukkit())) {
+      Util.debug("Cancelled by integrations");
+      return;
+    }
+    
+    if (!QuickShop.instance().getConfig().getBoolean("shop.lock")) {
+      // Warn them if they haven't been warned since
+      // reboot
+      if (!QuickShop.instance().getWarnings().contains(p.getName())) {
+        p.sendMessage(MsgUtil.getMessage("shops-arent-locked", p));
+        QuickShop.instance().getWarnings().add(p.getName());
+      }
+    }
+    
+    Util.debug("23");
+    
+    /*
+     * Creates the shop
+     */
     ContainerShop shop = new ContainerShop(info.location(), price, info.item(),
         new ShopModerator(p.getUniqueId()), false, ShopType.SELLING);
+
+    ShopCreateEvent e = new ShopCreateEvent(shop, p);
+    if (Util.fireCancellableEvent(e))
+      return;
+    
+    double createCost = QuickShop.instance().getConfig().getDouble("shop.cost");
 
     // This must be called after the event has been called.
     // Else, if the event is cancelled, they won't get their
@@ -334,6 +369,8 @@ public class ShopActionManager {
     if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.bypasscreatefee")) {
       createCost = 0;
     }
+    
+    Util.debug("231");
 
     if (createCost > 0) {
       if (!QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), createCost)) {
@@ -354,28 +391,8 @@ public class ShopActionManager {
       }
     }
 
-    shop.onLoad();
-    ShopCreateEvent e = new ShopCreateEvent(shop, p);
-    if (Util.fireCancellableEvent(e)) {
-      ShopManager.instance().unload(shop);
-      return;
-    }
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location().bukkit())) {
-      ShopManager.instance().unload(shop);
-      Util.debug("Cancelled by integrations");
-      return;
-    }
-
     /* The shop has hereforth been successfully created */
     ShopManager.instance().createShop(shop, info);
-    if (!QuickShop.instance().getConfig().getBoolean("shop.lock")) {
-      // Warn them if they haven't been warned since
-      // reboot
-      if (!QuickShop.instance().getWarnings().contains(p.getName())) {
-        p.sendMessage(MsgUtil.getMessage("shops-arent-locked", p));
-        QuickShop.instance().getWarnings().add(p.getName());
-      }
-    }
     // Figures out which way we should put the sign on and
     // sets its text.
 
@@ -392,15 +409,15 @@ public class ShopActionManager {
   private void actionSell(
       @NotNull Player p,
       @NotNull String message,
-      @NotNull Shop shop, int amount) {
+      @NotNull Shop shop, int amount,
+      @NotNull ShopSnapshot info) {
 
     int stock = shop.getRemainingStock();
-    if (stock == -1) {
-      stock = 10000;
-    }
+    stock = shop.isUnlimited() ? Integer.MAX_VALUE : stock;
+    String stacks = info.item().getAmount() > 1 ? " * " + info.item().getAmount() : "";
     if (stock < amount) {
-      p.sendMessage(MsgUtil.getMessage("shop-stock-too-low", p, "" + stock,
-          Util.getItemStackName(shop.getItem())));
+      p.sendMessage(MsgUtil.getMessage("shop-stock-too-low", p, String.valueOf(stock),
+          Util.getItemStackName(shop.getItem()) + stacks));
       return;
     }
     if (amount < 1) {
@@ -475,7 +492,7 @@ public class ShopActionManager {
 
     MsgUtil.send(shop.getOwner(), msg, shop.isUnlimited());
     shop.sell(p, amount);
-    MsgUtil.sendPurchaseSuccess(p, shop, amount);
+    MsgUtil.sendPurchaseSuccess(p, shop, amount, info);
     ShopSuccessPurchaseEvent se = new ShopSuccessPurchaseEvent(shop, p, amount, total, tax);
     Bukkit.getPluginManager().callEvent(se);
   }
@@ -531,9 +548,9 @@ public class ShopActionManager {
     }
 
     if (shop.getShopType() == ShopType.BUYING) {
-      actionBuy(p, message, shop, amount);
+      actionBuy(p, message, shop, amount, info);
     } else {
-      actionSell(p, message, shop, amount);
+      actionSell(p, message, shop, amount, info);
     }
   }
 

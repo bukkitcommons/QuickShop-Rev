@@ -60,7 +60,6 @@ public interface DisplayItem {
             if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {
               item.remove();
               Util.debug("Removed a duped item display entity.1");
-              shop.checkDisplay();
               return;
             }
             

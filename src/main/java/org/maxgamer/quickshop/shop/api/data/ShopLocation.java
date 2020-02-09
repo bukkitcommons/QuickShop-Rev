@@ -109,4 +109,9 @@ public class ShopLocation implements Serializable {
   public Location bukkit() {
     return bukkit == null ? (bukkit = new Location(world(), x, y, z)) : bukkit;
   }
+  
+  @Override
+  public String toString() {
+    return bukkit().toString();
+  }
 }
