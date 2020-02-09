@@ -104,14 +104,6 @@ public interface Shop extends Managed {
   String ownerName();
 
   /**
-   * Remove x ItemStack from the shop inventory
-   *
-   * @param paramItemStack Want removed ItemStack
-   * @param paramInt Want remove how many
-   */
-  void remove(ItemStack paramItemStack, int paramInt);
-
-  /**
    * Execute sell action for player with x items.
    *
    * @param paramPlayer Target player

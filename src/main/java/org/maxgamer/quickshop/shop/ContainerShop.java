@@ -245,7 +245,9 @@ public class ContainerShop implements Shop, Managed {
       sell(p, -stackAmount);
     
     int totalAmount = stackAmount * item.getAmount();
-    ItemStack[] contents = p.getInventory().getStorageContents();
+    
+    Inventory playerInv = p.getInventory();
+    ItemStack[] contents = playerInv.getStorageContents();
     
     for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
       ItemStack playerItem = contents[i];
@@ -259,7 +261,8 @@ public class ContainerShop implements Shop, Managed {
       totalAmount -= buyAmount;
     }
     
-    p.getInventory().setContents(contents);
+    playerInv.setStorageContents(contents);
+    
     if (totalAmount > 0) {
       ShopLogger.instance().severe("Could not take all items from a players inventory on purchase! " + p.getName()
               + ", missing: " + stackAmount + ", item: " + Util.getItemStackName(this.getItem())
@@ -268,9 +271,9 @@ public class ContainerShop implements Shop, Managed {
       ItemStack offer = new ItemStack(item);
       offer.setAmount(stackAmount * item.getAmount());
       getInventory().addItem(offer);
+      
+      setSignText();
     }
-    
-    setSignText();
   }
 
   @Override
@@ -308,28 +311,6 @@ public class ContainerShop implements Shop, Managed {
   }
 
   /**
-   * Removes an item from the shop.
-   *
-   * @param item The itemstack. The amount does not matter, just everything else
-   * @param amount The amount to remove from the shop.
-   */
-  @Override
-  public void remove(@NotNull ItemStack item, int amount) {
-    if (this.unlimited)
-      return;
-    
-    Inventory inv = this.getInventory();
-    int remains = amount;
-    while (remains > 0) {
-      int stackSize = Math.min(remains, item.getMaxStackSize());
-      item.setAmount(stackSize);
-      Objects.requireNonNull(inv).removeItem(item);
-      remains -= stackSize;
-    }
-    this.setSignText();
-  }
-
-  /**
    * Returns a clone of this shop. References to the same display item, itemstack, location and
    * owner as this shop does. Do not modify them or you will modify this shop.
    *
@@ -346,51 +327,48 @@ public class ContainerShop implements Shop, Managed {
    * Sells amount of item to Player p. Does NOT check our inventory, or balances
    *
    * @param p The player to sell to
-   * @param amount The amount to sell
+   * @param stackAmount The amount to sell
    */
   @Override
-  public void sell(@NotNull Player p, int amount) {
-    if (amount < 0) {
-      this.buy(p, -amount);
-    }
-    // Items to drop on floor
-    ArrayList<ItemStack> floor = new ArrayList<>(5);
-    Inventory pInv = p.getInventory();
-    amount = amount * this.item.getAmount();
-    if (this.isUnlimited()) {
-      ItemStack item = new ItemStack(this.item);
-      while (amount > 0) {
-        int stackSize = Math.min(amount, this.item.getMaxStackSize());
-        item.setAmount(stackSize);
-        pInv.addItem(item);
-        amount -= stackSize;
+  public void sell(@NotNull Player p, int stackAmount) {
+    if (stackAmount < 0)
+      buy(p, -stackAmount);
+    
+    // Overslot Items to drop on floor
+    List<ItemStack> floor = Lists.newArrayList();
+    int totalAmount = stackAmount * item.getAmount();
+    
+    Inventory playerInv = p.getInventory();
+    ItemStack offer = new ItemStack(item);
+    
+    if (unlimited) {
+      while (totalAmount > 0) {
+        int offerAmount = Math.min(totalAmount, offer.getMaxStackSize());
+        offer.setAmount(offerAmount);
+        floor.addAll(playerInv.addItem(offer).values());
+        
+        totalAmount -= offerAmount;
       }
     } else {
-      ItemStack[] chestContents = Objects.requireNonNull(this.getInventory()).getContents();
-      for (int i = 0; amount > 0 && i < chestContents.length; i++) {
-        // Can't clone it here, it could be null
-        ItemStack item = chestContents[i];
-        if (item != null && item.getType() != Material.AIR && this.isShoppingItem(item)) {
-          // Copy it, we don't want to interfere
-          item = new ItemStack(item);
-          // Amount = total, item.getAmount() = how many items in the
-          // stack
-          int stackSize = Math.min(amount, item.getAmount());
-          // If Amount is item.getAmount(), then this sets the amount
-          // to 0
-          // Else it sets it to the remainder
-          chestContents[i].setAmount(chestContents[i].getAmount() - stackSize);
-          // We can modify this, it is a copy.
-          item.setAmount(stackSize);
-          // Add the items to the players inventory
-          floor.addAll(pInv.addItem(item).values());
-          amount -= stackSize;
-        }
+      Inventory chestInv = getInventory();
+      ItemStack[] contents = chestInv.getContents();
+      
+      for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
+        ItemStack chestItem = contents[i];
+        
+        int takeAmount = Math.min(totalAmount, chestItem.getAmount());
+        chestItem.setAmount(chestItem.getAmount() - takeAmount);
+        
+        offer.setAmount(takeAmount);
+        floor.addAll(playerInv.addItem(offer).values());
+        
+        totalAmount -= takeAmount;
       }
-      // We now have to update the chests inventory manually.
-      this.getInventory().setContents(chestContents);
-      this.setSignText();
+      
+      chestInv.setContents(contents);
+      setSignText();
     }
+    
     for (ItemStack stack : floor) {
       p.getWorld().dropItem(p.getLocation(), stack);
     }
@@ -419,8 +397,7 @@ public class ContainerShop implements Shop, Managed {
           && QuickShop.instance().getOpenInvPlugin() != null) {
         OpenInv openInv = ((OpenInv) QuickShop.instance().getOpenInvPlugin());
         return openInv.getSpecialEnderChest(
-            Objects.requireNonNull(
-                openInv.loadPlayer(Bukkit.getOfflinePlayer(this.moderator.getOwner()))),
+            openInv.loadPlayer(Bukkit.getOfflinePlayer(this.moderator.getOwner())),
             Bukkit.getOfflinePlayer((this.moderator.getOwner())).isOnline()).getBukkitInventory();
       }
     } catch (Exception e) {
