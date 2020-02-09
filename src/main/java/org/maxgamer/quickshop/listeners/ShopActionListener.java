@@ -27,6 +27,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -99,7 +100,7 @@ public class ShopActionListener implements Listener {
       .filter(shop ->
         !BaseConfig.sneakToTrade || e.getPlayer().isSneaking())
       .filter(shop ->
-        QuickShop.getPermissionManager().hasPermission(player, "quickshop.use"))    
+        PermissionManager.instance().has(player, "quickshop.use"))    
       
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling trade");
@@ -159,7 +160,7 @@ public class ShopActionListener implements Listener {
       
       .filter(shop ->
         player.getGameMode() != GameMode.CREATIVE &&
-        QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.sell"))
+        PermissionManager.instance().has(player, "quickshop.create.sell"))
       
       .filter(shop -> !BaseConfig.sneakToCreat || player.isSneaking())
       .filter(shop -> ShopManager.canBuildShop(player, block))
@@ -184,13 +185,13 @@ public class ShopActionListener implements Listener {
         }
         
         if (Util.getSecondHalf(block).isPresent() &&
-            !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.double")) {
+            !PermissionManager.instance().has(player, "quickshop.create.double")) {
           player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
           return;
         }
 
         if (block.getType() == Material.ENDER_CHEST &&
-            !QuickShop.getPermissionManager().hasPermission(player, "quickshop.create.enderchest")) {
+            !PermissionManager.instance().has(player, "quickshop.create.enderchest")) {
           return;
         }
         

@@ -34,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
@@ -439,7 +440,7 @@ public class MsgUtil {
    * @param shop Target shop
    */
   public static void sendControlPanelInfo(@NotNull CommandSender sender, @NotNull Shop shop) {
-    if (!QuickShop.getPermissionManager().hasPermission(sender, "quickshop.use")) {
+    if (!PermissionManager.instance().has(sender, "quickshop.use")) {
       return;
     }
     if (QuickShop.instance().getConfig().getBoolean("sneak-to-control")) {
@@ -453,7 +454,7 @@ public class MsgUtil {
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("controlpanel.infomation", sender));
     // Owner
-    if (!QuickShop.getPermissionManager().hasPermission(sender, "quickshop.setowner")) {
+    if (!PermissionManager.instance().has(sender, "quickshop.setowner")) {
       chatSheetPrinter.printLine(MsgUtil.getMessage("menu.owner", sender, shop.ownerName()));
     } else {
       chatSheetPrinter
@@ -468,7 +469,7 @@ public class MsgUtil {
     }
 
     // Unlimited
-    if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.unlimited")) {
+    if (PermissionManager.instance().has(sender, "quickshop.unlimited")) {
       String text =
           MsgUtil.getMessage("controlpanel.unlimited", sender, translateBoolean(shop.isUnlimited()));
       String hoverText = MsgUtil.getMessage("controlpanel.unlimited-hover", sender);
@@ -480,7 +481,7 @@ public class MsgUtil {
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Buying/Selling Mode
-    if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.create.buy")
+    if (PermissionManager.instance().has(sender, "quickshop.create.buy")
         && sender.hasPermission("quickshop.create.sell")) {
       if (shop.is(ShopType.SELLING)) {
         String text = MsgUtil.getMessage("controlpanel.mode-selling", sender);
@@ -503,7 +504,7 @@ public class MsgUtil {
       }
     }
     // Set Price
-    if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.price")
+    if (PermissionManager.instance().has(sender, "quickshop.other.price")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text = MsgUtil.getMessage("controlpanel.price", sender,
           (QuickShop.instance().getConfig().getBoolean("use-decimal-format")) ? decimalFormat(shop.getPrice())
@@ -513,7 +514,7 @@ public class MsgUtil {
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
     }
     // Refill
-    if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.refill")) {
+    if (PermissionManager.instance().has(sender, "quickshop.refill")) {
       String text =
           MsgUtil.getMessage("controlpanel.refill", sender, String.valueOf(shop.getPrice()));
       String hoverText = MsgUtil.getMessage("controlpanel.refill-hover", sender);
@@ -521,7 +522,7 @@ public class MsgUtil {
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
     }
     // Refill
-    if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.empty")) {
+    if (PermissionManager.instance().has(sender, "quickshop.empty")) {
       String text =
           MsgUtil.getMessage("controlpanel.empty", sender, String.valueOf(shop.getPrice()));
       String hoverText = MsgUtil.getMessage("controlpanel.empty-hover", sender);
@@ -533,7 +534,7 @@ public class MsgUtil {
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Remove
-    if (QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.destroy")
+    if (PermissionManager.instance().has(sender, "quickshop.other.destroy")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text =
           MsgUtil.getMessage("controlpanel.remove", sender, String.valueOf(shop.getPrice()));
@@ -578,7 +579,7 @@ public class MsgUtil {
       TextComponent normalmessage =
           new TextComponent(normalText + "   " + MsgUtil.getMessage("menu.preview", player));
       ComponentBuilder cBuilder = new ComponentBuilder(json);
-      if (QuickShop.getPermissionManager().hasPermission(player, "quickshop.preview")) {
+      if (PermissionManager.instance().has(player, "quickshop.preview")) {
         normalmessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
             MsgUtil.getMessage("menu.commands.preview", player,
                 shop.getLocation().worldName(),
@@ -601,7 +602,7 @@ public class MsgUtil {
   public static void sendMessageToOps(@NotNull String message) {
     Bukkit.getOnlinePlayers()
           .stream()
-          .filter(player -> player.isOp() || QuickShop.getPermissionManager().hasPermission(player, "quickshop.alert"))
+          .filter(player -> player.isOp() || PermissionManager.instance().has(player, "quickshop.alert"))
           .forEach(player -> player.sendMessage(message));
   }
 

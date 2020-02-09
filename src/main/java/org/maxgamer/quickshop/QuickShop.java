@@ -90,9 +90,6 @@ public class QuickShop extends JavaPlugin {
   public static QuickShop instance() {
     return singleton;
   }
-  
-  /** The manager to check permissions. */
-  private static PermissionManager permissionManager;
 
   private IntegrationHelper integrationHelper;
   // Listeners (These don't)
@@ -186,15 +183,6 @@ public class QuickShop extends JavaPlugin {
   }
 
   /**
-   * Get the permissionManager as static
-   *
-   * @return the permission Manager.
-   */
-  public static PermissionManager getPermissionManager() {
-    return permissionManager;
-  }
-
-  /**
    * Get the Player's Shop limit.
    *
    * @param p The player you want get limit.
@@ -203,7 +191,7 @@ public class QuickShop extends JavaPlugin {
   public int getShopLimit(@NotNull Player p) {
     int max = BaseConfig.defaultLimits;
     for (Entry<String, Integer> entry : limits.entrySet()) {
-      if (entry.getValue() > max && getPermissionManager().hasPermission(p, entry.getKey())) {
+      if (entry.getValue() > max && PermissionManager.instance().has(p, entry.getKey())) {
         max = entry.getValue();
       }
     }
@@ -512,7 +500,6 @@ public class QuickShop extends JavaPlugin {
 
     /* Initalize the tools */
     // Create the shop manager.
-    permissionManager = new PermissionManager();
     // This should be inited before shop manager
     if (BaseConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {

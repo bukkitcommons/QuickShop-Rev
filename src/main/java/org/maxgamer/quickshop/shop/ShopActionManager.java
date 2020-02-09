@@ -23,6 +23,7 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopCreateEvent;
 import org.maxgamer.quickshop.event.ShopPurchaseEvent;
 import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopModerator;
 import org.maxgamer.quickshop.shop.api.ShopType;
@@ -112,7 +113,7 @@ public class ShopActionManager {
       tax = 0; // Tax was disabled.
 
     double totalPrice = amount * shop.getPrice();
-    if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.tax")) {
+    if (PermissionManager.instance().has(p, "quickshop.tax")) {
       tax = 0;
       Util.debug("Disable the Tax for player " + p.getName()
       + " cause they have permission quickshop.tax");
@@ -207,7 +208,7 @@ public class ShopActionManager {
     }
 
     if (Util.getSecondHalf(info.location().block()) != null
-        && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
+        && !PermissionManager.instance().has(p, "quickshop.create.double")) {
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
       return;
     }
@@ -218,7 +219,7 @@ public class ShopActionManager {
     }
     
     if (info.location().block().getType() == Material.ENDER_CHEST) {
-      if (!QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.enderchest")) {
+      if (!PermissionManager.instance().has(p, "quickshop.create.enderchest")) {
         return;
       }
     }
@@ -357,7 +358,7 @@ public class ShopActionManager {
     // This must be called after the event has been called.
     // Else, if the event is cancelled, they won't get their
     // money back.
-    if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.bypasscreatefee")) {
+    if (PermissionManager.instance().has(p, "quickshop.bypasscreatefee")) {
       createCost = 0;
     }
 
@@ -427,7 +428,7 @@ public class ShopActionManager {
     // Money handling
     double tax = QuickShop.instance().getConfig().getDouble("tax");
     double total = amount * shop.getPrice();
-    if (QuickShop.getPermissionManager().hasPermission(p, "quickshop.tax")) {
+    if (PermissionManager.instance().has(p, "quickshop.tax")) {
       tax = 0;
       Util.debug("Disable the Tax for player " + p.getName()
       + " cause they have permission quickshop.tax");

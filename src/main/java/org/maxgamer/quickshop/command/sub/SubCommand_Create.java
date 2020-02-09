@@ -15,6 +15,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.shop.api.data.ShopAction;
@@ -78,12 +79,12 @@ public class SubCommand_Create implements CommandProcesser {
       }
 
       if (Util.getSecondHalf(b) != null
-          && !QuickShop.getPermissionManager().hasPermission(p, "quickshop.create.double")) {
+          && !PermissionManager.instance().has(p, "quickshop.create.double")) {
         p.sendMessage(MsgUtil.getMessage("no-double-chests", sender));
         return;
       }
 
-      if (Util.isBlacklisted(item) && !QuickShop.getPermissionManager().hasPermission(p,
+      if (Util.isBlacklisted(item) && !PermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
         p.sendMessage(MsgUtil.getMessage("blacklisted-item", sender));
         return;

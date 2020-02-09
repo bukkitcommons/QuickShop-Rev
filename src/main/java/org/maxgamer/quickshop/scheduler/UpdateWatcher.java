@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.utils.VersionData;
 import org.maxgamer.quickshop.utils.VersionUpdater;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
@@ -98,7 +99,7 @@ public class UpdateWatcher implements Listener {
   
   @EventHandler
   public void playerJoin(PlayerJoinEvent e) {
-    if (QuickShop.getPermissionManager().hasPermission(e.getPlayer(), "quickshop.alert"))
+    if (PermissionManager.instance().has(e.getPlayer(), "quickshop.alert"))
       Bukkit.getScheduler().runTaskLater(QuickShop.instance(), () -> alert(e.getPlayer()), 4 * 20);
   }
 }

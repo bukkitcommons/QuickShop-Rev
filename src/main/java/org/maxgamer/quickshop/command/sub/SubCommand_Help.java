@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandContainer;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 
 public class SubCommand_Help implements CommandProcesser {
@@ -53,7 +54,7 @@ public class SubCommand_Help implements CommandProcesser {
         for (String requirePermission : requirePermissions) {
           // FIXME: 24/11/2019 You are already checked the null and empty
           if (requirePermission != null && !requirePermission.isEmpty()
-              && !QuickShop.getPermissionManager().hasPermission(s, requirePermission)) {
+              && !PermissionManager.instance().has(s, requirePermission)) {
             // noinspection UnnecessaryContinue
             continue;
           }

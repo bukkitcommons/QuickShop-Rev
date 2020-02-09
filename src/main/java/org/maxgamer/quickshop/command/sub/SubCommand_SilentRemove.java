@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.command.SneakyTabs;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.Util;
@@ -45,7 +46,7 @@ public class SubCommand_SilentRemove extends SneakyTabs implements CommandProces
     }
 
     if (!shop.get().getModerator().isModerator(p.getUniqueId())
-        && !QuickShop.getPermissionManager().hasPermission(sender, "quickshop.other.destroy")) {
+        && !PermissionManager.instance().has(sender, "quickshop.other.destroy")) {
       sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
       return;
     }

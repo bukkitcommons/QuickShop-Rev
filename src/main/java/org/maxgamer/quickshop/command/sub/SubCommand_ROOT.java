@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.CommandContainer;
 import org.maxgamer.quickshop.command.CommandProcesser;
+import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 
 public class SubCommand_ROOT implements CommandProcesser {
@@ -46,7 +47,7 @@ public class SubCommand_ROOT implements CommandProcesser {
       if (requirePermissions != null) {
         for (String requirePermission : requirePermissions) {
           if (requirePermission != null && !requirePermission.isEmpty()
-              && !QuickShop.getPermissionManager().hasPermission(sender, requirePermission)) {
+              && !PermissionManager.instance().has(sender, requirePermission)) {
             Util.debug("Sender " + sender.getName() + " trying tab-complete the command: "
                 + commandLabel + ", but no permission " + requirePermission);
             return new ArrayList<>();
