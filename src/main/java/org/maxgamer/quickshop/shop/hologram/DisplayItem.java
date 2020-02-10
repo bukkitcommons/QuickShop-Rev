@@ -59,7 +59,7 @@ public interface DisplayItem {
           viewer.ifPresent(shop -> {
             if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {
               item.remove();
-              Util.debug("Removed a duped item display entity.1");
+              Util.debug("Removed a duped item display entity by distance > 0.6");
               return;
             }
             
@@ -68,13 +68,13 @@ public interface DisplayItem {
             
             if (!shop.getDisplay().getDisplay().getUniqueId().equals(item.getUniqueId())) {
               item.remove();
-              Util.debug("Removed a duped item display entity.2");
+              Util.debug("Removed a duped item display entity by uuid not equals");
               return;
             }
             
             if (((EntityDisplayItem) shop.getDisplay()).data().type().entityType() != item.getType()) {
               item.remove();
-              Util.debug("Removed a duped item display entity.3");
+              Util.debug("Removed a duped item display entity by type not equals");
               return;
             }
           });
@@ -83,7 +83,7 @@ public interface DisplayItem {
           
           if (!QuickShop.instance().getItemMatcher().matches(itemStack, displayItem)) {
             item.remove();
-            Util.debug("Removed a duped item display entity.");
+            Util.debug("Removed a duped item display entity by not matches");
           }
         }
       } catch (JsonSyntaxException e) {

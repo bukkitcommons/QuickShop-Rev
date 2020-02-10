@@ -128,20 +128,20 @@ public class ShopActionListener implements Listener {
           player.sendMessage(MsgUtil.getMessage("how-many-buy", player, "" + afforable));
         } else {
           double ownerBalance = QuickShop.instance().getEconomy().getBalance(shop.getOwner());
-          int items = Util.countItems(player.getInventory(), shop.getItem());
-          int ownerCanAfford = (int) (ownerBalance / price);
+          int totalItems = Util.countStacks(player.getInventory(), shop.getItem()) * shop.getItem().getAmount();
+          int ownerAfforableItems = (int) (ownerBalance / price) * shop.getItem().getAmount();
 
           if (!shop.isUnlimited()) {
-            items = Math.min(items, shop.getRemainingSpace());
-            items = Math.min(items, ownerCanAfford);
+            totalItems = Math.min(totalItems, shop.getRemainingSpace());
+            totalItems = Math.min(totalItems, ownerAfforableItems);
           } else if (BaseConfig.payUnlimitedShopOwners) {
-            items = Math.min(items, ownerCanAfford);
+            totalItems = Math.min(totalItems, ownerAfforableItems);
           }
 
-          if (items < 0)
-            items = 0;
+          if (totalItems < 0)
+            totalItems = 0;
 
-          player.sendMessage(MsgUtil.getMessage("how-many-sell", player, "" + items));
+          player.sendMessage(MsgUtil.getMessage("how-many-sell", player, "" + totalItems));
         }
         
         ShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));

@@ -16,7 +16,7 @@ import org.maxgamer.quickshop.utils.Util;
 
 @ToString
 public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
-  private static final DisplayData DATA = new DisplayData(DisplayType.REALITEM);
+  private static final DisplayData DATA = new DisplayData(DisplayType.DROPPED_ITEM);
   
   public RealDisplayItem(@NotNull Shop shop) {
     super(shop, DATA);

@@ -80,7 +80,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
       respawn();
     } else {
       Location location = getDisplayLocation();
-      boolean fix = data.type() == DisplayType.REALITEM ?
+      boolean fix = data.type() == DisplayType.DROPPED_ITEM ?
           entity.getLocation().distance(location) > 0.6 :
           entity.getLocation().equals(location);
       

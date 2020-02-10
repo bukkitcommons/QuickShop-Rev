@@ -222,7 +222,7 @@ public class Util {
    * @param item The ItemStack to search for
    * @return The number of items that match in this inventory.
    */
-  public static int countItems(@Nullable Inventory inv, @NotNull ItemStack item) {
+  public static int countStacks(@Nullable Inventory inv, @NotNull ItemStack item) {
     if (inv == null)
       return 0;
     

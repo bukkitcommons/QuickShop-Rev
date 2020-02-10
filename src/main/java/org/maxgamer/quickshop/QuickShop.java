@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
@@ -16,6 +17,7 @@ import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -26,8 +28,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.command.CommandManager;
+import org.maxgamer.quickshop.configuration.ConfigurationData;
 import org.maxgamer.quickshop.configuration.ConfigurationManager;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.impl.DatabaseConfig;
+import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
+import org.maxgamer.quickshop.configuration.impl.MatcherConfig;
 import org.maxgamer.quickshop.database.Database;
 import org.maxgamer.quickshop.database.DatabaseHelper;
 import org.maxgamer.quickshop.database.Dispatcher;
@@ -214,7 +220,7 @@ public class QuickShop extends JavaPlugin {
         getLogger().info("Successfully loaded PlaceHolderAPI support!");
       }
     }
-    if (BaseConfig.displayItems) {
+    if (DisplayConfig.displayItems) {
       if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
         try {
           Clearlag clearlag = (Clearlag) Bukkit.getPluginManager().getPlugin("ClearLag");
@@ -314,9 +320,11 @@ public class QuickShop extends JavaPlugin {
   public void reloadConfig() {
     configurationManager.load(QuickShop.class);
     configurationManager.load(BaseConfig.class);
+    configurationManager.load(DisplayConfig.class);
+    configurationManager.load(MatcherConfig.class);
+    configurationManager.load(DatabaseConfig.class);
+    
     super.reloadConfig();
-    // Load quick variables
-    // this.display = this.getConfig().getBoolean("shop.display-items");
     this.priceChangeRequiresFee = BaseConfig.priceModFee > 0;
     this.displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
     if (BaseConfig.logActions) {
@@ -446,14 +454,15 @@ public class QuickShop extends JavaPlugin {
     sentryErrorReporter = new SentryErrorReporter(this);
     // loadEcon();
     switch (BaseConfig.serverPlatform) {
-      case 1:
+      case "Spigot":
         bukkitAPIWrapper = new SpigotWrapper();
         getLogger().info(
             "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
-      case 2:
+      case "Paper":
         bukkitAPIWrapper = new PaperWrapper();
         getLogger().info("Plugin now running under Paper mode.");
-      default: // AUTO
+      case "":
+      default:
         if (Util.isClassAvailable("com.destroystokyo.paper.PaperConfig")) {
           bukkitAPIWrapper = new PaperWrapper();
           getLogger().info("Plugin now running under Paper mode.");
@@ -501,7 +510,7 @@ public class QuickShop extends JavaPlugin {
     /* Initalize the tools */
     // Create the shop manager.
     // This should be inited before shop manager
-    if (BaseConfig.displayItems) {
+    if (DisplayConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
         this.displayAutoDespawnWatcher = new SyncDisplayDespawner();
         Bukkit.getScheduler().runTaskTimer(QuickShop.instance(), this.displayAutoDespawnWatcher, 20,
@@ -511,12 +520,11 @@ public class QuickShop extends JavaPlugin {
     this.databaseManager = new Dispatcher(database);
     this.permissionChecker = new BuildPerms();
 
-    ConfigurationSection limitCfg = this.getConfig().getConfigurationSection("limits");
-    if (limitCfg != null) {
-      this.limit = limitCfg.getBoolean("use", false);
-      limitCfg = limitCfg.getConfigurationSection("ranks");
-      for (String key : Objects.requireNonNull(limitCfg).getKeys(true)) {
-        limits.put(key, limitCfg.getInt(key));
+    if (BaseConfig.enableLimits) {
+      this.limit = BaseConfig.enableLimits;
+      for (Map<String, Integer> key : BaseConfig.limitRanks) {
+        for (Entry<String, Integer> e : key.entrySet())
+          limits.put(e.getKey(), e.getValue());
       }
     }
     if (getConfig().getInt("shop.find-distance") > 100) {
@@ -569,12 +577,7 @@ public class QuickShop extends JavaPlugin {
     /* Delay the Ecoonomy system load, give a chance to let economy system regiser. */
     /* And we have a listener to listen the ServiceRegisterEvent :) */
     Util.debug("Loading economy system...");
-    new BukkitRunnable() {
-      @Override
-      public void run() {
-        loadEcon();
-      }
-    }.runTaskLater(this, 1);
+    loadEcon();
     Util.debug("Registering shop watcher...");
     Bukkit.getScheduler().runTaskTimer(this, signUpdateWatcher, 40, 40);
     if (logWatcher != null) {
@@ -660,20 +663,7 @@ public class QuickShop extends JavaPlugin {
       getLogger().severe("FATAL: QSRR can't run on CatServer Community/Personal/Pro/Async");
       throw new RuntimeException("QuickShop doen't support CatServer");
     }
-
-    if (Util.isDevEdition()) {
-      getLogger().severe("WARNING: You are running QSRR in dev-mode");
-      getLogger().severe("WARNING: Keep backup and DO NOT run this in a production environment!");
-      getLogger().severe("WARNING: Test version may destroy everything!");
-      getLogger().severe(
-          "WARNING: QSRR won't start without your confirmation, nothing will change before you turn on dev allowed.");
-      if (!BaseConfig.developerMode) {
-        getLogger().severe(
-            "WARNING: Set dev-mode: true in config.yml to allow qs load in dev mode(You may need add this line to the config yourself).");
-        noopDisable = true;
-        throw new RuntimeException("Snapshot cannot run when dev-mode is false in the config");
-      }
-    }
+    
     String nmsVersion = Util.getNMSVersion();
     getLogger().info("Running QuickShop-Reremake on NMS version " + nmsVersion
         + " For Minecraft version " + ReflectFactory.getServerVersion());
@@ -686,25 +676,22 @@ public class QuickShop extends JavaPlugin {
    */
   private boolean setupDatabase() {
     try {
-      ConfigurationSection dbCfg = getConfig().getConfigurationSection("database");
       DatabaseConnector dbCore;
-      if (Objects.requireNonNull(dbCfg).getBoolean("mysql")) {
-        // MySQL database - Required database be created first.
-        // dbPrefix = dbCfg.getString("prefix");
-        // if (dbPrefix == null || "none".equals(dbPrefix)) {
-        // dbPrefix = "";
-        // }
-        String user = dbCfg.getString("user");
-        String pass = dbCfg.getString("password");
-        String host = dbCfg.getString("host");
-        String port = dbCfg.getString("port");
-        String database = dbCfg.getString("database");
-        boolean useSSL = dbCfg.getBoolean("usessl");
-        dbCore = new MySQLConnector(Objects.requireNonNull(host, "MySQL host can't be null"),
-            Objects.requireNonNull(user, "MySQL username can't be null"),
-            Objects.requireNonNull(pass, "MySQL password can't be null"),
-            Objects.requireNonNull(database, "MySQL database name can't be null"),
-            Objects.requireNonNull(port, "MySQL port can't be null"), useSSL);
+      if (DatabaseConfig.enableMySQL) {
+        ConfigurationData data = QuickShop.instance().getConfigurationManager().get(DatabaseConfig.class);
+        YamlConfiguration src = data.conf();
+        
+        String user = src.getString("settings.mysql.user");
+        if (user == null)
+          src.set("settings.mysql.user", user = "root");
+        
+        String pass = src.getString("settings.mysql.password");
+        if (pass == null)
+          src.set("settings.mysql.password", pass = "passwd");
+        
+        dbCore = new MySQLConnector(DatabaseConfig.host,
+            user, pass,
+            DatabaseConfig.name, DatabaseConfig.port, DatabaseConfig.enableSSL);
       } else {
         // SQLite database - Doing this handles file creation
         dbCore = new SQLiteConnector(new File(this.getDataFolder(), "shops.db"));
@@ -749,7 +736,7 @@ public class QuickShop extends JavaPlugin {
       }
       // Use internal Metric class not Maven for solve plugin name issues
       String display_Items;
-      if (BaseConfig.displayItems) { // Maybe mod server use this plugin more?
+      if (DisplayConfig.displayItems) { // Maybe mod server use this plugin more?
                                                           // Or have big
         // number items need disabled?
         display_Items = "Enabled";
@@ -818,7 +805,7 @@ public class QuickShop extends JavaPlugin {
     File file = new File(getDataFolder(), "example.config.yml");
     file.delete();
     try {
-      Files.copy(Objects.requireNonNull(getResource("config.yml")), file.toPath());
+      Files.copy(getResource("config.yml"), file.toPath());
     } catch (IOException ioe) {
       getLogger().warning("Error on spawning the example config file: " + ioe.getMessage());
     }

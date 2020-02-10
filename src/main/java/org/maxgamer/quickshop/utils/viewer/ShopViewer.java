@@ -69,16 +69,12 @@ public class ShopViewer {
   }
   
   public ShopViewer ifPresent(Consumer<Shop> consumer) {
-    Util.debug("isPresent, fails: " + fails + ", present: " + isPresent());
-    
     if (!fails && shop != null)
       consumer.accept(shop);
     return this;
   }
   
   public ShopViewer ifPresent(Runnable runnable) {
-    Util.debug("isPresent, fails: " + fails + ", present: " + isPresent());
-    
     if (!fails && shop != null)
       runnable.run();
     return this;

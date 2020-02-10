@@ -15,7 +15,7 @@ import org.maxgamer.quickshop.configuration.Configuration;
 import org.maxgamer.quickshop.configuration.Node;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 
-@Configuration("integrations.yml")
+@Configuration("configs/integrations.yml")
 public class FactionsIntegration implements IntegratedPlugin {
   @Node(value = "integrations.factions.create.flags")
   public static List<String> createFlags = Lists.newArrayList();

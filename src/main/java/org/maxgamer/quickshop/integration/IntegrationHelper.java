@@ -45,13 +45,13 @@ public class IntegrationHelper {
   public void callIntegrationsUnload(@NotNull IntegrateStage stage) {
     integrations.forEach(integratedPlugin -> {
       if (integratedPlugin.getClass().getDeclaredAnnotation(IntegrationStage.class)
-          .loadStage() == stage) {
+          .unloadStage() == stage) {
         Util.debug("Calling for unload " + integratedPlugin.getName());
         integratedPlugin.unload();
       } else {
         Util.debug("Ignored calling because " + integratedPlugin.getName() + " stage is "
             + integratedPlugin.getClass().getDeclaredAnnotation(IntegrationStage.class)
-                .loadStage());
+                .unloadStage());
       }
     });
   }

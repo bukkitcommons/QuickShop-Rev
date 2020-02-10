@@ -20,10 +20,8 @@ import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
 import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.shop.hologram.DisplayType;
 
 /** This event is called after DisplayItem removed */
@@ -63,9 +61,8 @@ public class ShopDisplayItemDespawnEvent extends ShopEvent implements Cancellabl
    * @param shop Target shop
    * @param itemStack Target itemstacck
    */
-  @Deprecated
   public ShopDisplayItemDespawnEvent(@NotNull Shop shop, @NotNull ItemStack itemStack) {
-    this(shop, itemStack, DisplayType.fromID(BaseConfig.displayTypeId));
+    this(shop, itemStack, DisplayType.valueOf(DisplayConfig.displayType));
   }
 
   @Override

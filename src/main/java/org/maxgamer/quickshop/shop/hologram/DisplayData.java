@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
@@ -107,7 +108,7 @@ public class DisplayData {
    * @return The empty data
    */
   public static DisplayData create() {
-    return new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId));
+    return new DisplayData(DisplayType.valueOf(DisplayConfig.displayType));
   }
   
   /**
@@ -117,14 +118,14 @@ public class DisplayData {
    */
   public static DisplayData create(@NotNull ItemStack item) {
     try {
-      DisplayData def = new DisplayData(DisplayType.fromID(BaseConfig.displayTypeId));
+      DisplayData def = new DisplayData(DisplayType.valueOf(DisplayConfig.displayType));
 
       YamlConfiguration conf =
-          QuickShop.instance().getConfigurationManager().get(BaseConfig.class).conf();
+          QuickShop.instance().getConfigurationManager().get(DisplayConfig.class).conf();
 
       if (conf != null) {
         @Nullable DisplayDataMatchesResult dataArmourStand = DisplayData.matchDataFor(conf,
-            "shop.display-type-specifics.armor-stand", item, DisplayType.ARMORSTAND);
+            "settings.specifics.armor-stand", item, DisplayType.ARMOR_STAND);
         
         // Return if vaildate is not need (accurate matches)
         if (dataArmourStand != null && !dataArmourStand.needVaildate)
@@ -133,7 +134,7 @@ public class DisplayData {
               : dataArmourStand.data;
 
         @Nullable DisplayDataMatchesResult dataDroppedItem = DisplayData.matchDataFor(conf,
-            "shop.display-type-specifics.dropped-item", item, DisplayType.REALITEM);
+            "settings.specifics.dropped-item", item, DisplayType.DROPPED_ITEM);
         
         // Return or consider the vaildate-need data if not exists. 
         if (dataDroppedItem != null)
@@ -149,7 +150,7 @@ public class DisplayData {
       return def;
     } catch (Throwable e) {
       e.printStackTrace();
-      return new DisplayData(DisplayType.REALITEM);
+      return new DisplayData(DisplayType.DROPPED_ITEM);
     }
   }
   
@@ -342,7 +343,7 @@ public class DisplayData {
           /*
            * Loads armor stand attributes
            */
-          if (displayType == DisplayType.ARMORSTAND) {
+          if (displayType == DisplayType.ARMOR_STAND) {
             Map<?, ?> attributes = Map.class.cast(attrMap.get("attribute"));
 
             if (attributes instanceof Map) {

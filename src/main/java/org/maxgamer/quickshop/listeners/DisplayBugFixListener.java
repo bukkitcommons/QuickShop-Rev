@@ -10,6 +10,7 @@ import org.bukkit.event.block.BlockCanBuildEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
 import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.Util;
 
@@ -21,7 +22,7 @@ public class DisplayBugFixListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void canBuild(BlockCanBuildEvent e) {
-    if (!BaseConfig.displayItems
+    if (!DisplayConfig.displayItems
         // || DisplayItem.getNowUsing(null) != DisplayType.ARMORSTAND
         || e.isBuildable()) {
       return;

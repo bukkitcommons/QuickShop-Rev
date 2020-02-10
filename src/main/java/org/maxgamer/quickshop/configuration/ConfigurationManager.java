@@ -1,7 +1,12 @@
 package org.maxgamer.quickshop.configuration;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.nio.file.CopyOption;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -9,9 +14,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.io.Files;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -40,11 +48,10 @@ public class ConfigurationManager {
     if (data != null) {
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
-        Util.debug("rewrite: " + field.getName() + ", value " + data.conf().get(path));
         if (node.rewrite()) {
+          Util.debug(field.getName() + " rewritted.");
           data.conf().set(path, getStatic(field));
         }
-        Util.debug("rewrite: " + field.getName() + ", value (fixed) " + getStatic(field));
       });
 
       data.conf().save(data.file());
@@ -86,7 +93,7 @@ public class ConfigurationManager {
     
     if (filePath != null) {
       Util.debug("Path of configuration " + confClass.getName() + " is " + filePath.value());
-      File file = createConfigurationFile(new File(parent, filePath.value()));
+      File file = deploysConfigurationFile(new File(parent, filePath.value()), filePath.value());
       YamlConfiguration conf = YamlConfiguration.loadConfiguration(file);
 
       ConfigurationData data = new ConfigurationData(conf, file);
@@ -95,24 +102,41 @@ public class ConfigurationManager {
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
         Object value = conf.get(path);
-        Util.debug("field: " + field.getName() + ", value " + value);
+        
         if (value == null) {
+          Util.debug(field.getName() + ": " + value);
           value = getStatic(field);
+          
+          conf.set(path, value);
         } else {
           setStatic(field, value);
         }
-        Util.debug("field: " + field.getName() + ", value (fixed) " + value);
       });
 
+      conf.save(file);
       return data;
     }
     return null;
   }
 
-  @SneakyThrows
-  private File createConfigurationFile(@NotNull File file) {
+  private File deploysConfigurationFile(@NotNull File file, @NotNull String path) {
     createParents(file);
-    file.createNewFile();
+    if (file.exists()) return file;
+    
+    try {
+      InputStream jarFile = QuickShop.instance().getResource(path);
+      
+      if (jarFile == null) {
+        file.createNewFile();
+      } else {
+        Util.debug("Copying resource from Jar to " + path);
+        java.nio.file.Files.copy(jarFile, file.toPath());
+      }
+    } catch (Throwable t) {
+      ShopLogger.instance().severe("Failed to prepare configuration file, corrupted jar? @ " + path);
+      t.printStackTrace();
+    }
+    
     return file;
   }
 

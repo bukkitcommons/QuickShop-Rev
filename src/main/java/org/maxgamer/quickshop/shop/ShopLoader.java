@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -145,7 +146,7 @@ public class ShopLoader implements Listener {
   }
   
   public void delete(@NotNull Shop shop) {
-    Util.debug("Deleteing shop: " + shop.getLocation());
+    Util.debug("Deleting shop: " + shop.getLocation());
     
     ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
@@ -199,7 +200,8 @@ public class ShopLoader implements Listener {
             Util.debug("Loading from chunk loading: " + shop.getLocation());
             ShopManager.instance().load(shop);
           } else {
-            Util.debug("Cannot be a shop on chunk loading: " + shop.getLocation());
+            Util.debug("Cannot be a shop, deleting @ " + shop.getLocation());
+            ShopLoader.instance().delete(shop);
           }
         });
       });
@@ -253,6 +255,7 @@ public class ShopLoader implements Listener {
   public void loadShopsFor(@NotNull ResultSet set, @NotNull World world) throws SQLException {
     Map<Long, Map<Long, Shop>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
     
+    long foundShops = 0;
     long loadedShops = 0;
     long durTotalShopsNano = 0;
     
@@ -280,19 +283,18 @@ public class ShopLoader implements Listener {
           inWorld.computeIfAbsent(Util.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
       inChunk.put(Util.blockKey(data.x(), data.y(), data.z()), shop);
       
-      loadedShops++;
-      
       if (Util.isChunkLoaded(shop.getLocation())) {
         // Load to World
         if (Util.canBeShop(shop.getLocation().block())) {
+          loadedShops++;
           ShopManager.instance().load(shop);
         } else {
-          Util.debug("Cannot be a shop on world loading: " + shop.getLocation());
+          Util.debug("Cannot be a shop, deleting @ " + shop.getLocation());
+          ShopLoader.instance().delete(shop);
         }
-      } else {
-        Util.debug("Ignored shop at unloaded chunk: " + shop.getLocation());
       }
       
+      foundShops++;
       durTotalShopsNano = System.nanoTime() - onPerShop;
     }
     
@@ -300,10 +302,16 @@ public class ShopLoader implements Listener {
       long averagePerShop = durTotalShopsNano / loadedShops;
       
       ShopLogger.instance().info(
-          "Loaded " + loadedShops + " shops in " + world.getName() +
+          "Loaded " + ChatColor.GREEN + loadedShops + ChatColor.RESET + " of " + foundShops +
+          " shops in " + world.getName() +
           " (Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
     } else {
-      ShopLogger.instance().info("No shop could be loaded in " + world.getName());
+      if (foundShops > 0)
+        ShopLogger.instance().info("Found " + ChatColor.GREEN + loadedShops + ChatColor.RESET +
+            " shops in " + world.getName() +
+            " and would be loaded when needed");
+      else
+        ShopLogger.instance().info("No shop was found in " + world.getName());
     }
   }
 

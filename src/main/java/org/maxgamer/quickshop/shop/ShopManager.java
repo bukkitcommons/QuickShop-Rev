@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.event.ShopCreateEvent;
 import org.maxgamer.quickshop.event.ShopPreCreateEvent;
 import org.maxgamer.quickshop.shop.api.Shop;
@@ -151,7 +152,7 @@ public class ShopManager {
       return;
     
     // Create sign
-    if (info.sign() != null /*&& QuickShop.instance().getConfig().getBoolean("shop.auto-sign")*/) {
+    if (info.sign() != null && BaseConfig.autoSign) {
       if (!Util.isAir(info.sign().getType()) &&
           !(Util.isWallSign(info.sign().getType()) &&
               Arrays.stream(((org.bukkit.block.Sign) info.sign().getState()).getLines())

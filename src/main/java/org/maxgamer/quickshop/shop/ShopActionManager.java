@@ -84,10 +84,10 @@ public class ShopActionManager {
     }
 
     // Not enough items
-    int count = Util.countItems(p.getInventory(), shop.getItem());
+    int count = Util.countStacks(p.getInventory(), shop.getItem());
     amount = amount == -1 ? count : amount;
     if (amount > count) {
-      p.sendMessage(MsgUtil.getMessage("you-dont-have-that-many-items", p, "" + count,
+      p.sendMessage(MsgUtil.getMessage("you-dont-have-that-many-items", p, "" + count * info.item().getAmount(),
           Util.getItemStackName(shop.getItem())));
       return false;
     }
@@ -123,9 +123,7 @@ public class ShopActionManager {
     }
 
     // Paying - withdraw owner
-    boolean shouldPayOwner =
-        !shop.isUnlimited() ||
-        QuickShop.instance().getConfig().getBoolean("shop.pay-unlimited-shop-owners");
+    boolean shouldPayOwner = !shop.isUnlimited() || BaseConfig.payUnlimitedShopOwners;
     if (shouldPayOwner) {
       boolean withdrawOwner = QuickShop.instance().getEconomy().withdraw(shop.getOwner(), totalPrice); // Withdraw owner's money
       if (!withdrawOwner) {
@@ -207,7 +205,7 @@ public class ShopActionManager {
       return;
     }
 
-    if (Util.getSecondHalf(info.location().block()) != null
+    if (Util.getSecondHalf(info.location().block()).isPresent()
         && !PermissionManager.instance().has(p, "quickshop.create.double")) {
       p.sendMessage(MsgUtil.getMessage("no-double-chests", p));
       return;
@@ -224,9 +222,7 @@ public class ShopActionManager {
       }
     }
 
-    // allow-shop-without-space-for-sign check
-    if (QuickShop.instance().getConfig().getBoolean("shop.auto-sign")
-        && !QuickShop.instance().getConfig().getBoolean("allow-shop-without-space-for-sign")) {
+    if (BaseConfig.autoSign && !BaseConfig.allowNoSign) {
 
       if (info.sign() == null) {
         p.sendMessage(MsgUtil.getMessage("failed-to-put-sign", p));
@@ -256,10 +252,10 @@ public class ShopActionManager {
 
     // Price per item
     double price;
-    double minPrice = QuickShop.instance().getConfig().getDouble("shop.minimum-price");
+    double minPrice = BaseConfig.minimumPrice == -1 ? Integer.MIN_VALUE : BaseConfig.minimumPrice;
 
     try {
-      if (QuickShop.instance().getConfig().getBoolean("whole-number-prices-only")) {
+      if (BaseConfig.integerPriceOnly) {
         try {
           price = Integer.parseInt(message);
         } catch (NumberFormatException ex2) {
@@ -274,7 +270,7 @@ public class ShopActionManager {
             new DecimalFormat("#.#########").format(Math.abs(price)).replace(",", ".");
         String[] processedDouble = strFormat.split(".");
         if (processedDouble.length > 1) {
-          int maximumDigitsLimit = QuickShop.instance().getConfig().getInt("maximum-digits-in-price", -1);
+          int maximumDigitsLimit = BaseConfig.maximumPriceDigitals;
           if (processedDouble[1].length() > maximumDigitsLimit && maximumDigitsLimit != -1) {
             p.sendMessage(MsgUtil.getMessage("digits-reach-the-limit", p,
                 String.valueOf(maximumDigitsLimit)));
@@ -290,8 +286,8 @@ public class ShopActionManager {
       return;
     }
 
-    boolean decFormat = QuickShop.instance().getConfig().getBoolean("use-decimal-format");
-    if (QuickShop.instance().getConfig().getBoolean("shop.allow-free-shop")) {
+    boolean decFormat = BaseConfig.decimalFormatPrice;
+    if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
         p.sendMessage(MsgUtil.getMessage("price-too-cheap", p,
             (decFormat) ? MsgUtil.decimalFormat(minPrice) : "" + minPrice));
@@ -305,7 +301,7 @@ public class ShopActionManager {
       }
     }
 
-    double price_limit = QuickShop.instance().getConfig().getInt("shop.maximum-price");
+    double price_limit = BaseConfig.maximumPrice == -1 ? Integer.MAX_VALUE : BaseConfig.maximumPrice;
     if (price_limit != -1) {
       if (price > price_limit) {
         p.sendMessage(MsgUtil.getMessage("price-too-high", p,
@@ -334,7 +330,7 @@ public class ShopActionManager {
       return;
     }
     
-    if (!QuickShop.instance().getConfig().getBoolean("shop.lock")) {
+    if (!BaseConfig.lock) {
       // Warn them if they haven't been warned since
       // reboot
       if (!QuickShop.instance().getWarnings().contains(p.getName())) {
@@ -353,7 +349,7 @@ public class ShopActionManager {
     if (Util.fireCancellableEvent(e))
       return;
     
-    double createCost = QuickShop.instance().getConfig().getDouble("shop.cost");
+    double createCost = BaseConfig.createCost;
 
     // This must be called after the event has been called.
     // Else, if the event is cancelled, they won't get their
@@ -369,7 +365,7 @@ public class ShopActionManager {
         return;
       }
       try {
-        String taxAccount = QuickShop.instance().getConfig().getString("tax-account");
+        String taxAccount = BaseConfig.taxAccount;
         if (taxAccount != null) {
           QuickShop.instance().getEconomy().deposit(Bukkit.getOfflinePlayer(taxAccount).getUniqueId(),
               createCost);
@@ -426,7 +422,7 @@ public class ShopActionManager {
       return; // Cancelled
     }
     // Money handling
-    double tax = QuickShop.instance().getConfig().getDouble("tax");
+    double tax = BaseConfig.taxRate;
     double total = amount * shop.getPrice();
     if (PermissionManager.instance().has(p, "quickshop.tax")) {
       tax = 0;
@@ -447,8 +443,7 @@ public class ShopActionManager {
               Objects.requireNonNull(format(QuickShop.instance().getEconomy().getBalance(p.getUniqueId())))));
       return;
     }
-    boolean shouldPayOwner = !shop.isUnlimited()
-        || (QuickShop.instance().getConfig().getBoolean("shop.pay-unlimited-shop-owners") && shop.isUnlimited());
+    boolean shouldPayOwner = !shop.isUnlimited() || BaseConfig.payUnlimitedShopOwners;
     if (shouldPayOwner) {
       double depositMoney = total * (1 - tax);
       boolean successB = QuickShop.instance().getEconomy().deposit(shop.getOwner(), depositMoney);
@@ -467,7 +462,7 @@ public class ShopActionManager {
 
     String msg;
     // Notify the shop owner
-    if (QuickShop.instance().getConfig().getBoolean("show-tax")) {
+    if (BaseConfig.showTax) {
       msg = MsgUtil.getMessage("player-bought-from-your-store-tax", p, p.getName(), "" + amount,
           "##########" + Util.serialize(shop.getItem()) + "##########", Util.format((tax * total)));
     } else {
@@ -529,8 +524,7 @@ public class ShopActionManager {
         return;
       }
     } catch (NumberFormatException e) {
-      if (message.equalsIgnoreCase(
-          QuickShop.instance().getConfig().getString("shop.word-for-trade-all-items", "all"))) {
+      if (message.equalsIgnoreCase(BaseConfig.tradeAllWord)) {
         amount = -1;
       } else {
         p.sendMessage(MsgUtil.getMessage("not-a-integer", p, message));

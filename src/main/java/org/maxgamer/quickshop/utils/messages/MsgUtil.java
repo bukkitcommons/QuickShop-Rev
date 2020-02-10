@@ -34,6 +34,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.permission.impl.PermissionManager;
 import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.shop.api.ShopType;
@@ -58,7 +59,7 @@ public class MsgUtil {
   private static HashMap<UUID, String> playerMessages = Maps.newHashMap();
   
   private static DecimalFormat decimalFormat =
-      new DecimalFormat(Objects.requireNonNull(QuickShop.instance().getConfig().getString("decimal-format")));
+      new DecimalFormat(BaseConfig.decimalFormat);
   
   public final static MinecraftLocale MINECRAFT_LOCALE = new MinecraftLocale();
 
@@ -248,7 +249,7 @@ public class MsgUtil {
   public static void loadCfgMessages() throws InvalidConfigurationException {
     /* Check & Load & Create default messages.yml */
     // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
-    String languageCode = QuickShop.instance().getConfig().getString("language", "en");
+    String languageCode = BaseConfig.language.equalsIgnoreCase("default") ? "en" : BaseConfig.language;
     MINECRAFT_LOCALE.reload();
     
     // Init nJson
@@ -381,7 +382,7 @@ public class MsgUtil {
    * @param isUnlimited The shop is or unlimited
    */
   public static void send(@NotNull UUID uuid, @NotNull String message, boolean isUnlimited) {
-    if (isUnlimited && QuickShop.instance().getConfig().getBoolean("shop.ignore-unlimited-shop-messages")) {
+    if (isUnlimited && BaseConfig.ignoreUnlimitedMessages) {
       return; // Ignore unlimited shops messages.
     }
     
@@ -443,7 +444,7 @@ public class MsgUtil {
     if (!PermissionManager.instance().has(sender, "quickshop.use")) {
       return;
     }
-    if (QuickShop.instance().getConfig().getBoolean("sneak-to-control")) {
+    if (BaseConfig.sneakToControl) {
       if (sender instanceof Player) {
         if (!((Player) sender).isSneaking()) { // sneaking
           return;
@@ -460,8 +461,7 @@ public class MsgUtil {
       chatSheetPrinter
           .printSuggestableCmdLine(
               MsgUtil.getMessage("controlpanel.setowner", sender,
-                  shop.ownerName() + ((QuickShop.instance().getConfig().getBoolean(
-                      "shop.show-owner-uuid-in-controlpanel-if-op") && shop.isUnlimited())
+                  shop.ownerName() + ((BaseConfig.showOwnerUUIDForOp && shop.isUnlimited())
                           ? (" (" + shop.getOwner() + ")")
                           : "")),
               MsgUtil.getMessage("controlpanel.setowner-hover", sender),
@@ -507,8 +507,7 @@ public class MsgUtil {
     if (PermissionManager.instance().has(sender, "quickshop.other.price")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text = MsgUtil.getMessage("controlpanel.price", sender,
-          (QuickShop.instance().getConfig().getBoolean("use-decimal-format")) ? decimalFormat(shop.getPrice())
-              : "" + shop.getPrice());
+          BaseConfig.decimalFormatPrice ? decimalFormat(shop.getPrice()) : "" + shop.getPrice());
       String hoverText = MsgUtil.getMessage("controlpanel.price-hover", sender);
       String clickCommand = MsgUtil.getMessage("controlpanel.commands.price", sender);
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
@@ -660,8 +659,8 @@ public class MsgUtil {
     String stackMessage = shop.getItem().getAmount() > 1 ? " * " + shop.getItem().getAmount() : "";
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.item-name-and-price", p, "" + amount,
         Util.getItemStackName(shop.getItem()) + stackMessage, Util.format((amount * shop.getPrice()))));
-    if (QuickShop.instance().getConfig().getBoolean("show-tax")) {
-      double tax = QuickShop.instance().getConfig().getDouble("tax");
+    if (BaseConfig.showTax) {
+      double tax = BaseConfig.taxRate;
       double total = amount * shop.getPrice();
       if (tax != 0) {
         if (!p.getUniqueId().equals(shop.getOwner())) {

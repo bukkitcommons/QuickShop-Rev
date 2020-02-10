@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
 import org.maxgamer.quickshop.event.ShopClickEvent;
 import org.maxgamer.quickshop.event.ShopLoadEvent;
 import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
@@ -79,10 +80,10 @@ public class ContainerShop implements Shop, Managed {
     this.location = s.location.clone();
     this.moderator = s.moderator.clone();
     
-    if (BaseConfig.displayItems) {
+    if (DisplayConfig.displayItems) {
       DisplayData data = DisplayData.create(this.item);
       switch (data.type()) {
-        case ARMORSTAND:
+        case ARMOR_STAND:
           display = new ArmorStandDisplayItem(this, data);
           break;
         default:
@@ -112,10 +113,10 @@ public class ContainerShop implements Shop, Managed {
     this.shopType = type;
     this.unlimited = unlimited;
 
-    if (BaseConfig.displayItems) {
+    if (DisplayConfig.displayItems) {
       DisplayData data = DisplayData.create(this.item);
       switch (data.type()) {
-        case ARMORSTAND:
+        case ARMOR_STAND:
           display = new ArmorStandDisplayItem(this, data);
           break;
         default:
@@ -157,7 +158,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingStock() {
-    return unlimited ? -1 : Util.countItems(this.getInventory(), this.getItem()) / item.getAmount();
+    return unlimited ? -1 : Util.countStacks(getInventory(), item);
   }
 
   /**
@@ -167,7 +168,7 @@ public class ContainerShop implements Shop, Managed {
    */
   @Override
   public int getRemainingSpace() {
-    return unlimited ? -1 : Util.countSpace(this.getInventory(), this.getItem());
+    return unlimited ? -1 : Util.countSpace(getInventory(), item);
   }
 
   /**
@@ -285,9 +286,12 @@ public class ContainerShop implements Shop, Managed {
   }
 
   private void checkDisplay0() {
-    if (!BaseConfig.displayItems || !this.isLoaded) {
+    if (!DisplayConfig.displayItems || !this.isLoaded) {
       return;
     }
+    
+    if (!Util.isChunkLoaded(location))
+      return;
 
     if (this.display == null) {
       Util.debug("Warning: DisplayItem is null, this shouldn't happend...");
@@ -344,8 +348,11 @@ public class ContainerShop implements Shop, Managed {
       Inventory chestInv = getInventory();
       ItemStack[] contents = chestInv.getContents();
       
+      // Take items from chest and offer to player's inventory
       for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
         ItemStack chestItem = contents[i];
+        if (chestItem == null || !isShoppingItem(chestItem))
+          continue;
         
         int takeAmount = Math.min(totalAmount, chestItem.getAmount());
         chestItem.setAmount(chestItem.getAmount() - takeAmount);
@@ -402,9 +409,8 @@ public class ContainerShop implements Shop, Managed {
       InventoryHolder container = (InventoryHolder) location.block().getState();
       return container.getInventory();
     } catch (Throwable t) {
-      ShopLogger.instance().warning("The container of a shop have probably gone: " + location);
-      ShopLogger.instance().warning("Details of this exception:");
-      t.printStackTrace();
+      ShopLogger.instance().severe("The container of a shop have probably gone, with current block type: " +
+          location.block().getType() + " @ " + location);
       
       ShopManager.instance().unload(this);
       return null;
@@ -470,7 +476,8 @@ public class ContainerShop implements Shop, Managed {
         player,
         unlimited ?
             MsgUtil.getMessagePlaceholder("signs.unlimited", player) :
-            String.valueOf(shopType == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()));
+            (String.valueOf(shopType == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()))
+        );
     
     String stacks = item.getAmount() > 1 ? " * " + item.getAmount() : "";
     lines[2] = MsgUtil.getMessagePlaceholder(
@@ -511,9 +518,6 @@ public class ContainerShop implements Shop, Managed {
   @NotNull
   @Override
   public List<Sign> getShopSigns() {
-    if (this.getLocation().world() == null)
-      return Collections.emptyList();
-    
     OfflinePlayer player = Bukkit.getOfflinePlayer(getOwner());
     String signHeader =
         MsgUtil.getMessagePlaceholder("signs.header", player, ownerName());

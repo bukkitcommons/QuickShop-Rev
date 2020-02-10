@@ -24,7 +24,7 @@ import org.maxgamer.quickshop.integration.IntegrationStage;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
-@Configuration("integrations.yml")
+@Configuration("configs/integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_LOAD)
 public class WorldGuardIntegration implements IntegratedPlugin {
   private List<WorldGuardFlags> createFlags;

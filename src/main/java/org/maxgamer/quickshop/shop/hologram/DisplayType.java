@@ -15,11 +15,11 @@ public enum DisplayType {
    */
   UNKNOWN(-1, EntityType.UNKNOWN), // same as 0
 
-  REALITEM(0, EntityType.DROPPED_ITEM),
+  DROPPED_ITEM(0, EntityType.DROPPED_ITEM),
   
-  ARMORSTAND(1, EntityType.ARMOR_STAND),
+  ARMOR_STAND(1, EntityType.ARMOR_STAND),
 
-  VIRTUALITEM(2, EntityType.UNKNOWN); // not implement yet
+  VIRTUAL_ITEM(2, EntityType.UNKNOWN); // not implement yet
 
   private int id;
   
@@ -47,10 +47,10 @@ public enum DisplayType {
 
   public static DisplayType typeIs(@Nullable DisplayItem displayItem) {
     if (displayItem instanceof RealDisplayItem) {
-      return REALITEM;
+      return DROPPED_ITEM;
     }
     if (displayItem instanceof ArmorStandDisplayItem) {
-      return ARMORSTAND;
+      return ARMOR_STAND;
     }
     return UNKNOWN;
   }

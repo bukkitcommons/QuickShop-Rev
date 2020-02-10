@@ -78,7 +78,7 @@ public class SubCommand_Create implements CommandProcesser {
         return;
       }
 
-      if (Util.getSecondHalf(b) != null
+      if (Util.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(p, "quickshop.create.double")) {
         p.sendMessage(MsgUtil.getMessage("no-double-chests", sender));
         return;

@@ -73,7 +73,7 @@ public class SubCommand_SetOwner implements CommandProcesser {
       @SuppressWarnings("deprecation")
       final OfflinePlayer p = Bukkit.getOfflinePlayer(cmdArg[0]);
       final String shopOwner = Bukkit.getOfflinePlayer(shop.get().getOwner()).getName();
-      if (shopOwner == null) {
+      if (!p.hasPlayedBefore()) {
         sender.sendMessage(MsgUtil.getMessage("unknown-player", null));
         return;
       }

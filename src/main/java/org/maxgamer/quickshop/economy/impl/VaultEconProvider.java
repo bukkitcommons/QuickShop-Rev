@@ -134,7 +134,7 @@ public class VaultEconProvider implements EconomyProvider, Listener {
     }
     OfflinePlayer p = Bukkit.getOfflinePlayer(name);
     try {
-      return Objects.requireNonNull(this.vault).depositPlayer(p, amount).transactionSuccess();
+      return vault.depositPlayer(p, amount).transactionSuccess();
     } catch (Throwable t) {
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();
       t.printStackTrace();

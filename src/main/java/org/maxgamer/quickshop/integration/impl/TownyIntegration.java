@@ -29,7 +29,7 @@ import org.maxgamer.quickshop.integration.IntegrateStage;
 import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
 
-@Configuration("integrations.yml")
+@Configuration("configs/integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class TownyIntegration implements IntegratedPlugin {
   private List<TownyFlags> createFlags;
