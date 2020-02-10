@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.VersionData;
 import org.maxgamer.quickshop.utils.VersionUpdater;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;

@@ -22,10 +22,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
 
 public class SubCommand_About extends SneakyTabs implements CommandProcesser {
 

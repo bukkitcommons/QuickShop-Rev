@@ -1,19 +1,3 @@
-/*
- * This file is a part of project QuickShop, the name is DatabaseHelper.java Copyright (C) Ghost_chu
- * <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.database;
 
 import java.sql.PreparedStatement;
@@ -24,10 +8,11 @@ import java.util.UUID;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.configuration.impl.DatabaseConfig;
-import org.maxgamer.quickshop.database.connector.MySQLConnector;
+import org.maxgamer.quickshop.configuration.DatabaseConfig;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.database.Database;
+import cc.bukkit.shop.database.Dispatcher;
+import cc.bukkit.shop.database.connector.MySQLConnector;
 
 /**
  * A Util to execute all SQLs.
@@ -38,17 +23,19 @@ public class DatabaseHelper {
   private final Database db;
 
   @NotNull
-  private final QuickShop plugin;
+  private final Dispatcher dispatcher;
 
-  public DatabaseHelper(@NotNull QuickShop plugin, @NotNull Database db) throws SQLException {
+  public DatabaseHelper(@NotNull Dispatcher dispatcher, @NotNull Database db) throws SQLException {
     this.db = db;
-    this.plugin = plugin;
+    this.dispatcher = dispatcher;
+    
     if (!db.hasTable(DatabaseConfig.databasePrefix + "shops")) {
       createShopsTable();
     }
     if (!db.hasTable(DatabaseConfig.databasePrefix + "messages")) {
       createMessagesTable();
     }
+    
     checkColumns();
   }
 
@@ -95,7 +82,7 @@ public class DatabaseHelper {
       String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE time < ?";
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
       ps.setLong(1, weekAgo);
-      plugin.getDispatcher().add(ps);
+      dispatcher.add(ps);
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -106,7 +93,7 @@ public class DatabaseHelper {
       String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE owner = ?";
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
       ps.setString(1, player.toString());
-      plugin.getDispatcher().add(ps);
+      dispatcher.add(ps);
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -122,7 +109,7 @@ public class DatabaseHelper {
     Statement st = db.getConnection().createStatement();
     String createTable = "CREATE TABLE " + DatabaseConfig.databasePrefix
         + "messages (owner  VARCHAR(255) NOT NULL, message  TEXT(25) NOT NULL, time  BIGINT(32) NOT NULL );";
-    if (plugin.getDatabase().getConnector() instanceof MySQLConnector) {
+    if (db.getConnector() instanceof MySQLConnector) {
       createTable = "CREATE TABLE " + DatabaseConfig.databasePrefix
           + "messages (owner  VARCHAR(255) NOT NULL, message  TEXT(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL , time  BIGINT(32) NOT NULL );";
     }
@@ -148,7 +135,7 @@ public class DatabaseHelper {
     ps.setString(7, world);
     ps.setInt(8, unlimited);
     ps.setInt(9, shopType);
-    plugin.getDispatcher().add(ps);
+    dispatcher.add(ps);
   }
 
   /**
@@ -200,7 +187,7 @@ public class DatabaseHelper {
       ps.setString(1, player.toString());
       ps.setString(2, message);
       ps.setLong(3, time);
-      plugin.getDispatcher().add(ps);
+      dispatcher.add(ps);
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -222,7 +209,7 @@ public class DatabaseHelper {
     ps.setInt(3, y);
     ps.setInt(4, z);
     ps.setString(5, worldName);
-    plugin.getDispatcher().add(ps);
+    dispatcher.add(ps);
   }
 
   public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited,
@@ -240,7 +227,7 @@ public class DatabaseHelper {
       ps.setInt(7, y);
       ps.setInt(8, z);
       ps.setString(9, world);
-      plugin.getDispatcher().add(ps);
+      dispatcher.add(ps);
       // db.execute(q, owner, Util.serialize(item), unlimited, shopType, price, x, y, z, world);
   }
 }

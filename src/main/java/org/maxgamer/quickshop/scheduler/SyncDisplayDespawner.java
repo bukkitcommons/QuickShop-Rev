@@ -3,10 +3,10 @@ package org.maxgamer.quickshop.scheduler;
 import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.Shop;
 
 @AllArgsConstructor
 public class SyncDisplayDespawner implements Runnable {

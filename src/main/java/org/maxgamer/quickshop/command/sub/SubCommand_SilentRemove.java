@@ -9,14 +9,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class SubCommand_SilentRemove extends SneakyTabs implements CommandProcesser {
 
@@ -51,6 +51,6 @@ public class SubCommand_SilentRemove extends SneakyTabs implements CommandProces
       return;
     }
 
-    ShopLoader.instance().delete(shop.get());
+    QuickShopLoader.instance().delete(shop.get());
   }
 }

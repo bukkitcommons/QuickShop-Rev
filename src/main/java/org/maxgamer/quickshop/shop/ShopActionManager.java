@@ -1,6 +1,17 @@
 package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Maps;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopModerator;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.data.ShopAction;
+import cc.bukkit.shop.data.ShopCreator;
+import cc.bukkit.shop.data.ShopActionData;
+import cc.bukkit.shop.data.ShopSnapshot;
+import cc.bukkit.shop.event.ShopCreateEvent;
+import cc.bukkit.shop.event.ShopPurchaseEvent;
+import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
+import cc.bukkit.shop.viewer.ShopViewer;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
@@ -19,23 +30,12 @@ import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.event.ShopCreateEvent;
-import org.maxgamer.quickshop.event.ShopPurchaseEvent;
-import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.ShopModerator;
-import org.maxgamer.quickshop.shop.api.ShopType;
-import org.maxgamer.quickshop.shop.api.data.ShopAction;
-import org.maxgamer.quickshop.shop.api.data.ShopCreator;
-import org.maxgamer.quickshop.shop.api.data.ShopData;
-import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class ShopActionManager {
   // TODO delayed remove
@@ -55,13 +55,13 @@ public class ShopActionManager {
   /*
    * Action manager
    */
-  private Map<UUID, ShopData> actionData = Maps.newConcurrentMap();
+  private Map<UUID, ShopActionData> actionData = Maps.newConcurrentMap();
   
   public boolean hasAction(@NotNull UUID player) {
     return actionData.containsKey(player);
   }
   
-  public void setAction(@NotNull UUID player, @NotNull ShopData data) {
+  public void setAction(@NotNull UUID player, @NotNull ShopActionData data) {
     actionData.put(player, data);
   }
   
@@ -548,7 +548,7 @@ public class ShopActionManager {
     final String message = ChatColor.stripColor(msg);
     Runnable runnable = () -> {
       // They wanted to do something.
-      ShopData info = actionData.remove(p.getUniqueId());
+      ShopActionData info = actionData.remove(p.getUniqueId());
       
       if (!info.location().worldName().equals(p.getLocation().getWorld().getName())
           || info.location().bukkit().distanceSquared(p.getLocation()) > 25) {
@@ -577,7 +577,7 @@ public class ShopActionManager {
   }
 
   /** @return Returns the HashMap. Info contains what their last question etc was. */
-  public Map<UUID, ShopData> getActions() {
+  public Map<UUID, ShopActionData> getActions() {
     return this.actionData;
   }
   

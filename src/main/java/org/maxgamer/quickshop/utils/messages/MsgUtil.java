@@ -34,17 +34,17 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.ShopType;
-import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.JsonLocale;
 import org.maxgamer.quickshop.utils.files.LocaleFile;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.data.ShopSnapshot;
 
 public class MsgUtil {
   private static YamlConfiguration builtInDefaultLanguage = YamlConfiguration.loadConfiguration(

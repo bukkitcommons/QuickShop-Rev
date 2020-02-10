@@ -1,6 +1,16 @@
 package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Maps;
+import com.google.gson.JsonSyntaxException;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopModerator;
+import cc.bukkit.shop.data.ShopCreator;
+import cc.bukkit.shop.data.ShopData;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.event.ShopCreateEvent;
+import cc.bukkit.shop.event.ShopPreCreateEvent;
+import cc.bukkit.shop.util.Utils;
+import cc.bukkit.shop.viewer.ShopViewer;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,26 +23,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.event.ShopCreateEvent;
-import org.maxgamer.quickshop.event.ShopPreCreateEvent;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.data.ShopCreator;
-import org.maxgamer.quickshop.shop.api.data.ShopLocation;
+import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class ShopManager {
   /*
@@ -59,23 +65,40 @@ public class ShopManager {
    *
    * @param world The name of the world
    * @param shop The shop to add
+   * @throws InvalidConfigurationException 
+   * @throws JsonSyntaxException 
    */
-  public void load(@NotNull Shop shop) {
-    if (shop.isLoaded()) {
-      Util.debug("Already loaded shop: " + shop.getLocation());
-      return;
-    }
-    
-    @NotNull ShopLocation location = shop.getLocation();
-    
+  public Shop load(@NotNull World world, @NotNull ShopData data) throws JsonSyntaxException, InvalidConfigurationException {
     Map<Long, Map<Long, Shop>> inWorld =
-        loadedShops.computeIfAbsent(location.worldName(), s -> new HashMap<>(3));
+        loadedShops.computeIfAbsent(data.world(), s -> new HashMap<>(3));
     
     Map<Long, Shop> inChunk =
-        inWorld.computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4), s -> Maps.newHashMap());
+        inWorld.computeIfAbsent(Utils.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
     
-    inChunk.put(location.blockKey(), shop);
+    Shop shop = new ContainerShop(
+        ShopLocation.from(world, data.x(), data.y(), data.z()),
+        data.price(), data.item(),
+        data.moderators(), data.unlimited(), data.type());
+    
+    inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), shop);
     shop.onLoad();
+    
+    return shop;
+  }
+  
+  public Shop load(@NotNull Shop shop) {
+    Map<Long, Map<Long, Shop>> inWorld =
+        loadedShops.computeIfAbsent(shop.getLocation().worldName(), s -> new HashMap<>(3));
+    
+    Map<Long, Shop> inChunk =
+        inWorld.computeIfAbsent(Utils.chunkKey(
+            shop.getLocation().x() >> 4, shop.getLocation().z() >> 4), s -> Maps.newHashMap());
+    
+    inChunk.put(Utils.blockKey(
+        shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z()), shop);
+    shop.onLoad();
+    
+    return shop;
   }
 
   /**
@@ -89,9 +112,10 @@ public class ShopManager {
     try {
       if (QuickShop.instance().isLimit()) {
         UUID uuid = player.getUniqueId();
-        long owned = ShopLoader.instance().getAllShops()
-            .stream()
-            .filter(shop -> shop.getOwner().equals(uuid))
+        long owned = QuickShopLoader.instance().getAllShops()
+            .stream() // ASYNC
+            .filter(shop ->
+              shop.moderators().getOwner().equals(uuid))
             .count();
         
         int max = QuickShop.instance().getShopLimit(player);
@@ -209,17 +233,22 @@ public class ShopManager {
                     location.worldName(),
                     location.x(), location.y(), location.z());
       
-      Map<Long, Shop> inChunk =
-          ShopLoader
+      Map<Long, ShopData> inChunk =
+          QuickShopLoader
             .instance()
             .getShopsMap()
             .computeIfAbsent(location.worldName(),
                 s -> new HashMap<>(3))
-            .computeIfAbsent(Util.chunkKey(location.x() >> 4, location.z() >> 4),
+            .computeIfAbsent(Utils.chunkKey(location.x() >> 4, location.z() >> 4),
                 s -> Maps.newHashMap());
       
       Util.debug("Putting into memory shop database: " + location.toString());
-      inChunk.put(location.blockKey(), shop);
+      
+      ShopData data = new ShopData(Util.serialize(info.item()), shop.getModerator().serialize(),
+          shop.getLocation().worldName(), shop.getShopType(), shop.getPrice(),
+          shop.isUnlimited(), shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z());
+      
+      inChunk.put(location.blockKey(), data);
       
       load(shop);
     } catch (SQLException error) {
@@ -269,19 +298,19 @@ public class ShopManager {
   }
   
   @Nullable
-  private Map<Long, Shop> getLoadedShopsInChunk(@NotNull Chunk c) {
-    return getLoadedShopsInWorld(c.getWorld().getName(), c.getX(), c.getZ());
+  public Map<Long, Shop> getLoadedShopsInChunk(@NotNull Chunk c) {
+    return getLoadedShopsInChunk(c.getWorld().getName(), c.getX(), c.getZ());
   }
 
   @Nullable
-  private Map<Long, Shop> getLoadedShopsInWorld(@NotNull String world, int chunkX, int chunkZ) {
+  private Map<Long, Shop> getLoadedShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
     @Nullable Map<Long, Map<Long, Shop>> inWorld = loadedShops.get(world);
     if (inWorld == null) {
       Util.debug("World map not found: " + world);
       return null;
     }
     
-    return inWorld.get(Util.chunkKey(chunkX, chunkZ));
+    return inWorld.get(Utils.chunkKey(chunkX, chunkZ));
   }
   
   public ShopViewer getLoadedShopAt(Location loc) {
@@ -291,7 +320,15 @@ public class ShopManager {
       return ShopViewer.empty();
     }
     
-    return ShopViewer.of(inChunk.get(Util.blockKey(loc)));
+    return ShopViewer.of(inChunk.get(Utils.blockKey(loc)));
+  }
+  
+  public ShopViewer getLoadedShopAt(String world, int x, int y, int z) {
+    @Nullable Map<Long, Shop> inChunk = getLoadedShopsInChunk(world, x >> 4, z >> 4);
+    if (inChunk == null)
+      return ShopViewer.empty();
+    
+    return ShopViewer.of(inChunk.get(Utils.blockKey(x, y, z)));
   }
   
   public boolean hasLoadedShopAt(@NotNull Location loc) {
@@ -299,7 +336,7 @@ public class ShopManager {
     if (inChunk == null)
       return false;
     
-    return inChunk.containsKey(Util.blockKey(loc));
+    return inChunk.containsKey(Utils.blockKey(loc));
   }
 
   /**
@@ -364,7 +401,7 @@ public class ShopManager {
     
     if (inWorld != null) {
       Map<Long, Shop> inChunk =
-          inWorld.get(Util.chunkKey(location.x() >> 4, location.z() >> 4));
+          inWorld.get(Utils.chunkKey(location.x() >> 4, location.z() >> 4));
       
       if (inChunk != null)
         inChunk.remove(location.blockKey());

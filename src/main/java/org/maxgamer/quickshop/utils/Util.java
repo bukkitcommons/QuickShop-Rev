@@ -1,6 +1,11 @@
 package org.maxgamer.quickshop.utils;
 
 import com.google.common.io.Files;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.database.connector.MySQLConnector;
+import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.viewer.ShopViewer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,18 +58,13 @@ import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.database.connector.MySQLConnector;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.data.ShopLocation;
-import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -91,34 +91,6 @@ public class Util {
     // This is always '+' instead of '-' even in negative pos
     return new Location(shopLocation.world(), shopLocation.x() + .5, shopLocation.y() + .5,
         shopLocation.z() + .5);
-  }
-
-  /**
-   * Gets an unique key of a chunk based on its coordinates.
-   * 
-   * @param x X Coordinate
-   * @param z Z Coordinate
-   * @return Chunk coordinates packed into a long
-   * @author Aikar
-   */
-  public static long chunkKey(int chunkX, int chunkZ) {
-    return (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
-  }
-
-  /**
-   * Gets an unique key of a block based on its coordinates.
-   * 
-   * @param x X Coordinate
-   * @param z Z Coordinate
-   * @return Chunk coordinates packed into a long
-   * @author Spottedleaf
-   */
-  public static long blockKey(int x, int y, int z) {
-    return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
-  }
-  
-  public static long blockKey(Location loc) {
-    return blockKey(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
   }
 
   /**
@@ -184,6 +156,11 @@ public class Util {
       return false;
     }
     return true;
+  }
+  
+  public static boolean canBeShop(@NotNull World world, int x, int y, int z) {
+    BlockState state = world.getBlockAt(x, y, z).getState();
+    return canBeShop(state);
   }
   
   public static boolean canBeShop(@NotNull Block block) {
@@ -1084,5 +1061,9 @@ public class Util {
     if (!cache.exists())
       cache.mkdirs();
     return cache;
+  }
+
+  public static boolean isChunkLoaded(@NotNull World world, int chunkX, int chunkZ) {
+    return world.isChunkLoaded(chunkX, chunkZ);
   }
 }

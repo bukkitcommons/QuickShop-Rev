@@ -6,15 +6,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.BlockViewer;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
-import org.maxgamer.quickshop.utils.viewer.ViewAction;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
+import cc.bukkit.shop.viewer.BlockViewer;
+import cc.bukkit.shop.viewer.ShopViewer;
+import cc.bukkit.shop.viewer.ViewAction;
 
 public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
 
@@ -38,7 +38,7 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
         if (shop.isPresent()) {
           if (shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
               || PermissionManager.instance().has(sender, "quickshop.other.destroy")) {
-            ShopLoader.instance().delete(shop.get());
+            QuickShopLoader.instance().delete(shop.get());
           } else {
             sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
           }

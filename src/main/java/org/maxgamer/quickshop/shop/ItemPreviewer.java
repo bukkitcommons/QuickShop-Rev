@@ -11,9 +11,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.event.ShopInventoryPreviewEvent;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.event.ShopInventoryPreviewEvent;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 
 /** A class to create a GUI item preview quickly */

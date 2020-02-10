@@ -25,13 +25,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class SubCommand_SilentBuy implements CommandProcesser {
 

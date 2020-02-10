@@ -10,10 +10,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.event.ProtectionCheckStatus;
-import org.maxgamer.quickshop.event.ShopProtectionCheckEvent;
-import org.maxgamer.quickshop.shop.api.data.ShopLocation;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.event.ProtectionCheckStatus;
+import cc.bukkit.shop.event.ShopProtectionCheckEvent;
 
 public class BuildPerms {
   /**

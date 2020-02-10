@@ -1,6 +1,21 @@
 package org.maxgamer.quickshop.shop;
 
 import com.google.common.collect.Lists;
+import cc.bukkit.shop.Managed;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopModerator;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.event.ShopClickEvent;
+import cc.bukkit.shop.event.ShopLoadEvent;
+import cc.bukkit.shop.event.ShopModeratorChangedEvent;
+import cc.bukkit.shop.event.ShopPriceChangeEvent;
+import cc.bukkit.shop.event.ShopSaveEvent;
+import cc.bukkit.shop.event.ShopUnloadEvent;
+import cc.bukkit.shop.event.ShopPriceChangeEvent.Reason;
+import cc.bukkit.shop.hologram.DisplayData;
+import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.viewer.ShopViewer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,30 +42,15 @@ import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
-import org.maxgamer.quickshop.event.ShopClickEvent;
-import org.maxgamer.quickshop.event.ShopLoadEvent;
-import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
-import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
-import org.maxgamer.quickshop.event.ShopPriceChangeEvent.Reason;
-import org.maxgamer.quickshop.event.ShopUnloadEvent;
-import org.maxgamer.quickshop.event.ShopSaveEvent;
-import org.maxgamer.quickshop.shop.api.Managed;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.ShopModerator;
-import org.maxgamer.quickshop.shop.api.ShopType;
-import org.maxgamer.quickshop.shop.api.data.ShopLocation;
-import org.maxgamer.quickshop.shop.hologram.DisplayData;
-import org.maxgamer.quickshop.shop.hologram.DisplayItem;
-import org.maxgamer.quickshop.shop.hologram.impl.ArmorStandDisplayItem;
-import org.maxgamer.quickshop.shop.hologram.impl.EntityDisplayItem;
-import org.maxgamer.quickshop.shop.hologram.impl.RealDisplayItem;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.configuration.DisplayConfig;
+import org.maxgamer.quickshop.hologram.ArmorStandDisplayItem;
+import org.maxgamer.quickshop.hologram.EntityDisplayItem;
+import org.maxgamer.quickshop.hologram.RealDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 /** ChestShop core */
 @Getter

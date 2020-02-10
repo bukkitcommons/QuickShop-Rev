@@ -20,33 +20,19 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
-import org.bukkit.plugin.java.PluginClassLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.command.CommandManager;
-import org.maxgamer.quickshop.configuration.ConfigurationData;
-import org.maxgamer.quickshop.configuration.ConfigurationManager;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.configuration.impl.DatabaseConfig;
-import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
-import org.maxgamer.quickshop.configuration.impl.MatcherConfig;
-import org.maxgamer.quickshop.database.Database;
+import org.maxgamer.quickshop.command.QuickShopCommands;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.configuration.DatabaseConfig;
+import org.maxgamer.quickshop.configuration.DisplayConfig;
+import org.maxgamer.quickshop.configuration.MatcherConfig;
 import org.maxgamer.quickshop.database.DatabaseHelper;
-import org.maxgamer.quickshop.database.Dispatcher;
-import org.maxgamer.quickshop.database.connector.DatabaseConnector;
-import org.maxgamer.quickshop.database.connector.MySQLConnector;
-import org.maxgamer.quickshop.database.connector.SQLiteConnector;
-import org.maxgamer.quickshop.economy.EconomyProvider;
-import org.maxgamer.quickshop.economy.EconomyType;
-import org.maxgamer.quickshop.economy.impl.ReserveEconProvider;
-import org.maxgamer.quickshop.economy.impl.VaultEconProvider;
-import org.maxgamer.quickshop.integration.IntegrateStage;
-import org.maxgamer.quickshop.integration.IntegrationHelper;
-import org.maxgamer.quickshop.integration.impl.FactionsIntegration;
-import org.maxgamer.quickshop.integration.impl.PlotSquaredIntegration;
-import org.maxgamer.quickshop.integration.impl.ResidenceIntegration;
-import org.maxgamer.quickshop.integration.impl.TownyIntegration;
-import org.maxgamer.quickshop.integration.impl.WorldGuardIntegration;
+import org.maxgamer.quickshop.integration.FactionsIntegration;
+import org.maxgamer.quickshop.integration.PlotSquaredIntegration;
+import org.maxgamer.quickshop.integration.ResidenceIntegration;
+import org.maxgamer.quickshop.integration.TownyIntegration;
+import org.maxgamer.quickshop.integration.WorldGuardIntegration;
 import org.maxgamer.quickshop.listeners.BlockListener;
 import org.maxgamer.quickshop.listeners.ChatListener;
 import org.maxgamer.quickshop.listeners.ClearLaggListener;
@@ -57,14 +43,14 @@ import org.maxgamer.quickshop.listeners.InternalListener;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.ShopActionManager;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.ItemMatcher;
@@ -74,14 +60,26 @@ import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
+import cc.bukkit.shop.configuration.ConfigurationData;
+import cc.bukkit.shop.configuration.ConfigurationManager;
+import cc.bukkit.shop.database.Database;
+import cc.bukkit.shop.database.Dispatcher;
+import cc.bukkit.shop.database.connector.DatabaseConnector;
+import cc.bukkit.shop.database.connector.MySQLConnector;
+import cc.bukkit.shop.database.connector.SQLiteConnector;
+import cc.bukkit.shop.economy.EconomyProvider;
+import cc.bukkit.shop.economy.EconomyType;
+import cc.bukkit.shop.economy.impl.ReserveEconProvider;
+import cc.bukkit.shop.economy.impl.VaultEconProvider;
+import cc.bukkit.shop.integration.IntegrateStage;
+import cc.bukkit.shop.integration.IntegrationHelper;
 
 @Getter
-public class QuickShop extends JavaPlugin {
+public final class QuickShop extends JavaPlugin {
   /**
    * This is only a reference of the internal instance.
    * @see QuickShop#instance()
@@ -103,7 +101,7 @@ public class QuickShop extends JavaPlugin {
   private IssuesHelper bootError;
   // Listeners - We decide which one to use at runtime
   private final ChatListener chatListener = new ChatListener();
-  private CommandManager commandManager;
+  private QuickShopCommands commandManager;
   /** WIP */
   private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
 
@@ -410,7 +408,7 @@ public class QuickShop extends JavaPlugin {
     }
 
     Util.debug("Cleaning up database queues...");
-    dispatcher.flush();
+    dispatcher.close();
 
     Util.debug("Unregistering tasks...");
     // if (itemWatcherTask != null)
@@ -484,7 +482,7 @@ public class QuickShop extends JavaPlugin {
     /*
      * Commands
      */
-    commandManager = new CommandManager();
+    commandManager = new QuickShopCommands();
     getCommand("qs").setExecutor(commandManager);
     getCommand("qs").setTabCompleter(commandManager);
     
@@ -543,7 +541,7 @@ public class QuickShop extends JavaPlugin {
     signUpdateWatcher = new ScheduledSignUpdater();
 
     /* Load all shops. */
-    ShopLoader.instance().loadShops();
+    QuickShopLoader.instance().loadShops();
 
     Bukkit.getPluginManager().registerEvents(blockListener, this);
     Bukkit.getPluginManager().registerEvents(playerListener, this);
@@ -658,7 +656,7 @@ public class QuickShop extends JavaPlugin {
       ShopLogger.instance().info("Database Connector: " + connector.getClass().getSimpleName());
       database = new Database(connector);
       dispatcher = new Dispatcher(database);
-      databaseHelper = new DatabaseHelper(this, database);
+      databaseHelper = new DatabaseHelper(dispatcher, database);
       
     } catch (Throwable t) {
       t.printStackTrace();

@@ -38,13 +38,13 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 
 @AllArgsConstructor
 public class LockListener implements Listener {

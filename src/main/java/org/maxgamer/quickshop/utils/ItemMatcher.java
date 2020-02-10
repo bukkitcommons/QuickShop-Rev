@@ -9,7 +9,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.configuration.impl.MatcherConfig;
+import org.maxgamer.quickshop.configuration.MatcherConfig;
 import com.google.common.collect.Multimap;
 
 /** A util allow quickshop check item matches easy and quick. */

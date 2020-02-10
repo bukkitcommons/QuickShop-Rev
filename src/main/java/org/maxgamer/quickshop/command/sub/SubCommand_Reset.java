@@ -25,9 +25,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.command.CommandProcesser;
 
 public class SubCommand_Reset implements CommandProcesser {
   @NotNull

@@ -39,7 +39,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.BaseConfig;
 import com.google.common.collect.Maps;
 
 public abstract class ShopPluginLogger extends PluginLogger {
@@ -117,12 +117,12 @@ public abstract class ShopPluginLogger extends PluginLogger {
     String prefix = plugin.getDescription().getPrefix();
     String pluginName = (useLog4j = BaseConfig.useLog4j) ?
 
-        (ChatColor.GREEN + (prefix == null ? plugin.getDescription().getName() : prefix)
+        (ChatColor.DARK_GREEN + (prefix == null ? plugin.getDescription().getName() : prefix)
             + ChatColor.RESET)
         :
 
-        (prefix != null ? ChatColor.RESET + "[" + ChatColor.GREEN + prefix + ChatColor.RESET + "] "
-            : ChatColor.RESET + "[" + ChatColor.GREEN + plugin.getDescription().getName() + ChatColor.RESET + "] ");
+        (prefix != null ? ChatColor.RESET + "[" + ChatColor.DARK_GREEN + prefix + ChatColor.RESET + "] "
+            : ChatColor.RESET + "[" + ChatColor.DARK_GREEN + plugin.getDescription().getName() + ChatColor.RESET + "] ");
     pluginName = applyStyles(pluginName);
 
     // Log4j setup

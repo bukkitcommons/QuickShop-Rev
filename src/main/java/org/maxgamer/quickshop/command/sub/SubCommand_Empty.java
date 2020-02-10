@@ -23,12 +23,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class SubCommand_Empty extends SneakyTabs implements CommandProcesser {
   @Override

@@ -5,9 +5,7 @@ import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 /** BootError class contains print errors on /qs command when plugin failed launched. */
 @EqualsAndHashCode

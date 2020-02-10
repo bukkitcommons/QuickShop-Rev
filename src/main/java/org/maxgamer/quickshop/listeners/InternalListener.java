@@ -21,12 +21,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.event.ShopCreateEvent;
-import org.maxgamer.quickshop.event.ShopDeleteEvent;
-import org.maxgamer.quickshop.event.ShopModeratorChangedEvent;
-import org.maxgamer.quickshop.event.ShopPriceChangeEvent;
-import org.maxgamer.quickshop.event.ShopSuccessPurchaseEvent;
-import org.maxgamer.quickshop.shop.api.ShopType;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.event.ShopCreateEvent;
+import cc.bukkit.shop.event.ShopDeleteEvent;
+import cc.bukkit.shop.event.ShopModeratorChangedEvent;
+import cc.bukkit.shop.event.ShopPriceChangeEvent;
+import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
 
 @AllArgsConstructor
 public class InternalListener implements Listener {

@@ -1,31 +1,16 @@
-/*
- * This file is a part of project QuickShop, the name is OngoingFeeWatcher.java Copyright (C)
- * Ghost_chu <https://github.com/Ghost-chu> Copyright (C) Bukkit Commons Studio and contributors
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU Lesser General Public License as published by the Free Software Foundation, either version 3
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this program.
- * If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.maxgamer.quickshop.scheduler;
 
+import java.sql.SQLException;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.shop.ShopLoader;
-import org.maxgamer.quickshop.shop.api.Shop;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.data.ShopData;
 
 /**
  * Check the shops after server booted up, make sure shop can correct self-deleted when container
@@ -49,29 +34,27 @@ public class OngoingFeeWatcher extends BukkitRunnable {
     boolean allowLoan = BaseConfig.allowLoan;
     boolean ignoreUnlimited = BaseConfig.ongoingFeeIgnoreUnlimited;
     
-    ShopLoader.instance().forEachShops(shop -> {
-      if (!shop.isUnlimited() || !ignoreUnlimited) {
-        UUID shopOwner = shop.getOwner();
+    QuickShopLoader.instance().forEachShops(shop -> {
+      if (!shop.unlimited() || !ignoreUnlimited) {
+        UUID shopOwner = shop.moderators().getOwner();
         
-        Bukkit.getScheduler().runTask(plugin, () -> {
-          if (!allowLoan) {
-            // Disallow loan
-            if (plugin.getEconomy().getBalance(shopOwner) < cost) {
-              this.removeShop(shop);
-            }
-          }
-          boolean success = plugin.getEconomy().withdraw(shop.getOwner(), cost);
-          if (!success) {
+        if (!allowLoan) {
+          // Disallow loan
+          if (plugin.getEconomy().getBalance(shopOwner) < cost) {
             this.removeShop(shop);
-          } else {
-            try {
-              // noinspection ConstantConditions,deprecation
-              plugin.getEconomy()
-                  .deposit(Bukkit.getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), cost);
-            } catch (Exception ignored) {
-            }
           }
-        }); // FIXME
+        }
+        boolean success = plugin.getEconomy().withdraw(shop.moderators().getOwner(), cost);
+        if (!success) {
+          this.removeShop(shop);
+        } else {
+          try {
+            // noinspection ConstantConditions,deprecation
+            plugin.getEconomy()
+                .deposit(Bukkit.getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), cost);
+          } catch (Exception ignored) {
+          }
+        }
       } else {
         Util.debug(
             "Shop was ignored for ongoing fee cause it is unlimited and ignoreUnlimited = true : "
@@ -85,15 +68,21 @@ public class OngoingFeeWatcher extends BukkitRunnable {
    *
    * @param shop The shop was remove cause no enough ongoing fee
    */
-  public void removeShop(@NotNull Shop shop) {
-    Bukkit.getScheduler().runTask(plugin, () -> ShopLoader.instance().delete(shop));
-
-    if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
-      MsgUtil.send(shop.getOwner(),
-          MsgUtil.getMessagePlaceholder("shop-removed-cause-ongoing-fee",
-              Bukkit.getOfflinePlayer(shop.getOwner()),
-              "World:" + shop.getLocation().worldName() + " X:"
-                  + shop.getLocation().x() + " Y:" + shop.getLocation().y() + " Z:"
-                  + shop.getLocation().z()));
+  public void removeShop(@NotNull ShopData shop) {
+    Bukkit.getScheduler().runTask(plugin, () -> {
+      try {
+        QuickShopLoader.instance().delete(shop);
+        
+        if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
+          MsgUtil.send(shop.moderators().getOwner(),
+              MsgUtil.getMessagePlaceholder("shop-removed-cause-ongoing-fee",
+                  Bukkit.getOfflinePlayer(shop.moderators().getOwner()),
+                  "World:" + shop.world() + " X:" + shop.x() +
+                  " Y:" + shop.y() + " Z:" + shop.z()));
+        
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    });
   }
 }

@@ -16,14 +16,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopActionManager;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class BlockListener implements Listener {
   /*
@@ -78,7 +78,7 @@ public class BlockListener implements Listener {
       }
       
       ShopActionManager.instance().getActions().remove(player.getUniqueId());
-      ShopLoader.instance().delete(shop);
+      QuickShopLoader.instance().delete(shop);
       player.sendMessage(MsgUtil.getMessage("success-removed-shop", player));
     });
   }

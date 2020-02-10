@@ -1,17 +1,18 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.sql.SQLException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
 
 public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesser {
 
@@ -37,39 +38,51 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
       sender.sendMessage(ChatColor.GREEN + "Async thread is started, please wait...");
       //Util.backupDatabase(); // Already warn the user, don't care about backup result.
       
-      ShopLoader.instance().forEachShops(shop -> {
-        if (shop.getItem().getType() == Material.AIR) {
-          sender.sendMessage(
-              ChatColor.YELLOW + "Shop " + shop + " removing cause item data is damaged.");
-          ShopLoader.instance().delete(shop);
-          return;
-        }
-        
-        if (shop.getLocation().world() == null) {
-          sender.sendMessage(
-              ChatColor.YELLOW + "Shop " + shop + " removing cause target world not loaded.");
-          ShopLoader.instance().delete(shop);
-          return;
-        }
-        
-        if (shop.getOwner() == null) {
-          sender.sendMessage(
-              ChatColor.YELLOW + "Shop " + shop + " removing cause owner data is damaged.");
-          ShopLoader.instance().delete(shop);
-          return;
-        }
-        
-        // Shop exist check
-        QuickShop.instance().getServer().getScheduler().runTask(QuickShop.instance(), () -> {
-          Util.debug(
-              "Posted to main server thread to continue access Bukkit API for shop " + shop);
-          
-          if (!Util.canBeShop(shop.getLocation().block())) {
-            sender.sendMessage(ChatColor.YELLOW + "Shop " + shop
-                + " removing cause target location nolonger is a shop or disallow create the shop.");
-            ShopLoader.instance().delete(shop);
+      QuickShopLoader.instance().forEachShops(shop -> {
+        try {
+          if (shop.item().getType() == Material.AIR) {
+            sender.sendMessage(
+                ChatColor.YELLOW + "Shop " + shop + " removing cause item data is damaged.");
+            QuickShop.instance().getDatabaseHelper().deleteShop(
+                shop.x(), shop.y(), shop.z(), shop.world());
+            return;
           }
-        }); // Post to server main thread to check.
+          
+          if (shop.location().world() == null) {
+            sender.sendMessage(
+                ChatColor.YELLOW + "Shop " + shop + " removing cause target world not loaded.");
+            QuickShop.instance().getDatabaseHelper().deleteShop(
+                shop.x(), shop.y(), shop.z(), shop.world());
+            return;
+          }
+          
+          if (shop.moderators() == null) {
+            sender.sendMessage(
+                ChatColor.YELLOW + "Shop " + shop + " removing cause owner data is damaged.");
+            QuickShop.instance().getDatabaseHelper().deleteShop(
+                shop.x(), shop.y(), shop.z(), shop.world());
+            return;
+          }
+          
+          // Shop exist check
+          QuickShop.instance().getServer().getScheduler().runTask(QuickShop.instance(), () -> {
+            Util.debug(
+                "Posted to main server thread to continue access Bukkit API for shop " + shop);
+            
+            if (!Util.canBeShop(shop.location().block())) {
+              sender.sendMessage(ChatColor.YELLOW + "Shop " + shop
+                  + " removing cause target location nolonger is a shop or disallow create the shop.");
+              try {
+                QuickShop.instance().getDatabaseHelper().deleteShop(
+                    shop.x(), shop.y(), shop.z(), shop.world());
+              } catch (SQLException e) {
+                return;
+              }
+            }
+          });
+        } catch (SQLException e) {
+          return;
+        }
       });
       
       sender.sendMessage(ChatColor.GREEN + "All shops completed checks.");

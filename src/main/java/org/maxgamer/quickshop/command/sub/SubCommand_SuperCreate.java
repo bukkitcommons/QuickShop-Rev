@@ -28,16 +28,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.data.ShopAction;
-import org.maxgamer.quickshop.shop.api.data.ShopCreator;
-import org.maxgamer.quickshop.shop.api.data.ShopLocation;
-import org.maxgamer.quickshop.shop.api.data.ShopSnapshot;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.data.ShopAction;
+import cc.bukkit.shop.data.ShopCreator;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.data.ShopSnapshot;
 
 public class SubCommand_SuperCreate implements CommandProcesser {
 

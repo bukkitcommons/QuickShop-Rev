@@ -4,14 +4,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.BlockViewer;
-import org.maxgamer.quickshop.utils.viewer.ViewAction;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
+import cc.bukkit.shop.viewer.BlockViewer;
+import cc.bukkit.shop.viewer.ViewAction;
 
 public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
   @Override

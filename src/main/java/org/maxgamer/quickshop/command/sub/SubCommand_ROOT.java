@@ -21,10 +21,10 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandContainer;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.command.CommandContainer;
+import cc.bukkit.shop.command.CommandProcesser;
 
 public class SubCommand_ROOT implements CommandProcesser {
 

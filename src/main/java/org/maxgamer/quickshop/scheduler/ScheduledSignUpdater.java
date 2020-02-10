@@ -2,8 +2,8 @@ package org.maxgamer.quickshop.scheduler;
 
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.api.Shop;
 import com.google.common.collect.Sets;
+import cc.bukkit.shop.Shop;
 
 public class ScheduledSignUpdater implements Runnable {
   private Set<Shop> signs = Sets.newHashSet();

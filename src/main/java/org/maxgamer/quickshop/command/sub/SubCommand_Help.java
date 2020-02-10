@@ -22,10 +22,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.command.CommandContainer;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.permission.impl.PermissionManager;
+import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.command.CommandContainer;
+import cc.bukkit.shop.command.CommandProcesser;
 
 public class SubCommand_Help implements CommandProcesser {
 

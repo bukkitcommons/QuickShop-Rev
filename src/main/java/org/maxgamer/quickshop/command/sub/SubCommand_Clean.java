@@ -1,19 +1,22 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.command.CommandProcesser;
-import org.maxgamer.quickshop.command.SneakyTabs;
 import org.maxgamer.quickshop.shop.ContainerShop;
-import org.maxgamer.quickshop.shop.ShopLoader;
-import org.maxgamer.quickshop.shop.api.Shop;
-import org.maxgamer.quickshop.shop.api.ShopType;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import com.google.common.collect.Lists;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.command.SneakyTabs;
+import cc.bukkit.shop.data.ShopLocation;
 
 public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
 
@@ -27,14 +30,17 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
 
     sender.sendMessage(MsgUtil.getMessage("command.cleaning", sender));
 
-    final ArrayList<Shop> pendingRemoval = new java.util.ArrayList<>();
+    List<Shop> pendingRemoval = Lists.newArrayList();
     int[] count = {0, 0};
     
-    ShopLoader.instance().getAllShops().forEach(shop -> {
+    QuickShopLoader.instance().getAllShops().forEach(data -> {
+      Shop shop = new ContainerShop(
+          ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
+          data.price(), data.item(),
+          data.moderators(), data.unlimited(), data.type());
+      
       try {
-        if (shop.getLocation().world() != null && shop.is(ShopType.SELLING)
-            && shop.getRemainingStock() == 0 && shop instanceof ContainerShop) {
-          // FIXME load air shop
+        if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0) {
           if (!Util.canBeShopIgnoreBlocklist(shop.getLocation().block().getState())) {
             pendingRemoval.add(shop);
             return;
@@ -66,7 +72,7 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
     });
 
     for (Shop shop : pendingRemoval)
-      ShopLoader.instance().delete(shop);
+      QuickShopLoader.instance().delete(shop);
 
     MsgUtil.clean();
     sender.sendMessage(MsgUtil.getMessage("command.cleaned", sender, "" + count[0]));

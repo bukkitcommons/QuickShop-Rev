@@ -40,12 +40,12 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
+import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class DisplayProtectionListener implements Listener {
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)

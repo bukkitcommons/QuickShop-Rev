@@ -17,12 +17,12 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.impl.BaseConfig;
-import org.maxgamer.quickshop.shop.ShopLoader;
+import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.viewer.ShopViewer;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class ShopProtector implements Listener {
   private static void handleProtection(
@@ -57,7 +57,7 @@ public class ShopProtector implements Listener {
     for (Block block : event.blockList())
       handleProtection(block.getLocation(), BaseConfig.explosionProtection,
           () -> event.setCancelled(true),
-          shop -> ShopLoader.instance().delete(shop));
+          shop -> QuickShopLoader.instance().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -65,7 +65,7 @@ public class ShopProtector implements Listener {
     for (Block block : event.blockList())
       handleProtection(block.getLocation(), BaseConfig.explosionProtection,
           () -> event.setCancelled(true),
-          shop -> ShopLoader.instance().delete(shop));
+          shop -> QuickShopLoader.instance().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
