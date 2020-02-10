@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.Nullable;
@@ -129,8 +128,8 @@ public class ShopLogger extends PluginLogger {
             + ChatColor.RESET)
         :
 
-        (prefix != null ? "[" + ChatColor.YELLOW + prefix + ChatColor.RESET + "] "
-            : "[" + ChatColor.YELLOW + QuickShop.instance().getDescription().getName() + ChatColor.RESET + "] ");
+        (prefix != null ? ChatColor.RESET + "[" + ChatColor.GREEN + prefix + ChatColor.RESET + "] "
+            : ChatColor.RESET + "[" + ChatColor.GREEN + QuickShop.instance().getDescription().getName() + ChatColor.RESET + "] ");
     pluginName = applyStyles(pluginName);
 
     // Log4j setup
