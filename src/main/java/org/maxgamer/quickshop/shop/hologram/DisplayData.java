@@ -18,6 +18,7 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.configuration.impl.DisplayConfig;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import com.google.common.collect.Maps;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

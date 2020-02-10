@@ -19,6 +19,7 @@ import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.economy.EconomyProvider;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 public class VaultEconProvider implements EconomyProvider, Listener {
 

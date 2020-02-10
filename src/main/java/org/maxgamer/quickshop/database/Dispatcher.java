@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import org.maxgamer.quickshop.utils.messages.WarningSender;
 import com.google.common.collect.Queues;
 

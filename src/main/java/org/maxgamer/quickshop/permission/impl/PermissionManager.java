@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.impl.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionProvider;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 public class PermissionManager {
   /*

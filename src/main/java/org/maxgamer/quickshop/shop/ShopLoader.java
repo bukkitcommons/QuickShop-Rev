@@ -42,6 +42,7 @@ import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.shop.api.data.ShopLocation;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 /** A class allow plugin load shops fast and simply. */
 public class ShopLoader implements Listener {

@@ -63,6 +63,7 @@ import org.maxgamer.quickshop.shop.hologram.DisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;

@@ -29,6 +29,7 @@ import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 @IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class PlotSquaredIntegration implements IntegratedPlugin {

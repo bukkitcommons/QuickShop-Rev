@@ -37,6 +37,7 @@ import org.maxgamer.quickshop.shop.api.ShopType;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import org.maxgamer.quickshop.utils.viewer.ShopViewer;
 
 public class SubCommand_Price implements CommandProcesser {

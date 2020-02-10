@@ -23,6 +23,7 @@ import org.maxgamer.quickshop.integration.IntegratedPlugin;
 import org.maxgamer.quickshop.integration.IntegrationStage;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 @Configuration("configs/integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_LOAD)

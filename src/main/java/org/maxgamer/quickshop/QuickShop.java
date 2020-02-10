@@ -74,6 +74,7 @@ import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
@@ -337,11 +338,13 @@ public class QuickShop extends JavaPlugin {
   public QuickShop() {
     super();
     singleton = instance = this;
+    ShopLogger.initalize(this);
   }
 
   protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
     super(loader, description, dataFolder, file);
     singleton = instance = this;
+    ShopLogger.initalize(this);
 }
   
   private void onLoad0() throws IllegalArgumentException, IllegalAccessException {
@@ -351,7 +354,6 @@ public class QuickShop extends JavaPlugin {
         logger.set(this, ShopLogger.instance());
         // Note: Do this after onLoad
       }
-      
     } catch (Throwable t) {
       t.printStackTrace();
     }

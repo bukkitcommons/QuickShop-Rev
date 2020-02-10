@@ -29,6 +29,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.HttpRequest;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 public class MojangAPI {
   final String versionManifestUrl = "https://launchermeta.mojang.com/mc/game/version_manifest.json";
