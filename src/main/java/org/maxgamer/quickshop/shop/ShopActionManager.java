@@ -165,7 +165,9 @@ public class ShopActionManager {
           "" + shop.getLocation().y(), "" + shop.getLocation().z());
     }
 
-    MsgUtil.send(shop.getOwner(), msg, shop.isUnlimited());
+    if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+      MsgUtil.send(shop.getOwner(), msg);
+    
     shop.buy(p, amount);
     MsgUtil.sendSellSuccess(p, shop, amount);
 
@@ -331,12 +333,7 @@ public class ShopActionManager {
     }
     
     if (!BaseConfig.lock) {
-      // Warn them if they haven't been warned since
-      // reboot
-      if (!QuickShop.instance().getWarnings().contains(p.getName())) {
-        p.sendMessage(MsgUtil.getMessage("shops-arent-locked", p));
-        QuickShop.instance().getWarnings().add(p.getName());
-      }
+      p.sendMessage(MsgUtil.getMessage("shops-arent-locked", p));
     }
     
     /*
@@ -476,7 +473,9 @@ public class ShopActionManager {
           Util.getItemStackName(shop.getItem()));
     }
 
-    MsgUtil.send(shop.getOwner(), msg, shop.isUnlimited());
+    if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+      MsgUtil.send(shop.getOwner(), msg);
+    
     shop.sell(p, amount);
     MsgUtil.sendPurchaseSuccess(p, shop, amount, info);
     ShopSuccessPurchaseEvent se = new ShopSuccessPurchaseEvent(shop, p, amount, total, tax);

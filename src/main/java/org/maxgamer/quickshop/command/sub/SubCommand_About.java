@@ -36,26 +36,26 @@ public class SubCommand_About extends SneakyTabs implements CommandProcesser {
     sender.sendMessage(
         ChatColor.AQUA + "QuickShop " + ChatColor.YELLOW + QuickShop.getFork());
     sender.sendMessage(ChatColor.AQUA + "Ver " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-        + QuickShop.getVersion());
-    if (QuickShop.getVersion().toUpperCase().contains("LTS")) {
+        + QuickShop.instance().getVersion());
+    if (QuickShop.instance().getVersion().toUpperCase().contains("LTS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.lts", sender));
-    } else if (QuickShop.getVersion().toUpperCase().contains("STABLE")) {
+    } else if (QuickShop.instance().getVersion().toUpperCase().contains("STABLE")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.stable", sender));
-    } else if (QuickShop.getVersion().toUpperCase().contains("QV")) {
+    } else if (QuickShop.instance().getVersion().toUpperCase().contains("QV")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.qualityverifyed", sender));
-    } else if (QuickShop.getVersion().toUpperCase().contains("BETA")) {
+    } else if (QuickShop.instance().getVersion().toUpperCase().contains("BETA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.unstable", sender));
-    } else if (QuickShop.getVersion().toUpperCase().contains("ALPHA")) {
+    } else if (QuickShop.instance().getVersion().toUpperCase().contains("ALPHA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.unstable", sender));
-    } else if (QuickShop.getVersion().toUpperCase().contains("EARLY ACCESS")) {
+    } else if (QuickShop.instance().getVersion().toUpperCase().contains("EARLY ACCESS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.unstable", sender));
-    } else if (QuickShop.getVersion().toUpperCase().contains("SNAPSHOT")) {
+    } else if (QuickShop.instance().getVersion().toUpperCase().contains("SNAPSHOT")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
           + MsgUtil.getMessage("updatenotify.label.unstable", sender));
     } else {

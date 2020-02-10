@@ -1,30 +1,26 @@
 package org.maxgamer.quickshop;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.Getter;
 import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
+import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.plugin.java.JavaPluginLoader;
+import org.bukkit.plugin.java.PluginClassLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.command.CommandManager;
@@ -37,7 +33,6 @@ import org.maxgamer.quickshop.configuration.impl.MatcherConfig;
 import org.maxgamer.quickshop.database.Database;
 import org.maxgamer.quickshop.database.DatabaseHelper;
 import org.maxgamer.quickshop.database.Dispatcher;
-import org.maxgamer.quickshop.database.Database.ConnectionException;
 import org.maxgamer.quickshop.database.connector.DatabaseConnector;
 import org.maxgamer.quickshop.database.connector.MySQLConnector;
 import org.maxgamer.quickshop.database.connector.SQLiteConnector;
@@ -71,7 +66,6 @@ import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.ShopLoader;
 import org.maxgamer.quickshop.shop.ShopManager;
-import org.maxgamer.quickshop.shop.api.Shop;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.ItemMatcher;
 import org.maxgamer.quickshop.utils.BuildPerms;
@@ -80,7 +74,6 @@ import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.nms.ReflectFactory;
 import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
@@ -88,8 +81,12 @@ import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
 
 @Getter
 public class QuickShop extends JavaPlugin {
-  /** The active instance of QuickShop */
-  @Deprecated public static QuickShop instance;
+  /**
+   * This is only a reference of the internal instance.
+   * @see QuickShop#instance()
+   */
+  @Deprecated
+  public static QuickShop instance;
   
   private static QuickShop singleton;
   
@@ -99,46 +96,59 @@ public class QuickShop extends JavaPlugin {
 
   private IntegrationHelper integrationHelper;
   // Listeners (These don't)
-  private BlockListener blockListener;
+  private final BlockListener blockListener = new BlockListener();
   /** The BootError, if it not NULL, plugin will stop loading and show setted errors when use /qs */
   @Nullable
   private IssuesHelper bootError;
   // Listeners - We decide which one to use at runtime
-  private ChatListener chatListener;
+  private final ChatListener chatListener = new ChatListener();
   private CommandManager commandManager;
   /** WIP */
   private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
 
-  private CustomInventoryListener customInventoryListener;
+  private final CustomInventoryListener customInventoryListener = new CustomInventoryListener(this);
+  
   /** The database for storing all our data for persistence */
+  @NotNull
   private Database database;
   /** Contains all SQL tasks */
+  @NotNull
   private DatabaseHelper databaseHelper;
+  
   /** Queued database manager */
-  private Dispatcher databaseManager;
+  @NotNull
+  private Dispatcher dispatcher;
 
-  private DisplayBugFixListener displayBugFixListener;
+  @NotNull
+  private final DisplayBugFixListener displayBugFixListener = new DisplayBugFixListener(this);
   private int displayItemCheckTicks;
   /** The economy we hook into for transactions */
+  @NotNull
   private EconomyProvider economy;
 
-  private DisplayProtectionListener inventoryListener;
-  private ItemMatcher itemMatcher;
+  @NotNull
+  private final DisplayProtectionListener inventoryListener = new DisplayProtectionListener();
+  @NotNull
+  private final ItemMatcher itemMatcher = new ItemMatcher();
   /** Language manager, to select which language will loaded. */
+  @NotNull
   private final ResourceAccessor language = new ResourceAccessor();
 
   /** Whether or not to limit players shop amounts */
   private boolean limit = false;
 
   /** The shop limites. */
+  @NotNull
   private HashMap<String, Integer> limits = new HashMap<>();
 
-  private LockListener lockListener;
+  @NotNull
+  private final LockListener lockListener = new LockListener(this);
   // private BukkitTask itemWatcherTask;
   @Nullable
   private AsyncLogWatcher logWatcher;
   /** bStats, good helper for metrics. */
-  private Metrics metrics;
+  @NotNull
+  private final Metrics metrics = new Metrics(this);
 
   private boolean noopDisable;
   /** The plugin OpenInv (null if not present) */
@@ -150,32 +160,32 @@ public class QuickShop extends JavaPlugin {
 
   @NotNull
   private final ShopActionListener playerListener = new ShopActionListener();
-  
-  private InternalListener internalListener;
+  @NotNull
+  private final InternalListener internalListener = new InternalListener(this);
   /**
    * Whether we players are charged a fee to change the price on their shop (To help deter endless
    * undercutting
    */
   private boolean priceChangeRequiresFee = false;
   /** The error reporter to help devs report errors to Sentry.io */
+  @NotNull
   private SentryErrorReporter sentryErrorReporter;
-  /** The server UniqueID, use to the ErrorReporter */
-  private UUID serverUniqueID;
 
-  private boolean setupDBonEnableding = false;
-
-  private ShopProtector shopProtectListener;
+  @NotNull
+  private final ShopProtector shopProtectListener = new ShopProtector();
   // private ShopVaildWatcher shopVaildWatcher;
   private SyncDisplayDespawner displayAutoDespawnWatcher;
   /** A set of players who have been warned ("Your shop isn't automatically locked") */
-  private HashSet<String> warnings = new HashSet<>();
 
-  private OngoingFeeWatcher ongoingFeeWatcher;
+
+  @NotNull
+  private final OngoingFeeWatcher ongoingFeeWatcher = new OngoingFeeWatcher(this);
   private ScheduledSignUpdater signUpdateWatcher;
   private BukkitWrapper bukkitAPIWrapper;
   private boolean enabledAsyncDisplayDespawn;
   
   @Getter
+  @NotNull
   private final ConfigurationManager configurationManager = ConfigurationManager.createManager(this);
 
   /**
@@ -184,8 +194,8 @@ public class QuickShop extends JavaPlugin {
    *
    * @return Plugin Version
    */
-  public static String getVersion() {
-    return QuickShop.instance().getDescription().getVersion();
+  public String getVersion() {
+    return getDescription().getVersion();
   }
 
   /**
@@ -205,7 +215,7 @@ public class QuickShop extends JavaPlugin {
   }
 
   /** Load 3rdParty plugin support module. */
-  private void load3rdParty() {
+  private void loadSoftdepends() {
     // added for compatibility reasons with OpenInv - see
     // https://github.com/KaiKikuchi/QuickShop/issues/139
     if (BaseConfig.openInv) {
@@ -258,49 +268,30 @@ public class QuickShop extends JavaPlugin {
    * @return true if successful, false if the core is invalid or is not found, and vault cannot be
    *         used.
    */
-  private boolean loadEcon() {
-    try {
-      // EconomyCore core = new Economy_Vault();
-      EconomyProvider core = null;
-      switch (EconomyType.fromID(BaseConfig.economyType)) {
-        case UNKNOWN:
-          IssuesHelper.error("Can't load the Economy provider, invalid value in config.yml.");
-          return false;
-        case VAULT:
-          core = new VaultEconProvider();
-          Util.debug("Now using the Vault economy system.");
-          break;
-        case RESERVE:
-          core = new ReserveEconProvider();
-          Util.debug("Now using the Reserve economy system.");
-          break;
-        default:
-          Util.debug("No any economy provider selected.");
-          break;
-      }
-      if (core == null) {
-        return false;
-      }
-      if (!core.isValid()) {
-        // getLogger().severe("Economy is not valid!");
+  private boolean loadEconomy() {
+    EconomyProvider core;
+    switch (EconomyType.fromID(BaseConfig.economyType)) {
+      case VAULT:
+        economy = core = new VaultEconProvider();
+        break;
+      case RESERVE:
+        economy = core = new ReserveEconProvider();
+        break;
+      default:
         IssuesHelper.econError();
-        // if(econ.equals("Vault"))
-        // getLogger().severe("(Does Vault have an Economy to hook into?!)");
+        Util.debug("No economy provider can be selected.");
         return false;
-      } else {
-        this.economy = core;
-        return true;
-      }
-    } catch (Exception e) {
-      this.getSentryErrorReporter().ignoreThrow();
-      e.printStackTrace();
-      getLogger().severe("QuickShop could not hook into a economy/Not found Vault or Reserve!");
-      getLogger().severe("QuickShop CANNOT start!");
+    }
+    
+    QuickShop.instance().log("Economy Provider: " + core.getName());
+    
+    if (!core.isValid()) {
       IssuesHelper.econError();
-      HandlerList.unregisterAll(this);
-      getLogger().severe("Plugin listeners was disabled, please fix the economy issue.");
+      Util.debug("Economy provider is not vaild: " + core.getName());
       return false;
     }
+    
+    return true;
   }
 
   /**
@@ -318,30 +309,68 @@ public class QuickShop extends JavaPlugin {
   /** Reloads QuickShops config */
   @Override
   public void reloadConfig() {
+    super.reloadConfig(); // This cannot be removed, or NPE
+    
     configurationManager.load(QuickShop.class);
     configurationManager.load(BaseConfig.class);
     configurationManager.load(DisplayConfig.class);
     configurationManager.load(MatcherConfig.class);
     configurationManager.load(DatabaseConfig.class);
     
-    super.reloadConfig();
-    this.priceChangeRequiresFee = BaseConfig.priceModFee > 0;
-    this.displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
-    if (BaseConfig.logActions) {
+    priceChangeRequiresFee = BaseConfig.priceModFee > 0;
+    displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
+    
+    if (BaseConfig.logActions)
       logWatcher = new AsyncLogWatcher(this, new File(getDataFolder(), "qs.log"));
-    } else {
-      logWatcher = null;
-    }
   }
 
   /** Early than onEnable, make sure instance was loaded in first time. */
   @Override
   public void onLoad() {
+    try {
+      onLoad0();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+  }
+  
+  public QuickShop() {
+    super();
     singleton = instance = this;
-    getDataFolder().mkdirs();
-    replaceLogger();
+  }
 
-    this.bootError = null;
+  protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
+    super(loader, description, dataFolder, file);
+    singleton = instance = this;
+}
+  
+  private void onLoad0() throws IllegalArgumentException, IllegalAccessException {
+    try {
+      Field logger = ReflectionUtil.getField(JavaPlugin.class, "logger");
+      if (logger != null) {
+        logger.set(this, ShopLogger.instance());
+        // Note: Do this after onLoad
+      }
+      
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    
+    boolean fine = IssuesHelper.scanDupeInstall();
+    ChatColor sideColor = fine ? org.bukkit.ChatColor.DARK_GREEN : ChatColor.DARK_RED;
+    ChatColor coreColor = fine ? org.bukkit.ChatColor.GREEN : ChatColor.RED;
+    
+    System.out.println(
+        sideColor + "  __  __   ||   \r\n" + 
+        coreColor + "" + " /  \\(_    ||   QuickShop - Rev\r\n" + 
+        coreColor + "" + " \\_\\/__)   ||   Version  " + getVersion().substring(4) + "\r\n" +
+        sideColor + "           ||   ");
+    
+    getLogger().info("Developers: " + Util.list2String(getDescription().getAuthors()));
+    getLogger().info("Original Author: Netherfoam, Timtower, KaiNoMood");
+    
+    getDataFolder().mkdirs();
+
     getLogger().info("Loading up integration modules.");
     this.integrationHelper = new IntegrationHelper();
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
@@ -379,9 +408,7 @@ public class QuickShop extends JavaPlugin {
     }
 
     Util.debug("Cleaning up database queues...");
-    if (this.getDatabaseManager() != null) {
-      this.getDatabaseManager().flush();
-    }
+    dispatcher.flush();
 
     Util.debug("Unregistering tasks...");
     // if (itemWatcherTask != null)
@@ -406,9 +433,7 @@ public class QuickShop extends JavaPlugin {
         e.printStackTrace();
       }
     }
-    if (warnings != null) {
-      warnings.clear();
-    }
+    
     // this.reloadConfig();
     Util.debug("Calling integrations...");
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
@@ -418,41 +443,49 @@ public class QuickShop extends JavaPlugin {
   @Override
   public void onEnable() {
     long start = System.currentTimeMillis();
-    configurationManager.load(QuickShop.class);
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
-    /* PreInit for BootError feature */
-    commandManager = new CommandManager();
-    // noinspection ConstantConditions
-    getCommand("qs").setExecutor(commandManager);
-    // noinspection ConstantConditions
-    getCommand("qs").setTabCompleter(commandManager);
-
-    getLogger().info("Quickshop " + getFork());
-    getLogger().info("Reading the configuration...");
-    /* Process the config */
-    saveDefaultConfig();
-    reloadConfig();
-    getConfig().options().copyDefaults(true); // Load defaults.
-    saveDefaultConfig();
-    reloadConfig();
-    // getConfig().options().copyDefaults(true);
-    if (getConfig().getInt("config-version") == 0) {
-      getConfig().set("config-version", 1);
-    }
-    updateConfig(getConfig().getInt("config-version"));
-
-    getLogger().info("Developers: " + Util.list2String(this.getDescription().getAuthors()));
-    getLogger().info("Original author: Netherfoam, Timtower, KaiNoMood");
-    getLogger().info("Let's start loading the plugin");
-
-    /* It will generate a new UUID above updateConfig */
-    /* Process Metrics and Sentry error reporter. */
-    metrics = new Metrics(this);
-    // noinspection ConstantConditions
-    serverUniqueID =
-        UUID.fromString(getConfig().getString("server-uuid", String.valueOf(UUID.randomUUID())));
     sentryErrorReporter = new SentryErrorReporter(this);
-    // loadEcon();
+    
+    /*
+     * Configs
+     */
+    reloadConfig();
+    getConfig().options().copyDefaults(true);
+    saveDefaultConfig();
+    Util.loadFromConfig();
+    
+    /*
+     * Locales
+     */
+    try {
+      MsgUtil.loadCfgMessages();
+    } catch (Exception e) {
+      getLogger().warning("An error throws when loading messages");
+      e.printStackTrace();
+    }
+    MsgUtil.loadItemi18n();
+    MsgUtil.loadEnchi18n();
+    MsgUtil.loadPotioni18n();
+    
+    /*
+     * Economy
+     */
+    Util.debug("Loading economy system...");
+    loadEconomy();
+    
+    /*
+     * Third party
+     */
+    loadSoftdepends();
+    registerIntegrations();
+    integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
+    
+    /*
+     * Commands
+     */
+    commandManager = new CommandManager();
+    getCommand("qs").setExecutor(commandManager);
+    getCommand("qs").setTabCompleter(commandManager);
+    
     switch (BaseConfig.serverPlatform) {
       case "Spigot":
         bukkitAPIWrapper = new SpigotWrapper();
@@ -473,31 +506,6 @@ public class QuickShop extends JavaPlugin {
         }
     }
 
-    /* Initalize the Utils */
-    itemMatcher = new ItemMatcher();
-    Util.initialize();
-    try {
-      MsgUtil.loadCfgMessages();
-    } catch (Exception e) {
-      getLogger().warning("An error throws when loading messages");
-      e.printStackTrace();
-    }
-    MsgUtil.loadItemi18n();
-    MsgUtil.loadEnchi18n();
-    MsgUtil.loadPotioni18n();
-
-    /* Check the running envs is support or not. */
-    try {
-      runtimeCheck(this);
-    } catch (RuntimeException e) {
-      IssuesHelper.error(e.getMessage());
-      return;
-    }
-
-    /* Load 3rd party supports */
-    load3rdParty();
-
-    setupDBonEnableding = true;
     boolean success = setupDatabase(); // Load the database
     if (!success) {
       noopDisable = true;
@@ -505,7 +513,6 @@ public class QuickShop extends JavaPlugin {
       Bukkit.getPluginManager().disablePlugin(this, true);
       return;
     }
-    setupDBonEnableding = false;
 
     /* Initalize the tools */
     // Create the shop manager.
@@ -517,7 +524,6 @@ public class QuickShop extends JavaPlugin {
             getConfig().getInt("shop.display-check-time"));
       }
     }
-    this.databaseManager = new Dispatcher(database);
     this.permissionChecker = new BuildPerms();
 
     if (BaseConfig.enableLimits) {
@@ -537,20 +543,6 @@ public class QuickShop extends JavaPlugin {
     /* Load all shops. */
     ShopLoader.instance().loadShops();
 
-    getLogger().info("Registering Listeners...");
-    // Register events
-
-    blockListener = new BlockListener();
-    chatListener = new ChatListener();
-    inventoryListener = new DisplayProtectionListener();
-    customInventoryListener = new CustomInventoryListener(this);
-    displayBugFixListener = new DisplayBugFixListener(this);
-    shopProtectListener = new ShopProtector();
-    // shopVaildWatcher = new ShopVaildWatcher(this);
-    ongoingFeeWatcher = new OngoingFeeWatcher(this);
-    lockListener = new LockListener(this);
-    internalListener = new InternalListener(this);
-
     Bukkit.getPluginManager().registerEvents(blockListener, this);
     Bukkit.getPluginManager().registerEvents(playerListener, this);
     Bukkit.getPluginManager().registerEvents(chatListener, this);
@@ -560,24 +552,7 @@ public class QuickShop extends JavaPlugin {
     Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
     Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
     Bukkit.getPluginManager().registerEvents(internalListener, this);
-    if (getConfig().getBoolean("shop.lock")) {
-      Bukkit.getPluginManager().registerEvents(lockListener, this);
-    }
-    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
-      Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
-    }
-    getLogger().info("Cleaning MsgUtils...");
-    MsgUtil.loadTransactionMessages();
-    MsgUtil.clean();
-    getLogger().info("Registering UpdateWatcher...");
-    UpdateWatcher.init();
-    getLogger().info("Registering BStats Mertics...");
-    submitMeritcs();
-    getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
-    /* Delay the Ecoonomy system load, give a chance to let economy system regiser. */
-    /* And we have a listener to listen the ServiceRegisterEvent :) */
-    Util.debug("Loading economy system...");
-    loadEcon();
+    
     Util.debug("Registering shop watcher...");
     Bukkit.getScheduler().runTaskTimer(this, signUpdateWatcher, 40, 40);
     if (logWatcher != null) {
@@ -589,8 +564,25 @@ public class QuickShop extends JavaPlugin {
       ongoingFeeWatcher.runTaskTimerAsynchronously(this, 0,
           getConfig().getInt("shop.ongoing-fee.ticks"));
     }
-    registerIntegrations();
+    
+    UpdateWatcher.init();
+    submitMeritcs();
+    
+    if (BaseConfig.lock) {
+      Bukkit.getPluginManager().registerEvents(lockListener, this);
+    }
+    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
+      Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
+    }
+    
+    getLogger().info("Loading player messages..");
+    MsgUtil.loadTransactionMessages();
+    MsgUtil.clean();
+    
+    getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
+    
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_ENABLE);
+    
     try {
       String[] easterEgg = new FunnyEasterEgg().getRandomEasterEgg();
       if (!(easterEgg == null)) {
@@ -601,72 +593,36 @@ public class QuickShop extends JavaPlugin {
   }
 
   private void registerIntegrations() {
-    if (getConfig().getBoolean("integration.towny.enable")) {
-      Plugin towny = Bukkit.getPluginManager().getPlugin("Towny");
-      if (towny != null && towny.isEnabled()) {
-        this.integrationHelper.register(new TownyIntegration(this));
-      }
-    }
-    if (getConfig().getBoolean("integration.worldguard.enable")) {
-      Plugin worldGuard = Bukkit.getPluginManager().getPlugin("WorldGuard");
-      if (worldGuard != null && worldGuard.isEnabled()) {
-        this.integrationHelper.register(new WorldGuardIntegration());
-      }
-    }
-    if (getConfig().getBoolean("integration.plotsquared.enable")) {
-      Plugin plotSquared = Bukkit.getPluginManager().getPlugin("PlotSquared");
-      if (plotSquared != null && plotSquared.isEnabled()) {
-        this.integrationHelper.register(new PlotSquaredIntegration());
-      }
-    }
-    if (getConfig().getBoolean("integration.residence.enable")) {
-      Plugin residence = Bukkit.getPluginManager().getPlugin("Residence");
-      if (residence != null && residence.isEnabled()) {
-        this.integrationHelper.register(new ResidenceIntegration());
-      }
+    Plugin towny = Bukkit.getPluginManager().getPlugin("Towny");
+    if (towny != null && towny.isEnabled()) {
+      if (getConfig().getBoolean("integration.towny.enable"))
+        integrationHelper.register(new TownyIntegration(this));
     }
     
-    configurationManager.load(FactionsIntegration.class);
-    if (FactionsIntegration.enabled) {
-      Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
-      if (factions != null && factions.isEnabled()) {
-        this.integrationHelper.register(new FactionsIntegration());
-      }
-    } else {
-      ConfigurationManager.createManager(this).unload(FactionsIntegration.class);
-    }
-  }
-
-  /**
-   * Check the env plugin running.
-   *
-   * @throws RuntimeException The error message, use this to create a BootError.
-   */
-  private void runtimeCheck(QuickShop shop) throws RuntimeException {
-    if (Util.isClassAvailable("org.maxgamer.quickshop.Util.NMS")) {
-      getLogger().severe(
-          "FATAL: Old QuickShop is installed, You must remove old quickshop jar from plugins folder!");
-      throw new RuntimeException(
-          "FATAL: Old QuickShop is installed, You must remove old quickshop jar from plugins folder!");
-    }
-    try {
-      getServer().spigot();
-    } catch (Throwable e) {
-      getLogger().severe("FATAL: QSRR can only be run on Spigot servers and forks of Spigot!");
-      throw new RuntimeException("Server must be Spigot based, Don't use CraftBukkit!");
-    }
-
-    if (getServer().getName().toLowerCase().contains("catserver")
-        || Util.isClassAvailable("moe.luohuayu.CatServer")
-        || Util.isClassAvailable("catserver.server.CatServer")) {
-      // Send FATAL ERROR TO CatServer's users.
-      getLogger().severe("FATAL: QSRR can't run on CatServer Community/Personal/Pro/Async");
-      throw new RuntimeException("QuickShop doen't support CatServer");
+    Plugin worldGuard = Bukkit.getPluginManager().getPlugin("WorldGuard");
+    if (worldGuard != null && worldGuard.isEnabled()) {
+      if (getConfig().getBoolean("integration.worldguard.enable"))
+        integrationHelper.register(new WorldGuardIntegration());
     }
     
-    String nmsVersion = Util.getNMSVersion();
-    getLogger().info("Running QuickShop-Reremake on NMS version " + nmsVersion
-        + " For Minecraft version " + ReflectFactory.getServerVersion());
+    Plugin plotSquared = Bukkit.getPluginManager().getPlugin("PlotSquared");
+    if (plotSquared != null && plotSquared.isEnabled()) {
+      if (getConfig().getBoolean("integration.plotsquared.enable"))
+        integrationHelper.register(new PlotSquaredIntegration());
+    }
+    
+    Plugin residence = Bukkit.getPluginManager().getPlugin("Residence");
+    if (residence != null && residence.isEnabled()) {
+      if (getConfig().getBoolean("integration.residence.enable"))
+        integrationHelper.register(new ResidenceIntegration());
+    }
+    
+    Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
+    if (factions != null && factions.isEnabled()) {
+      configurationManager.load(FactionsIntegration.class);
+      if (FactionsIntegration.enabled)
+        integrationHelper.register(new FactionsIntegration());
+    }
   }
 
   /**
@@ -676,7 +632,8 @@ public class QuickShop extends JavaPlugin {
    */
   private boolean setupDatabase() {
     try {
-      DatabaseConnector dbCore;
+      DatabaseConnector connector;
+      
       if (DatabaseConfig.enableMySQL) {
         ConfigurationData data = QuickShop.instance().getConfigurationManager().get(DatabaseConfig.class);
         YamlConfiguration src = data.conf();
@@ -689,37 +646,24 @@ public class QuickShop extends JavaPlugin {
         if (pass == null)
           src.set("settings.mysql.password", pass = "passwd");
         
-        dbCore = new MySQLConnector(DatabaseConfig.host,
+        connector = new MySQLConnector(DatabaseConfig.host,
             user, pass,
             DatabaseConfig.name, DatabaseConfig.port, DatabaseConfig.enableSSL);
       } else {
-        // SQLite database - Doing this handles file creation
-        dbCore = new SQLiteConnector(new File(this.getDataFolder(), "shops.db"));
+        connector = new SQLiteConnector(new File(getDataFolder(), "shops.db"));
       }
-      this.database = new Database(dbCore);
-      // Make the database up to date
+      
+      ShopLogger.instance().info("Database Connector: " + connector.getClass().getSimpleName());
+      database = new Database(connector);
+      dispatcher = new Dispatcher(database);
       databaseHelper = new DatabaseHelper(this, database);
-      ShopLogger.instance().info("Database Connector: " + dbCore.getClass().getSimpleName());
-    } catch (ConnectionException e) {
-      e.printStackTrace();
-      if (setupDBonEnableding) {
-        IssuesHelper.databaseError();
-        return false;
-      } else {
-        getLogger().severe("Error connecting to the database.");
-      }
-      return false;
-    } catch (SQLException e) {
-      e.printStackTrace();
-      getServer().getPluginManager().disablePlugin(this);
-      if (setupDBonEnableding) {
-        IssuesHelper.databaseError();
-        return false;
-      } else {
-        getLogger().severe("Error setting up the database.");
-      }
+      
+    } catch (Throwable t) {
+      t.printStackTrace();
+      IssuesHelper.databaseError();
       return false;
     }
+    
     return true;
   }
 
@@ -793,24 +737,6 @@ public class QuickShop extends JavaPlugin {
     }
   }
 
-  private void updateConfig(int selectedVersion) {
-    String serverUUID = getConfig().getString("server-uuid");
-    if (serverUUID == null || serverUUID.isEmpty()) {
-      serverUUID = BaseConfig.uuid;
-      configurationManager.save(BaseConfig.class);
-      getConfig().set("server-uuid", serverUUID);
-    }
-    saveConfig();
-    reloadConfig();
-    File file = new File(getDataFolder(), "example.config.yml");
-    file.delete();
-    try {
-      Files.copy(getResource("config.yml"), file.toPath());
-    } catch (IOException ioe) {
-      getLogger().warning("Error on spawning the example config file: " + ioe.getMessage());
-    }
-  }
-
   /**
    * Return the QSRR's fork edition name, you can modify this if you want create yourself fork.
    *
@@ -818,16 +744,5 @@ public class QuickShop extends JavaPlugin {
    */
   public static String getFork() {
     return "Rev";
-  }
-
-  private void replaceLogger() {
-    try {
-      Field logger = ReflectionUtil.getField(JavaPlugin.class, "logger");
-      if (logger != null) {
-        logger.set(this, ShopLogger.instance());
-      }
-    } catch (Throwable e) {
-      e.printStackTrace();
-    }
   }
 }

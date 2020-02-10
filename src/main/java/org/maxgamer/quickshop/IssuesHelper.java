@@ -5,6 +5,7 @@ import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 
 /** BootError class contains print errors on /qs command when plugin failed launched. */
@@ -15,6 +16,41 @@ public class IssuesHelper {
   
   public static boolean hasErrored() {
     return errored;
+  }
+  
+  public static boolean scanDupeInstall() {
+    try {
+      try {
+        Class.forName("org.maxgamer.quickshop.Util.NMS");
+      } catch (ClassNotFoundException e) {
+        ;
+      } catch (NoClassDefFoundError e) {
+        errored = true;
+        Bukkit.getLogger().severe(
+            "You have installed an older version of QuickShop, please remove that first!");
+        Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
+        return false;
+      }
+      
+      try {
+        Class.forName("org.maxgamer.quickshop.Watcher.LogWatcher"); // Reremake, v3
+        Class.forName("org.maxgamer.quickshop.watcher.LogWatcher"); // Reremake, v4
+      } catch (ClassNotFoundException e) {
+        ;
+      } catch (NoClassDefFoundError e) {
+        errored = true;
+        Bukkit.getLogger().severe(
+            "You have installed another edition of QuickShop, please check your plugins!");
+        Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
+        return false;
+      }
+    } catch (Throwable t) {
+      // This can comes from disabling plugin.
+      errored = true;
+      return false;
+    }
+    
+    return true;
   }
 
   protected static void error(@NotNull String... errors) {

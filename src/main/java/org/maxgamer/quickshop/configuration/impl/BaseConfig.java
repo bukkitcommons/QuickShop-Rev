@@ -11,7 +11,10 @@ import com.google.common.collect.Maps;
 
 @Configuration("base-config.yml")
 public class BaseConfig {
-  @Node("settings.permission.provider")
+  @Node(value = "server.uuid", rewrite = true)
+  public static String serverUUID = UUID.randomUUID().toString();
+  
+  @Node(value = "settings.permission.provider")
   public static String permsProvider = "Bukkit";
 
   @Node(value = "settings.plugin.developer-mode", rewrite = true)

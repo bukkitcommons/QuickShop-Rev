@@ -3,13 +3,10 @@ package org.maxgamer.quickshop.configuration;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.URL;
-import java.nio.file.CopyOption;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +16,6 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,6 +31,51 @@ public class ConfigurationManager {
   public ConfigurationManager unload(@NotNull Class<?> confClass) {
     configurations.remove(confClass);
     return this;
+  }
+  
+  public void upgrade(Class<?> confClass) {
+    ConfigurationData data = configurations.get(confClass);
+    if (data == null)
+      return;
+    
+    // Backup that file with increased id
+    int backupId = 1;
+    File file = new File(data.file().getParentFile(), data.file().getName().concat("backup"));
+    while (file.exists())
+      file = new File(file.getParentFile(), file.getName() + backupId++);
+    
+    forEachNode(confClass, (field, node) -> {
+      NodeType type = node.type();
+      switch (type) {
+        case CONFIG:
+          return;
+        case REMOVE:
+          data.conf().set(node.value(), null);
+          break;
+        case MOVE:
+          YamlConfiguration conf = data.conf();
+          if (StringUtils.contains(node.ref(), '/')) {
+            // Across files action
+            String[] params = StringUtils.split(node.ref(), '/');
+            File refFile = new File(QuickShop.instance().getDataFolder(), params[0]);
+            if (params.length > 2) {
+              refFile = new File(refFile, params[1]); // Nested folder
+              params[1] = params[2];
+            }
+            
+            if (!refFile.exists())
+              return;
+            
+            YamlConfiguration ref = YamlConfiguration.loadConfiguration(refFile);
+            if (ref.isSet(params[1]))
+              conf.set(node.value(), ref.get(params[1]));
+          } else {
+            if (conf.isSet(node.ref()))
+              conf.set(node.value(), conf.get(node.ref()));
+          }
+          break;
+      }
+    });
   }
   
   @Nullable
@@ -89,7 +130,7 @@ public class ConfigurationManager {
   @SneakyThrows
   public ConfigurationData load(@NotNull Class<?> confClass) {
     Configuration filePath = confClass.getAnnotation(Configuration.class);
-    Util.debug("Loading configuration for " + confClass.getName());
+    Util.debug("Loading configuration class: " + confClass.getName());
     
     if (filePath != null) {
       Util.debug("Path of configuration " + confClass.getName() + " is " + filePath.value());
@@ -98,7 +139,11 @@ public class ConfigurationManager {
 
       ConfigurationData data = new ConfigurationData(conf, file);
       configurations.put(confClass, data);
+      
+      Util.debug("Upgrading config file: " + filePath.value());
+      upgrade(confClass);
 
+      Util.debug("Loading config file: " + filePath.value());
       forEachNode(confClass, (field, node) -> {
         String path = node.value();
         Object value = conf.get(path);

@@ -43,9 +43,9 @@ public class Paste {
     finalReport.append("\n");
     finalReport.append("================================================\n");
     finalReport.append("QuickShop:\n");
-    finalReport.append("\tVersion: ").append(QuickShop.getVersion()).append("\n");
+    finalReport.append("\tVersion: ").append(QuickShop.instance().getVersion()).append("\n");
     finalReport.append("\tFork: ").append(QuickShop.getFork()).append("\n");
-    finalReport.append("\tServer ID: ").append(plugin.getServerUniqueID()).append("\n");
+    finalReport.append("\tServer ID: ").append(BaseConfig.serverUUID).append("\n");
     finalReport.append("\tOpenInv Hook: ")
         .append(plugin.getOpenInvPlugin() == null ? "Disabled" : "Enabled").append("\n");
     finalReport.append("\tEconomy System: ");

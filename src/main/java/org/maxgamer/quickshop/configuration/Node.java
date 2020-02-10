@@ -13,4 +13,8 @@ public @interface Node {
   String value();
 
   boolean rewrite() default false;
+  
+  String ref() default "";
+  
+  NodeType type() default NodeType.CONFIG;
 }

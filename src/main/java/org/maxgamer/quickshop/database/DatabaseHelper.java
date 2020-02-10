@@ -95,7 +95,7 @@ public class DatabaseHelper {
       String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE time < ?";
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
       ps.setLong(1, weekAgo);
-      plugin.getDatabaseManager().add(ps);
+      plugin.getDispatcher().add(ps);
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -106,7 +106,7 @@ public class DatabaseHelper {
       String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE owner = ?";
       PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
       ps.setString(1, player.toString());
-      plugin.getDatabaseManager().add(ps);
+      plugin.getDispatcher().add(ps);
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -148,7 +148,7 @@ public class DatabaseHelper {
     ps.setString(7, world);
     ps.setInt(8, unlimited);
     ps.setInt(9, shopType);
-    plugin.getDatabaseManager().add(ps);
+    plugin.getDispatcher().add(ps);
   }
 
   /**
@@ -200,7 +200,7 @@ public class DatabaseHelper {
       ps.setString(1, player.toString());
       ps.setString(2, message);
       ps.setLong(3, time);
-      plugin.getDatabaseManager().add(ps);
+      plugin.getDispatcher().add(ps);
     } catch (SQLException sqle) {
       sqle.printStackTrace();
     }
@@ -222,7 +222,7 @@ public class DatabaseHelper {
     ps.setInt(3, y);
     ps.setInt(4, z);
     ps.setString(5, worldName);
-    plugin.getDatabaseManager().add(ps);
+    plugin.getDispatcher().add(ps);
   }
 
   public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited,
@@ -240,7 +240,7 @@ public class DatabaseHelper {
       ps.setInt(7, y);
       ps.setInt(8, z);
       ps.setString(9, world);
-      plugin.getDatabaseManager().add(ps);
+      plugin.getDispatcher().add(ps);
       // db.execute(q, owner, Util.serialize(item), unlimited, shopType, price, x, y, z, world);
   }
 }

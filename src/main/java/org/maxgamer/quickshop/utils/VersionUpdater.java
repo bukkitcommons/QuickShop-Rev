@@ -58,7 +58,7 @@ public class VersionUpdater {
 
     try {
       List<String> versions = getHistoryVersions();
-      int curIndex = versions.indexOf(QuickShop.getVersion());
+      int curIndex = versions.indexOf(QuickShop.instance().getVersion());
       
       // Custom build or already latest
       if (curIndex == -1 || curIndex == 0)
@@ -88,7 +88,7 @@ public class VersionUpdater {
     }
     Util.debug("Downloading from " + uurl);
     InputStream is = HttpRequest.get(new URL(uurl))
-        .header("User-Agent", "QuickShop-Reremake " + QuickShop.getVersion()).execute()
+        .header("User-Agent", "QuickShop-Reremake " + QuickShop.instance().getVersion()).execute()
         .getInputStream();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     byte[] buff = new byte[1024];

@@ -44,6 +44,10 @@ public class ReserveEconProvider implements EconomyProvider {
   public ReserveEconProvider() {
     setup();
   }
+  
+  public String getName() {
+    return "Reserve";
+  }
 
   private String formatInternal(double balance) {
     try {

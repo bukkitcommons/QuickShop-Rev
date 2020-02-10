@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginLogger;
 import org.jetbrains.annotations.Nullable;
@@ -104,10 +105,12 @@ public class ShopLogger extends PluginLogger {
     LOG4J_LEVELS.put(Level.OFF, org.apache.logging.log4j.Level.OFF);
   }
   
-  private final static ShopLogger SINGLETON_LOGGER = new ShopLogger();
+  private static class Singleton {
+    private final static ShopLogger LOGGER = new ShopLogger();
+  }
   
-  public static ShopLogger instance() {
-    return SINGLETON_LOGGER;
+  public static Logger instance() {
+    return Singleton.LOGGER;
   }
   
   @Nullable

@@ -508,7 +508,7 @@ public class Util {
   }
 
   /** Initialize the Util tools. */
-  public static void initialize() {
+  public static void loadFromConfig() {
     blacklist.clear();
     blockListedBlocks.clear();
     restrictedPrices.clear();
@@ -1036,8 +1036,8 @@ public class Util {
    *
    * @return DevEdition status
    */
-  public static boolean isDevEdition() {
-    String version = QuickShop.instance().getDescription().getVersion().toLowerCase();
+  public static boolean isDevEdition(String pluginVersion) {
+    String version = pluginVersion.toLowerCase();
     return (version.contains("dev") || version.contains("develop") || version.contains("alpha")
         || version.contains("beta") || version.contains("test") || version.contains("snapshot")
         || version.contains("preview"));

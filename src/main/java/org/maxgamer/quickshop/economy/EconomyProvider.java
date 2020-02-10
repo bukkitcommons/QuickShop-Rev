@@ -28,6 +28,8 @@ public interface EconomyProvider {
    * @return True if success (Should be almost always)
    */
   boolean deposit(UUID name, double amount);
+  
+  String getName();
 
   /**
    * Formats the given number... E.g. 50.5 becomes $50.5 Dollars, or 50 Dollars 5 Cents

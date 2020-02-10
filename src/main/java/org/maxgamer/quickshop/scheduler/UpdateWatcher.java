@@ -67,7 +67,7 @@ public class UpdateWatcher implements Listener {
                           ThreadLocalRandom.current().nextInt(messages.size())) :
                       messages.get(0)
                   ),
-            data.version(), QuickShop.getVersion()
+            data.version(), QuickShop.instance().getVersion()
         );
         
         TextComponent updatenow = new TextComponent(

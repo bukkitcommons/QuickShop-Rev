@@ -95,7 +95,7 @@ public class ShopManager {
         
         int max = QuickShop.instance().getShopLimit(player);
         
-        if (owned >= max) {
+        if (owned >= max && Util.canBeShop(block)) {
           player.sendMessage(
               MsgUtil.getMessage("reached-maximum-can-create", player,
                   String.valueOf(owned), String.valueOf(max)));

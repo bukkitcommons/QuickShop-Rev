@@ -43,7 +43,6 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.JsonLocale;
 import org.maxgamer.quickshop.utils.files.LocaleFile;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
-import com.bekvon.bukkit.residence.commands.info;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
@@ -56,11 +55,12 @@ public class MsgUtil {
   private static YamlConfiguration potioni18n;
   
   private static LocaleFile messagei18n;
+  
+  @NotNull
   private static HashMap<UUID, String> playerMessages = Maps.newHashMap();
-  
-  private static DecimalFormat decimalFormat =
-      new DecimalFormat(BaseConfig.decimalFormat);
-  
+  @NotNull
+  private static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
+  @NotNull
   public final static MinecraftLocale MINECRAFT_LOCALE = new MinecraftLocale();
 
   /**
@@ -287,7 +287,7 @@ public class MsgUtil {
         }
         String enchName = MINECRAFT_LOCALE.getEnchantment(ench.getKey().getKey());
         enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
-        ShopLogger.instance().info("Found new ench [" + enchName + "] , adding it to the config...");
+        //ShopLogger.instance().info("Found new ench [" + enchName + "] , adding it to the config...");
       }
     });
   }
@@ -304,8 +304,8 @@ public class MsgUtil {
         }
         String itemName = MINECRAFT_LOCALE.getItem(material);
         itemi18n.set("itemi18n." + material.name(), itemName);
-        ShopLogger.instance()
-            .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
+        //ShopLogger.instance()
+        //    .info("Found new items/blocks [" + itemName + "] , adding it to the config...");
       }
     });
   }
@@ -344,7 +344,7 @@ public class MsgUtil {
           continue;
         }
         String potionName = MINECRAFT_LOCALE.getPotion(potion);
-        ShopLogger.instance().info("Found new potion [" + potionName + "] , adding it to the config...");
+        //ShopLogger.instance().info("Found new potion [" + potionName + "] , adding it to the config...");
         potioni18n.set("potioni18n." + potion.getName(), potionName);
       }
     });
@@ -381,11 +381,7 @@ public class MsgUtil {
    *        Else, if they're not online, queues it for them in the database.
    * @param isUnlimited The shop is or unlimited
    */
-  public static void send(@NotNull UUID uuid, @NotNull String message, boolean isUnlimited) {
-    if (isUnlimited && BaseConfig.ignoreUnlimitedMessages) {
-      return; // Ignore unlimited shops messages.
-    }
-    
+  public static void send(@NotNull UUID uuid, @NotNull String message) {
     Player player = Bukkit.getPlayer(uuid);
     if (player == null) {
       playerMessages.put(uuid, message);

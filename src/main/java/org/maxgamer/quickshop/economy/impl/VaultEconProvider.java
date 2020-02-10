@@ -40,6 +40,10 @@ public class VaultEconProvider implements EconomyProvider, Listener {
       return true;
     }
   }
+  
+  public String getName() {
+    return "Vault";
+  }
 
   private String formatInternal(double balance) {
     if (!checkValid()) {
