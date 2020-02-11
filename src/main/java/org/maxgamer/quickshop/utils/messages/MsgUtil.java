@@ -8,15 +8,10 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.SneakyThrows;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import java.util.function.Consumer;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,9 +37,14 @@ import org.maxgamer.quickshop.utils.files.LocaleFile;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.data.ShopSnapshot;
+import lombok.SneakyThrows;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class MsgUtil {
   private static YamlConfiguration builtInDefaultLanguage = YamlConfiguration.loadConfiguration(
@@ -436,7 +436,7 @@ public class MsgUtil {
    * @param sender Target sender
    * @param shop Target shop
    */
-  public static void sendControlPanelInfo(@NotNull CommandSender sender, @NotNull Shop shop) {
+  public static void sendControlPanelInfo(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
     if (!PermissionManager.instance().has(sender, "quickshop.use")) {
       return;
     }
@@ -564,7 +564,7 @@ public class MsgUtil {
    * @param player Target player
    * @param normalText The text you will see
    */
-  public static void sendItemholochat(@NotNull Shop shop, @NotNull ItemStack itemStack,
+  public static void sendItemholochat(@NotNull ContainerShop shop, @NotNull ItemStack itemStack,
       @NotNull Player player, @NotNull String normalText) {
     try {
       String json = ItemNMS.toJson(itemStack);
@@ -608,7 +608,7 @@ public class MsgUtil {
    * @param shop Target shop
    * @param amount Trading item amounts.
    */
-  public static void sendPurchaseSuccess(@NotNull Player p, @NotNull Shop shop, int amount, @NotNull ShopSnapshot info) {
+  public static void sendPurchaseSuccess(@NotNull Player p, @NotNull ContainerShop shop, int amount, @NotNull ShopSnapshot info) {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.successful-purchase", p));
@@ -648,7 +648,7 @@ public class MsgUtil {
    * @param shop Target shop
    * @param amount Trading item amounts.
    */
-  public static void sendSellSuccess(@NotNull Player p, @NotNull Shop shop, int amount) {
+  public static void sendSellSuccess(@NotNull Player p, @NotNull ContainerShop shop, int amount) {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(MsgUtil.getMessage("menu.successfully-sold", p));
@@ -698,7 +698,7 @@ public class MsgUtil {
    * @param p Target player
    * @param shop The shop
    */
-  public static void sendShopInfo(@NotNull Player p, @NotNull Shop shop) {
+  public static void sendShopInfo(@NotNull Player p, @NotNull ContainerShop shop) {
     // Potentially faster with an array?
     ItemStack items = shop.getItem();
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);

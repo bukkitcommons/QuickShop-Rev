@@ -2,9 +2,6 @@ package cc.bukkit.shop.economy.impl;
 
 import java.util.Objects;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
@@ -18,8 +15,10 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import cc.bukkit.shop.economy.EconomyProvider;
+import lombok.Getter;
+import lombok.Setter;
+import net.milkbowl.vault.economy.Economy;
 
 public class VaultEconProvider implements EconomyProvider, Listener {
 

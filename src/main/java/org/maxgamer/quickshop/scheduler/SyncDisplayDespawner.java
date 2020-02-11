@@ -1,12 +1,12 @@
 package org.maxgamer.quickshop.scheduler;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class SyncDisplayDespawner implements Runnable {
@@ -14,7 +14,7 @@ public class SyncDisplayDespawner implements Runnable {
   public void run() {
     int range = BaseConfig.despawnerRange;
 
-    QuickShopManager.instance().viewLoadedShops(shops ->
+    Shop.getManager().viewLoadedShops(shops ->
       shops.parallelStream()
         .filter(shop -> shop.getDisplay() != null).forEach(shop -> {
           // Check the range has player?
@@ -35,7 +35,7 @@ public class SyncDisplayDespawner implements Runnable {
       );
   }
 
-  public boolean removeDisplayItemDelayed(Shop shop) {
+  public boolean removeDisplayItemDelayed(ContainerShop shop) {
     if (shop.getDisplay().isPendingRemoval()) {
       // Actually remove the pending display
       Util.debug("Removing the shop " + shop + " the display, cause nobody can see it");

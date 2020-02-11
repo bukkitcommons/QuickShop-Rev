@@ -1,31 +1,11 @@
 package org.maxgamer.quickshop.shop;
 
-import com.google.common.collect.Lists;
-import cc.bukkit.shop.Managed;
-import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopModerator;
-import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopLocation;
-import cc.bukkit.shop.event.ShopClickEvent;
-import cc.bukkit.shop.event.ShopLoadEvent;
-import cc.bukkit.shop.event.ShopModeratorChangedEvent;
-import cc.bukkit.shop.event.ShopPriceChangeEvent;
-import cc.bukkit.shop.event.ShopSaveEvent;
-import cc.bukkit.shop.event.ShopUnloadEvent;
-import cc.bukkit.shop.event.ShopPriceChangeEvent.Reason;
-import cc.bukkit.shop.hologram.DisplayData;
-import cc.bukkit.shop.hologram.DisplayItem;
-import cc.bukkit.shop.viewer.ShopViewer;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -42,7 +22,6 @@ import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.hologram.ArmorStandDisplayItem;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
@@ -50,13 +29,32 @@ import org.maxgamer.quickshop.hologram.RealDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
+import com.google.common.collect.Lists;
+import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.Managed;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopModerator;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.event.ShopClickEvent;
+import cc.bukkit.shop.event.ShopLoadEvent;
+import cc.bukkit.shop.event.ShopModeratorChangedEvent;
+import cc.bukkit.shop.event.ShopPriceChangeEvent;
+import cc.bukkit.shop.event.ShopPriceChangeEvent.Reason;
+import cc.bukkit.shop.event.ShopSaveEvent;
+import cc.bukkit.shop.event.ShopUnloadEvent;
+import cc.bukkit.shop.hologram.DisplayData;
+import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /** ChestShop core */
 @Getter
 @Setter
 @EqualsAndHashCode
-public class ContainerShop implements Shop, Managed {
+public class ContainerQuickShop implements ContainerShop, Managed {
   @NotNull
   private final ItemStack item;
   @NotNull
@@ -72,7 +70,7 @@ public class ContainerShop implements Shop, Managed {
   private ShopType shopType;
   private boolean unlimited;
 
-  private ContainerShop(@NotNull ContainerShop s) {
+  private ContainerQuickShop(@NotNull ContainerQuickShop s) {
     this.shopType = s.shopType;
     this.unlimited = s.unlimited;
     this.price = s.price;
@@ -105,7 +103,7 @@ public class ContainerShop implements Shop, Managed {
    * @param type The shop type
    * @param unlimited The unlimited
    */
-  public ContainerShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
+  public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
     this.location = shopLocation;
     this.price = price;
@@ -315,8 +313,8 @@ public class ContainerShop implements Shop, Managed {
 
   @Override
   @NotNull
-  public ContainerShop clone() {
-    return new ContainerShop(this);
+  public ContainerQuickShop clone() {
+    return new ContainerQuickShop(this);
   }
 
   /**
@@ -380,13 +378,13 @@ public class ContainerShop implements Shop, Managed {
    *         attached to another.
    */
   @Nullable
-  public ContainerShop getAttachedShop() {
+  public ContainerQuickShop getAttachedShop() {
     Optional<Location> c = Util.getSecondHalf(location.block());
     if (!c.isPresent())
       return null;
     
-    ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(c.get());
-    return (ContainerShop) shop.get();
+    ShopViewer shop = Shop.getManager().getLoadedShopAt(c.get());
+    return (ContainerQuickShop) shop.get();
   }
 
   @Nullable
@@ -413,7 +411,7 @@ public class ContainerShop implements Shop, Managed {
       ShopLogger.instance().severe("The container of a shop have probably gone, with current block type: " +
           location.block().getType() + " @ " + location);
       
-      QuickShopManager.instance().unload(this);
+      Shop.getManager().unload(this);
       return null;
     }
   }
@@ -558,7 +556,7 @@ public class ContainerShop implements Shop, Managed {
    *         this is buying/selling.
    */
   public boolean isDualShop() {
-    ContainerShop nextTo = getAttachedShop();
+    ContainerQuickShop nextTo = getAttachedShop();
     if (nextTo == null)
       return false;
     

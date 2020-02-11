@@ -1,8 +1,6 @@
 package cc.bukkit.shop.util;
 
 import org.bukkit.Location;
-import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.data.ShopLocation;
 
 public abstract class Utils {
   /**

@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.listeners;
 
 import java.util.Collection;
-import lombok.AllArgsConstructor;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
@@ -9,10 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.hologram.DisplayItem;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class DisplayBugFixListener implements Listener {

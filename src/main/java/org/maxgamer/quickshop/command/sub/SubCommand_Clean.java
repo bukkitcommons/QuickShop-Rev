@@ -7,12 +7,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.ContainerShop;
+import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import com.google.common.collect.Lists;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
@@ -30,11 +30,11 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
 
     sender.sendMessage(MsgUtil.getMessage("command.cleaning", sender));
 
-    List<Shop> pendingRemoval = Lists.newArrayList();
+    List<ContainerShop> pendingRemoval = Lists.newArrayList();
     int[] count = {0, 0};
     
     QuickShopLoader.instance().getAllShops().forEach(data -> {
-      Shop shop = new ContainerShop(
+      ContainerShop shop = new ContainerQuickShop(
           ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
           data.price(), data.item(),
           data.moderators(), data.unlimited(), data.type());
@@ -57,7 +57,7 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
               }
           }
           
-          ContainerShop cs = (ContainerShop) shop;
+          ContainerQuickShop cs = (ContainerQuickShop) shop;
           if (cs.isDualShop()) {
             return;
           }
@@ -71,7 +71,7 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
       }
     });
 
-    for (Shop shop : pendingRemoval)
+    for (ContainerShop shop : pendingRemoval)
       QuickShopLoader.instance().delete(shop);
 
     MsgUtil.clean();

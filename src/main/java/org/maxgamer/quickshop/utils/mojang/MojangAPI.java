@@ -16,20 +16,18 @@
 
 package org.maxgamer.quickshop.utils.mojang;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.HttpRequest;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 public class MojangAPI {
   final String versionManifestUrl = "https://launchermeta.mojang.com/mc/game/version_manifest.json";

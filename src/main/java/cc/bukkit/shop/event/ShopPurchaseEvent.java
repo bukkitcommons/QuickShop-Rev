@@ -16,17 +16,17 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
+import lombok.Getter;
 
 public class ShopPurchaseEvent extends ShopEvent implements Cancellable {
 
   @Getter
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   @Getter
   @NotNull
@@ -45,7 +45,7 @@ public class ShopPurchaseEvent extends ShopEvent implements Cancellable {
    * @param player The player buying
    * @param amount The amount they're buying
    */
-  public ShopPurchaseEvent(@NotNull Shop shop, @NotNull Player player, int amount) {
+  public ShopPurchaseEvent(@NotNull ContainerShop shop, @NotNull Player player, int amount) {
     this.shop = shop;
     this.player = player;
     this.amount = amount;

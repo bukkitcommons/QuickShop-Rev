@@ -16,23 +16,23 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
+import lombok.Getter;
 
 /** Getting the unloading shop, Can't cancel. */
 public class ShopUnloadEvent extends ShopEvent {
 
   @NotNull
   @Getter
-  private Shop shop;
+  private ContainerShop shop;
 
   /**
    * Getting the unloading shop, Can't cancel.
    *
    * @param shop The shop to unload
    */
-  public ShopUnloadEvent(@NotNull Shop shop) {
+  public ShopUnloadEvent(@NotNull ContainerShop shop) {
     this.shop = shop;
   }
 }

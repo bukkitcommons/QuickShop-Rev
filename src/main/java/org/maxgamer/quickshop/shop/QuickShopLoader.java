@@ -1,15 +1,5 @@
 package org.maxgamer.quickshop.shop;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.JsonSyntaxException;
-import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLoader;
-import cc.bukkit.shop.ShopModerator;
-import cc.bukkit.shop.data.ShopData;
-import cc.bukkit.shop.event.ShopDeleteEvent;
-import cc.bukkit.shop.util.Utils;
-import cc.bukkit.shop.viewer.ShopViewer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -20,8 +10,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -42,6 +30,19 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.gson.JsonSyntaxException;
+import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopLoader;
+import cc.bukkit.shop.ShopModerator;
+import cc.bukkit.shop.data.ShopData;
+import cc.bukkit.shop.event.ShopDeleteEvent;
+import cc.bukkit.shop.util.Utils;
+import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
 
 /** A class allow plugin load shops fast and simply. */
 public class QuickShopLoader implements ShopLoader, Listener {
@@ -141,11 +142,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
   public void onWorldUnload(WorldUnloadEvent event) {
     String world = event.getWorld().getName();
     
-    QuickShopManager.instance()
+    Shop.getManager()
                .getLoadedShops()
                .getOrDefault(world, Collections.emptyMap())
                .values()
-               .forEach(blockMap -> blockMap.values().forEach(shop -> QuickShopManager.instance().unload(shop)));
+               .forEach(blockMap -> blockMap.values().forEach(shop -> Shop.getManager().unload(shop)));
     // Note: we do not actually remove the shop from memory,
     // to ensures it is able to get right data of existence when needed,
     // such as shop cleaner.
@@ -155,7 +156,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     });
   }
   
-  public void delete(@NotNull Shop shop) {
+  public void delete(@NotNull ContainerShop shop) {
     ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
       Util.debug("Shop deletion was canceled because a plugin canceled it.");
@@ -166,7 +167,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     if (inChunk.isPresent() && !inChunk.get().isEmpty())
       inChunk.get().remove(shop.getLocation().blockKey());
     
-    QuickShopManager.instance().unload(shop);
+    Shop.getManager().unload(shop);
     
     // Delete the display item
     if (shop.getDisplay() != null) {
@@ -190,7 +191,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
   
   public void delete(@NotNull ShopData data) throws SQLException {
     ShopViewer viewer =
-        QuickShopManager.instance().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());
+        Shop.getManager().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());
     
     if (viewer.isPresent()) {
       delete(viewer.get());
@@ -211,7 +212,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         inChunk.get().values().forEach(shop -> {
           try {
             if (Util.canBeShop(event.getWorld(), shop.x(), shop.y(), shop.z())) {
-              QuickShopManager.instance().load(event.getWorld(), shop);
+              Shop.getManager().load(event.getWorld(), shop);
             } else {
               QuickShop.instance().getDatabaseHelper().deleteShop(shop.x(), shop.y(), shop.z(), shop.world());
             }
@@ -224,11 +225,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
-    @Nullable Map<Long, Shop> inChunk = QuickShopManager.instance().getLoadedShopsInChunk(e.getChunk());
+    @Nullable Map<Long, ContainerShop> inChunk = Shop.getManager().getLoadedShopsInChunk(e.getChunk());
 
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-        inChunk.values().forEach(shop -> QuickShopManager.instance().unload(shop));
+        inChunk.values().forEach(shop -> Shop.getManager().unload(shop));
       });
   }
   
@@ -296,7 +297,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         // Load to World
         if (Util.canBeShop(world, data.x(), data.y(), data.z())) {
           loadedShops++;
-          QuickShopManager.instance().load(world, data);
+          Shop.getManager().load(world, data);
           inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), data);
         } else {
           QuickShop.instance().getDatabaseHelper().deleteShop(data.x(), data.y(), data.z(), data.world());

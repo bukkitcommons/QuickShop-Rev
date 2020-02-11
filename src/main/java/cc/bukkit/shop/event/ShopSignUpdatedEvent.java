@@ -16,17 +16,17 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.block.Sign;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
+import lombok.Getter;
 
 /** Calling when shop sign update, Can't cancel */
 public class ShopSignUpdatedEvent extends ShopEvent {
 
   @Getter
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   @Getter
   @NotNull
@@ -38,7 +38,7 @@ public class ShopSignUpdatedEvent extends ShopEvent {
    * @param shop Target shop
    * @param sign Updated sign
    */
-  public ShopSignUpdatedEvent(@NotNull Shop shop, @NotNull Sign sign) {
+  public ShopSignUpdatedEvent(@NotNull ContainerShop shop, @NotNull Sign sign) {
     this.shop = shop;
     this.sign = sign;
   }

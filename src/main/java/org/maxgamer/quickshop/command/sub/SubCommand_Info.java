@@ -8,9 +8,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.shop.ContainerShop;
+import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopManager;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.command.CommandProcesser;
@@ -25,7 +25,7 @@ public class SubCommand_Info extends SneakyTabs implements CommandProcesser {
     int buying, selling, doubles, chunks, worlds, doubleschests;
     buying = selling = doubles = chunks = worlds = doubleschests = 0;
     int nostock = 0;
-    Shop shop;
+    ContainerShop shop;
 
     for (Map<Long, Map<Long, ShopData>> inWorld : QuickShopLoader.instance().getShopsMap().values()) {
       worlds++;
@@ -41,18 +41,18 @@ public class SubCommand_Info extends SneakyTabs implements CommandProcesser {
           }
           
           try {
-            shop = QuickShopManager.instance().load(Bukkit.getWorld(data.world()), data);
+            shop = Shop.getManager().load(Bukkit.getWorld(data.world()), data);
           } catch (InvalidConfigurationException e) {
             continue;
           }
 
-          if (shop instanceof ContainerShop && ((ContainerShop) shop).isDualShop()) {
+          if (shop instanceof ContainerQuickShop && ((ContainerQuickShop) shop).isDualShop()) {
             doubles++;
           } else if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0) {
             nostock++;
           }
 
-          if (shop instanceof ContainerShop && ((ContainerShop) shop).isDoubleChestShop()) {
+          if (shop instanceof ContainerQuickShop && ((ContainerQuickShop) shop).isDoubleChestShop()) {
             doubleschests++;
           }
         }

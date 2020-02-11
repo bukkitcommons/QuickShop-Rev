@@ -16,18 +16,17 @@
 
 package org.maxgamer.quickshop.integration;
 
-import com.palmergames.bukkit.towny.utils.ShopPlotUtil;
-import cc.bukkit.shop.configuration.Configuration;
-import cc.bukkit.shop.configuration.ConfigurationData;
-import cc.bukkit.shop.configuration.ConfigurationManager;
-import cc.bukkit.shop.integration.IntegrateStage;
-import cc.bukkit.shop.integration.IntegratedPlugin;
-import cc.bukkit.shop.integration.IntegrationStage;
 import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
+import com.palmergames.bukkit.towny.utils.ShopPlotUtil;
+import cc.bukkit.shop.configuration.Configuration;
+import cc.bukkit.shop.configuration.ConfigurationData;
+import cc.bukkit.shop.integration.IntegrateStage;
+import cc.bukkit.shop.integration.IntegratedPlugin;
+import cc.bukkit.shop.integration.IntegrationStage;
 
 @Configuration("configs/integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)

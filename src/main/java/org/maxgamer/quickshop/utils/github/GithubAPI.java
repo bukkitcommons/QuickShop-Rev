@@ -16,11 +16,11 @@
 
 package org.maxgamer.quickshop.utils.github;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import java.net.URL;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.utils.HttpRequest;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class GithubAPI {
   private Gson gson = new GsonBuilder().disableHtmlEscaping().create();

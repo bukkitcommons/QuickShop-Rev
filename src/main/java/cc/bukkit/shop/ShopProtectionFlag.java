@@ -24,7 +24,7 @@ public class ShopProtectionFlag implements Serializable {
    */
   public static ShopProtectionFlag create(
       @NotNull ItemStack itemStack,
-      @NotNull Shop shop) {
+      @NotNull ContainerShop shop) {
     return new ShopProtectionFlag(Util.serialize(itemStack), shop.getLocation().toString());
   }
 

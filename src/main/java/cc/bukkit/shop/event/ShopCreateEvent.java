@@ -16,11 +16,11 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
+import lombok.Getter;
 
 public class ShopCreateEvent extends ShopEvent implements Cancellable {
 
@@ -30,7 +30,7 @@ public class ShopCreateEvent extends ShopEvent implements Cancellable {
 
   @Getter
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   private boolean cancelled;
 
@@ -40,7 +40,7 @@ public class ShopCreateEvent extends ShopEvent implements Cancellable {
    * @param shop Target shop
    * @param player The player creaing the shop
    */
-  public ShopCreateEvent(@NotNull Shop shop, @NotNull Player player) {
+  public ShopCreateEvent(@NotNull ContainerShop shop, @NotNull Player player) {
     this.shop = shop;
     this.player = player;
   }

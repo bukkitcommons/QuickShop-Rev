@@ -2,11 +2,11 @@ package cc.bukkit.shop.integration;
 
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.Util;
+import lombok.Getter;
 
 @Getter
 public class IntegrationHelper {

@@ -3,7 +3,6 @@ package org.maxgamer.quickshop.command;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import lombok.Data;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,6 +11,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.sub.SubCommand_About;
 import org.maxgamer.quickshop.command.sub.SubCommand_Amount;
 import org.maxgamer.quickshop.command.sub.SubCommand_Buy;
@@ -45,10 +45,10 @@ import org.maxgamer.quickshop.command.sub.SubCommand_Unlimited;
 import org.maxgamer.quickshop.command.sub.SubCommand_Update;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.command.CommandContainer;
+import lombok.Data;
 
 @Data
 public class QuickShopCommands implements TabCompleter, CommandExecutor {

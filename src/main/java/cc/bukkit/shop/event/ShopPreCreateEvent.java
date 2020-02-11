@@ -16,11 +16,11 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
+import lombok.Getter;
 
 /**
  * This event is called before the shop creation request is sent. E.g. A player clicks a chest, this

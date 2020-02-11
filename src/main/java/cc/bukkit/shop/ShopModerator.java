@@ -1,14 +1,14 @@
 package cc.bukkit.shop;
 
+import java.util.Set;
+import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import java.util.Set;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Contains shop's moderators infomations, owner, staffs etc.

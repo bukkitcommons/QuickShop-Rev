@@ -16,11 +16,6 @@
 
 package org.maxgamer.quickshop.utils;
 
-import io.sentry.SentryClient;
-import io.sentry.SentryClientFactory;
-import io.sentry.context.Context;
-import io.sentry.event.BreadcrumbBuilder;
-import io.sentry.event.UserBuilder;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.ArrayList;
@@ -41,6 +36,11 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.utils.paste.Paste;
+import io.sentry.SentryClient;
+import io.sentry.SentryClientFactory;
+import io.sentry.context.Context;
+import io.sentry.event.BreadcrumbBuilder;
+import io.sentry.event.UserBuilder;
 
 /** Auto report errors to qs's sentry. */
 public class SentryErrorReporter {

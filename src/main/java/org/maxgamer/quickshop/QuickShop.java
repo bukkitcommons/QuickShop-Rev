@@ -7,11 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import lombok.Getter;
-import me.minebuilders.clearlag.Clearlag;
-import me.minebuilders.clearlag.listeners.ItemMergeListener;
-import org.bukkit.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.ItemSpawnEvent;
@@ -44,19 +41,18 @@ import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
+import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
-import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.shop.ShopActionManager;
+import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.ItemMatcher;
-import org.maxgamer.quickshop.utils.BuildPerms;
-import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
+import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
@@ -64,6 +60,7 @@ import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.configuration.ConfigurationManager;
 import cc.bukkit.shop.database.Database;
@@ -77,6 +74,9 @@ import cc.bukkit.shop.economy.impl.ReserveEconProvider;
 import cc.bukkit.shop.economy.impl.VaultEconProvider;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationHelper;
+import lombok.Getter;
+import me.minebuilders.clearlag.Clearlag;
+import me.minebuilders.clearlag.listeners.ItemMergeListener;
 
 @Getter
 public final class QuickShop extends JavaPlugin {
@@ -402,7 +402,7 @@ public final class QuickShop extends JavaPlugin {
     }
     Util.debug("Unloading all shops...");
     try {
-      QuickShopManager.instance().clear();
+      Shop.getManager().clear();
     } catch (Throwable th) {
       // ignore, we didn't care that
     }
@@ -421,7 +421,7 @@ public final class QuickShop extends JavaPlugin {
     Util.debug("Cleaning up resources and unloading all shops...");
     /* Remove all display items, and any dupes we can find */
     ShopActionManager.instance().getActions().clear();
-    QuickShopManager.instance().clear();
+    Shop.getManager().clear();
     /* Close Database */
     if (database != null) {
       try {

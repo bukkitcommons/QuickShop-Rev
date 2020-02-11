@@ -1,7 +1,5 @@
 package org.maxgamer.quickshop.shop;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -15,6 +13,8 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.event.ShopInventoryPreviewEvent;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /** A class to create a GUI item preview quickly */
 @EqualsAndHashCode

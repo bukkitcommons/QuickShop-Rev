@@ -16,20 +16,20 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.hologram.DisplayType;
+import lombok.Getter;
 
 /** This event is called after DisplayItem removed */
 public class ShopDisplayItemDespawnEvent extends ShopEvent implements Cancellable {
 
   @Getter
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   @Getter
   @NotNull
@@ -48,7 +48,7 @@ public class ShopDisplayItemDespawnEvent extends ShopEvent implements Cancellabl
    * @param itemStack Target itemstacck
    * @param displayType The displayType
    */
-  public ShopDisplayItemDespawnEvent(@NotNull Shop shop, @NotNull ItemStack itemStack,
+  public ShopDisplayItemDespawnEvent(@NotNull ContainerShop shop, @NotNull ItemStack itemStack,
       @NotNull DisplayType displayType) {
     this.shop = shop;
     this.itemStack = itemStack;
@@ -61,7 +61,7 @@ public class ShopDisplayItemDespawnEvent extends ShopEvent implements Cancellabl
    * @param shop Target shop
    * @param itemStack Target itemstacck
    */
-  public ShopDisplayItemDespawnEvent(@NotNull Shop shop, @NotNull ItemStack itemStack) {
+  public ShopDisplayItemDespawnEvent(@NotNull ContainerShop shop, @NotNull ItemStack itemStack) {
     this(shop, itemStack, DisplayType.valueOf(DisplayConfig.displayType));
   }
 

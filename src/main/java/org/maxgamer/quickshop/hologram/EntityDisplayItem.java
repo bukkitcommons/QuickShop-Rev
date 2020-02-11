@@ -1,8 +1,5 @@
 package org.maxgamer.quickshop.hologram;
 
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -13,12 +10,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.event.ShopDisplayItemDespawnEvent;
 import cc.bukkit.shop.hologram.DisplayAttribute;
 import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.hologram.DisplayItem;
 import cc.bukkit.shop.hologram.DisplayType;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 
 @ToString
 @Accessors(fluent = true)
@@ -29,7 +29,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
   
   @Getter
   @NotNull
-  protected Shop shop;
+  protected ContainerShop shop;
   @Getter
   @NotNull
   protected DisplayData data;
@@ -40,7 +40,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
   
   protected boolean pendingRemoval;
   
-  public EntityDisplayItem(@NotNull Shop shop, @NotNull DisplayData data) {
+  public EntityDisplayItem(@NotNull ContainerShop shop, @NotNull DisplayData data) {
     this.shop = shop;
     this.data = data;
     

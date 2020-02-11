@@ -5,15 +5,15 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ShopViewer {
   @Nullable
-  private final Shop shop;
+  private final ContainerShop shop;
   
-  public static ShopViewer of(@Nullable Shop shop) {
+  public static ShopViewer of(@Nullable ContainerShop shop) {
     return new ShopViewer(shop);
   }
   
@@ -37,26 +37,26 @@ public class ShopViewer {
     return this;
   }
   
-  public ShopViewer accept(Consumer<Shop> consumer) {
+  public ShopViewer accept(Consumer<ContainerShop> consumer) {
     Util.debug("Accept, fails: " + fails);
     
     if (!fails) consumer.accept(shop);
     return this;
   }
   
-  public boolean test(Predicate<Shop> predicate, boolean def) {
+  public boolean test(Predicate<ContainerShop> predicate, boolean def) {
     Util.debug("Test, fails: " + fails);
     
     return fails ? def : !predicate.test(shop);
   }
   
-  public <R> R apply(Function<Shop, R> function, R def) {
+  public <R> R apply(Function<ContainerShop, R> function, R def) {
     Util.debug("Apply, fails: " + fails);
     
     return fails ? def : function.apply(shop);
   }
   
-  public ShopViewer filter(Predicate<Shop> predicate) {
+  public ShopViewer filter(Predicate<ContainerShop> predicate) {
     boolean before = fails;
     fails = fails ? true : !predicate.test(shop);
     
@@ -68,7 +68,7 @@ public class ShopViewer {
     return shop == null;
   }
   
-  public ShopViewer ifPresent(Consumer<Shop> consumer) {
+  public ShopViewer ifPresent(Consumer<ContainerShop> consumer) {
     if (!fails && shop != null)
       consumer.accept(shop);
     return this;
@@ -84,7 +84,7 @@ public class ShopViewer {
     return shop != null;
   }
 
-  public Shop get() {
+  public ContainerShop get() {
     return shop;
   }
 }

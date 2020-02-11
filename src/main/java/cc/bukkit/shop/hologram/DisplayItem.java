@@ -1,11 +1,5 @@
 package cc.bukkit.shop.hologram;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopProtectionFlag;
-import cc.bukkit.shop.viewer.ShopViewer;
-import lombok.SneakyThrows;
 import java.util.Collections;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -19,8 +13,14 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopProtectionFlag;
+import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.SneakyThrows;
 
 /**
  * @author Netherfoam A display item, that spawns a block above the chest and cannot be interacted
@@ -54,7 +54,7 @@ public interface DisplayItem {
         
         if (shopProtectionFlag.getShopLocationData() != null) {
           ShopViewer viewer =
-              QuickShopManager.instance().getLoadedShopAt(deserialize(shopProtectionFlag.getShopLocationData()));
+              Shop.getManager().getLoadedShopAt(deserialize(shopProtectionFlag.getShopLocationData()));
           
           viewer.ifPresent(shop -> {
             if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {
@@ -109,7 +109,7 @@ public interface DisplayItem {
    * @param itemStack Target ItemStack
    * @return Contains protect flag.
    */
-  public static boolean isDisplayItem(@Nullable ItemStack itemStack, @Nullable Shop shop) {
+  public static boolean isDisplayItem(@Nullable ItemStack itemStack, @Nullable ContainerShop shop) {
     if (itemStack == null || !itemStack.hasItemMeta())
       return false;
     
@@ -151,7 +151,7 @@ public interface DisplayItem {
    * @param shop The shop
    * @return New itemStack with protect flag.
    */
-  static ItemStack createGuardItemStack(@NotNull ItemStack itemStack, @NotNull Shop shop) {
+  static ItemStack createGuardItemStack(@NotNull ItemStack itemStack, @NotNull ContainerShop shop) {
     itemStack = new ItemStack(itemStack);
     itemStack.setAmount(1);
     

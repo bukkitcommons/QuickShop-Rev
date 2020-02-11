@@ -1,7 +1,5 @@
 package cc.bukkit.shop.data;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import java.io.Serializable;
 import javax.annotation.concurrent.Immutable;
 import org.bukkit.Bukkit;
@@ -11,8 +9,9 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.util.Utils;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 
 @Immutable
 @Accessors(fluent = true)

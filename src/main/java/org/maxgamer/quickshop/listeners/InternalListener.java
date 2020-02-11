@@ -16,7 +16,6 @@
 
 package org.maxgamer.quickshop.listeners;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +26,7 @@ import cc.bukkit.shop.event.ShopDeleteEvent;
 import cc.bukkit.shop.event.ShopModeratorChangedEvent;
 import cc.bukkit.shop.event.ShopPriceChangeEvent;
 import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class InternalListener implements Listener {

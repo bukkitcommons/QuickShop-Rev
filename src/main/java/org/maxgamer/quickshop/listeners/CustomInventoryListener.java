@@ -16,7 +16,6 @@
 
 package org.maxgamer.quickshop.listeners;
 
-import lombok.AllArgsConstructor;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class CustomInventoryListener implements Listener {

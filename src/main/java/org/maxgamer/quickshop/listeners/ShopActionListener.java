@@ -2,7 +2,6 @@ package org.maxgamer.quickshop.listeners;
 
 import java.util.Arrays;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -28,18 +27,20 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.data.ShopAction;
-import cc.bukkit.shop.data.ShopCreator;
 import cc.bukkit.shop.data.ShopActionData;
+import cc.bukkit.shop.data.ShopCreator;
 import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.data.ShopSnapshot;
 import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class ShopActionListener implements Listener {
@@ -54,7 +55,7 @@ public class ShopActionListener implements Listener {
       return;
     Util.debug(ChatColor.YELLOW + "> Handling interact");
     
-    ShopViewer viewer = QuickShopManager.instance().getLoadedShopFrom(block);
+    ShopViewer viewer = Shop.getManager().getLoadedShopFrom(block);
     /*
      * Effect handling
      */
@@ -240,7 +241,7 @@ public class ShopActionListener implements Listener {
       @Nullable Location chest = event.getInventory().getLocation();
       
       if (chest != null)
-        QuickShopManager.instance().getLoadedShopAt(chest).ifPresent(Shop::setSignText);
+        Shop.getManager().getLoadedShopAt(chest).ifPresent(ContainerShop::setSignText);
       
     } catch (NullPointerException npe) {
       return;

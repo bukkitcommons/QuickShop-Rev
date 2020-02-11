@@ -41,9 +41,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.hologram.DisplayItem;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -55,7 +55,7 @@ public class DisplayProtectionListener implements Listener {
     
     Block targetBlock = event.getToBlock();
     Block shopBlock = targetBlock.getRelative(BlockFace.DOWN);
-    ShopViewer shop = QuickShopManager.instance().getLoadedShopFrom(shopBlock.getLocation());
+    ShopViewer shop = Shop.getManager().getLoadedShopFrom(shopBlock.getLocation());
     if (!shop.isPresent()) {
       return;
     }
@@ -86,7 +86,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    ShopViewer shop = QuickShopManager.instance().getLoadedShopFrom(block.getLocation());
+    ShopViewer shop = Shop.getManager().getLoadedShopFrom(block.getLocation());
     if (shop.isPresent()) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -99,7 +99,7 @@ public class DisplayProtectionListener implements Listener {
     for (Block oBlock : event.getBlocks()) {
       Block otherBlock = oBlock.getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
       if (Util.canBeShop(otherBlock)) {
-        shop = QuickShopManager.instance().getLoadedShopFrom(otherBlock.getLocation());
+        shop = Shop.getManager().getLoadedShopFrom(otherBlock.getLocation());
         if (shop != null) {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -119,7 +119,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     
     Block block = event.getBlock().getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
-    ShopViewer shop = QuickShopManager.instance().getLoadedShopFrom(block.getLocation());
+    ShopViewer shop = Shop.getManager().getLoadedShopFrom(block.getLocation());
     if (shop.get() != null) {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -132,7 +132,7 @@ public class DisplayProtectionListener implements Listener {
     for (Block oBlock : event.getBlocks()) {
       Block otherBlock = oBlock.getRelative(event.getDirection()).getRelative(BlockFace.DOWN);
       if (Util.canBeShop(otherBlock)) {
-        shop = QuickShopManager.instance().getLoadedShopFrom(otherBlock.getLocation());
+        shop = Shop.getManager().getLoadedShopFrom(otherBlock.getLocation());
         if (shop.get() != null) {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
@@ -453,7 +453,7 @@ public class DisplayProtectionListener implements Listener {
       return;
     
     Block waterBlock = event.getBlockClicked().getRelative(event.getBlockFace());
-    QuickShopManager.instance().getLoadedShopAt(waterBlock.getRelative(BlockFace.DOWN).getLocation()).ifPresent(shop -> {
+    Shop.getManager().getLoadedShopAt(waterBlock.getRelative(BlockFace.DOWN).getLocation()).ifPresent(shop -> {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Player  " + event.getPlayer().getName()
           + " trying use water to move somethings on the shop top, QuickShop already remove it.");

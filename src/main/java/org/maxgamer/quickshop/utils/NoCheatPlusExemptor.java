@@ -16,13 +16,10 @@
 
 package org.maxgamer.quickshop.utils;
 
-import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
-import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
+import fr.neatmonster.nocheatplus.hooks.NCPExemptionManager;
 
 /** WIP */
 public class NoCheatPlusExemptor {

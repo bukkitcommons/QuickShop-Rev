@@ -1,15 +1,13 @@
 package org.maxgamer.quickshop.command.sub;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
 import cc.bukkit.shop.viewer.BlockViewer;
@@ -33,7 +31,7 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
       .ifEmpty(notLookingAtShop)
       
       .forEach(block -> {
-        ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(block);
+        ShopViewer shop = Shop.getManager().getLoadedShopAt(block);
         
         if (shop.isPresent()) {
           if (shop.get().getModerator().isModerator(((Player) sender).getUniqueId())

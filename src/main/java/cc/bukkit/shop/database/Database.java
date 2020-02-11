@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import lombok.Cleanup;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import cc.bukkit.shop.database.connector.DatabaseConnector;
+import lombok.Cleanup;
+import lombok.SneakyThrows;
 
 public class Database {
   @NotNull

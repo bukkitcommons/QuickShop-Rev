@@ -1,6 +1,5 @@
 package org.maxgamer.quickshop.hologram;
 
-import lombok.ToString;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
@@ -8,17 +7,18 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.event.ShopDisplayItemSpawnEvent;
 import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.hologram.DisplayItem;
 import cc.bukkit.shop.hologram.DisplayType;
+import lombok.ToString;
 
 @ToString
 public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
   private static final DisplayData DATA = new DisplayData(DisplayType.DROPPED_ITEM);
   
-  public RealDisplayItem(@NotNull Shop shop) {
+  public RealDisplayItem(@NotNull ContainerShop shop) {
     super(shop, DATA);
   }
   

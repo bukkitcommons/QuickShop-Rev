@@ -1,14 +1,13 @@
 package cc.bukkit.shop.data;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.ItemMatcher;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.ShopModerator;
 import cc.bukkit.shop.ShopType;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
 @Accessors(fluent = true)
@@ -20,7 +19,7 @@ public class ShopSnapshot implements ShopActionData {
   private final ShopType shopType;
   private final boolean unlimited;
   
-  public ShopSnapshot(@NotNull Shop shop) {
+  public ShopSnapshot(@NotNull ContainerShop shop) {
     item = shop.getItem();
     location = shop.getLocation();
     moderator = shop.getModerator();
@@ -35,7 +34,7 @@ public class ShopSnapshot implements ShopActionData {
    * @param shop, The need checked with this shop.
    * @return hasChanged
    */
-  public boolean hasChanged(@NotNull Shop shop) {
+  public boolean hasChanged(@NotNull ContainerShop shop) {
     return
         unlimited != shop.isUnlimited() ||
         shopType != shop.getShopType() ||

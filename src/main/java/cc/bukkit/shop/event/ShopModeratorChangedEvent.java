@@ -16,10 +16,10 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.ShopModerator;
+import lombok.Getter;
 
 /** Calling when moderator was changed, Can't cancel */
 public class ShopModeratorChangedEvent extends ShopEvent {
@@ -30,7 +30,7 @@ public class ShopModeratorChangedEvent extends ShopEvent {
 
   @Getter
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   /**
    * Will call when shop price was changed.
@@ -38,7 +38,7 @@ public class ShopModeratorChangedEvent extends ShopEvent {
    * @param shop Target shop
    * @param shopModerator The shop moderator
    */
-  public ShopModeratorChangedEvent(@NotNull Shop shop, @NotNull ShopModerator shopModerator) {
+  public ShopModeratorChangedEvent(@NotNull ContainerShop shop, @NotNull ShopModerator shopModerator) {
     this.shop = shop;
     this.moderator = shopModerator;
   }

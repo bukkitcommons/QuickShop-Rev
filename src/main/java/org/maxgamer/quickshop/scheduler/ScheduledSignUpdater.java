@@ -3,17 +3,17 @@ package org.maxgamer.quickshop.scheduler;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import com.google.common.collect.Sets;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 
 public class ScheduledSignUpdater implements Runnable {
-  private Set<Shop> signs = Sets.newHashSet();
+  private Set<ContainerShop> signs = Sets.newHashSet();
 
-  public void schedule(@NotNull Shop shop) {
+  public void schedule(@NotNull ContainerShop shop) {
     signs.add(shop);
   }
 
   @Override
   public void run() {
-    signs.forEach(Shop::setSignText);
+    signs.forEach(ContainerShop::setSignText);
   }
 }

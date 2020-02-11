@@ -1,11 +1,11 @@
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class ShopInventoryPreviewEvent extends ShopEvent implements Cancellable {

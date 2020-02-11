@@ -16,17 +16,17 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
+import lombok.Getter;
 
 /** Call when loading shop */
 public class ShopLoadEvent extends ShopEvent implements Cancellable {
 
   @Getter
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   private boolean cancelled;
 
@@ -35,7 +35,7 @@ public class ShopLoadEvent extends ShopEvent implements Cancellable {
    *
    * @param shop Target shop
    */
-  public ShopLoadEvent(@NotNull Shop shop) {
+  public ShopLoadEvent(@NotNull ContainerShop shop) {
     this.shop = shop;
   }
 

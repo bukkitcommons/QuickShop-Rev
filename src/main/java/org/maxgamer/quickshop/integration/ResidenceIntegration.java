@@ -1,5 +1,9 @@
 package org.maxgamer.quickshop.integration;
 
+import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
@@ -8,10 +12,6 @@ import com.google.common.collect.Lists;
 import cc.bukkit.shop.configuration.Configuration;
 import cc.bukkit.shop.configuration.Node;
 import cc.bukkit.shop.integration.IntegratedPlugin;
-import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 @Configuration("configs/integrations.yml")
 public class ResidenceIntegration implements IntegratedPlugin {

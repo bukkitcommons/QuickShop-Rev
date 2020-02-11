@@ -15,7 +15,6 @@ package org.maxgamer.quickshop.utils;
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.google.common.io.Closer;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.google.common.io.Closer;
 
 public class HttpRequest implements Closeable {
 

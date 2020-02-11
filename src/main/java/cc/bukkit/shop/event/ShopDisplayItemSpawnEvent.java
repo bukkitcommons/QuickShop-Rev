@@ -1,13 +1,13 @@
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.event.Cancellable;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.hologram.DisplayType;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable {
@@ -21,7 +21,7 @@ public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable 
   private final ItemStack itemStack;
 
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
 
   @Setter
   private boolean cancelled;
@@ -34,7 +34,7 @@ public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable 
    * @param itemStack Target ItemStack
    */
   public ShopDisplayItemSpawnEvent(
-      @NotNull Shop shop,
+      @NotNull ContainerShop shop,
       @NotNull ItemStack itemStack,
       @NotNull DisplayData data) {
     
@@ -51,7 +51,7 @@ public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable 
    * @param shop Target shop
    * @param itemStack The ItemStack for spawning the displayItem
    */
-  public ShopDisplayItemSpawnEvent(@NotNull Shop shop, @NotNull ItemStack itemStack) {
+  public ShopDisplayItemSpawnEvent(@NotNull ContainerShop shop, @NotNull ItemStack itemStack) {
     this(shop, itemStack, DisplayData.create(itemStack));
   }
 }

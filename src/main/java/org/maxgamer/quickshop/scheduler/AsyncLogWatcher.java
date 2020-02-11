@@ -10,11 +10,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import lombok.NonNull;
-import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
+import lombok.NonNull;
+import lombok.SneakyThrows;
 
 public class AsyncLogWatcher implements Runnable {
   private Queue<String> logs = new ConcurrentLinkedQueue<>();

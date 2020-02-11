@@ -1,11 +1,5 @@
 package org.maxgamer.quickshop.utils;
 
-import com.google.common.io.Files;
-import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.data.ShopLocation;
-import cc.bukkit.shop.database.connector.MySQLConnector;
-import cc.bukkit.shop.hologram.DisplayItem;
-import cc.bukkit.shop.viewer.ShopViewer;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,13 +8,11 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +21,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -52,21 +43,22 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import com.google.common.io.Files;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.database.connector.MySQLConnector;
+import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.Getter;
 
 /** @author MACHENIKE */
 /**
@@ -103,8 +95,7 @@ public class Util {
     final Optional<Block> shopBlock = Util.getSignAttached(sign);
     
     return shopBlock.isPresent() ?
-        QuickShopManager
-          .instance()
+        Shop.getManager()
           .getLoadedShopAt(shopBlock.get()) : ShopViewer.empty();
   }
 
@@ -702,13 +693,13 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      ShopViewer firstShop = QuickShopManager.instance().getLoadedShopAt(c.getLocation());
+      ShopViewer firstShop = Shop.getManager().getLoadedShopAt(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Optional<Location> secondHalf = getSecondHalf(c);
       ShopViewer secondShop =
           secondHalf.isPresent() ?
-              QuickShopManager.instance().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
+              Shop.getManager().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
       
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {

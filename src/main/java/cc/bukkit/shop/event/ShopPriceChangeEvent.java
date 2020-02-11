@@ -1,11 +1,11 @@
 package cc.bukkit.shop.event;
 
+import org.bukkit.event.Cancellable;
+import org.jetbrains.annotations.NotNull;
+import cc.bukkit.shop.ContainerShop;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.event.Cancellable;
-import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
 
 /**
  * Called when the price of a shop changes for some reason.
@@ -29,7 +29,7 @@ public class ShopPriceChangeEvent extends ShopEvent implements Cancellable {
   private boolean cancelled;
 
   @NotNull
-  private final Shop shop;
+  private final ContainerShop shop;
   
   @NotNull
   private final Reason reason;

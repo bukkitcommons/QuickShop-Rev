@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,6 +20,8 @@ import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
 import cc.bukkit.shop.economy.impl.VaultEconProvider;
+import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 
 /** A util to generate a paste report and upload it to EngineHub/Ubuntu Paste */
 @AllArgsConstructor

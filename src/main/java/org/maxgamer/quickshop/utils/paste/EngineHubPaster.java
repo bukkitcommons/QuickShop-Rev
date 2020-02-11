@@ -1,7 +1,5 @@
 package org.maxgamer.quickshop.utils.paste;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
@@ -10,6 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.HttpRequest;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class EngineHubPaster implements PasteInterface {
   @Override

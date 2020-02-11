@@ -18,11 +18,11 @@ import org.bukkit.inventory.Inventory;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class BlockListener implements Listener {
@@ -53,7 +53,7 @@ public class BlockListener implements Listener {
       
       viewer = Util.getShopBySign(block);
     } else {
-      viewer = QuickShopManager.instance().getLoadedShopAt(block);
+      viewer = Shop.getManager().getLoadedShopAt(block);
     }
     
     viewer
@@ -91,8 +91,7 @@ public class BlockListener implements Listener {
 
       if (location != null) {
         // Delayed task. Event triggers when item is moved, not when it is received.
-        QuickShopManager
-        .instance()
+        Shop.getManager()
         .getLoadedShopFrom(location)
         .ifPresent(shop -> QuickShop.instance().getSignUpdateWatcher().schedule(shop));
       }
@@ -113,7 +112,7 @@ public class BlockListener implements Listener {
       final Player player = event.getPlayer();
       
       if (!PermissionManager.instance().has(player, "quickshop.create.double") &&
-          QuickShopManager.instance().hasLoadedShopAt(chest)) {
+          Shop.getManager().hasLoadedShopAt(chest)) {
         event.setCancelled(true);
         player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
       }

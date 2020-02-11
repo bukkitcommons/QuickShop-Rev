@@ -1,17 +1,5 @@
 package org.maxgamer.quickshop.shop;
 
-import com.google.common.collect.Maps;
-import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopModerator;
-import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopAction;
-import cc.bukkit.shop.data.ShopCreator;
-import cc.bukkit.shop.data.ShopActionData;
-import cc.bukkit.shop.data.ShopSnapshot;
-import cc.bukkit.shop.event.ShopCreateEvent;
-import cc.bukkit.shop.event.ShopPurchaseEvent;
-import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
-import cc.bukkit.shop.viewer.ShopViewer;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
@@ -35,7 +23,19 @@ import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
+import com.google.common.collect.Maps;
+import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopModerator;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.data.ShopAction;
+import cc.bukkit.shop.data.ShopActionData;
+import cc.bukkit.shop.data.ShopCreator;
+import cc.bukkit.shop.data.ShopSnapshot;
+import cc.bukkit.shop.event.ShopCreateEvent;
+import cc.bukkit.shop.event.ShopPurchaseEvent;
+import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class ShopActionManager {
   // TODO delayed remove
@@ -72,7 +72,7 @@ public class ShopActionManager {
   private boolean actionBuy(
       @NotNull Player p,
       @NotNull String message,
-      @NotNull Shop shop, int amount,
+      @NotNull ContainerShop shop, int amount,
       @NotNull ShopSnapshot info) {
 
     // No enough shop space
@@ -105,7 +105,7 @@ public class ShopActionManager {
   private boolean actionBuy0(
       @NotNull Player p,
       @NotNull String message,
-      @NotNull Shop shop, int amount,
+      @NotNull ContainerShop shop, int amount,
       @NotNull ShopSnapshot info) {
 
     // Tax handling
@@ -203,7 +203,7 @@ public class ShopActionManager {
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
     }
 
-    if (QuickShopManager.instance().getLoadedShopAt(info.location()).isPresent()) {
+    if (Shop.getManager().getLoadedShopAt(info.location()).isPresent()) {
       p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
       return;
     }
@@ -340,7 +340,7 @@ public class ShopActionManager {
     /*
      * Creates the shop
      */
-    ContainerShop shop = new ContainerShop(info.location(), price, info.item(),
+    ContainerQuickShop shop = new ContainerQuickShop(info.location(), price, info.item(),
         new ShopModerator(p.getUniqueId()), false, ShopType.SELLING);
 
     ShopCreateEvent e = new ShopCreateEvent(shop, p);
@@ -376,12 +376,12 @@ public class ShopActionManager {
     }
 
     /* The shop has hereforth been successfully created */
-    QuickShopManager.instance().createShop(shop, info);
+    Shop.getManager().createShop(shop, info);
     // Figures out which way we should put the sign on and
     // sets its text.
 
     if (shop.isDualShop()) {
-      Shop nextTo = shop.getAttachedShop();
+      ContainerShop nextTo = shop.getAttachedShop();
       if (Objects.requireNonNull(nextTo).getPrice() > shop.getPrice()) {
         // The one next to it must always be a
         // buying shop.
@@ -393,7 +393,7 @@ public class ShopActionManager {
   private void actionSell(
       @NotNull Player p,
       @NotNull String message,
-      @NotNull Shop shop, int amount,
+      @NotNull ContainerShop shop, int amount,
       @NotNull ShopSnapshot info) {
 
     int stock = shop.getRemainingStock();
@@ -500,7 +500,7 @@ public class ShopActionManager {
 
     // Shop gone
     // Get the shop they interacted with
-    ShopViewer shopOp = QuickShopManager.instance().getLoadedShopAt(info.location());
+    ShopViewer shopOp = Shop.getManager().getLoadedShopAt(info.location());
     // It's not valid anymore
     if (!shopOp.isPresent() || !Util.canBeShop(info.location().block())) {
       p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));
@@ -508,7 +508,7 @@ public class ShopActionManager {
     }
 
     // Shop changed
-    Shop shop = shopOp.get();
+    ContainerShop shop = shopOp.get();
     if (info.hasChanged(shop)) {
       p.sendMessage(MsgUtil.getMessage("shop-has-changed", p));
       return;

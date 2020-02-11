@@ -19,17 +19,16 @@ package cc.bukkit.shop.economy.impl;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.Setter;
-import net.tnemc.core.Reserve;
-import net.tnemc.core.economy.EconomyAPI;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 import cc.bukkit.shop.economy.EconomyProvider;
+import lombok.Getter;
+import lombok.Setter;
+import net.tnemc.core.Reserve;
+import net.tnemc.core.economy.EconomyAPI;
 
 /** @author creatorfromhell */
 public class ReserveEconProvider implements EconomyProvider {

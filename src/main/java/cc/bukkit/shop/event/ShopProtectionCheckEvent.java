@@ -16,11 +16,11 @@
 
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.jetbrains.annotations.NotNull;
+import lombok.Getter;
 
 public class ShopProtectionCheckEvent extends ShopEvent {
 

@@ -18,8 +18,6 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Level;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -29,12 +27,11 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.shop.ContainerShop;
-import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.command.CommandProcesser;
@@ -134,7 +131,7 @@ public class SubCommand_Price implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(b.getLocation());
+      final ShopViewer shop = Shop.getManager().getLoadedShopAt(b.getLocation());
 
       if (shop.isEmpty() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
           && !PermissionManager.instance().has(sender, "quickshop.other.price"))) {
@@ -170,17 +167,17 @@ public class SubCommand_Price implements CommandProcesser {
       sender.sendMessage(
           MsgUtil.getMessage("price-is-now", sender, QuickShop.instance().getEconomy().format(shop.get().getPrice())));
       // Chest shops can be double shops.
-      if (!(shop.get() instanceof ContainerShop)) {
+      if (!(shop.get() instanceof ContainerQuickShop)) {
         return;
       }
 
-      final ContainerShop cs = (ContainerShop) shop.get();
+      final ContainerQuickShop cs = (ContainerQuickShop) shop.get();
 
       if (!cs.isDualShop()) {
         return;
       }
 
-      final Shop nextTo = cs.getAttachedShop();
+      final ContainerShop nextTo = cs.getAttachedShop();
 
       if (nextTo == null) {
         // TODO: 24/11/2019 Send message about that issue.

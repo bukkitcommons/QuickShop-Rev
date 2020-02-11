@@ -22,7 +22,6 @@ import static org.bukkit.ChatColor.STRIKETHROUGH;
 import static org.bukkit.ChatColor.UNDERLINE;
 import static org.bukkit.ChatColor.WHITE;
 import static org.bukkit.ChatColor.YELLOW;
-
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Map;
@@ -32,7 +31,6 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
@@ -41,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import com.google.common.collect.Maps;
+import lombok.SneakyThrows;
 
 public abstract class ShopPluginLogger extends PluginLogger {
   /**

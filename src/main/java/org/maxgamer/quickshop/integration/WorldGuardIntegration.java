@@ -1,5 +1,13 @@
 package org.maxgamer.quickshop.integration;
 
+import java.util.List;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
@@ -15,15 +23,6 @@ import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 import cc.bukkit.shop.integration.IntegrationStage;
-import java.util.List;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
-import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
 @Configuration("configs/integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_LOAD)

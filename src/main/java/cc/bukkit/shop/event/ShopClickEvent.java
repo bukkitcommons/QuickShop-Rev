@@ -1,15 +1,15 @@
 package cc.bukkit.shop.event;
 
-import lombok.Getter;
 import org.bukkit.event.Cancellable;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ContainerShop;
+import lombok.Getter;
 
 public class ShopClickEvent extends ShopEvent implements Cancellable {
 
   @NotNull
   @Getter
-  private final Shop shop;
+  private final ContainerShop shop;
 
   private boolean cancelled;
 
@@ -18,7 +18,7 @@ public class ShopClickEvent extends ShopEvent implements Cancellable {
    *
    * @param shop The shop bought from
    */
-  public ShopClickEvent(@NotNull Shop shop) {
+  public ShopClickEvent(@NotNull ContainerShop shop) {
     this.shop = shop;
   }
 

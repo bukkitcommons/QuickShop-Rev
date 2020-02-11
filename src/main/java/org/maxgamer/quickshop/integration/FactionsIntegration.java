@@ -1,5 +1,9 @@
 package org.maxgamer.quickshop.integration;
 
+import java.util.List;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import com.google.common.collect.Lists;
 import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
@@ -9,11 +13,6 @@ import com.massivecraft.factions.perms.PermissibleAction;
 import cc.bukkit.shop.configuration.Configuration;
 import cc.bukkit.shop.configuration.Node;
 import cc.bukkit.shop.integration.IntegratedPlugin;
-import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 
 @Configuration("configs/integrations.yml")
 public class FactionsIntegration implements IntegratedPlugin {

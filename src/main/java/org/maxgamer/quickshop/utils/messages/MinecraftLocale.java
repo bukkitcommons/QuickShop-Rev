@@ -1,8 +1,5 @@
 package org.maxgamer.quickshop.utils.messages;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +17,9 @@ import org.maxgamer.quickshop.utils.files.Rewriter;
 import org.maxgamer.quickshop.utils.mojang.AssetJson;
 import org.maxgamer.quickshop.utils.mojang.MojangAPI;
 import org.maxgamer.quickshop.utils.nms.ReflectFactory;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class MinecraftLocale {
   @NotNull
