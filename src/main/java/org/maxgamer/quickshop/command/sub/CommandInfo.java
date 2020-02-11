@@ -8,7 +8,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
@@ -71,6 +70,6 @@ public class CommandInfo extends QuickShopCommand {
         + " shops create on double chest.)");
     sender.sendMessage(ChatColor.GREEN + "" + nostock
         + " nostock selling shops (excluding doubles) which will be removed by /qs clean.");
-    sender.sendMessage(ChatColor.GREEN + "QuickShop " + QuickShop.instance().getVersion());
+    sender.sendMessage(ChatColor.GREEN + "QuickShop Rev");
   }
 }

@@ -18,6 +18,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.economy.VaultEconProvider;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
 import lombok.AllArgsConstructor;
@@ -43,8 +44,8 @@ public class Paste {
     finalReport.append("\n");
     finalReport.append("================================================\n");
     finalReport.append("QuickShop:\n");
-    finalReport.append("\tVersion: ").append(QuickShop.instance().getVersion()).append("\n");
-    finalReport.append("\tFork: ").append(QuickShop.getFork()).append("\n");
+    finalReport.append("\tVersion: ").append(Shop.getVersion()).append("\n");
+    finalReport.append("\tFork: ").append("Rev").append("\n");
     finalReport.append("\tServer ID: ").append(BaseConfig.serverUUID).append("\n");
     finalReport.append("\tOpenInv Hook: ")
         .append(plugin.getOpenInvPlugin() == null ? "Disabled" : "Enabled").append("\n");

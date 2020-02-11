@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.Shop;
 
 
 public class CommandAbout extends QuickShopCommand {
@@ -14,30 +15,30 @@ public class CommandAbout extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     QuickShop.instance();
     sender.sendMessage(
-        ChatColor.AQUA + "QuickShop " + ChatColor.YELLOW + QuickShop.getFork());
+        ChatColor.AQUA + "QuickShop Rev");
     sender.sendMessage(ChatColor.AQUA + "Ver " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-        + QuickShop.instance().getVersion());
-    if (QuickShop.instance().getVersion().toUpperCase().contains("LTS")) {
+        + Shop.getVersion());
+    if (Shop.getVersion().toUpperCase().contains("LTS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.lts", sender));
-    } else if (QuickShop.instance().getVersion().toUpperCase().contains("STABLE")) {
+          + Shop.getLocaleManager().getMessage("updatenotify.label.lts", sender));
+    } else if (Shop.getVersion().toUpperCase().contains("STABLE")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.stable", sender));
-    } else if (QuickShop.instance().getVersion().toUpperCase().contains("QV")) {
+          + Shop.getLocaleManager().getMessage("updatenotify.label.stable", sender));
+    } else if (Shop.getVersion().toUpperCase().contains("QV")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.qualityverifyed", sender));
-    } else if (QuickShop.instance().getVersion().toUpperCase().contains("BETA")) {
+          + Shop.getLocaleManager().getMessage("updatenotify.label.qualityverifyed", sender));
+    } else if (Shop.getVersion().toUpperCase().contains("BETA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
-    } else if (QuickShop.instance().getVersion().toUpperCase().contains("ALPHA")) {
+          + Shop.getLocaleManager().getMessage("updatenotify.label.unstable", sender));
+    } else if (Shop.getVersion().toUpperCase().contains("ALPHA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
-    } else if (QuickShop.instance().getVersion().toUpperCase().contains("EARLY ACCESS")) {
+          + Shop.getLocaleManager().getMessage("updatenotify.label.unstable", sender));
+    } else if (Shop.getVersion().toUpperCase().contains("EARLY ACCESS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
-    } else if (QuickShop.instance().getVersion().toUpperCase().contains("SNAPSHOT")) {
+          + Shop.getLocaleManager().getMessage("updatenotify.label.unstable", sender));
+    } else if (Shop.getVersion().toUpperCase().contains("SNAPSHOT")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
+          + Shop.getLocaleManager().getMessage("updatenotify.label.unstable", sender));
     } else {
       sender.sendMessage(
           ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN + "[Main Line]");

@@ -2,7 +2,6 @@ package org.maxgamer.quickshop.command;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -13,7 +12,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
@@ -21,6 +19,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.command.CommandData;
 import cc.bukkit.shop.command.ShopCommand;
 
@@ -72,7 +71,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
   
   private void sendHelp(@NotNull CommandSender sender, @NotNull String commandLabel) {
     boolean player = sender instanceof Player;
-    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.description.title", player ? (Player) sender : null));
+    sender.sendMessage(Shop.getLocaleManager().getMessage("command.description.title", player ? (Player) sender : null));
 
     for (CommandData container : commands) {
       if (container.hidden())
@@ -84,7 +83,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
 
       sender.sendMessage(
           ChatColor.GREEN + "/" + commandLabel + " " + container.label() + ChatColor.YELLOW
-              + " - " + QuickShop.instance().getLocaleManager().getMessage("command.description." + container.label(), player ? (Player) sender : null));
+              + " - " + Shop.getLocaleManager().getMessage("command.description." + container.label(), player ? (Player) sender : null));
     }
   }
 
@@ -107,7 +106,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
       
       for (String permission : container.permissions()) {
         if (!PermissionManager.instance().has(sender, permission)) {
-          sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-permission", sender instanceof Player ? (Player) sender : null));
+          sender.sendMessage(Shop.getLocaleManager().getMessage("no-permission", sender instanceof Player ? (Player) sender : null));
           return true;
         }
       }

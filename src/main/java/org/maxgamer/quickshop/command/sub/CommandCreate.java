@@ -32,7 +32,7 @@ public class CommandCreate extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.price", sender));
+    list.add(Shop.getLocaleManager().getMessage("tabcomplete.price", sender));
 
     return list;
   }
@@ -49,7 +49,7 @@ public class CommandCreate extends QuickShopCommand {
     final ItemStack item = p.getInventory().getItemInMainHand();
 
     if (item.getType() == Material.AIR) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-anythings-in-your-hand", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("no-anythings-in-your-hand", sender));
       return;
     }
 
@@ -80,13 +80,13 @@ public class CommandCreate extends QuickShopCommand {
 
       if (Util.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(p, "quickshop.create.double")) {
-        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-double-chests", sender));
+        p.sendMessage(Shop.getLocaleManager().getMessage("no-double-chests", sender));
         return;
       }
 
       if (Util.isBlacklisted(item) && !PermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
-        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("blacklisted-item", sender));
+        p.sendMessage(Shop.getLocaleManager().getMessage("blacklisted-item", sender));
         return;
       }
 
@@ -101,7 +101,7 @@ public class CommandCreate extends QuickShopCommand {
       }
 
       p.sendMessage(
-          QuickShop.instance().getLocaleManager().getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
+          Shop.getLocaleManager().getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
       Util.debug("Created by wait chat");
       return;
     }

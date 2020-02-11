@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
@@ -21,12 +20,12 @@ public class CommandBuy extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     
     if (!(sender instanceof Player)) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("Can't run command by Console", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("Can't run command by Console", sender));
       return;
     }
 
     Runnable notLookingAtShop = () -> sender.sendMessage(
-        QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+        Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
 
     BlockViewer
         .get((Player) sender, 10)
@@ -47,7 +46,7 @@ public class CommandBuy extends QuickShopCommand {
                 shop.setSignText();
                 shop.save();
                 sender.sendMessage(
-                    QuickShop.instance().getLocaleManager().getMessage("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
+                    Shop.getLocaleManager().getMessage("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
 
                 return ViewAction.BREAK;
               }, ViewAction.NEXT);

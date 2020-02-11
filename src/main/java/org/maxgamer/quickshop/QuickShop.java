@@ -7,18 +7,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.command.QuickShopCommandManager;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DatabaseConfig;
@@ -63,6 +61,7 @@ import org.maxgamer.quickshop.utils.nms.Reflections;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
+import com.google.common.collect.Maps;
 import cc.bukkit.shop.LocaleManager;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopItemMatcher;
@@ -81,12 +80,10 @@ import cc.bukkit.shop.database.connector.SQLiteConnector;
 import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
 import cc.bukkit.shop.integration.IntegrateStage;
-import cc.bukkit.shop.integration.IntegrationHelper;
+import cc.bukkit.shop.integration.IntegrationManager;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.file.ResourceAccessor;
 import lombok.Getter;
-import me.minebuilders.clearlag.Clearlag;
-import me.minebuilders.clearlag.listeners.ItemMergeListener;
 
 @Getter
 public final class QuickShop extends JavaPlugin implements ShopPlugin {
@@ -95,115 +92,90 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   public static QuickShop instance() {
     return singleton;
   }
-
-  private IntegrationHelper integrationHelper;
-  // Listeners (These don't)
-  private final BlockListener blockListener = new BlockListener();
-  /** The BootError, if it not NULL, plugin will stop loading and show setted errors when use /qs */
-  @Nullable
-  private IssuesHelper bootError;
-  // Listeners - We decide which one to use at runtime
-  private final ChatListener chatListener = new ChatListener();
-  private QuickShopCommandManager commandManager;
-  /** WIP */
-  private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
-
-  private final CustomInventoryListener customInventoryListener = new CustomInventoryListener(this);
   
-  /** The database for storing all our data for persistence */
-  @NotNull
-  private Database database;
-  /** Contains all SQL tasks */
-  @NotNull
-  private DatabaseHelper databaseHelper;
-  
-  /** Queued database manager */
-  @NotNull
-  private Dispatcher dispatcher;
-
-  @NotNull
-  private final DisplayBugFixListener displayBugFixListener = new DisplayBugFixListener(this);
-  private int displayItemCheckTicks;
-  /** The economy we hook into for transactions */
-  @NotNull
-  private EconomyProvider economy;
-
-  @NotNull
-  private final DisplayProtectionListener inventoryListener = new DisplayProtectionListener();
-  @NotNull
-  private final ShopItemMatcher itemMatcher = new QuickShopItemMatcher();
-  /** Language manager, to select which language will loaded. */
-  @NotNull
-  private ResourceAccessor resourceAccessor;
-
-  /** Whether or not to limit players shop amounts */
-  private boolean limit = false;
-
-  /** The shop limites. */
-  @NotNull
-  private HashMap<String, Integer> limits = new HashMap<>();
-
-  @NotNull
-  private final LockListener lockListener = new LockListener(this);
-  // private BukkitTask itemWatcherTask;
-  @Nullable
-  private AsyncLogWatcher logWatcher;
-  /** bStats, good helper for metrics. */
-  @NotNull
-  private final Metrics metrics = new Metrics(this);
-
-  private boolean noopDisable;
-  /** The plugin OpenInv (null if not present) */
-  private Plugin openInvPlugin;
-  /** The plugin PlaceHolderAPI(null if not present) */
-  private Plugin placeHolderAPI;
-  /** A util to call to check some actions permission */
-  private BuildPerms permissionChecker;
-
-  @NotNull
-  private final ShopActionListener playerListener = new ShopActionListener();
-  @NotNull
-  private final InternalListener internalListener = new InternalListener(this);
-  /**
-   * Whether we players are charged a fee to change the price on their shop (To help deter endless
-   * undercutting
+  /*
+   * ShopPlugin implements
    */
-  private boolean priceChangeRequiresFee = false;
-  /** The error reporter to help devs report errors to Sentry.io */
-  @NotNull
-  private SentryErrorReporter sentryErrorReporter;
-
-  @NotNull
-  private final ShopProtector shopProtectListener = new ShopProtector();
-  // private ShopVaildWatcher shopVaildWatcher;
-  private SyncDisplayDespawner displayAutoDespawnWatcher;
-  /** A set of players who have been warned ("Your shop isn't automatically locked") */
-
-
-  @NotNull
-  private final OngoingFeeWatcher ongoingFeeWatcher = new OngoingFeeWatcher(this);
-  private ScheduledSignUpdater signUpdateWatcher;
-  private BukkitWrapper bukkitAPIWrapper;
-  private boolean enabledAsyncDisplayDespawn;
-  
-  @Getter
   private LocaleManager localeManager;
-  @Getter
+  
+  @NotNull
   private final ShopMessager messager = new QuickShopMessager();
   
-  @Getter
   @NotNull
-  private final ConfigurationManager configurationManager = ConfigurationManager.createManager(this);
+  private final ShopItemMatcher itemMatcher = new QuickShopItemMatcher();
+  
+  @Override
+  public ShopManager getManager() {
+    return QuickShopManager.instance();
+  }
 
-  /**
-   * Returns QS version, this method only exist on QSRR forks If running other QSRR forks,, result
-   * may not is "Reremake x.x.x" If running QS offical, Will throw exception.
-   *
-   * @return Plugin Version
-   */
+  @Override
+  public ShopLoader getLoader() {
+    return QuickShopLoader.instance();
+  }
+
+  @Override
+  public ShopActionManager getActions() {
+    return QuickShopActionManager.instance();
+  }
+  
+  @Override
   public String getVersion() {
     return getDescription().getVersion();
   }
+  
+  /*
+   * Exclusive implements
+   */
+  private IntegrationManager integrationHelper; // FIXME API
+  
+  private QuickShopCommandManager commandManager; // FIXME API
+  
+  @NotNull
+  private final ConfigurationManager configurationManager = ConfigurationManager.createManager(this); // FIXME API
+  
+  @NotNull
+  private final IssuesHelper issuesHelper = IssuesHelper.create();
+  
+  @NotNull
+  private NoCheatPlusExemptor ncpExemptor = new NoCheatPlusExemptor();
+  
+  @NotNull
+  private final Metrics metrics = new Metrics(this);
+  
+  private EconomyProvider economy;
+  
+  private ResourceAccessor resourceAccessor;
+  
+  private BukkitWrapper bukkitAPIWrapper;
+  
+  @NotNull
+  private final HashMap<String, Integer> shopPermLimits = Maps.newHashMap();
+  
+  /*
+   * Softdepend plugins
+   */
+  private Optional<Plugin> openInvPlugin;
+
+  private Optional<Plugin> placeHolderAPI;
+  
+  /*
+   * Database
+   */
+  private Dispatcher dispatcher;
+  
+  private Database database;
+  
+  private DatabaseHelper databaseHelper;
+  
+  /*
+   * Misc
+   */
+  private AsyncLogWatcher logWatcher;
+
+  private BuildPerms permissionChecker;
+
+  private SentryErrorReporter sentryErrorReporter;
 
   /**
    * Get the Player's Shop limit.
@@ -213,58 +185,29 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
    */
   public int getShopLimit(@NotNull Player p) {
     int max = BaseConfig.defaultLimits;
-    for (Entry<String, Integer> entry : limits.entrySet()) {
+    for (Entry<String, Integer> entry : shopPermLimits.entrySet()) {
       if (entry.getValue() > max && PermissionManager.instance().has(p, entry.getKey())) {
         max = entry.getValue();
       }
     }
     return max;
   }
-
-  /** Load 3rdParty plugin support module. */
+  
+  
+  
   private void loadSoftdepends() {
-    // added for compatibility reasons with OpenInv - see
-    // https://github.com/KaiKikuchi/QuickShop/issues/139
     if (BaseConfig.openInv) {
-      this.openInvPlugin = Bukkit.getPluginManager().getPlugin("OpenInv");
-      if (this.openInvPlugin != null) {
+      openInvPlugin = Optional.ofNullable(Bukkit.getPluginManager().getPlugin("OpenInv"));
+      
+      if (openInvPlugin.isPresent())
         getLogger().info("Successfully loaded OpenInv support!");
-      }
     }
+    
     if (BaseConfig.placeHolderAPI) {
-      this.placeHolderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
-      if (this.placeHolderAPI != null) {
+      placeHolderAPI = Optional.ofNullable(Bukkit.getPluginManager().getPlugin("PlaceholderAPI"));
+      
+      if (placeHolderAPI.isPresent())
         getLogger().info("Successfully loaded PlaceHolderAPI support!");
-      }
-    }
-    if (DisplayConfig.displayItems) {
-      if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
-        try {
-          Clearlag clearlag = (Clearlag) Bukkit.getPluginManager().getPlugin("ClearLag");
-          for (RegisteredListener clearLagListener : ItemSpawnEvent.getHandlerList()
-              .getRegisteredListeners()) {
-            if (!clearLagListener.getPlugin().equals(clearlag)) {
-              continue;
-            }
-            int spamTimes = 500;
-            if (clearLagListener.getListener().getClass().equals(ItemMergeListener.class)) {
-              ItemSpawnEvent.getHandlerList().unregister(clearLagListener.getListener());
-              for (int i = 0; i < spamTimes; i++) {
-                getLogger().warning("+++++++++++++++++++++++++++++++++++++++++++");
-                getLogger().severe(
-                    "Detected incompatible module of ClearLag-ItemMerge module, it will broken the QuickShop display, we already unregister this module listener!");
-                getLogger().severe(
-                    "Please turn off it in the ClearLag config.yml or turn off the QuickShop display feature!");
-                getLogger().severe(
-                    "If you didn't do that, this message will keep spam in your console every times you server boot up!");
-                getLogger().warning("+++++++++++++++++++++++++++++++++++++++++++");
-                getLogger().info("This message will spam more " + (spamTimes - i) + " times!");
-              }
-            }
-          }
-        } catch (Throwable ignored) {
-        }
-      }
     }
   }
 
@@ -285,7 +228,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         economy = core = new ReserveEconProvider();
         break;
       default:
-        IssuesHelper.econError();
+        issuesHelper.econError();
         Util.debug("No economy provider can be selected.");
         return false;
     }
@@ -293,7 +236,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     QuickShop.instance().log("Economy Provider: " + core.getName());
     
     if (!core.isValid()) {
-      IssuesHelper.econError();
+      issuesHelper.econError();
       Util.debug("Economy provider is not vaild: " + core.getName());
       return false;
     }
@@ -324,9 +267,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     configurationManager.load(MatcherConfig.class);
     configurationManager.load(DatabaseConfig.class);
     
-    priceChangeRequiresFee = BaseConfig.priceModFee > 0;
-    displayItemCheckTicks = BaseConfig.displayItemCheckTicks;
-    
     if (BaseConfig.logActions)
       logWatcher = new AsyncLogWatcher(this, new File(getDataFolder(), "qs.log"));
   }
@@ -345,7 +285,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
 
   @Override
   public void onDisable() {
-    if (noopDisable)
+    if (issuesHelper.hasErrored())
       return;
     
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.UNLOAD);
@@ -418,7 +358,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       t.printStackTrace();
     }
     
-    boolean fine = IssuesHelper.scanDupeInstall();
+    boolean fine = issuesHelper.scanDupeInstall();
     ChatColor sideColor = fine ? org.bukkit.ChatColor.DARK_GREEN : ChatColor.DARK_RED;
     ChatColor coreColor = fine ? org.bukkit.ChatColor.GREEN : ChatColor.RED;
     
@@ -434,7 +374,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     getDataFolder().mkdirs();
 
     getLogger().info("Loading up integration modules.");
-    this.integrationHelper = new IntegrationHelper();
+    this.integrationHelper = new IntegrationManager();
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
     if (getConfig().getBoolean("integration.worldguard.enable")) {
       Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
@@ -515,7 +455,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
 
     boolean success = setupDatabase(); // Load the database
     if (!success) {
-      noopDisable = true;
+      issuesHelper.databaseError();
       ShopLogger.instance().severe("Fatal error: Failed to setup database");
       Bukkit.getPluginManager().disablePlugin(this, true);
       return;
@@ -526,18 +466,16 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     // This should be inited before shop manager
     if (DisplayConfig.displayItems) {
       if (getConfig().getBoolean("shop.display-auto-despawn")) {
-        this.displayAutoDespawnWatcher = new SyncDisplayDespawner();
-        Bukkit.getScheduler().runTaskTimer(QuickShop.instance(), this.displayAutoDespawnWatcher, 20,
+        Bukkit.getScheduler().runTaskTimer(QuickShop.instance(), new SyncDisplayDespawner(), 20,
             getConfig().getInt("shop.display-check-time"));
       }
     }
     this.permissionChecker = new BuildPerms();
 
     if (BaseConfig.enableLimits) {
-      this.limit = BaseConfig.enableLimits;
       for (Map<String, Integer> key : BaseConfig.limitRanks) {
         for (Entry<String, Integer> e : key.entrySet())
-          limits.put(e.getKey(), e.getValue());
+          shopPermLimits.put(e.getKey(), e.getValue());
       }
     }
     if (getConfig().getInt("shop.find-distance") > 100) {
@@ -545,37 +483,33 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       .severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
     }
 
-    signUpdateWatcher = new ScheduledSignUpdater();
-
     /* Load all shops. */
     Shop.getLoader().loadShops();
 
-    Bukkit.getPluginManager().registerEvents(blockListener, this);
-    Bukkit.getPluginManager().registerEvents(playerListener, this);
-    Bukkit.getPluginManager().registerEvents(chatListener, this);
-    Bukkit.getPluginManager().registerEvents(inventoryListener, this);
-    Bukkit.getPluginManager().registerEvents(customInventoryListener, this);
-    Bukkit.getPluginManager().registerEvents(displayBugFixListener, this);
-    Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
-    Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
-    Bukkit.getPluginManager().registerEvents(internalListener, this);
+    Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
+    Bukkit.getPluginManager().registerEvents(new ShopActionListener(), this);
+    Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+    Bukkit.getPluginManager().registerEvents(new DisplayProtectionListener(), this);
+    Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(), this);
+    Bukkit.getPluginManager().registerEvents(new DisplayBugFixListener(), this);
+    Bukkit.getPluginManager().registerEvents(new ShopProtector(), this);
+    Bukkit.getPluginManager().registerEvents(new InternalListener(), this);
 
-    if (BaseConfig.lock) {
-      Bukkit.getPluginManager().registerEvents(lockListener, this);
-    }
-    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
+    if (BaseConfig.lock)
+      Bukkit.getPluginManager().registerEvents(new LockListener(), this);
+    
+    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null)
       Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
-    }
 
     Util.debug("Registering shop watcher...");
-    Bukkit.getScheduler().runTaskTimer(this, signUpdateWatcher, 40, 40);
+    Bukkit.getScheduler().runTaskTimer(this, new ScheduledSignUpdater(), 40, 40);
     if (logWatcher != null) {
       Bukkit.getScheduler().runTaskTimerAsynchronously(this, logWatcher, 0, 10);
       getLogger().info("Log actions is enabled, actions will log in the qs.log file!");
     }
     if (getConfig().getBoolean("shop.ongoing-fee.enable")) {
       getLogger().info("Ongoing fee feature is enabled.");
-      ongoingFeeWatcher.runTaskTimerAsynchronously(this, 0,
+      new OngoingFeeWatcher().runTaskTimerAsynchronously(this, 0,
           getConfig().getInt("shop.ongoing-fee.ticks"));
     }
     
@@ -667,7 +601,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       
     } catch (Throwable t) {
       t.printStackTrace();
-      IssuesHelper.databaseError();
+      issuesHelper.databaseError();
       return false;
     }
     
@@ -742,29 +676,5 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     } else {
       getLogger().info("You have disabled mertics, Skipping...");
     }
-  }
-
-  /**
-   * Return the QSRR's fork edition name, you can modify this if you want create yourself fork.
-   *
-   * @return The fork name.
-   */
-  public static String getFork() {
-    return "Rev";
-  }
-
-  @Override
-  public ShopManager getManager() {
-    return QuickShopManager.instance();
-  }
-
-  @Override
-  public ShopLoader getLoader() {
-    return QuickShopLoader.instance();
-  }
-
-  @Override
-  public ShopActionManager getActions() {
-    return QuickShopActionManager.instance();
   }
 }

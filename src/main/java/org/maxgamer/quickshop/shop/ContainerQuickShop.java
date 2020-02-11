@@ -390,10 +390,10 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   @Nullable
   public Inventory getInventory() {
     try {
-      if (QuickShop.instance().getOpenInvPlugin() != null ||
+      if (QuickShop.instance().getOpenInvPlugin().isPresent() &&
           location.block().getType() == Material.ENDER_CHEST) {
         
-        com.lishid.openinv.OpenInv openInv = ((com.lishid.openinv.OpenInv) QuickShop.instance().getOpenInvPlugin());
+        com.lishid.openinv.OpenInv openInv = ((com.lishid.openinv.OpenInv) QuickShop.instance().getOpenInvPlugin().get());
         
         return openInv.getSpecialEnderChest(
             openInv.loadPlayer(Bukkit.getOfflinePlayer(moderator.getOwner())),
@@ -461,30 +461,30 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     String[] lines = new String[4];
     
     OfflinePlayer player =
-        QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled() ?
+        QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled() ?
         Bukkit.getOfflinePlayer(getOwner()) : null;
     
-    lines[0] = QuickShop.instance().getLocaleManager().getMessage(
+    lines[0] = Shop.getLocaleManager().getMessage(
         "signs.header",
         player,
         ownerName());
     
     String section = shopType.name().toLowerCase();
-    lines[1] = QuickShop.instance().getLocaleManager().getMessage(
+    lines[1] = Shop.getLocaleManager().getMessage(
         "signs.".concat(section),
         player,
         unlimited ?
-            QuickShop.instance().getLocaleManager().getMessage("signs.unlimited", player) :
+            Shop.getLocaleManager().getMessage("signs.unlimited", player) :
             (String.valueOf(shopType == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()))
         );
     
     String stacks = item.getAmount() > 1 ? " * " + item.getAmount() : "";
-    lines[2] = QuickShop.instance().getLocaleManager().getMessage(
+    lines[2] = Shop.getLocaleManager().getMessage(
         "signs.item",
         player,
         Util.getItemStackName(getItem()) + stacks);
     
-    lines[3] = QuickShop.instance().getLocaleManager().getMessage(
+    lines[3] = Shop.getLocaleManager().getMessage(
         "signs.price",
         player,
         Util.format(price));
@@ -519,7 +519,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   public List<Sign> getShopSigns() {
     OfflinePlayer player = Bukkit.getOfflinePlayer(getOwner());
     String signHeader =
-        QuickShop.instance().getLocaleManager().getMessage("signs.header", player, ownerName());
+        Shop.getLocaleManager().getMessage("signs.header", player, ownerName());
     
     List<Sign> signs = Lists.newArrayListWithCapacity(4);
 
@@ -642,13 +642,13 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   @Override
   public @NotNull String ownerName() {
     if (unlimited) {
-      return QuickShop.instance().getLocaleManager().getMessage("admin-shop",
+      return Shop.getLocaleManager().getMessage("admin-shop",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
     
     String name = Bukkit.getOfflinePlayer(getOwner()).getName();
     if (name == null || name.isEmpty()) {
-      return QuickShop.instance().getLocaleManager().getMessage("unknown-owner",
+      return Shop.getLocaleManager().getMessage("unknown-owner",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
     

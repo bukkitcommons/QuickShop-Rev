@@ -4,20 +4,19 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
 import cc.bukkit.shop.util.ShopLogger;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
-/** BootError class contains print errors on /qs command when plugin failed launched. */
-@EqualsAndHashCode
-@ToString
 public class IssuesHelper {
-  private static boolean errored;
+  public static IssuesHelper create() {
+    return new IssuesHelper();
+  }
   
-  public static boolean hasErrored() {
+  private boolean errored;
+  
+  public boolean hasErrored() {
     return errored;
   }
   
-  public static boolean scanDupeInstall() {
+  public boolean scanDupeInstall() {
     try {
       try {
         Class.forName("org.maxgamer.quickshop.Util.NMS");
@@ -52,7 +51,7 @@ public class IssuesHelper {
     return true;
   }
 
-  protected static void error(@NotNull String... errors) {
+  protected void error(@NotNull String... errors) {
     errored = true;
     ShopLogger.instance().severe("#####################################################");
     ShopLogger.instance().severe(" QuickShop is disabled, Please fix any errors and restart");
@@ -66,8 +65,8 @@ public class IssuesHelper {
    *
    * @return The reason of error.
    */
-  static void databaseError() {
-    IssuesHelper.error("Error connecting to the database",
+  public void databaseError() {
+    error("Error connecting to the database",
         "Make sure your database service is running.",
         "Or check the configuration in your config.yml");
   }
@@ -77,12 +76,12 @@ public class IssuesHelper {
    *
    * @return The reason of error.
    */
-  static void econError() {
+  public void econError() {
     // Check Vault is installed
     if (Bukkit.getPluginManager().getPlugin("Vault") == null
         && Bukkit.getPluginManager().getPlugin("Reserve") == null) {
       // Vault not installed
-      IssuesHelper.error("Vault or Reserve is not installed or loaded!",
+      error("Vault or Reserve is not installed or loaded!",
           "Make sure you installed Vault or Reserve.");
     }
     // if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
@@ -93,14 +92,14 @@ public class IssuesHelper {
     // Vault is installed
     if (Bukkit.getPluginManager().getPlugin("CMI") != null) {
       // Found may in-compatiable plugin
-      IssuesHelper.error(
+      error(
           "No Economy plugin detected, did you installed and loaded them? Make sure they loaded before QuickShop.",
           "Make sure you have an economy plugin hooked into Vault or Reserve.",
           ChatColor.YELLOW + "Incompatibility detected: CMI Installed",
           "Download CMI Edition of Vault might fix this.");
     }
 
-    IssuesHelper.error(
+    error(
         "No Economy plugin detected, did you installed and loaded them? Make sure they loaded before QuickShop.",
         "Install an economy plugin to get Vault or Reserve working.");
   }

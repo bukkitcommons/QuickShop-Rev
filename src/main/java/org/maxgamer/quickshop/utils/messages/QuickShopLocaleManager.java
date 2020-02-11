@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.utils.nms.ItemNMS;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.LocaleFile;
 import cc.bukkit.shop.LocaleManager;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.action.data.ShopSnapshot;
 import cc.bukkit.shop.util.ShopLogger;
@@ -133,7 +134,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     String filled = Util.fillArgs(raw.get(), args);
     
     if (player instanceof OfflinePlayer) {
-      if (QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled()) {
+      if (QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled()) {
         try {
           filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
           Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
@@ -187,7 +188,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     LocaleFile json;
     languageCode = "en".equals(languageCode) ?
         languageCode :
-          (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
+          (Shop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
     json = new JsonLocale(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json", plugin);
     json.create();
     
@@ -250,7 +251,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     
     YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
     yaml.options().copyDefaults(false);
-    YamlConfiguration def = YamlConfiguration.loadConfiguration(new InputStreamReader(QuickShop.instance().getResource(fileName)));
+    YamlConfiguration def = YamlConfiguration.loadConfiguration(new InputStreamReader(Shop.instance().getResource(fileName)));
     yaml.setDefaults(def);
     
     Util.parseColours(yaml);

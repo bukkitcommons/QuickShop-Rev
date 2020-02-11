@@ -9,7 +9,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -26,7 +25,7 @@ public class CommandRefill extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.amount", sender));
+    list.add(Shop.getLocaleManager().getMessage("tabcomplete.amount", sender));
 
     return list;
   }
@@ -40,7 +39,7 @@ public class CommandRefill extends QuickShopCommand {
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.no-amount-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("command.no-amount-given", sender));
       return;
     }
 
@@ -49,14 +48,14 @@ public class CommandRefill extends QuickShopCommand {
     try {
       add = Integer.parseInt(cmdArg[0]);
     } catch (NumberFormatException e) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("thats-not-a-number", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("thats-not-a-number", sender));
       return;
     }
 
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 
@@ -69,10 +68,10 @@ public class CommandRefill extends QuickShopCommand {
       }
 
       shop.get().fill(add);
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("refill-success", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("refill-success", sender));
       return;
     }
 
-    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
   }
 }

@@ -16,16 +16,10 @@ import cc.bukkit.shop.action.data.ShopData;
  * lost.
  */
 public class OngoingFeeWatcher extends BukkitRunnable {
-  private QuickShop plugin;
-
-  public OngoingFeeWatcher(@NotNull QuickShop plugin) {
-    this.plugin = plugin;
-  }
-
   @Override
   public void run() {
     Util.debug("Run task for ongoing fee...");
-    if (plugin.getEconomy() == null) {
+    if (QuickShop.instance().getEconomy() == null) {
       Util.debug("Economy hadn't get ready.");
       return;
     }
@@ -39,17 +33,17 @@ public class OngoingFeeWatcher extends BukkitRunnable {
         
         if (!allowLoan) {
           // Disallow loan
-          if (plugin.getEconomy().getBalance(shopOwner) < cost) {
+          if (QuickShop.instance().getEconomy().getBalance(shopOwner) < cost) {
             this.removeShop(shop);
           }
         }
-        boolean success = plugin.getEconomy().withdraw(shop.moderators().getOwner(), cost);
+        boolean success = QuickShop.instance().getEconomy().withdraw(shop.moderators().getOwner(), cost);
         if (!success) {
           this.removeShop(shop);
         } else {
           try {
             // noinspection ConstantConditions,deprecation
-            plugin.getEconomy()
+            QuickShop.instance().getEconomy()
                 .deposit(Bukkit.getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), cost);
           } catch (Exception ignored) {
           }
@@ -68,13 +62,13 @@ public class OngoingFeeWatcher extends BukkitRunnable {
    * @param shop The shop was remove cause no enough ongoing fee
    */
   public void removeShop(@NotNull ShopData shop) {
-    Bukkit.getScheduler().runTask(plugin, () -> {
+    Bukkit.getScheduler().runTask(Shop.instance(), () -> {
       try {
         Shop.getLoader().delete(shop);
         
         if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
-          QuickShop.instance().getMessager().send(shop.moderators().getOwner(),
-              QuickShop.instance().getLocaleManager().getMessage("shop-removed-cause-ongoing-fee",
+          Shop.getMessager().send(shop.moderators().getOwner(),
+              Shop.getLocaleManager().getMessage("shop-removed-cause-ongoing-fee",
                   Bukkit.getOfflinePlayer(shop.moderators().getOwner()),
                   "World:" + shop.world() + " X:" + shop.x() +
                   " Y:" + shop.y() + " Z:" + shop.z()));

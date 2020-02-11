@@ -28,12 +28,12 @@ public class CommandFind extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("Only player can run this command", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("Only player can run this command", sender));
       return;
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.no-type-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("command.no-type-given", sender));
       return;
     }
 
@@ -91,7 +91,7 @@ public class CommandFind extends QuickShopCommand {
     }
 
     if (closest == null) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-nearby-shop", sender, cmdArg[0]));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("no-nearby-shop", sender, cmdArg[0]));
       return;
     }
 
@@ -99,7 +99,7 @@ public class CommandFind extends QuickShopCommand {
     // Hack fix to make /qs find not used by /back
     QuickShop.instance().getBukkitAPIWrapper().teleportEntity(p, Util.lookAt(loc, lookat).add(0, -1.62, 0),
         PlayerTeleportEvent.TeleportCause.UNKNOWN);
-    p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("nearby-shop-this-way", sender,
+    p.sendMessage(Shop.getLocaleManager().getMessage("nearby-shop-this-way", sender,
         "" + (int) Math.floor(Math.sqrt(minDistanceSquared))));
   }
 }

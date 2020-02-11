@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import cc.bukkit.shop.Shop;
 
@@ -17,7 +16,7 @@ public class CommandAmount extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.amount", sender));
+    list.add(Shop.getLocaleManager().getMessage("tabcomplete.amount", sender));
 
     return list;
   }
@@ -26,7 +25,7 @@ public class CommandAmount extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (cmdArg.length < 1) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.wrong-args", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("command.wrong-args", sender));
       return;
     }
 
@@ -38,7 +37,7 @@ public class CommandAmount extends QuickShopCommand {
     final Player player = (Player) sender;
 
     if (!Shop.getActions().hasAction(player.getUniqueId())) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-pending-action", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("no-pending-action", sender));
       return;
     }
 

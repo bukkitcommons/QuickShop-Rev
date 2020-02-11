@@ -433,7 +433,7 @@ public class Util {
     if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
       return itemStack.getItemMeta().getDisplayName();
     
-    return QuickShop.instance().getLocaleManager().getLocalizedName(itemStack.getType().name());
+    return Shop.getLocaleManager().getLocalizedName(itemStack.getType().name());
   }
 
   /**
@@ -580,7 +580,7 @@ public class Util {
           }
           inv.setItem(i, new ItemStack(Material.AIR));
           Util.debug("Found a displayitem in an inventory, Scheduling to removal...");
-          QuickShop.instance().getLocaleManager().sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
+          Shop.getLocaleManager().sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
               + location + ", Item is " + itemStack.getType().name());
         }
       }

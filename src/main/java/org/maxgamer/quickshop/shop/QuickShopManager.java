@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.collection.LongHashMap;
+import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
@@ -56,7 +58,7 @@ public class QuickShopManager implements ShopManager {
   /*
    * Shop containers
    */
-  private final Map<String, Map<Long, Map<Long, ContainerShop>>> loadedShops = Maps.newHashMap();
+  private final Map<String, Map<Long, Map<Long, ContainerShop>>> loadedShops = ObjectsHashMap.withExpectedSize(3);
   
   /**
    * Adds a shop to the world. Does NOT require the chunk or world to be loaded Call shop.onLoad by
@@ -70,10 +72,10 @@ public class QuickShopManager implements ShopManager {
   @Override
   public ContainerShop load(@NotNull World world, @NotNull ShopData data) throws JsonSyntaxException, InvalidConfigurationException {
     Map<Long, Map<Long, ContainerShop>> inWorld =
-        loadedShops.computeIfAbsent(data.world(), s -> new HashMap<>(3));
+        loadedShops.computeIfAbsent(data.world(), s -> LongHashMap.withExpectedSize(8));
     
     Map<Long, ContainerShop> inChunk =
-        inWorld.computeIfAbsent(Utils.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
+        inWorld.computeIfAbsent(Utils.chunkKey(data.x() >> 4, data.z() >> 4), s -> LongHashMap.withExpectedSize(16));
     
     ContainerShop shop = new ContainerQuickShop(
         ShopLocation.from(world, data.x(), data.y(), data.z()),
@@ -89,11 +91,11 @@ public class QuickShopManager implements ShopManager {
   @Override
   public ContainerShop load(@NotNull ContainerShop shop) {
     Map<Long, Map<Long, ContainerShop>> inWorld =
-        loadedShops.computeIfAbsent(shop.getLocation().worldName(), s -> new HashMap<>(3));
+        loadedShops.computeIfAbsent(shop.getLocation().worldName(), s -> LongHashMap.withExpectedSize(8));
     
     Map<Long, ContainerShop> inChunk =
         inWorld.computeIfAbsent(Utils.chunkKey(
-            shop.getLocation().x() >> 4, shop.getLocation().z() >> 4), s -> Maps.newHashMap());
+            shop.getLocation().x() >> 4, shop.getLocation().z() >> 4), s -> LongHashMap.withExpectedSize(16));
     
     inChunk.put(Utils.blockKey(
         shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z()), shop);
@@ -111,7 +113,7 @@ public class QuickShopManager implements ShopManager {
    */
   public static boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
     try {
-      if (QuickShop.instance().isLimit()) {
+      if (BaseConfig.enableLimits) {
         UUID uuid = player.getUniqueId();
         long owned = Shop.getLoader().getAllShops()
             .stream() // ASYNC
@@ -123,14 +125,14 @@ public class QuickShopManager implements ShopManager {
         
         if (owned >= max && Util.canBeShop(block)) {
           player.sendMessage(
-              QuickShop.instance().getLocaleManager().getMessage("reached-maximum-can-create", player,
+              Shop.getLocaleManager().getMessage("reached-maximum-can-create", player,
                   String.valueOf(owned), String.valueOf(max)));
           
           return false;
         }
       }
       
-      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(false, player);
+      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(false, player);
       if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
         Util.debug("PermissionChecker canceled shop creation");
         return false;
@@ -141,7 +143,7 @@ public class QuickShopManager implements ShopManager {
         return false;
       
     } finally {
-      QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, player);
+      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(true, player);
     }
 
     return true;
@@ -241,9 +243,9 @@ public class QuickShopManager implements ShopManager {
           Shop.getLoader()
             .getShopsMap()
             .computeIfAbsent(location.worldName(),
-                s -> new HashMap<>(3))
+                s -> LongHashMap.withExpectedSize(8))
             .computeIfAbsent(Utils.chunkKey(location.x() >> 4, location.z() >> 4),
-                s -> Maps.newHashMap());
+                s -> LongHashMap.withExpectedSize(16));
       
       Util.debug("Putting into memory shop database: " + location.toString());
       

@@ -6,18 +6,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCanBuildEvent;
-import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.utils.Util;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class DisplayBugFixListener implements Listener {
-
-  @NotNull
-  private final QuickShop plugin;
-
   @EventHandler(ignoreCancelled = true)
   public void canBuild(BlockCanBuildEvent e) {
     if (!DisplayConfig.displayItems

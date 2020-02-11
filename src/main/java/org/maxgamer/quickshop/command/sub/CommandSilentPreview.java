@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
@@ -39,7 +38,7 @@ public class CommandSilentPreview extends QuickShopCommand {
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!(shop.get() instanceof ContainerQuickShop)) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 

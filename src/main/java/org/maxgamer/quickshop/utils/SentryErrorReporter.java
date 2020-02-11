@@ -62,7 +62,7 @@ public class SentryErrorReporter {
     // sentryClient = Sentry.init(dsn);
     sentryClient = SentryClientFactory.sentryClient(dsn);;
     context = sentryClient.getContext();
-    // context.addTag("plugin_version", QuickShop.getVersion());
+    // context.addTag("plugin_version", Shop.getVersion());
     context.addTag("system_os", System.getProperty("os.name"));
     context.addTag("system_arch", System.getProperty("os.arch"));
     context.addTag("system_version", System.getProperty("os.version"));

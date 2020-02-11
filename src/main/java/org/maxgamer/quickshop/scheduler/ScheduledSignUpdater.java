@@ -6,9 +6,9 @@ import com.google.common.collect.Sets;
 import cc.bukkit.shop.ContainerShop;
 
 public class ScheduledSignUpdater implements Runnable {
-  private Set<ContainerShop> signs = Sets.newHashSet();
+  private static final Set<ContainerShop> signs = Sets.newHashSet();
 
-  public void schedule(@NotNull ContainerShop shop) {
+  public static void schedule(@NotNull ContainerShop shop) {
     signs.add(shop);
   }
 

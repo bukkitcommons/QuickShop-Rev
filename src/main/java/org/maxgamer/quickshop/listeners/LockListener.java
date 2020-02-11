@@ -19,21 +19,14 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import lombok.AllArgsConstructor;
+import cc.bukkit.shop.util.ShopLogger;
 
-@AllArgsConstructor
 public class LockListener implements Listener {
-
-  @NotNull
-  private final QuickShop plugin;
-
   @EventHandler(ignoreCancelled = true)
   public void invEvent(InventoryMoveItemEvent e) {
     if (!ItemPreviewer.isPreviewItem(e.getItem())) {
@@ -101,8 +94,7 @@ public class LockListener implements Listener {
       if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
           || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
         // Ignore break lockette sign
-        plugin.getLogger()
-            .info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
+        ShopLogger.instance().info("Skipped a dead-lock shop sign.(Lockette or other sign-lock plugin)");
         return;
       }
     }
@@ -115,7 +107,7 @@ public class LockListener implements Listener {
         if (!shop.getOwner().equals(p.getUniqueId())
             && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
           e.setCancelled(true);
-          p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-permission", p));
+          p.sendMessage(Shop.getLocaleManager().getMessage("no-permission", p));
         }
       });
     } else if (Util.isWallSign(b.getType())) {
@@ -139,7 +131,7 @@ public class LockListener implements Listener {
         if (!shop.getOwner().equals(p.getUniqueId())
             && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
           e.setCancelled(true);
-          p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-permission", p));
+          p.sendMessage(Shop.getLocaleManager().getMessage("no-permission", p));
         }
       });
     }
@@ -168,10 +160,10 @@ public class LockListener implements Listener {
     Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
       if (!shop.getModerator().isModerator(p.getUniqueId())) {
         if (PermissionManager.instance().has(p, "quickshop.other.open")) {
-          p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("bypassing-lock", p));
+          p.sendMessage(Shop.getLocaleManager().getMessage("bypassing-lock", p));
           return;
         }
-        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("that-is-locked", p));
+        p.sendMessage(Shop.getLocaleManager().getMessage("that-is-locked", p));
         e.setCancelled(true);
       }
     });
@@ -196,11 +188,11 @@ public class LockListener implements Listener {
     }
 
     if (PermissionManager.instance().has(p, "quickshop.other.open")) {
-      p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("bypassing-lock", p));
+      p.sendMessage(Shop.getLocaleManager().getMessage("bypassing-lock", p));
       return;
     }
 
-    p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("that-is-locked", p));
+    p.sendMessage(Shop.getLocaleManager().getMessage("that-is-locked", p));
     e.setCancelled(true);
   }
 }

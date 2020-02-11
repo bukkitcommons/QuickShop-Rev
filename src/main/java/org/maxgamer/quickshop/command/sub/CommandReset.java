@@ -1,6 +1,5 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
+import cc.bukkit.shop.Shop;
 import lombok.SneakyThrows;
 
 public class CommandReset extends QuickShopCommand {
@@ -34,25 +34,25 @@ public class CommandReset extends QuickShopCommand {
       @NotNull String[] cmdArg) {
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.no-type-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("command.no-type-given", sender));
       return;
     }
 
     switch (cmdArg[0]) {
       case "lang":
-        QuickShop.instance().getLocaleManager().load();
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
+        Shop.getLocaleManager().load();
+        sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
         break;
       case "config":
         QuickShop.instance().saveDefaultConfig();
         QuickShop.instance().reloadConfig();
         Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
         Bukkit.getPluginManager().enablePlugin(QuickShop.instance());
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
+        sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
         break;
       case "messages":
-        QuickShop.instance().getLocaleManager().load();
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
+        Shop.getLocaleManager().load();
+        sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
         break;
     }
   }

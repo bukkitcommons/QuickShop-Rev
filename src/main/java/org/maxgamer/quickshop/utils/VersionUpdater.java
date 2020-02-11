@@ -21,6 +21,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.github.GithubAPI;
 import org.maxgamer.quickshop.utils.github.ReleaseJsonContainer;
 import com.google.common.collect.Lists;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.util.VersionData;
 
 public class VersionUpdater {
@@ -59,7 +60,7 @@ public class VersionUpdater {
 
     try {
       List<String> versions = getHistoryVersions();
-      int curIndex = versions.indexOf(QuickShop.instance().getVersion());
+      int curIndex = versions.indexOf(Shop.getVersion());
       
       // Custom build or already latest
       if (curIndex == -1 || curIndex == 0)
@@ -89,7 +90,7 @@ public class VersionUpdater {
     }
     Util.debug("Downloading from " + uurl);
     InputStream is = HttpRequest.get(new URL(uurl))
-        .header("User-Agent", "QuickShop-Reremake " + QuickShop.instance().getVersion()).execute()
+        .header("User-Agent", "QuickShop-Reremake " + Shop.getVersion()).execute()
         .getInputStream();
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     byte[] buff = new byte[1024];

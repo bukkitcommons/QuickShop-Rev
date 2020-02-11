@@ -8,7 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
@@ -25,14 +24,14 @@ public class CommandSell extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("Can't run command by Console", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("Can't run command by Console", sender));
       return;
     }
 
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 
@@ -48,9 +47,9 @@ public class CommandSell extends QuickShopCommand {
       shop.get().setSignText();
       shop.get().save();
       sender.sendMessage(
-          QuickShop.instance().getLocaleManager().getMessage("command.now-selling", sender, Util.getItemStackName(shop.get().getItem())));
+          Shop.getLocaleManager().getMessage("command.now-selling", sender, Util.getItemStackName(shop.get().getItem())));
       return;
     }
-    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
   }
 }

@@ -8,7 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.Util;
@@ -34,7 +33,7 @@ public class CommandSilentEmpty extends QuickShopCommand {
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!(shop.get() instanceof ContainerQuickShop)) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 
@@ -47,7 +46,7 @@ public class CommandSilentEmpty extends QuickShopCommand {
     }
 
     inventory.clear();
-    QuickShop.instance().getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
-    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("empty-success", sender));
+    Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
+    sender.sendMessage(Shop.getLocaleManager().getMessage("empty-success", sender));
   }
 }

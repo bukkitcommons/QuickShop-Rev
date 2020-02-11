@@ -1,20 +1,20 @@
 package org.maxgamer.quickshop.utils.messages;
 
 import java.sql.ResultSet;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
-import com.google.common.collect.Maps;
+import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
 import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.util.ShopLogger;
 
 public class QuickShopMessager implements ShopMessager {
   @NotNull
-  private final HashMap<UUID, String> playerMessages = Maps.newHashMap();
+  private final Map<UUID, String> playerMessages = ObjectsHashMap.withExpectedSize(32);
 
   /** Deletes any messages that are older than a week in the database, to save on space. */
   public void clean() {

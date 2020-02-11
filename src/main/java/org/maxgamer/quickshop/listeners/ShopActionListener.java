@@ -82,7 +82,7 @@ public class ShopActionListener implements Listener {
         .accept(shop -> {
           Util.debug(ChatColor.GREEN + "Handling control");
           
-          QuickShop.instance().getLocaleManager().sendControlPanelInfo(e.getPlayer(), shop);
+          Shop.getLocaleManager().sendControlPanelInfo(e.getPlayer(), shop);
           shop.setSignText();
         });
       
@@ -106,7 +106,7 @@ public class ShopActionListener implements Listener {
         Util.debug(ChatColor.GREEN + "Handling trade");
         
         shop.onClick();
-        QuickShop.instance().getLocaleManager().sendShopInfo(player, shop);
+        Shop.getLocaleManager().sendShopInfo(player, shop);
         shop.setSignText();
         
         double price = shop.getPrice();
@@ -125,7 +125,7 @@ public class ShopActionListener implements Listener {
           if (afforable < 0)
             afforable = 0;
 
-          player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("how-many-buy", player, "" + afforable));
+          player.sendMessage(Shop.getLocaleManager().getMessage("how-many-buy", player, "" + afforable));
         } else {
           double ownerBalance = QuickShop.instance().getEconomy().getBalance(shop.getOwner());
           int totalItems = Util.countStacks(player.getInventory(), shop.getItem()) * shop.getItem().getAmount();
@@ -141,7 +141,7 @@ public class ShopActionListener implements Listener {
           if (totalItems < 0)
             totalItems = 0;
 
-          player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("how-many-sell", player, "" + totalItems));
+          player.sendMessage(Shop.getLocaleManager().getMessage("how-many-sell", player, "" + totalItems));
         }
         
         QuickShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));
@@ -173,20 +173,20 @@ public class ShopActionListener implements Listener {
           return;
           /*
           if (!QuickShop.getPermissionManager().hasPermission(player, "quickshop.bypass." + item.getType().name())) {
-            player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("blacklisted-item", player));
+            player.sendMessage(Shop.getLocaleManager().getMessage("blacklisted-item", player));
             return;
           }
           */
         }
         
         if (item == null || item.getType() == Material.AIR) {
-          player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-anythings-in-your-hand", player));
+          player.sendMessage(Shop.getLocaleManager().getMessage("no-anythings-in-your-hand", player));
           return;
         }
         
         if (Util.getSecondHalf(block).isPresent() &&
             !PermissionManager.instance().has(player, "quickshop.create.double")) {
-          player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-double-chests", player));
+          player.sendMessage(Shop.getLocaleManager().getMessage("no-double-chests", player));
           return;
         }
 
@@ -221,7 +221,7 @@ public class ShopActionListener implements Listener {
         ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), expectedSign, item);
 
         QuickShopActionManager.instance().getActions().put(player.getUniqueId(), info);
-        player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("how-much-to-trade-for", player,
+        player.sendMessage(Shop.getLocaleManager().getMessage("how-much-to-trade-for", player,
             Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
       });
     
@@ -250,7 +250,7 @@ public class ShopActionListener implements Listener {
   @EventHandler(priority = EventPriority.MONITOR)
   public void onJoin(PlayerJoinEvent event) {
     if (BaseConfig.autoFetchShopMessages)
-      QuickShop.instance().getMessager().flushMessagesFor(event.getPlayer());
+      Shop.getMessager().flushMessagesFor(event.getPlayer());
   }
   
   @EventHandler
@@ -299,9 +299,9 @@ public class ShopActionListener implements Listener {
 
     if (shopLoc.getWorld() != to.getWorld() || shopLoc.distanceSquared(to) > 25) {
       if (info.action() == ShopAction.CREATE)
-        player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("shop-creation-cancelled", player));
+        player.sendMessage(Shop.getLocaleManager().getMessage("shop-creation-cancelled", player));
       else
-        player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("shop-purchase-cancelled", player));
+        player.sendMessage(Shop.getLocaleManager().getMessage("shop-purchase-cancelled", player));
       
       Util.debug(player.getName() + " too far with the shop location.");
       QuickShopActionManager.instance().getActions().remove(player.getUniqueId());

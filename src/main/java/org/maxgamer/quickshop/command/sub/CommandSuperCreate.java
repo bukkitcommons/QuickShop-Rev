@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
@@ -33,7 +32,7 @@ public class CommandSuperCreate extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.amount", sender));
+    list.add(Shop.getLocaleManager().getMessage("tabcomplete.amount", sender));
 
     return list;
   }
@@ -50,7 +49,7 @@ public class CommandSuperCreate extends QuickShopCommand {
     final ItemStack item = p.getInventory().getItemInMainHand();
 
     if (item.getType() == Material.AIR) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-anythings-in-your-hand", sender));
+      sender.sendMessage(Shop.getLocaleManager().getMessage("no-anythings-in-your-hand", sender));
       return;
     }
 
@@ -74,13 +73,13 @@ public class CommandSuperCreate extends QuickShopCommand {
 
       if (Util.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(sender, "quickshop.create.double")) {
-        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-double-chests", sender));
+        p.sendMessage(Shop.getLocaleManager().getMessage("no-double-chests", sender));
         return;
       }
 
       if (Util.isBlacklisted(item) && !PermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
-        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("blacklisted-item", sender));
+        p.sendMessage(Shop.getLocaleManager().getMessage("blacklisted-item", sender));
         return;
       }
 
@@ -93,9 +92,9 @@ public class CommandSuperCreate extends QuickShopCommand {
 
       QuickShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(
-          QuickShop.instance().getLocaleManager().getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
+          Shop.getLocaleManager().getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
       return;
     }
-    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
   }
 }
