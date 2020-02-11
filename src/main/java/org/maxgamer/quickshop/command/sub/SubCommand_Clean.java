@@ -13,6 +13,7 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
@@ -33,7 +34,7 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
     List<ContainerShop> pendingRemoval = Lists.newArrayList();
     int[] count = {0, 0};
     
-    QuickShopLoader.instance().getAllShops().forEach(data -> {
+    Shop.getLoader().getAllShops().forEach(data -> {
       ContainerShop shop = new ContainerQuickShop(
           ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
           data.price(), data.item(),

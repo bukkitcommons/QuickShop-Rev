@@ -27,7 +27,7 @@ public class SubCommand_Info extends SneakyTabs implements CommandProcesser {
     int nostock = 0;
     ContainerShop shop;
 
-    for (Map<Long, Map<Long, ShopData>> inWorld : QuickShopLoader.instance().getShopsMap().values()) {
+    for (Map<Long, Map<Long, ShopData>> inWorld : Shop.getLoader().getShopsMap().values()) {
       worlds++;
 
       for (Map<Long, ShopData> inChunk : inWorld.values()) {

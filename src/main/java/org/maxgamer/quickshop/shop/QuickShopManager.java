@@ -30,6 +30,7 @@ import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopManager;
 import cc.bukkit.shop.data.ShopCreator;
 import cc.bukkit.shop.data.ShopData;
@@ -113,7 +114,7 @@ public class QuickShopManager implements ShopManager {
     try {
       if (QuickShop.instance().isLimit()) {
         UUID uuid = player.getUniqueId();
-        long owned = QuickShopLoader.instance().getAllShops()
+        long owned = Shop.getLoader().getAllShops()
             .stream() // ASYNC
             .filter(shop ->
               shop.moderators().getOwner().equals(uuid))
@@ -238,8 +239,7 @@ public class QuickShopManager implements ShopManager {
                     location.x(), location.y(), location.z());
       
       Map<Long, ShopData> inChunk =
-          QuickShopLoader
-            .instance()
+          Shop.getLoader()
             .getShopsMap()
             .computeIfAbsent(location.worldName(),
                 s -> new HashMap<>(3))

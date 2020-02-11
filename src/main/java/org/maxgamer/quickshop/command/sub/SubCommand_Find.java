@@ -14,6 +14,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
 import cc.bukkit.shop.data.ShopData;
@@ -61,7 +62,7 @@ public class SubCommand_Find extends SneakyTabs implements CommandProcesser {
     for (int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++) {
       for (int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++) {
         Chunk d = c.getWorld().getChunkAt(x, z);
-        @NotNull Optional<Map<Long, ShopData>> inChunk = QuickShopLoader.instance().getShopsInChunk(d);
+        @NotNull Optional<Map<Long, ShopData>> inChunk = Shop.getLoader().getShopsInChunk(d);
 
         if (!inChunk.isPresent()) {
           continue;

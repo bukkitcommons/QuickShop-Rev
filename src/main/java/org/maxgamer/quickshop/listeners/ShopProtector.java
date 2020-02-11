@@ -55,7 +55,7 @@ public class ShopProtector implements Listener {
     for (Block block : event.blockList())
       handleProtection(block.getLocation(), BaseConfig.explosionProtection,
           () -> event.setCancelled(true),
-          shop -> QuickShopLoader.instance().delete(shop));
+          shop -> Shop.getLoader().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -63,7 +63,7 @@ public class ShopProtector implements Listener {
     for (Block block : event.blockList())
       handleProtection(block.getLocation(), BaseConfig.explosionProtection,
           () -> event.setCancelled(true),
-          shop -> QuickShopLoader.instance().delete(shop));
+          shop -> Shop.getLoader().delete(shop));
   }
 
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

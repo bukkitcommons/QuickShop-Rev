@@ -546,7 +546,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     signUpdateWatcher = new ScheduledSignUpdater();
 
     /* Load all shops. */
-    QuickShopLoader.instance().loadShops();
+    Shop.getLoader().loadShops();
 
     Bukkit.getPluginManager().registerEvents(blockListener, this);
     Bukkit.getPluginManager().registerEvents(playerListener, this);

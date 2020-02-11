@@ -1,5 +1,6 @@
 package cc.bukkit.shop;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,4 +25,10 @@ public interface ShopLoader {
 
   @NotNull
   Optional<Map<Long, Map<Long, ShopData>>> getShopsInWorld(@NotNull String world);
+
+  void delete(@NotNull ShopData shop) throws SQLException;
+
+  void delete(ContainerShop shop);
+
+  Map<String, Map<Long, Map<Long, ShopData>>> getShopsMap();
 }

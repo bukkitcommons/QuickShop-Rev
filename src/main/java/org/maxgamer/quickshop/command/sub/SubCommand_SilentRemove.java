@@ -50,6 +50,6 @@ public class SubCommand_SilentRemove extends SneakyTabs implements CommandProces
       return;
     }
 
-    QuickShopLoader.instance().delete(shop.get());
+    Shop.getLoader().delete(shop.get());
   }
 }

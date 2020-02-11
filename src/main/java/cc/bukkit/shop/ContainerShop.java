@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.hologram.DisplayItem;
@@ -19,7 +18,7 @@ public interface ContainerShop extends Managed {
    */
   @Deprecated
   default public void delete() {
-    QuickShopLoader.instance().delete(this);
+    Shop.getLoader().delete(this);
   }
   
   /**

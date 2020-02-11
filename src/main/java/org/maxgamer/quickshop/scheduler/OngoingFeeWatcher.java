@@ -10,6 +10,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.data.ShopData;
 
 /**
@@ -34,7 +35,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
     boolean allowLoan = BaseConfig.allowLoan;
     boolean ignoreUnlimited = BaseConfig.ongoingFeeIgnoreUnlimited;
     
-    QuickShopLoader.instance().forEachShops(shop -> {
+    Shop.getLoader().forEachShops(shop -> {
       if (!shop.unlimited() || !ignoreUnlimited) {
         UUID shopOwner = shop.moderators().getOwner();
         
@@ -71,7 +72,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
   public void removeShop(@NotNull ShopData shop) {
     Bukkit.getScheduler().runTask(plugin, () -> {
       try {
-        QuickShopLoader.instance().delete(shop);
+        Shop.getLoader().delete(shop);
         
         if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
           MsgUtil.send(shop.moderators().getOwner(),

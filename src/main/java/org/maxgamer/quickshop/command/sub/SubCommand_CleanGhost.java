@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
 
@@ -36,7 +37,7 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
       sender.sendMessage(ChatColor.GREEN + "Async thread is started, please wait...");
       //Util.backupDatabase(); // Already warn the user, don't care about backup result.
       
-      QuickShopLoader.instance().forEachShops(shop -> {
+      Shop.getLoader().forEachShops(shop -> {
         try {
           if (shop.item().getType() == Material.AIR) {
             sender.sendMessage(

@@ -36,7 +36,7 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
         if (shop.isPresent()) {
           if (shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
               || PermissionManager.instance().has(sender, "quickshop.other.destroy")) {
-            QuickShopLoader.instance().delete(shop.get());
+            Shop.getLoader().delete(shop.get());
           } else {
             sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
           }
