@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import cc.bukkit.shop.util.ShopLogger;
 
 public abstract class ItemNMS {
   private static Method craftItemStack_asNMSCopyMethod;

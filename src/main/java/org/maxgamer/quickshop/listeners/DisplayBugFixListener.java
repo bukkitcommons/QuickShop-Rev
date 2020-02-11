@@ -32,7 +32,7 @@ public class DisplayBugFixListener implements Listener {
 
     for (Entity entity : entities) {
       if (!(entity instanceof ArmorStand)
-          || !DisplayItem.isDisplayItem(((ArmorStand) entity).getItemInHand(), null)) {
+          || !Util.isDisplayItem(((ArmorStand) entity).getItemInHand(), null)) {
         continue;
       }
 

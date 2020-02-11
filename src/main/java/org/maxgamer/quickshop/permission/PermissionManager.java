@@ -4,8 +4,8 @@ import java.util.Locale;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import cc.bukkit.shop.permission.PermissionProvider;
+import cc.bukkit.shop.util.ShopLogger;
 
 public class PermissionManager {
   /*

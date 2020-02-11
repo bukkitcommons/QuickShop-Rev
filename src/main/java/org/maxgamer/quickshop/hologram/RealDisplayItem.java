@@ -31,7 +31,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
   @Override
   public boolean isDisplayItem(@NotNull Entity entity) {
     if (entity instanceof Item)
-      return DisplayItem.isDisplayItem(((Item) entity).getItemStack(), null);
+      return Util.isDisplayItem(((Item) entity).getItemStack(), null);
     else
       return false;
   }

@@ -14,7 +14,7 @@ import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.VersionData;
 import org.maxgamer.quickshop.utils.VersionUpdater;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import cc.bukkit.shop.util.ShopLogger;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 

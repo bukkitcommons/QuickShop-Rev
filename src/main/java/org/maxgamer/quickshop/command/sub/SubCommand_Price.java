@@ -30,11 +30,11 @@ import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class SubCommand_Price implements CommandProcesser {

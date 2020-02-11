@@ -11,12 +11,13 @@ import org.bukkit.inventory.meta.MapMeta;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.MatcherConfig;
 import com.google.common.collect.Multimap;
+import cc.bukkit.shop.ShopItemMatcher;
 
 /** A util allow quickshop check item matches easy and quick. */
-public class ItemMatcher {
+public class QuickShopItemMatcher implements ShopItemMatcher {
   private boolean bukkit;
 
-  public ItemMatcher() {
+  public QuickShopItemMatcher() {
     this.bukkit =
         MatcherConfig.damage && MatcherConfig.repairCost && MatcherConfig.displayName &&
         MatcherConfig.lore && MatcherConfig.enchant && MatcherConfig.matchesPotion &&

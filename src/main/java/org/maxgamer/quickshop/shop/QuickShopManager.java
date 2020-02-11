@@ -26,7 +26,6 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
@@ -37,6 +36,7 @@ import cc.bukkit.shop.data.ShopData;
 import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.event.ShopCreateEvent;
 import cc.bukkit.shop.event.ShopPreCreateEvent;
+import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.Utils;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -78,7 +78,7 @@ public class QuickShopManager implements ShopManager {
     
     ContainerShop shop = new ContainerQuickShop(
         ShopLocation.from(world, data.x(), data.y(), data.z()),
-        data.price(), data.item(),
+        data.price(), Util.deserialize(data.item()),
         data.moderators(), data.unlimited(), data.type());
     
     inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), shop);

@@ -21,13 +21,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.github.intellectualsites.plotsquared.plot.flag.BooleanFlag;
 import com.github.intellectualsites.plotsquared.plot.flag.Flags;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 import cc.bukkit.shop.integration.IntegrationStage;
+import cc.bukkit.shop.util.ShopLogger;
 
 @IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class PlotSquaredIntegration implements IntegratedPlugin {

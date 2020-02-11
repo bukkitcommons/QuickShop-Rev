@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.data.ShopSnapshot;
+import cc.bukkit.shop.util.ShopLogger;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

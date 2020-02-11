@@ -46,7 +46,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
     
     this.displayItemStack = new ItemStack(shop.getItem());
     this.displayItemStack.setAmount(1);
-    this.displayItemStack = DisplayItem.createGuardItemStack(this.displayItemStack, this.shop);
+    this.displayItemStack = Util.createGuardItemStack(this.displayItemStack, this.shop);
   }
   
   @Override
@@ -98,7 +98,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
         case ARMOR_STAND:
           ArmorStand stand = (ArmorStand) entity;
           
-          if (DisplayItem.isDisplayItem(
+          if (Util.isDisplayItem(
               stand.getItem(EquipmentSlot.valueOf(data.get(DisplayAttribute.SLOT, "HEAD"))))) {
             
             Util.debug("Removed a duped ArmorStand display entity.");
@@ -107,7 +107,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
           break;
         case DROPPED_ITEM:
           Item item = (Item) entity;
-          DisplayItem.fixesDisplayItem(item);
+          Util.fixesDisplayItem(item);
         default:
           continue;
       }
@@ -128,7 +128,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
     this.entity = null;
     
     ShopDisplayItemDespawnEvent shopDisplayItemDespawnEvent =
-        new ShopDisplayItemDespawnEvent(this.shop, displayItemStack, data.type());
+        new ShopDisplayItemDespawnEvent(this.shop, displayItemStack, data);
     Bukkit.getPluginManager().callEvent(shopDisplayItemDespawnEvent);
   }
 }

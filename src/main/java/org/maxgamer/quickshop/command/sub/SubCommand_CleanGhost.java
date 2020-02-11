@@ -39,14 +39,6 @@ public class SubCommand_CleanGhost extends SneakyTabs implements CommandProcesse
       
       Shop.getLoader().forEachShops(shop -> {
         try {
-          if (shop.item().getType() == Material.AIR) {
-            sender.sendMessage(
-                ChatColor.YELLOW + "Shop " + shop + " removing cause item data is damaged.");
-            QuickShop.instance().getDatabaseHelper().deleteShop(
-                shop.x(), shop.y(), shop.z(), shop.world());
-            return;
-          }
-          
           if (shop.location().world() == null) {
             sender.sendMessage(
                 ChatColor.YELLOW + "Shop " + shop + " removing cause target world not loaded.");

@@ -53,18 +53,18 @@ import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
-import org.maxgamer.quickshop.utils.ItemMatcher;
+import org.maxgamer.quickshop.utils.QuickShopItemMatcher;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopActionManager;
+import cc.bukkit.shop.ShopItemMatcher;
 import cc.bukkit.shop.ShopLoader;
 import cc.bukkit.shop.ShopManager;
 import cc.bukkit.shop.ShopPlugin;
@@ -79,6 +79,7 @@ import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationHelper;
+import cc.bukkit.shop.util.ShopLogger;
 import lombok.Getter;
 import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
@@ -133,7 +134,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   @NotNull
   private final DisplayProtectionListener inventoryListener = new DisplayProtectionListener();
   @NotNull
-  private final ItemMatcher itemMatcher = new ItemMatcher();
+  private final ShopItemMatcher itemMatcher = new QuickShopItemMatcher();
   /** Language manager, to select which language will loaded. */
   @NotNull
   private final ResourceAccessor language = new ResourceAccessor();
@@ -341,13 +342,13 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   public QuickShop() {
     super();
     singleton = instance = this;
-    ShopLogger.initalize(this);
+    ShopLogger.initalize(this, BaseConfig.useLog4j);
   }
 
   protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
     super(loader, description, dataFolder, file);
     singleton = instance = this;
-    ShopLogger.initalize(this);
+    ShopLogger.initalize(this, BaseConfig.useLog4j);
 }
   
   private void onLoad0() throws IllegalArgumentException, IllegalAccessException {

@@ -3,7 +3,7 @@ package org.maxgamer.quickshop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
+import cc.bukkit.shop.util.ShopLogger;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

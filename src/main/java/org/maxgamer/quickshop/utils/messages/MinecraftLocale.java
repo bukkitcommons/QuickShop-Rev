@@ -20,6 +20,7 @@ import org.maxgamer.quickshop.utils.nms.ReflectFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import cc.bukkit.shop.util.ShopLogger;
 
 public class MinecraftLocale {
   @NotNull

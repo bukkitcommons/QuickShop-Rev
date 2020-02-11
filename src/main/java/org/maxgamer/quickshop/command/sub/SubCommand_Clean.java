@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -35,12 +36,12 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
     int[] count = {0, 0};
     
     Shop.getLoader().getAllShops().forEach(data -> {
-      ContainerShop shop = new ContainerQuickShop(
-          ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
-          data.price(), data.item(),
-          data.moderators(), data.unlimited(), data.type());
-      
       try {
+        ContainerShop shop = new ContainerQuickShop(
+            ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
+            data.price(), Util.deserialize(data.item()),
+            data.moderators(), data.unlimited(), data.type());
+        
         if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0) {
           if (!Util.canBeShopIgnoreBlocklist(shop.getLocation().block().getState())) {
             pendingRemoval.add(shop);
@@ -67,8 +68,9 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
           // Can be deleted safely.
           count[0]++;
         }
-      } catch (IllegalStateException e) {
-        pendingRemoval.add(shop); // The shop is not there anymore, remove it
+      } catch (IllegalStateException | InvalidConfigurationException e) {
+        e.printStackTrace();
+        //pendingRemoval.add(shop); // The shop is not there anymore, remove it
       }
     });
 

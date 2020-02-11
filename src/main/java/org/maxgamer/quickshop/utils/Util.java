@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -35,6 +37,7 @@ import org.bukkit.block.Container;
 import org.bukkit.block.EnderChest;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -43,22 +46,29 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.hologram.EntityDisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.DisplayInfo;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.database.connector.MySQLConnector;
 import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 /** @author MACHENIKE */
 /**
@@ -564,7 +574,7 @@ public class Util {
         if (itemStack == null) {
           continue;
         }
-        if (DisplayItem.isDisplayItem(itemStack, null)) {
+        if (isDisplayItem(itemStack, null)) {
           // Found Item and remove it.
           Location location = inv.getLocation();
           if (location == null) {
@@ -579,6 +589,151 @@ public class Util {
     } catch (Throwable t) {
       // Ignore
     }
+  }
+  
+public final static Gson GSON = new Gson();
+  
+  public static boolean isDisplayItem(@Nullable ItemStack itemStack) {
+    return isDisplayItem(itemStack, null);
+  }
+  
+  @SneakyThrows
+  public static void fixesDisplayItem(@Nullable Item item) {
+    ItemStack itemStack = item.getItemStack();
+    if (itemStack == null || !itemStack.hasItemMeta())
+      return;
+    
+    ItemMeta iMeta = itemStack.getItemMeta();
+    if (!iMeta.hasLore())
+      return;
+    
+    for (String lore : iMeta.getLore()) {
+      try {
+        if (!lore.startsWith("{")) {
+          continue;
+        }
+        DisplayInfo shopProtectionFlag = GSON.fromJson(lore, DisplayInfo.class);
+        if (shopProtectionFlag == null)
+          continue;
+        
+        if (shopProtectionFlag.getShopLocationData() != null) {
+          ShopViewer viewer =
+              Shop.getManager().getLoadedShopAt(deserializeLocation(shopProtectionFlag.getShopLocationData()));
+          
+          viewer.ifPresent(shop -> {
+            if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {
+              item.remove();
+              Util.debug("Removed a duped item display entity by distance > 0.6");
+              return;
+            }
+            
+            if (shop.getDisplay().getDisplay() == null)
+              return;
+            
+            if (!shop.getDisplay().getDisplay().getUniqueId().equals(item.getUniqueId())) {
+              item.remove();
+              Util.debug("Removed a duped item display entity by uuid not equals");
+              return;
+            }
+            
+            if (((EntityDisplayItem) shop.getDisplay()).data().type().entityType() != item.getType()) {
+              item.remove();
+              Util.debug("Removed a duped item display entity by type not equals");
+              return;
+            }
+          });
+        } else if (shopProtectionFlag.getShopItemStackData() != null) {
+          ItemStack displayItem = Util.deserialize(shopProtectionFlag.getShopItemStackData());
+          
+          if (!QuickShop.instance().getItemMatcher().matches(itemStack, displayItem)) {
+            item.remove();
+            Util.debug("Removed a duped item display entity by not matches");
+          }
+        }
+      } catch (JsonSyntaxException e) {
+        return;
+      }
+    }
+  }
+  
+  static Location deserializeLocation(@NotNull String location) {
+    Util.debug("will deserilize: " + location);
+    String[] sections = location.split(",");
+    String worldName = StringUtils.substringBetween(sections[0], "{name=", "}");
+    String x = sections[1].substring(2);
+    String y = sections[2].substring(2);
+    String z = sections[3].substring(2);
+    
+    return new Location(Bukkit.getWorld(worldName), Double.valueOf(x), Double.valueOf(y), Double.valueOf(z));
+  }
+
+  /**
+   * Check the itemStack is contains protect flag.
+   *
+   * @param itemStack Target ItemStack
+   * @return Contains protect flag.
+   */
+  public static boolean isDisplayItem(@Nullable ItemStack itemStack, @Nullable ContainerShop shop) {
+    if (itemStack == null || !itemStack.hasItemMeta())
+      return false;
+    
+    ItemMeta iMeta = itemStack.getItemMeta();
+    if (!iMeta.hasLore())
+      return false;
+    
+    String defaultMark = DisplayInfo.defaultMark();
+    for (String lore : iMeta.getLore()) {
+      try {
+        if (!lore.startsWith("{")) {
+          continue;
+        }
+        DisplayInfo shopProtectionFlag = GSON.fromJson(lore, DisplayInfo.class);
+        if (shopProtectionFlag == null) {
+          continue;
+        }
+        if (shop == null && defaultMark.equals(shopProtectionFlag.getMark())) {
+          return true;
+        }
+        if (shopProtectionFlag.getShopLocationData() != null) {
+          return shop == null ? true : shopProtectionFlag.getShopLocationData().equals(shop.getLocation().toString());
+        }
+        if (shop == null && shopProtectionFlag.getShopItemStackData() != null) {
+          return true;
+        }
+      } catch (JsonSyntaxException e) {
+        // Ignore
+      }
+    }
+    
+    return false;
+  }
+
+  /**
+   * Create a new itemStack with protect flag.
+   *
+   * @param itemStack Old itemStack
+   * @param shop The shop
+   * @return New itemStack with protect flag.
+   */
+  public static ItemStack createGuardItemStack(@NotNull ItemStack itemStack, @NotNull ContainerShop shop) {
+    itemStack = new ItemStack(itemStack);
+    itemStack.setAmount(1);
+    
+    ItemMeta meta = itemStack.getItemMeta();
+    if (BaseConfig.displayNameVisible) {
+      if (meta.hasDisplayName())
+        meta.setDisplayName(meta.getDisplayName());
+      else
+        meta.setDisplayName(Util.getItemStackName(itemStack));
+    } else {
+      meta.setDisplayName("");
+    }
+    
+    DisplayInfo shopProtectionFlag = DisplayInfo.from(itemStack, shop);
+    meta.setLore(Collections.singletonList(GSON.toJson(shopProtectionFlag)));
+    
+    itemStack.setItemMeta(meta);
+    return itemStack;
   }
 
   public static boolean isAir(@NotNull Material mat) {

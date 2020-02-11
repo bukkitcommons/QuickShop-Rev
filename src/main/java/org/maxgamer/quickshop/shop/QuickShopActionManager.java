@@ -23,7 +23,6 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -37,6 +36,7 @@ import cc.bukkit.shop.data.ShopSnapshot;
 import cc.bukkit.shop.event.ShopCreateEvent;
 import cc.bukkit.shop.event.ShopPurchaseEvent;
 import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
+import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class QuickShopActionManager implements ShopActionManager {

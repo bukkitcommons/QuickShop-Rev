@@ -77,7 +77,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     if (!(entity instanceof ArmorStand))
       return false;
     
-    return DisplayItem.isDisplayItem(
+    return Util.isDisplayItem(
         ((ArmorStand) entity).getItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD)), null);
   }
 

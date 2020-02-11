@@ -120,6 +120,10 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
+            <id>akarin-repo</id>
+            <url>https://raw.githubusercontent.com/Akarin-project/akarin-repo/master/repository</url>
+        </repository>
+        <repository>
             <id>central-repo</id>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
@@ -242,6 +246,12 @@
             <artifactId>lombok</artifactId>
             <version>1.18.8</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>cc.bukkit.shop</groupId>
+            <artifactId>Shop</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>

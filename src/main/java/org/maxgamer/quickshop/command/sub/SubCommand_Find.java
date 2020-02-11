@@ -68,17 +68,21 @@ public class SubCommand_Find extends SneakyTabs implements CommandProcesser {
           continue;
         }
 
-        for (ShopData shop : inChunk.get().values()) {
-          if (!Util.getItemStackName(shop.item()).toLowerCase().contains(lookFor)) {
-            continue;
-          }
+        try {
+          for (ShopData shop : inChunk.get().values()) {
+            if (!Util.getItemStackName(Util.deserialize(shop.item())).toLowerCase().contains(lookFor)) {
+              continue;
+            }
 
-          if (shop.location().bukkit().distanceSquared(loc) >= minDistanceSquared) {
-            continue;
-          }
+            if (shop.location().bukkit().distanceSquared(loc) >= minDistanceSquared) {
+              continue;
+            }
 
-          closest = shop;
-          minDistanceSquared = shop.location().bukkit().distanceSquared(loc);
+            closest = shop;
+            minDistanceSquared = shop.location().bukkit().distanceSquared(loc);
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
         }
       }
     }
