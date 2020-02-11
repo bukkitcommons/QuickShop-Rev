@@ -47,7 +47,8 @@ import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopActionManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.ItemMatcher;
@@ -61,6 +62,10 @@ import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopActionManager;
+import cc.bukkit.shop.ShopLoader;
+import cc.bukkit.shop.ShopManager;
+import cc.bukkit.shop.ShopPlugin;
 import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.configuration.ConfigurationManager;
 import cc.bukkit.shop.database.Database;
@@ -79,7 +84,7 @@ import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
 
 @Getter
-public final class QuickShop extends JavaPlugin {
+public final class QuickShop extends JavaPlugin implements ShopPlugin {
   /**
    * This is only a reference of the internal instance.
    * @see QuickShop#instance()
@@ -420,7 +425,7 @@ public final class QuickShop extends JavaPlugin {
     UpdateWatcher.uninit();
     Util.debug("Cleaning up resources and unloading all shops...");
     /* Remove all display items, and any dupes we can find */
-    ShopActionManager.instance().getActions().clear();
+    Shop.getActions().clear();
     Shop.getManager().clear();
     /* Close Database */
     if (database != null) {
@@ -744,5 +749,20 @@ public final class QuickShop extends JavaPlugin {
    */
   public static String getFork() {
     return "Rev";
+  }
+
+  @Override
+  public ShopManager getManager() {
+    return QuickShopManager.instance();
+  }
+
+  @Override
+  public ShopLoader getLoader() {
+    return QuickShopLoader.instance();
+  }
+
+  @Override
+  public ShopActionManager getActions() {
+    return QuickShopActionManager.instance();
   }
 }

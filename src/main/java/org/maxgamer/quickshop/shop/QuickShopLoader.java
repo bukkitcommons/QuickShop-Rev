@@ -152,7 +152,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     // such as shop cleaner.
     
     event.getWorld().getPlayers().forEach(player -> {
-      ShopActionManager.instance().getActions().remove(player.getUniqueId());
+      Shop.getActions().removeAction(player.getUniqueId());
     });
   }
   

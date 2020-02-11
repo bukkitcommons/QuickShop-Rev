@@ -29,9 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
-import org.maxgamer.quickshop.shop.ShopActionManager;
+import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.data.ShopCreator;
 import cc.bukkit.shop.data.ShopLocation;
@@ -98,13 +99,13 @@ public class SubCommand_SuperCreate implements CommandProcesser {
       }
 
       if (cmdArg.length >= 1) {
-        ShopActionManager.instance().handleChat(p, cmdArg[0], true);
+        Shop.getActions().handleChat(p, cmdArg[0], true);
         return;
       }
       // Send creation menu.
       final ShopCreator info = ShopCreator.create(ShopLocation.of(b.getLocation()), b.getRelative(p.getFacing().getOppositeFace()), item);
 
-      ShopActionManager.instance().getActions().put(p.getUniqueId(), info);
+      QuickShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(
           MsgUtil.getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
       return;

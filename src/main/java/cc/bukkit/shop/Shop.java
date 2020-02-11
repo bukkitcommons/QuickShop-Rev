@@ -28,4 +28,8 @@ public abstract class Shop {
   public static ShopLoader getLoader() {
     return plugin.getLoader();
   }
+  
+  public static ShopActionManager getActions() {
+    return plugin.getActions();
+  }
 }

@@ -28,7 +28,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
-import org.maxgamer.quickshop.shop.ShopActionManager;
+import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.ContainerShop;
@@ -145,7 +145,7 @@ public class ShopActionListener implements Listener {
           player.sendMessage(MsgUtil.getMessage("how-many-sell", player, "" + totalItems));
         }
         
-        ShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));
+        QuickShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));
       });
     
     Util.debug("STAGE 1");
@@ -221,7 +221,7 @@ public class ShopActionListener implements Listener {
         // Send creation menu.
         ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), expectedSign, item);
 
-        ShopActionManager.instance().getActions().put(player.getUniqueId(), info);
+        QuickShopActionManager.instance().getActions().put(player.getUniqueId(), info);
         player.sendMessage(MsgUtil.getMessage("how-much-to-trade-for", player,
             Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
       });
@@ -256,7 +256,7 @@ public class ShopActionListener implements Listener {
   
   @EventHandler
   public void onPlayerQuit(PlayerQuitEvent e) {
-    ShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
+    QuickShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
   }
   
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -292,7 +292,7 @@ public class ShopActionListener implements Listener {
   }
   
   public void handlePlayerMovement(Player player, Location to) {
-    ShopActionData info = ShopActionManager.instance().getActions().get(player.getUniqueId());
+    ShopActionData info = QuickShopActionManager.instance().getActions().get(player.getUniqueId());
     if (info == null)
       return;
 
@@ -305,7 +305,7 @@ public class ShopActionListener implements Listener {
         player.sendMessage(MsgUtil.getMessage("shop-purchase-cancelled", player));
       
       Util.debug(player.getName() + " too far with the shop location.");
-      ShopActionManager.instance().getActions().remove(player.getUniqueId());
+      QuickShopActionManager.instance().getActions().remove(player.getUniqueId());
     }
   }
 }

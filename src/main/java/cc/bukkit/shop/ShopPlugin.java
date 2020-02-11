@@ -6,4 +6,6 @@ public interface ShopPlugin extends Plugin {
   ShopManager getManager();
   
   ShopLoader getLoader();
+
+  ShopActionManager getActions();
 }

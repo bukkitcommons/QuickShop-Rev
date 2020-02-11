@@ -14,6 +14,7 @@ import org.bukkit.Tag;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +27,7 @@ import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopActionManager;
 import cc.bukkit.shop.ShopModerator;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.data.ShopAction;
@@ -37,18 +39,18 @@ import cc.bukkit.shop.event.ShopPurchaseEvent;
 import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
 import cc.bukkit.shop.viewer.ShopViewer;
 
-public class ShopActionManager {
+public class QuickShopActionManager implements ShopActionManager {
   // TODO delayed remove
   /*
    * Singleton
    */
   private static class LazySingleton {
-    private static final ShopActionManager INSTANCE = new ShopActionManager();
+    private static final QuickShopActionManager INSTANCE = new QuickShopActionManager();
   }
   
-  private ShopActionManager() {}
+  private QuickShopActionManager() {}
   
-  public static ShopActionManager instance() {
+  public static QuickShopActionManager instance() {
     return LazySingleton.INSTANCE;
   }
   
@@ -57,19 +59,23 @@ public class ShopActionManager {
    */
   private Map<UUID, ShopActionData> actionData = Maps.newConcurrentMap();
   
+  @Override
   public boolean hasAction(@NotNull UUID player) {
     return actionData.containsKey(player);
   }
   
+  @Override
   public void setAction(@NotNull UUID player, @NotNull ShopActionData data) {
     actionData.put(player, data);
   }
   
+  @Override
   public void removeAction(@NotNull UUID player) {
     actionData.remove(player);
   }
 
-  private boolean actionBuy(
+  @Override
+  public boolean actionBuy(
       @NotNull Player p,
       @NotNull String message,
       @NotNull ContainerShop shop, int amount,
@@ -179,7 +185,8 @@ public class ShopActionManager {
     return true;
   }
 
-  private void actionCreate(
+  @Override
+  public void actionCreate(
       @NotNull Player p,
       @NotNull ShopCreator info,
       @NotNull String message,
@@ -194,7 +201,7 @@ public class ShopActionManager {
         p.sendMessage(MsgUtil.getMessage("no-permission", p)
             + ": Some 3rd party plugin denied the permission checks, did you have permission built in there?");
         Util.debug("Failed to create shop: Protection check failed:");
-        for (RegisteredListener belisteners : BlockBreakEvent.getHandlerList()
+        for (RegisteredListener belisteners : BlockExpEvent.getHandlerList()
             .getRegisteredListeners()) {
           Util.debug(belisteners.getPlugin().getName());
         }
@@ -390,7 +397,8 @@ public class ShopActionManager {
     }
   }
 
-  private void actionSell(
+  @Override
+  public void actionSell(
       @NotNull Player p,
       @NotNull String message,
       @NotNull ContainerShop shop, int amount,
@@ -483,7 +491,8 @@ public class ShopActionManager {
     Bukkit.getPluginManager().callEvent(se);
   }
 
-  private void actionTrade(
+  @Override
+  public void actionTrade(
       @NotNull Player p,
       @NotNull ShopSnapshot info,
       @NotNull String message) {
@@ -540,10 +549,12 @@ public class ShopActionManager {
     }
   }
 
+  @Override
   public void handleChat(@NotNull Player p, @NotNull String msg, boolean sync) {
     handleChat(p, msg, false, sync);
   }
 
+  @Override
   public void handleChat(@NotNull Player p, @NotNull String msg, boolean bypassProtectionChecks, boolean sync) {
     final String message = ChatColor.stripColor(msg);
     Runnable runnable = () -> {
@@ -589,5 +600,10 @@ public class ShopActionManager {
    */
   public @Nullable String format(double d) {
     return QuickShop.instance().getEconomy().format(d);
+  }
+
+  @Override
+  public void clear() {
+    actionData.clear();
   }
 }

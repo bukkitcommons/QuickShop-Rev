@@ -21,8 +21,9 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.ShopActionManager;
+import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.command.CommandProcesser;
 
 public class SubCommand_Amount implements CommandProcesser {
@@ -53,11 +54,11 @@ public class SubCommand_Amount implements CommandProcesser {
 
     final Player player = (Player) sender;
 
-    if (!ShopActionManager.instance().hasAction(player.getUniqueId())) {
+    if (!Shop.getActions().hasAction(player.getUniqueId())) {
       sender.sendMessage(MsgUtil.getMessage("no-pending-action", sender));
       return;
     }
 
-    ShopActionManager.instance().handleChat(player, cmdArg[0], false);
+    Shop.getActions().handleChat(player, cmdArg[0], false);
   }
 }
