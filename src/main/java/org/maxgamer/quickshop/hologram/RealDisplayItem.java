@@ -45,7 +45,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
       return;
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-        new ShopDisplayItemSpawnEvent(shop, displayItemStack, DisplayData.create(displayItemStack));
+        new ShopDisplayItemSpawnEvent(shop, displayItemStack, DisplayDataMatcher.create(displayItemStack));
     if (Util.fireCancellableEvent(shopDisplayItemSpawnEvent))
       return;
     

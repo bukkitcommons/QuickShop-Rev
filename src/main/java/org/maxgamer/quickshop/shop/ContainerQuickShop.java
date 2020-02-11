@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.hologram.ArmorStandDisplayItem;
+import org.maxgamer.quickshop.hologram.DisplayDataMatcher;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
 import org.maxgamer.quickshop.hologram.RealDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
@@ -80,7 +81,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     this.moderator = s.moderator.clone();
     
     if (DisplayConfig.displayItems) {
-      DisplayData data = DisplayData.create(this.item);
+      DisplayData data = DisplayDataMatcher.create(this.item);
       switch (data.type()) {
         case ARMOR_STAND:
           display = new ArmorStandDisplayItem(this, data);
@@ -113,7 +114,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     this.unlimited = unlimited;
 
     if (DisplayConfig.displayItems) {
-      DisplayData data = DisplayData.create(this.item);
+      DisplayData data = DisplayDataMatcher.create(this.item);
       switch (data.type()) {
         case ARMOR_STAND:
           display = new ArmorStandDisplayItem(this, data);

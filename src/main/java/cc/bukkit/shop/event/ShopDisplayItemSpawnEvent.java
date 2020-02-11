@@ -44,14 +44,4 @@ public class ShopDisplayItemSpawnEvent extends ShopEvent implements Cancellable 
     
     this.displayType = data.type();
   }
-
-  /**
-   * This event is called before the shop display item created
-   *
-   * @param shop Target shop
-   * @param itemStack The ItemStack for spawning the displayItem
-   */
-  public ShopDisplayItemSpawnEvent(@NotNull ContainerShop shop, @NotNull ItemStack itemStack) {
-    this(shop, itemStack, DisplayData.create(itemStack));
-  }
 }
