@@ -1,6 +1,5 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,11 +28,11 @@ public class CommandPrice extends QuickShopCommand {
 
   @NotNull
   @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    ArrayList<String> list = new ArrayList<>();
-    list.add(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.price", sender));
-    return list;
+  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+    if (sender instanceof Player)
+      return Collections.singletonList(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.price", (Player) sender));
+    
+    return Collections.emptyList();
   }
 
   @Override
@@ -47,7 +46,7 @@ public class CommandPrice extends QuickShopCommand {
     final Player p = (Player) sender;
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-price-given", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-price-given", p));
       return;
     }
 
@@ -80,13 +79,13 @@ public class CommandPrice extends QuickShopCommand {
     if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
         p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("price-too-cheap", p,
-            (format) ? QuickShop.instance().getLocaleManager().decimalFormat(minPrice) : "" + minPrice));
+            (format) ? Util.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     } else {
       if (price < minPrice) {
         p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("price-too-cheap", p,
-            (format) ? QuickShop.instance().getLocaleManager().decimalFormat(minPrice) : "" + minPrice));
+            (format) ? Util.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     }
@@ -95,7 +94,7 @@ public class CommandPrice extends QuickShopCommand {
 
     if (price_limit != -1 && price > price_limit) {
       p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("price-too-high", p,
-          (format) ? QuickShop.instance().getLocaleManager().decimalFormat(price_limit) : "" + price_limit));
+          (format) ? Util.formatPrice(price_limit) : "" + price_limit));
       return;
     }
 
@@ -113,7 +112,7 @@ public class CommandPrice extends QuickShopCommand {
     final BlockIterator bIt = new BlockIterator(p, 10);
     // Loop through every block they're looking at upto 10 blocks away
     if (!bIt.hasNext()) {
-      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", p));
       return;
     }
 
@@ -121,25 +120,25 @@ public class CommandPrice extends QuickShopCommand {
       final Block b = bIt.next();
       final ShopViewer shop = Shop.getManager().getLoadedShopAt(b.getLocation());
 
-      if (shop.isEmpty() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
+      if (shop.isEmpty() || (!shop.get().getModerator().isModerator(p.getUniqueId())
           && !PermissionManager.instance().has(sender, "quickshop.other.price"))) {
         continue;
       }
       
       if (shop.get().getPrice() == price) {
         // Stop here if there isn't a price change
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-price-change", sender));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-price-change", p));
         return;
       }
 
       if (fee > 0 && !QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), fee)) {
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("you-cant-afford-to-change-price", sender,
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("you-cant-afford-to-change-price", p,
             QuickShop.instance().getEconomy().format(fee)));
         return;
       }
 
       if (fee > 0) {
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("fee-charged-for-price-change", sender,
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("fee-charged-for-price-change", p,
             QuickShop.instance().getEconomy().format(fee)));
         try {
           QuickShop.instance().getEconomy().deposit(
@@ -153,7 +152,7 @@ public class CommandPrice extends QuickShopCommand {
       // Update the shop
       shop.get().setPrice(price);
       sender.sendMessage(
-          QuickShop.instance().getLocaleManager().getMessage("price-is-now", sender, QuickShop.instance().getEconomy().format(shop.get().getPrice())));
+          QuickShop.instance().getLocaleManager().getMessage("price-is-now", p, QuickShop.instance().getEconomy().format(shop.get().getPrice())));
       // Chest shops can be double shops.
       if (!(shop.get() instanceof ContainerQuickShop)) {
         return;
@@ -174,17 +173,17 @@ public class CommandPrice extends QuickShopCommand {
 
       if (cs.is(ShopType.SELLING)) {
         if (cs.getPrice() < nextTo.getPrice()) {
-          sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("buying-more-than-selling", sender));
+          sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("buying-more-than-selling", p));
         }
       }
       // Buying
       else if (cs.getPrice() > nextTo.getPrice()) {
-        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("buying-more-than-selling", sender));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("buying-more-than-selling", p));
       }
 
       return;
     }
 
-    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", p));
   }
 }

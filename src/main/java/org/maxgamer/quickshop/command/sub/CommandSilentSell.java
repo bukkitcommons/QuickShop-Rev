@@ -40,7 +40,7 @@ public class CommandSilentSell extends QuickShopCommand {
     shop.get().setShopType(ShopType.SELLING);
     shop.get().setSignText();
     shop.get().save();
-    QuickShop.instance().getLocaleManager().sendControlPanelInfo(sender, shop.get());
+    QuickShop.instance().getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
     sender.sendMessage(
         QuickShop.instance().getLocaleManager().getMessage("command.now-selling", sender, Util.getItemStackName(shop.get().getItem())));
   }

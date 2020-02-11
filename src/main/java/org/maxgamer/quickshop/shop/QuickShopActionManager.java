@@ -24,16 +24,16 @@ import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopActionManager;
-import cc.bukkit.shop.ShopModerator;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopAction;
-import cc.bukkit.shop.data.ShopActionData;
-import cc.bukkit.shop.data.ShopCreator;
-import cc.bukkit.shop.data.ShopSnapshot;
+import cc.bukkit.shop.action.ShopAction;
+import cc.bukkit.shop.action.ShopActionData;
+import cc.bukkit.shop.action.ShopActionManager;
+import cc.bukkit.shop.action.data.ShopCreator;
+import cc.bukkit.shop.action.data.ShopSnapshot;
 import cc.bukkit.shop.event.ShopCreateEvent;
 import cc.bukkit.shop.event.ShopPurchaseEvent;
 import cc.bukkit.shop.event.ShopSuccessPurchaseEvent;
+import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -298,13 +298,13 @@ public class QuickShopActionManager implements ShopActionManager {
     if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
         p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("price-too-cheap", p,
-            (decFormat) ? QuickShop.instance().getLocaleManager().decimalFormat(minPrice) : "" + minPrice));
+            (decFormat) ? Util.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     } else {
       if (price < minPrice) {
         p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("price-too-cheap", p,
-            (decFormat) ? QuickShop.instance().getLocaleManager().decimalFormat(minPrice) : "" + minPrice));
+            (decFormat) ? Util.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     }
@@ -313,7 +313,7 @@ public class QuickShopActionManager implements ShopActionManager {
     if (price_limit != -1) {
       if (price > price_limit) {
         p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("price-too-high", p,
-            (decFormat) ? QuickShop.instance().getLocaleManager().decimalFormat(price_limit) : "" + price_limit));
+            (decFormat) ? Util.formatPrice(price_limit) : "" + price_limit));
         return;
       }
     }

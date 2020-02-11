@@ -14,12 +14,11 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.ShopMessager;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.util.ShopLocation;
 
 public class CommandClean extends QuickShopCommand {
   @Override

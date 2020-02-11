@@ -33,11 +33,11 @@ import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopAction;
-import cc.bukkit.shop.data.ShopActionData;
-import cc.bukkit.shop.data.ShopCreator;
-import cc.bukkit.shop.data.ShopLocation;
-import cc.bukkit.shop.data.ShopSnapshot;
+import cc.bukkit.shop.action.ShopAction;
+import cc.bukkit.shop.action.ShopActionData;
+import cc.bukkit.shop.action.data.ShopCreator;
+import cc.bukkit.shop.action.data.ShopSnapshot;
+import cc.bukkit.shop.util.ShopLocation;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.AllArgsConstructor;
 

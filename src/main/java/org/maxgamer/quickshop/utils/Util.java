@@ -57,10 +57,10 @@ import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
-import cc.bukkit.shop.DisplayInfo;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.database.connector.MySQLConnector;
+import cc.bukkit.shop.hologram.DisplayInfo;
+import cc.bukkit.shop.util.ShopLocation;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
@@ -80,6 +80,30 @@ public class Util {
     // This is always '+' instead of '-' even in negative pos
     return new Location(shopLocation.world(), shopLocation.x() + .5, shopLocation.y() + .5,
         shopLocation.z() + .5);
+  }
+  
+  
+  @NotNull
+  private final static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
+  
+  public static String formatPrice(double d) {
+    return decimalFormat.format(d);
+  }
+  
+  public static String fillArgs(@Nullable String raw, @Nullable String... args) {
+    if (raw == null) {
+      return "Invalid message: null";
+    }
+    if (raw.isEmpty()) {
+      return "";
+    }
+    if (args == null) {
+      return raw;
+    }
+    for (int i = 0; i < args.length; i++) {
+      raw = StringUtils.replace(raw, "{" + i + "}", args[i] == null ? "" : args[i]);
+    }
+    return raw;
   }
 
   /**

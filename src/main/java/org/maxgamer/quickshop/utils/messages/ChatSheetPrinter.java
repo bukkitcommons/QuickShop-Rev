@@ -18,7 +18,7 @@ package org.maxgamer.quickshop.utils.messages;
 
 import java.util.Arrays;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ import net.md_5.bungee.api.chat.TextComponent;
  */
 public class ChatSheetPrinter {
   final ChatColor chatColor = ChatColor.DARK_PURPLE;
-  private CommandSender p;
+  private Player p;
 
   public void printCenterLine(@NotNull String text) {
     p.sendMessage(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.left_half_line", p) + text

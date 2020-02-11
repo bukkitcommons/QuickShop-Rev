@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.files.Rewriter;
 import org.maxgamer.quickshop.utils.mojang.AssetJson;
 import org.maxgamer.quickshop.utils.mojang.MojangAPI;
 import org.maxgamer.quickshop.utils.nms.Reflections;
@@ -21,6 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.util.file.Rewriter;
 
 public class MinecraftLocale {
   @NotNull

@@ -57,18 +57,20 @@ import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.LocaleManager;
-import org.maxgamer.quickshop.utils.messages.ShopMessager;
+import org.maxgamer.quickshop.utils.messages.QuickShopLocaleManager;
+import org.maxgamer.quickshop.utils.messages.QuickShopMessager;
 import org.maxgamer.quickshop.utils.nms.Reflections;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
+import cc.bukkit.shop.LocaleManager;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopActionManager;
 import cc.bukkit.shop.ShopItemMatcher;
 import cc.bukkit.shop.ShopLoader;
 import cc.bukkit.shop.ShopManager;
+import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.ShopPlugin;
+import cc.bukkit.shop.action.ShopActionManager;
 import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.configuration.ConfigurationManager;
 import cc.bukkit.shop.database.Database;
@@ -81,6 +83,7 @@ import cc.bukkit.shop.economy.EconomyType;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationHelper;
 import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.util.file.ResourceAccessor;
 import lombok.Getter;
 import me.minebuilders.clearlag.Clearlag;
 import me.minebuilders.clearlag.listeners.ItemMergeListener;
@@ -101,7 +104,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private IssuesHelper bootError;
   // Listeners - We decide which one to use at runtime
   private final ChatListener chatListener = new ChatListener();
-  private final QuickShopCommandManager commandManager = new QuickShopCommandManager();
+  private QuickShopCommandManager commandManager;
   /** WIP */
   private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
 
@@ -186,7 +189,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   @Getter
   private LocaleManager localeManager;
   @Getter
-  private ShopMessager messager;
+  private final ShopMessager messager = new QuickShopMessager();
   
   @Getter
   @NotNull
@@ -327,72 +330,17 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     if (BaseConfig.logActions)
       logWatcher = new AsyncLogWatcher(this, new File(getDataFolder(), "qs.log"));
   }
-
-  /** Early than onEnable, make sure instance was loaded in first time. */
-  @Override
-  public void onLoad() {
-    try {
-      onLoad0();
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-  }
   
   public QuickShop() {
     super();
     singleton = this;
-    Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
   }
 
   protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
     super(loader, description, dataFolder, file);
     singleton = this;
-    Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
-}
-  
-  private void onLoad0() throws IllegalArgumentException, IllegalAccessException {
-    try {
-      Field logger = Reflections.getField(JavaPlugin.class, "logger");
-      if (logger != null) {
-        logger.set(this, ShopLogger.instance());
-        // Note: Do this after onLoad
-      }
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-    
-    boolean fine = IssuesHelper.scanDupeInstall();
-    ChatColor sideColor = fine ? org.bukkit.ChatColor.DARK_GREEN : ChatColor.DARK_RED;
-    ChatColor coreColor = fine ? org.bukkit.ChatColor.GREEN : ChatColor.RED;
-    
-    System.out.println(
-        sideColor + "  __  __   ||   \r\n" + 
-        coreColor + "" + " /  \\(_    ||   QuickShop - Rev\r\n" + 
-        coreColor + "" + " \\_\\/__)   ||   Version  " + getVersion().substring(4) + "\r\n" +
-        sideColor + "           ||   ");
-    
-    getLogger().info("Developers: " + Util.list2String(getDescription().getAuthors()));
-    getLogger().info("Original Author: Netherfoam, Timtower, KaiNoMood");
-    
-    getDataFolder().mkdirs();
-
-    getLogger().info("Loading up integration modules.");
-    this.integrationHelper = new IntegrationHelper();
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
-    if (getConfig().getBoolean("integration.worldguard.enable")) {
-      Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
-      Util.debug("Check WG plugin...");
-      if (wg != null) {
-        Util.debug("Loading WG modules.");
-        this.integrationHelper.register(new WorldGuardIntegration()); // WG require register
-                                                                          // flags when onLoad
-                                                                          // called.
-      }
-    }
-
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_LOAD);
   }
 
   @Override
@@ -446,10 +394,63 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
     Util.debug("All shutdown work is finished.");
   }
-
+  
   @Override
   public void onEnable() {
+    Bukkit.getScheduler().runTask(this, () -> {
+      try {
+        Shop.setPlugin(this);
+        enablePlugin();
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+    });
+  }
+
+  public void enablePlugin() {
+    try {
+      Field logger = Reflections.getField(JavaPlugin.class, "logger");
+      if (logger != null) {
+        logger.set(this, ShopLogger.instance());
+        // Note: Do this after onLoad
+      }
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    
+    boolean fine = IssuesHelper.scanDupeInstall();
+    ChatColor sideColor = fine ? org.bukkit.ChatColor.DARK_GREEN : ChatColor.DARK_RED;
+    ChatColor coreColor = fine ? org.bukkit.ChatColor.GREEN : ChatColor.RED;
+    
+    System.out.println(
+        sideColor + "  __  __   ||   \r\n" + 
+        coreColor + "" + " /  \\(_    ||   QuickShop - Rev\r\n" + 
+        coreColor + "" + " \\_\\/__)   ||   Version  " + getVersion().substring(4) + "\r\n" +
+        sideColor + "           ||   ");
+    
+    getLogger().info("Developers: " + Util.list2String(getDescription().getAuthors()));
+    getLogger().info("Original Author: Netherfoam, Timtower, KaiNoMood");
+    
+    getDataFolder().mkdirs();
+
+    getLogger().info("Loading up integration modules.");
+    this.integrationHelper = new IntegrationHelper();
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
+    if (getConfig().getBoolean("integration.worldguard.enable")) {
+      Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
+      Util.debug("Check WG plugin...");
+      if (wg != null) {
+        Util.debug("Loading WG modules.");
+        this.integrationHelper.register(new WorldGuardIntegration()); // WG require register
+                                                                          // flags when onLoad
+                                                                          // called.
+      }
+    }
+
+    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_LOAD);
+    
     long start = System.currentTimeMillis();
+    Shop.setPlugin(this);
     sentryErrorReporter = new SentryErrorReporter(this);
     
     /*
@@ -464,16 +465,13 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
      * Locales
      */
     resourceAccessor = new ResourceAccessor(this);
-    localeManager = new LocaleManager(this);
+    localeManager = new QuickShopLocaleManager(this);
     try {
-      localeManager.loadCfgMessages();
+      localeManager.load();
     } catch (Exception e) {
       getLogger().warning("An error throws when loading messages");
       e.printStackTrace();
     }
-    localeManager.loadItemi18n();
-    localeManager.loadEnchi18n();
-    localeManager.loadPotioni18n();
     
     /*
      * Economy
@@ -491,6 +489,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     /*
      * Commands
      */
+    commandManager = new QuickShopCommandManager();
     getCommand("qs").setExecutor(commandManager);
     getCommand("qs").setTabCompleter(commandManager);
     
@@ -543,7 +542,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     }
     if (getConfig().getInt("shop.find-distance") > 100) {
       getLogger()
-          .severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
+      .severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
     }
 
     signUpdateWatcher = new ScheduledSignUpdater();
@@ -560,7 +559,14 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
     Bukkit.getPluginManager().registerEvents(shopProtectListener, this);
     Bukkit.getPluginManager().registerEvents(internalListener, this);
-    
+
+    if (BaseConfig.lock) {
+      Bukkit.getPluginManager().registerEvents(lockListener, this);
+    }
+    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
+      Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
+    }
+
     Util.debug("Registering shop watcher...");
     Bukkit.getScheduler().runTaskTimer(this, signUpdateWatcher, 40, 40);
     if (logWatcher != null) {
@@ -576,15 +582,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     UpdateWatcher.init();
     submitMeritcs();
     
-    if (BaseConfig.lock) {
-      Bukkit.getPluginManager().registerEvents(lockListener, this);
-    }
-    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null) {
-      Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
-    }
-    
     getLogger().info("Loading player messages..");
-    messager = new ShopMessager();
     messager.loadTransactionMessages();
     messager.clean();
     

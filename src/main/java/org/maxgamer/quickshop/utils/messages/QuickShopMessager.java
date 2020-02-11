@@ -3,17 +3,16 @@ package org.maxgamer.quickshop.utils.messages;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.UUID;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
+import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.util.ShopLogger;
 
-public class ShopMessager {
+public class QuickShopMessager implements ShopMessager {
   @NotNull
   private final HashMap<UUID, String> playerMessages = Maps.newHashMap();
 
@@ -24,29 +23,6 @@ public class ShopMessager {
     // 604800,000 msec = 1 week.
     long weekAgo = System.currentTimeMillis() - 604800000;
     QuickShop.instance().getDatabaseHelper().cleanMessage(weekAgo);
-  }
-
-  /**
-   * Replace args in raw to args
-   *
-   * @param raw text
-   * @param args args
-   * @return filled text
-   */
-  public String fillArgs(@Nullable String raw, @Nullable String... args) {
-    if (raw == null) {
-      return "Invalid message: null";
-    }
-    if (raw.isEmpty()) {
-      return "";
-    }
-    if (args == null) {
-      return raw;
-    }
-    for (int i = 0; i < args.length; i++) {
-      raw = StringUtils.replace(raw, "{" + i + "}", args[i] == null ? "" : args[i]);
-    }
-    return raw;
   }
 
   /**

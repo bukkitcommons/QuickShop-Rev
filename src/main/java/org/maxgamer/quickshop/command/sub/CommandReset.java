@@ -40,21 +40,10 @@ public class CommandReset extends QuickShopCommand {
 
     switch (cmdArg[0]) {
       case "lang":
-        File item = new File(QuickShop.instance().getDataFolder(), "itemi18n.yml");
-        File ench = new File(QuickShop.instance().getDataFolder(), "enchi18n.yml");
-        File potion = new File(QuickShop.instance().getDataFolder(), "potioni18n.yml");
-        item.delete();
-        ench.delete();
-        potion.delete();
-        QuickShop.instance().getLocaleManager().MINECRAFT_LOCALE.reload();
-        QuickShop.instance().getLocaleManager().loadItemi18n();
-        QuickShop.instance().getLocaleManager().loadEnchi18n();
-        QuickShop.instance().getLocaleManager().loadPotioni18n();
+        QuickShop.instance().getLocaleManager().load();
         sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
         break;
       case "config":
-        File config = new File(QuickShop.instance().getDataFolder(), "config.yml");
-        config.delete();
         QuickShop.instance().saveDefaultConfig();
         QuickShop.instance().reloadConfig();
         Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
@@ -62,9 +51,7 @@ public class CommandReset extends QuickShopCommand {
         sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
         break;
       case "messages":
-        File msgs = new File(QuickShop.instance().getDataFolder(), "messages.json");
-        msgs.delete();
-        QuickShop.instance().getLocaleManager().loadCfgMessages();
+        QuickShop.instance().getLocaleManager().load();
         sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
         break;
     }

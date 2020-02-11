@@ -16,7 +16,7 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.data.ShopData;
+import cc.bukkit.shop.action.data.ShopData;
 
 public class CommandFind extends QuickShopCommand {
   @Override

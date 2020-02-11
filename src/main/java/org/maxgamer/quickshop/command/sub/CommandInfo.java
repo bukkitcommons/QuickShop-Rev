@@ -15,7 +15,7 @@ import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopData;
+import cc.bukkit.shop.action.data.ShopData;
 
 public class CommandInfo extends QuickShopCommand {
   @Override

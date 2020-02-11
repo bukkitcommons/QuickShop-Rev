@@ -10,9 +10,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.event.ProtectionCheckStatus;
 import cc.bukkit.shop.event.ShopProtectionCheckEvent;
+import cc.bukkit.shop.util.ShopLocation;
 
 public class BuildPerms {
   /**

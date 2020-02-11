@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import com.google.common.collect.Lists;
-import cc.bukkit.shop.configuration.Configuration;
-import cc.bukkit.shop.configuration.Node;
+import cc.bukkit.shop.configuration.annotation.Configuration;
+import cc.bukkit.shop.configuration.annotation.Node;
 
 @Configuration("base-config.yml")
 public class BaseConfig {

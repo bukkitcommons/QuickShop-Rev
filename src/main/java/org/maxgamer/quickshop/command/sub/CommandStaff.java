@@ -32,8 +32,6 @@ public class CommandStaff extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> tabList = new ArrayList<>();
 
-    Util.debug(Util.array2String(cmdArg));
-
     if (cmdArg.length < 2) {
       if (cmdArg.length == 1) {
         final String prefix = cmdArg[0].toLowerCase();

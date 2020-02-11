@@ -18,8 +18,8 @@ import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.data.ShopCreator;
-import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.action.data.ShopCreator;
+import cc.bukkit.shop.util.ShopLocation;
 
 public class CommandSuperCreate extends QuickShopCommand {
   @Override

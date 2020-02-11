@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
@@ -46,7 +47,7 @@ public class CommandSilentEmpty extends QuickShopCommand {
     }
 
     inventory.clear();
-    QuickShop.instance().getLocaleManager().sendControlPanelInfo(sender, shop.get());
+    QuickShop.instance().getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
     sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("empty-success", sender));
   }
 }

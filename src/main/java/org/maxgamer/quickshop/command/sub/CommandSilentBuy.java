@@ -40,7 +40,7 @@ public class CommandSilentBuy extends QuickShopCommand {
     shop.get().setShopType(ShopType.BUYING);
     shop.get().setSignText();
     shop.get().save();
-    QuickShop.instance().getLocaleManager().sendControlPanelInfo(sender, shop.get());
+    QuickShop.instance().getLocaleManager().sendControlPanelInfo((Player) sender, shop.get());
     sender.sendMessage(
         QuickShop.instance().getLocaleManager().getMessage("command.now-buying", sender, Util.getItemStackName(shop.get().getItem())));
   }

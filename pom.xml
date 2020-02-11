@@ -17,6 +17,7 @@
         <package>org.maxgamer.quickshop</package>
         <developer>Ghost-chu</developer>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <apiVersion>1.1.1</apiVersion>
     </properties>
     <issueManagement>
         <url>https://github.com/${developer}/${name}/issues</url>
@@ -250,7 +251,7 @@
         <dependency>
             <groupId>cc.bukkit.shop</groupId>
             <artifactId>Shop</artifactId>
-            <version>1.0.2</version>
+            <version>${apiVersion}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

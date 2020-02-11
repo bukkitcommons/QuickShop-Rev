@@ -5,12 +5,13 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.VersionUpdater;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.VersionData;
@@ -46,7 +47,7 @@ public class UpdateWatcher implements Listener {
       Bukkit.getScheduler().cancelTask(taskId);
   }
   
-  private static void alert(CommandSender sender) {
+  private static void alert(Player sender) {
     data.ifPresent(data -> {
       if (!data.beta()) {
         
@@ -55,9 +56,9 @@ public class UpdateWatcher implements Listener {
         ShopLogger.instance()
             .info("Update here: https://www.spigotmc.org/resources/62575/");
         
-        List<String> messages = QuickShop.instance().getLocaleManager().getI18nFile().getStringList("updatenotify.list");
+        List<String> messages = QuickShop.instance().getLocaleManager().getLocale().getStringList("updatenotify.list");
         
-        String notify = QuickShop.instance().getLocaleManager().fillArgs(
+        String notify = Util.fillArgs(
             messages.isEmpty() ?
                 "New update {0} now avaliable! Please update!" :
                   

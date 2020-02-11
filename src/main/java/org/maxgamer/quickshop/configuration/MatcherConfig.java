@@ -1,7 +1,7 @@
 package org.maxgamer.quickshop.configuration;
 
-import cc.bukkit.shop.configuration.Configuration;
-import cc.bukkit.shop.configuration.Node;
+import cc.bukkit.shop.configuration.annotation.Configuration;
+import cc.bukkit.shop.configuration.annotation.Node;
 
 @Configuration("configs/matchers.yml")
 public class MatcherConfig {

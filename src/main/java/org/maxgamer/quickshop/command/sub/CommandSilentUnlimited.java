@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
@@ -38,7 +39,7 @@ public class CommandSilentUnlimited extends QuickShopCommand {
     shop.get().setUnlimited(!shop.get().isUnlimited());
     // shop.setSignText();
     shop.get().save();
-    QuickShop.instance().getLocaleManager().sendControlPanelInfo(sender, shop.get());
+    QuickShop.instance().getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
 
     if (shop.get().isUnlimited()) {
       sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.toggle-unlimited.unlimited", sender));

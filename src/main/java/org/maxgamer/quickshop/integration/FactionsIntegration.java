@@ -10,8 +10,8 @@ import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.FPlayers;
 import com.massivecraft.factions.Faction;
 import com.massivecraft.factions.perms.PermissibleAction;
-import cc.bukkit.shop.configuration.Configuration;
-import cc.bukkit.shop.configuration.Node;
+import cc.bukkit.shop.configuration.annotation.Configuration;
+import cc.bukkit.shop.configuration.annotation.Node;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 
 @Configuration("configs/integrations.yml")

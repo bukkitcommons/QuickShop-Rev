@@ -9,8 +9,8 @@ import com.bekvon.bukkit.residence.containers.Flags;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.FlagPermissions;
 import com.google.common.collect.Lists;
-import cc.bukkit.shop.configuration.Configuration;
-import cc.bukkit.shop.configuration.Node;
+import cc.bukkit.shop.configuration.annotation.Configuration;
+import cc.bukkit.shop.configuration.annotation.Node;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 
 @Configuration("configs/integrations.yml")

@@ -17,8 +17,8 @@ import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.data.ShopCreator;
-import cc.bukkit.shop.data.ShopLocation;
+import cc.bukkit.shop.action.data.ShopCreator;
+import cc.bukkit.shop.util.ShopLocation;
 
 public class CommandCreate extends QuickShopCommand {
   @Override

@@ -9,7 +9,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.data.ShopData;
+import cc.bukkit.shop.action.data.ShopData;
 
 /**
  * Check the shops after server booted up, make sure shop can correct self-deleted when container
@@ -74,7 +74,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
         
         if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
           QuickShop.instance().getMessager().send(shop.moderators().getOwner(),
-              QuickShop.instance().getLocaleManager().getMessagePlaceholder("shop-removed-cause-ongoing-fee",
+              QuickShop.instance().getLocaleManager().getMessage("shop-removed-cause-ongoing-fee",
                   Bukkit.getOfflinePlayer(shop.moderators().getOwner()),
                   "World:" + shop.world() + " X:" + shop.x() +
                   " Y:" + shop.y() + " Z:" + shop.z()));

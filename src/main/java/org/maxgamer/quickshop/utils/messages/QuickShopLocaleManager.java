@@ -3,19 +3,16 @@ package org.maxgamer.quickshop.utils.messages;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -30,38 +27,38 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.files.JsonLocale;
-import org.maxgamer.quickshop.utils.files.LocaleFile;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
-import com.google.gson.Gson;
 import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.LocaleFile;
+import cc.bukkit.shop.LocaleManager;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.data.ShopSnapshot;
+import cc.bukkit.shop.action.data.ShopSnapshot;
 import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.util.file.json.JsonLocale;
 import lombok.SneakyThrows;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-public class LocaleManager {
-  private YamlConfiguration builtInDefaultLanguage;
+public class QuickShopLocaleManager implements LocaleManager {
   private YamlConfiguration enchi18n;
   private YamlConfiguration itemi18n;
   private YamlConfiguration potioni18n;
   
   private LocaleFile messagei18n;
   
-  @NotNull
-  private static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
+  public LocaleFile getLocale() {
+    return messagei18n;
+  }
+  
   @NotNull
   public final static MinecraftLocale MINECRAFT_LOCALE = new MinecraftLocale();
   
   private final QuickShop plugin;
   
-  public LocaleManager(@NotNull QuickShop plugin) {
+  public QuickShopLocaleManager(@NotNull QuickShop plugin) {
     this.plugin = plugin;
-    builtInDefaultLanguage = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResourceAccessor().getFile("en", "messages")));
   }
 
   /**
@@ -71,30 +68,7 @@ public class LocaleManager {
    * @return The result of translate.
    */
   public String translateBoolean(boolean bool) {
-    return getMessage(bool ? "booleanformat.success" : "booleanformat.failed", null);
-  }
-
-  /**
-   * Replace args in raw to args
-   *
-   * @param raw text
-   * @param args args
-   * @return filled text
-   */
-  public static String fillArgs(@Nullable String raw, @Nullable String... args) {
-    if (raw == null) {
-      return "Invalid message: null";
-    }
-    if (raw.isEmpty()) {
-      return "";
-    }
-    if (args == null) {
-      return raw;
-    }
-    for (int i = 0; i < args.length; i++) {
-      raw = StringUtils.replace(raw, "{" + i + "}", args[i] == null ? "" : args[i]);
-    }
-    return raw;
+    return getMessage(bool ? "booleanformat.success" : "booleanformat.failed");
   }
 
   /**
@@ -134,6 +108,10 @@ public class LocaleManager {
     }
     return Util.prettifyText(material.name());
   }
+  
+  public String getMessage(@NotNull String loc, @NotNull String... args) {
+    return getMessage(loc, null, args);
+  }
 
   /**
    * getMessage in messages.yml
@@ -143,9 +121,7 @@ public class LocaleManager {
    * @param player The sender will send the message to
    * @return message
    */
-  public String getMessage(@NotNull String loc,
-      @Nullable CommandSender player,
-      @NotNull String... args) {
+  public String getMessage(@NotNull String loc, @Nullable Object player, @NotNull String... args) {
     
     Optional<String> raw = messagei18n.getString(loc);
     if (!raw.isPresent()) {
@@ -154,7 +130,8 @@ public class LocaleManager {
 
       return loc;
     }
-    String filled = fillArgs(raw.get(), args);
+    String filled = Util.fillArgs(raw.get(), args);
+    
     if (player instanceof OfflinePlayer) {
       if (QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled()) {
         try {
@@ -174,40 +151,12 @@ public class LocaleManager {
   }
 
   /**
-   * getMessage in messages.yml
-   *
-   * @param loc location
-   * @param player The sender will send the message to
-   * @param args args
-   * @return message
-   */
-  public String getMessagePlaceholder(
-      @NotNull String loc,
-      @Nullable OfflinePlayer player,
-      @NotNull String... args) {
-    
-    Optional<String> raw = messagei18n.getString(loc);
-    if (!raw.isPresent())
-      return loc;
-    
-    String filled = fillArgs(raw.get(), args);
-    
-    if (player != null &&
-        QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled()) {
-      filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(player, filled);
-      Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
-    }
-    
-    return filled;
-  }
-
-  /**
    * Get potion effect's i18n name.
    *
    * @param potion potionType
    * @return Potion's i18n name.
    */
-  public String getPotioni18n(@NotNull PotionEffectType potion) {
+  public String getLocalizedName(@NotNull PotionEffectType potion) {
     String potionString = potion.getName().trim();
     if (potionString.isEmpty()) {
       return "Potion name is empty.";
@@ -218,8 +167,15 @@ public class LocaleManager {
     }
     return Util.prettifyText(potionString);
   }
-  
-  static Gson gson = new Gson();
+
+  @Override
+  public void load() throws InvalidConfigurationException {
+    MINECRAFT_LOCALE.reload();
+    loadCfgMessages();
+    loadEnchi18n();
+    loadItemi18n();
+    loadPotioni18n();
+  }
 
   public void loadCfgMessages() throws InvalidConfigurationException {
     /* Check & Load & Create default messages.yml */
@@ -232,7 +188,7 @@ public class LocaleManager {
     languageCode = "en".equals(languageCode) ?
         languageCode :
           (QuickShop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
-    json = new JsonLocale(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json");
+    json = new JsonLocale(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json", plugin);
     json.create();
     
     if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {
@@ -244,9 +200,9 @@ public class LocaleManager {
     
     messagei18n = json;
     /* Print to console this language file's author, contributors, and region */
-    ShopLogger.instance().info(getMessage("translation-author", null));
-    ShopLogger.instance().info(getMessage("translation-contributors", null));
-    ShopLogger.instance().info(getMessage("translation-country", null));
+    ShopLogger.instance().info(getMessage("translation-author"));
+    ShopLogger.instance().info(getMessage("translation-contributors"));
+    ShopLogger.instance().info(getMessage("translation-country"));
     /* Save the upgraded messages.yml */
   }
 
@@ -347,7 +303,7 @@ public class LocaleManager {
    * @param sender Target sender
    * @param shop Target shop
    */
-  public void sendControlPanelInfo(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
+  public void sendControlPanelInfo(@NotNull Player sender, @NotNull ContainerShop shop) {
     if (!PermissionManager.instance().has(sender, "quickshop.use")) {
       return;
     }
@@ -414,7 +370,7 @@ public class LocaleManager {
     if (PermissionManager.instance().has(sender, "quickshop.other.price")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text = getMessage("controlpanel.price", sender,
-          BaseConfig.decimalFormatPrice ? decimalFormat(shop.getPrice()) : "" + shop.getPrice());
+          BaseConfig.decimalFormatPrice ? Util.formatPrice(shop.getPrice()) : "" + shop.getPrice());
       String hoverText = getMessage("controlpanel.price-hover", sender);
       String clickCommand = getMessage("controlpanel.commands.price", sender);
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
@@ -677,28 +633,12 @@ public class LocaleManager {
       PotionEffectType potionEffectType = potionMeta.getBasePotionData().getType().getEffectType();
       if (potionEffectType != null) {
         chatSheetPrinter.printLine(getMessage("menu.effects", p));
-        chatSheetPrinter.printLine(ChatColor.YELLOW + getPotioni18n(potionEffectType));
+        chatSheetPrinter.printLine(ChatColor.YELLOW + getLocalizedName(potionEffectType));
       }
       potionMeta.getCustomEffects().forEach((potionEffect -> chatSheetPrinter
-          .printLine(ChatColor.YELLOW + getPotioni18n(potionEffect.getType()))));
+          .printLine(ChatColor.YELLOW + getLocalizedName(potionEffect.getType()))));
     }
     chatSheetPrinter.printFooter();
-  }
-
-  public String decimalFormat(double value) {
-    return decimalFormat.format(value);
-  }
-
-  public void setAndUpdate(@NotNull String path, @Nullable Object object) {
-    if (object == null) {
-      messagei18n.set(path, null); // Removal
-    }
-    Object objFromBuiltIn = builtInDefaultLanguage.get(path); // Apply english default
-    if (objFromBuiltIn == null) {
-      objFromBuiltIn = object; // Apply hard-code default, maybe a language file i forgotten
-                               // update??
-    }
-    messagei18n.set(path, objFromBuiltIn);
   }
 
   public LocaleFile getI18nFile() {
