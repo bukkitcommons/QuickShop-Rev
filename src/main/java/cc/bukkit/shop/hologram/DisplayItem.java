@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopProtectionFlag;
+import cc.bukkit.shop.DisplayInfo;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.SneakyThrows;
 
@@ -48,7 +48,7 @@ public interface DisplayItem {
         if (!lore.startsWith("{")) {
           continue;
         }
-        ShopProtectionFlag shopProtectionFlag = GSON.fromJson(lore, ShopProtectionFlag.class);
+        DisplayInfo shopProtectionFlag = GSON.fromJson(lore, DisplayInfo.class);
         if (shopProtectionFlag == null)
           continue;
         
@@ -117,13 +117,13 @@ public interface DisplayItem {
     if (!iMeta.hasLore())
       return false;
     
-    String defaultMark = ShopProtectionFlag.defaultMark();
+    String defaultMark = DisplayInfo.defaultMark();
     for (String lore : iMeta.getLore()) {
       try {
         if (!lore.startsWith("{")) {
           continue;
         }
-        ShopProtectionFlag shopProtectionFlag = GSON.fromJson(lore, ShopProtectionFlag.class);
+        DisplayInfo shopProtectionFlag = GSON.fromJson(lore, DisplayInfo.class);
         if (shopProtectionFlag == null) {
           continue;
         }
@@ -165,7 +165,7 @@ public interface DisplayItem {
       meta.setDisplayName("");
     }
     
-    ShopProtectionFlag shopProtectionFlag = ShopProtectionFlag.create(itemStack, shop);
+    DisplayInfo shopProtectionFlag = DisplayInfo.from(itemStack, shop);
     meta.setLore(Collections.singletonList(GSON.toJson(shopProtectionFlag)));
     
     itemStack.setItemMeta(meta);

@@ -921,6 +921,8 @@ public class Util {
     }
     return new String(filecontent, StandardCharsets.UTF_8);
   }
+  
+  private final static YamlConfiguration SERIALIZER = new YamlConfiguration();
 
   /**
    * Covert ItemStack to YAML string.
@@ -928,10 +930,9 @@ public class Util {
    * @param iStack target ItemStack
    * @return String serialized itemStack
    */
-  public static String serialize(@NotNull ItemStack iStack) { // FIXME move
-    YamlConfiguration cfg = new YamlConfiguration();
-    cfg.set("item", iStack);
-    return cfg.saveToString();
+  public static String serialize(@NotNull ItemStack iStack) {
+    SERIALIZER.set("item", iStack);
+    return SERIALIZER.saveToString();
   }
 
   private static byte[] toByteArray(@NotNull InputStream in) throws IOException {

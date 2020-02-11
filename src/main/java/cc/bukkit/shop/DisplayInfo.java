@@ -1,13 +1,13 @@
 package cc.bukkit.shop;
 
 import java.io.Serializable;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.utils.Util;
 import lombok.Data;
 
 @Data
-public class ShopProtectionFlag implements Serializable {
+public class DisplayInfo implements Serializable {
   private static final long serialVersionUID = 1L;
   private static final String DEFAULT_MARK = "QuickShop DisplayItem";
   
@@ -22,13 +22,26 @@ public class ShopProtectionFlag implements Serializable {
    * @param shop The shop
    * @return ShopProtectionFlag obj
    */
-  public static ShopProtectionFlag create(
+  public static DisplayInfo from(
       @NotNull ItemStack itemStack,
       @NotNull ContainerShop shop) {
-    return new ShopProtectionFlag(Util.serialize(itemStack), shop.getLocation().toString());
+    return new DisplayInfo(serializeItemStack(itemStack), shop.getLocation().toString());
   }
 
   public static String defaultMark() {
     return DEFAULT_MARK;
+  }
+  
+  private final static YamlConfiguration SERIALIZER = new YamlConfiguration();
+  
+  /**
+   * Covert ItemStack to YAML string.
+   *
+   * @param iStack target ItemStack
+   * @return String serialized itemStack
+   */
+  private static String serializeItemStack(@NotNull ItemStack iStack) {
+    SERIALIZER.set("item", iStack);
+    return SERIALIZER.saveToString();
   }
 }
