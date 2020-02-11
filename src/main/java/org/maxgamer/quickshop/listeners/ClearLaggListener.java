@@ -8,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.hologram.DisplayItem;
 
 public class ClearLaggListener implements Listener {
 

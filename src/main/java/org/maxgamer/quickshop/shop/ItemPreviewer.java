@@ -9,8 +9,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.event.ShopInventoryPreviewEvent;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.EqualsAndHashCode;
@@ -72,7 +72,7 @@ public class ItemPreviewer implements Listener {
       return;
     
     final int size = 9;
-    inventory = Bukkit.createInventory(null, 9, MsgUtil.getMessage("menu.preview", player));
+    inventory = Bukkit.createInventory(null, 9, QuickShop.instance().getLocaleManager().getMessage("menu.preview", player));
     for (int i = 0; i < size; i++) {
       inventory.setItem(i, shopInventoryPreview.getItemStack());
     }

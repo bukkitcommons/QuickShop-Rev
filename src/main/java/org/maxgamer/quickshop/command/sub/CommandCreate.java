@@ -16,7 +16,6 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.data.ShopCreator;
 import cc.bukkit.shop.data.ShopLocation;
@@ -33,7 +32,7 @@ public class CommandCreate extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(MsgUtil.getMessage("tabcomplete.price", sender));
+    list.add(QuickShop.instance().getLocaleManager().getMessage("tabcomplete.price", sender));
 
     return list;
   }
@@ -50,7 +49,7 @@ public class CommandCreate extends QuickShopCommand {
     final ItemStack item = p.getInventory().getItemInMainHand();
 
     if (item.getType() == Material.AIR) {
-      sender.sendMessage(MsgUtil.getMessage("no-anythings-in-your-hand", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-anythings-in-your-hand", sender));
       return;
     }
 
@@ -81,13 +80,13 @@ public class CommandCreate extends QuickShopCommand {
 
       if (Util.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(p, "quickshop.create.double")) {
-        p.sendMessage(MsgUtil.getMessage("no-double-chests", sender));
+        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-double-chests", sender));
         return;
       }
 
       if (Util.isBlacklisted(item) && !PermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
-        p.sendMessage(MsgUtil.getMessage("blacklisted-item", sender));
+        p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("blacklisted-item", sender));
         return;
       }
 
@@ -102,7 +101,7 @@ public class CommandCreate extends QuickShopCommand {
       }
 
       p.sendMessage(
-          MsgUtil.getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
+          QuickShop.instance().getLocaleManager().getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
       Util.debug("Created by wait chat");
       return;
     }

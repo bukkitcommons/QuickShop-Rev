@@ -11,10 +11,10 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
@@ -68,7 +68,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
   }
   
   private void sendHelp(@NotNull CommandSender sender, @NotNull String commandLabel) {
-    sender.sendMessage(MsgUtil.getMessage("command.description.title", sender));
+    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.description.title", sender));
 
     for (CommandData container : commands) {
       if (container.hidden())
@@ -80,7 +80,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
 
       sender.sendMessage(
           ChatColor.GREEN + "/" + commandLabel + " " + container.label() + ChatColor.YELLOW
-              + " - " + MsgUtil.getMessage("command.description." + container.label(), sender));
+              + " - " + QuickShop.instance().getLocaleManager().getMessage("command.description." + container.label(), sender));
     }
   }
 
@@ -103,7 +103,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
       
       for (String permission : container.permissions()) {
         if (!PermissionManager.instance().has(sender, permission)) {
-          sender.sendMessage(MsgUtil.getMessage("no-permission", sender));
+          sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-permission", sender));
           return true;
         }
       }

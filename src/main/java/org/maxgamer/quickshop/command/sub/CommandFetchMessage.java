@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.messages.ShopMessager;
-import cc.bukkit.shop.command.CommandProcesser;
 
 
 public class CommandFetchMessage  extends QuickShopCommand {
@@ -29,6 +28,6 @@ public class CommandFetchMessage  extends QuickShopCommand {
     QuickShop.instance()
              .getServer()
              .getScheduler()
-             .runTask(QuickShop.instance(), () -> ShopMessager.flushMessagesFor((Player) sender));
+             .runTask(QuickShop.instance(), () -> QuickShop.instance().getMessager().flushMessagesFor((Player) sender));
   }
 }

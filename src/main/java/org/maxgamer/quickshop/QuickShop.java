@@ -48,16 +48,16 @@ import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopItemMatcher;
+import org.maxgamer.quickshop.shop.QuickShopLoader;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.LocaleManager;
 import org.maxgamer.quickshop.utils.messages.ShopMessager;
 import org.maxgamer.quickshop.utils.nms.Reflections;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
@@ -87,13 +87,6 @@ import me.minebuilders.clearlag.listeners.ItemMergeListener;
 
 @Getter
 public final class QuickShop extends JavaPlugin implements ShopPlugin {
-  /**
-   * This is only a reference of the internal instance.
-   * @see QuickShop#instance()
-   */
-  @Deprecated
-  public static QuickShop instance;
-  
   private static QuickShop singleton;
   
   public static QuickShop instance() {
@@ -138,7 +131,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private final ShopItemMatcher itemMatcher = new QuickShopItemMatcher();
   /** Language manager, to select which language will loaded. */
   @NotNull
-  private final ResourceAccessor language = new ResourceAccessor();
+  private ResourceAccessor resourceAccessor;
 
   /** Whether or not to limit players shop amounts */
   private boolean limit = false;
@@ -189,6 +182,11 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private ScheduledSignUpdater signUpdateWatcher;
   private BukkitWrapper bukkitAPIWrapper;
   private boolean enabledAsyncDisplayDespawn;
+  
+  @Getter
+  private LocaleManager localeManager;
+  @Getter
+  private ShopMessager messager;
   
   @Getter
   @NotNull
@@ -342,14 +340,14 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   
   public QuickShop() {
     super();
-    singleton = instance = this;
+    singleton = this;
     Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
   }
 
   protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
     super(loader, description, dataFolder, file);
-    singleton = instance = this;
+    singleton = this;
     Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
 }
@@ -465,15 +463,17 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     /*
      * Locales
      */
+    resourceAccessor = new ResourceAccessor(this);
+    localeManager = new LocaleManager(this);
     try {
-      MsgUtil.loadCfgMessages();
+      localeManager.loadCfgMessages();
     } catch (Exception e) {
       getLogger().warning("An error throws when loading messages");
       e.printStackTrace();
     }
-    MsgUtil.loadItemi18n();
-    MsgUtil.loadEnchi18n();
-    MsgUtil.loadPotioni18n();
+    localeManager.loadItemi18n();
+    localeManager.loadEnchi18n();
+    localeManager.loadPotioni18n();
     
     /*
      * Economy
@@ -584,8 +584,9 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     }
     
     getLogger().info("Loading player messages..");
-    ShopMessager.loadTransactionMessages();
-    ShopMessager.clean();
+    messager = new ShopMessager();
+    messager.loadTransactionMessages();
+    messager.clean();
     
     getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
     

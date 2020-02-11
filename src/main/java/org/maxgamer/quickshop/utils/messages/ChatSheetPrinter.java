@@ -20,6 +20,7 @@ import java.util.Arrays;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,14 +40,14 @@ public class ChatSheetPrinter {
   private CommandSender p;
 
   public void printCenterLine(@NotNull String text) {
-    p.sendMessage(chatColor + MsgUtil.getMessage("tableformat.left_half_line", p) + text
-        + MsgUtil.getMessage("tableformat.right_half_line", p));
+    p.sendMessage(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.left_half_line", p) + text
+        + QuickShop.instance().getLocaleManager().getMessage("tableformat.right_half_line", p));
   }
 
   public void printExecuteableCmdLine(@NotNull String text, @NotNull String hoverText,
       @NotNull String executeCmd) {
     TextComponent message =
-        new TextComponent(chatColor + MsgUtil.getMessage("tableformat.left_begin", p) + text);
+        new TextComponent(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.left_begin", p) + text);
     message.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, executeCmd));
     message.setHoverEvent(
         new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));
@@ -54,26 +55,26 @@ public class ChatSheetPrinter {
   }
 
   public void printFooter() {
-    p.sendMessage(chatColor + MsgUtil.getMessage("tableformat.full_line", p));
+    p.sendMessage(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.full_line", p));
   }
 
   public void printHeader() {
     p.sendMessage("");
     p.sendMessage("");
-    p.sendMessage(chatColor + MsgUtil.getMessage("tableformat.full_line", p));
+    p.sendMessage(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.full_line", p));
   }
 
   public void printLine(@NotNull String text) {
     String[] texts = text.split("\n");
     Arrays.asList(texts).forEach((str) -> {
-      p.sendMessage(chatColor + MsgUtil.getMessage("tableformat.left_begin", p) + " " + str);
+      p.sendMessage(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.left_begin", p) + " " + str);
     });
   }
 
   public void printSuggestableCmdLine(@NotNull String text, @NotNull String hoverText,
       @NotNull String suggestCmd) {
     TextComponent message =
-        new TextComponent(chatColor + MsgUtil.getMessage("tableformat.left_begin", p) + text);
+        new TextComponent(chatColor + QuickShop.instance().getLocaleManager().getMessage("tableformat.left_begin", p) + text);
     message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, suggestCmd));
     message.setHoverEvent(
         new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(hoverText).create()));

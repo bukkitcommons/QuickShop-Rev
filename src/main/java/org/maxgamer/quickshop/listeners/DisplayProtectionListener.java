@@ -40,11 +40,10 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.hologram.DisplayItem;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class DisplayProtectionListener implements Listener {
@@ -473,6 +472,6 @@ public class DisplayProtectionListener implements Listener {
 
   private void sendAlert(@NotNull String msg) {
     if (BaseConfig.enableAlert)
-      MsgUtil.sendGlobalAlert(msg);
+      QuickShop.instance().getLocaleManager().sendGlobalAlert(msg);
   }
 }

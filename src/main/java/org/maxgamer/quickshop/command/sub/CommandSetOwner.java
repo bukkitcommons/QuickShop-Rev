@@ -9,8 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -24,19 +24,19 @@ public class CommandSetOwner extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
-      sender.sendMessage(MsgUtil.getMessage("Only player can run this command", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("Only player can run this command", sender));
       return;
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(MsgUtil.getMessage("command.no-owner-given", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.no-owner-given", sender));
       return;
     }
 
     final BlockIterator bIt = new BlockIterator((Player) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 
@@ -52,16 +52,16 @@ public class CommandSetOwner extends QuickShopCommand {
       final OfflinePlayer p = Bukkit.getOfflinePlayer(cmdArg[0]);
       final String shopOwner = Bukkit.getOfflinePlayer(shop.get().getOwner()).getName();
       if (!p.hasPlayedBefore()) {
-        sender.sendMessage(MsgUtil.getMessage("unknown-player", null));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("unknown-player", null));
         return;
       }
       shop.get().setOwner(p.getUniqueId());
       shop.get().setSignText();
       shop.get().save();
-      sender.sendMessage(MsgUtil.getMessage("command.new-owner", sender, shopOwner));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.new-owner", sender, shopOwner));
       return;
     }
 
-    sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
   }
 }

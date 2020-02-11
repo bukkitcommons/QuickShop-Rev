@@ -19,12 +19,17 @@ package org.maxgamer.quickshop;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.Rewriter;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ResourceAccessor {
+  private final Plugin plugin;
+  
   /**
    * Get target language's type file.
    *
@@ -40,7 +45,7 @@ public class ResourceAccessor {
     if (type == null || type.isEmpty()) {
       throw new IllegalArgumentException("Type cannot be null or empty");
     }
-    InputStream inputStream = QuickShop.instance().getResource(type + "/" + language + ".json");
+    InputStream inputStream = plugin.getResource(type + "/" + language + ".json");
     if (inputStream == null) {
       Util.debug("Using the default language because we can't get the InputStream.");
       inputStream = QuickShop.instance().getResource(type + "/" + "en" + ".json");
@@ -59,7 +64,7 @@ public class ResourceAccessor {
    * @param fileName The filename you want write to the plugin datafolder.
    */
   public void saveFile(@NotNull String language, @NotNull String type, @NotNull String fileName) {
-    File targetFile = new File(QuickShop.instance().getDataFolder(), fileName);
+    File targetFile = new File(plugin.getDataFolder(), fileName);
     if (!targetFile.exists()) {
       try {
         targetFile.createNewFile();
@@ -67,7 +72,6 @@ public class ResourceAccessor {
         e.printStackTrace();
       }
     }
-
     try {
       InputStream is = getFile(language, type);
       new Rewriter(targetFile).accept(is);

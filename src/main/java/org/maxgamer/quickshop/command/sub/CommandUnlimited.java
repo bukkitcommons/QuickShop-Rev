@@ -7,8 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -29,7 +29,7 @@ public class CommandUnlimited extends QuickShopCommand {
     final BlockIterator bIt = new BlockIterator((Player) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 
@@ -44,15 +44,15 @@ public class CommandUnlimited extends QuickShopCommand {
       shop.get().setUnlimited(!shop.get().isUnlimited());
 
       if (shop.get().isUnlimited()) {
-        sender.sendMessage(MsgUtil.getMessage("command.toggle-unlimited.unlimited", sender));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.toggle-unlimited.unlimited", sender));
         return;
       }
 
-      sender.sendMessage(MsgUtil.getMessage("command.toggle-unlimited.limited", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.toggle-unlimited.limited", sender));
 
       return;
     }
 
-    sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
   }
 }

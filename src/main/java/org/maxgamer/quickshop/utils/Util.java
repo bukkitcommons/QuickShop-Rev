@@ -51,7 +51,6 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import com.google.common.io.Files;
@@ -410,7 +409,7 @@ public class Util {
     if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
       return itemStack.getItemMeta().getDisplayName();
     
-    return MsgUtil.getLocalizedName(itemStack.getType().name());
+    return QuickShop.instance().getLocaleManager().getLocalizedName(itemStack.getType().name());
   }
 
   /**
@@ -557,7 +556,7 @@ public class Util {
           }
           inv.setItem(i, new ItemStack(Material.AIR));
           Util.debug("Found a displayitem in an inventory, Scheduling to removal...");
-          MsgUtil.sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
+          QuickShop.instance().getLocaleManager().sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at "
               + location + ", Item is " + itemStack.getType().name());
         }
       }

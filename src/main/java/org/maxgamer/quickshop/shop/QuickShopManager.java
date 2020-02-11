@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
@@ -124,7 +123,7 @@ public class QuickShopManager implements ShopManager {
         
         if (owned >= max && Util.canBeShop(block)) {
           player.sendMessage(
-              MsgUtil.getMessage("reached-maximum-can-create", player,
+              QuickShop.instance().getLocaleManager().getMessage("reached-maximum-can-create", player,
                   String.valueOf(owned), String.valueOf(max)));
           
           return false;

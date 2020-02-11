@@ -15,7 +15,6 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.data.ShopData;
 
@@ -29,12 +28,12 @@ public class CommandFind extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
-      sender.sendMessage(MsgUtil.getMessage("Only player can run this command", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("Only player can run this command", sender));
       return;
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(MsgUtil.getMessage("command.no-type-given", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.no-type-given", sender));
       return;
     }
 
@@ -92,7 +91,7 @@ public class CommandFind extends QuickShopCommand {
     }
 
     if (closest == null) {
-      sender.sendMessage(MsgUtil.getMessage("no-nearby-shop", sender, cmdArg[0]));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-nearby-shop", sender, cmdArg[0]));
       return;
     }
 
@@ -100,7 +99,7 @@ public class CommandFind extends QuickShopCommand {
     // Hack fix to make /qs find not used by /back
     QuickShop.instance().getBukkitAPIWrapper().teleportEntity(p, Util.lookAt(loc, lookat).add(0, -1.62, 0),
         PlayerTeleportEvent.TeleportCause.UNKNOWN);
-    p.sendMessage(MsgUtil.getMessage("nearby-shop-this-way", sender,
+    p.sendMessage(QuickShop.instance().getLocaleManager().getMessage("nearby-shop-this-way", sender,
         "" + (int) Math.floor(Math.sqrt(minDistanceSquared))));
   }
 }

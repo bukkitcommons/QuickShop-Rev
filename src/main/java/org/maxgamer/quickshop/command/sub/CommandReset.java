@@ -9,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import lombok.SneakyThrows;
 
 public class CommandReset extends QuickShopCommand {
@@ -35,7 +34,7 @@ public class CommandReset extends QuickShopCommand {
       @NotNull String[] cmdArg) {
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(MsgUtil.getMessage("command.no-type-given", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.no-type-given", sender));
       return;
     }
 
@@ -47,11 +46,11 @@ public class CommandReset extends QuickShopCommand {
         item.delete();
         ench.delete();
         potion.delete();
-        MsgUtil.MINECRAFT_LOCALE.reload();
-        MsgUtil.loadItemi18n();
-        MsgUtil.loadEnchi18n();
-        MsgUtil.loadPotioni18n();
-        sender.sendMessage(MsgUtil.getMessage("complete", sender));
+        QuickShop.instance().getLocaleManager().MINECRAFT_LOCALE.reload();
+        QuickShop.instance().getLocaleManager().loadItemi18n();
+        QuickShop.instance().getLocaleManager().loadEnchi18n();
+        QuickShop.instance().getLocaleManager().loadPotioni18n();
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
         break;
       case "config":
         File config = new File(QuickShop.instance().getDataFolder(), "config.yml");
@@ -60,13 +59,13 @@ public class CommandReset extends QuickShopCommand {
         QuickShop.instance().reloadConfig();
         Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
         Bukkit.getPluginManager().enablePlugin(QuickShop.instance());
-        sender.sendMessage(MsgUtil.getMessage("complete", sender));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
         break;
       case "messages":
         File msgs = new File(QuickShop.instance().getDataFolder(), "messages.json");
         msgs.delete();
-        MsgUtil.loadCfgMessages();
-        sender.sendMessage(MsgUtil.getMessage("complete", sender));
+        QuickShop.instance().getLocaleManager().loadCfgMessages();
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("complete", sender));
         break;
     }
   }

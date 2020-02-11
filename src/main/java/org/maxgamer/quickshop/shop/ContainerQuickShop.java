@@ -28,7 +28,6 @@ import org.maxgamer.quickshop.hologram.DisplayDataMatcher;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
 import org.maxgamer.quickshop.hologram.RealDisplayItem;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Managed;
@@ -465,27 +464,27 @@ public class ContainerQuickShop implements ContainerShop, Managed {
         QuickShop.instance().getPlaceHolderAPI() != null && QuickShop.instance().getPlaceHolderAPI().isEnabled() ?
         Bukkit.getOfflinePlayer(getOwner()) : null;
     
-    lines[0] = MsgUtil.getMessagePlaceholder(
+    lines[0] = QuickShop.instance().getLocaleManager().getMessagePlaceholder(
         "signs.header",
         player,
         ownerName());
     
     String section = shopType.name().toLowerCase();
-    lines[1] = MsgUtil.getMessagePlaceholder(
+    lines[1] = QuickShop.instance().getLocaleManager().getMessagePlaceholder(
         "signs.".concat(section),
         player,
         unlimited ?
-            MsgUtil.getMessagePlaceholder("signs.unlimited", player) :
+            QuickShop.instance().getLocaleManager().getMessagePlaceholder("signs.unlimited", player) :
             (String.valueOf(shopType == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()))
         );
     
     String stacks = item.getAmount() > 1 ? " * " + item.getAmount() : "";
-    lines[2] = MsgUtil.getMessagePlaceholder(
+    lines[2] = QuickShop.instance().getLocaleManager().getMessagePlaceholder(
         "signs.item",
         player,
         Util.getItemStackName(getItem()) + stacks);
     
-    lines[3] = MsgUtil.getMessagePlaceholder(
+    lines[3] = QuickShop.instance().getLocaleManager().getMessagePlaceholder(
         "signs.price",
         player,
         Util.format(price));
@@ -520,7 +519,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   public List<Sign> getShopSigns() {
     OfflinePlayer player = Bukkit.getOfflinePlayer(getOwner());
     String signHeader =
-        MsgUtil.getMessagePlaceholder("signs.header", player, ownerName());
+        QuickShop.instance().getLocaleManager().getMessagePlaceholder("signs.header", player, ownerName());
     
     List<Sign> signs = Lists.newArrayListWithCapacity(4);
 
@@ -643,13 +642,13 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   @Override
   public @NotNull String ownerName() {
     if (unlimited) {
-      return MsgUtil.getMessagePlaceholder("admin-shop",
+      return QuickShop.instance().getLocaleManager().getMessagePlaceholder("admin-shop",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
     
     String name = Bukkit.getOfflinePlayer(getOwner()).getName();
     if (name == null || name.isEmpty()) {
-      return MsgUtil.getMessagePlaceholder("unknown-owner",
+      return QuickShop.instance().getLocaleManager().getMessagePlaceholder("unknown-owner",
           Bukkit.getOfflinePlayer(this.getOwner()));
     }
     

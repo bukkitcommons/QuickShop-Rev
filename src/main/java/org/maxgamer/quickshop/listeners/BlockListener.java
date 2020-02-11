@@ -18,10 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -34,7 +31,7 @@ public class BlockListener implements Listener {
     Player player = event.getPlayer();
     
     if (event.isCancelled()) {
-      player.sendMessage(MsgUtil.getMessage("no-permission", player));
+      player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-permission", player));
       Util.debug("The action was cancelled by other plugin");
       return;
     }
@@ -63,23 +60,23 @@ public class BlockListener implements Listener {
       if (!isOwner &&
           !PermissionManager.instance().has(player, "quickshop.other.destroy")) {
         event.setCancelled(true);
-        player.sendMessage(MsgUtil.getMessage("no-permission", player));
+        player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-permission", player));
         return;
       }
       
       if (player.getGameMode() == GameMode.CREATIVE) {
         if (player.getInventory().getItemInMainHand().getType() != Material.GOLDEN_AXE) {
           event.setCancelled(true);
-          player.sendMessage(MsgUtil.getMessage("no-creative-break", player, MsgUtil.getLocalizedName(Material.GOLDEN_AXE.name())));
+          player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-creative-break", player, QuickShop.instance().getLocaleManager().getLocalizedName(Material.GOLDEN_AXE.name())));
           return;
         } else {
-          player.sendMessage(MsgUtil.getMessage("break-shop-use-supertool", player));
+          player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("break-shop-use-supertool", player));
         }
       }
       
       Shop.getActions().removeAction(player.getUniqueId());
       Shop.getLoader().delete(shop);
-      player.sendMessage(MsgUtil.getMessage("success-removed-shop", player));
+      player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("success-removed-shop", player));
     });
   }
 
@@ -114,7 +111,7 @@ public class BlockListener implements Listener {
       if (!PermissionManager.instance().has(player, "quickshop.create.double") &&
           Shop.getManager().hasLoadedShopAt(chest)) {
         event.setCancelled(true);
-        player.sendMessage(MsgUtil.getMessage("no-double-chests", player));
+        player.sendMessage(QuickShop.instance().getLocaleManager().getMessage("no-double-chests", player));
       }
     });
   }

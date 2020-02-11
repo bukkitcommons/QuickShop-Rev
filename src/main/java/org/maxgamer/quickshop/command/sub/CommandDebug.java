@@ -13,10 +13,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
 
 public class CommandDebug extends QuickShopCommand {
@@ -93,7 +93,7 @@ public class CommandDebug extends QuickShopCommand {
       Shop.instance().saveConfig();
       Bukkit.getPluginManager().disablePlugin(Shop.instance());
       Bukkit.getPluginManager().enablePlugin(Shop.instance());
-      sender.sendMessage(MsgUtil.getMessage("command.now-nolonger-debuging", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.now-nolonger-debuging", sender));
       return;
     }
 
@@ -101,7 +101,7 @@ public class CommandDebug extends QuickShopCommand {
     Shop.instance().saveConfig();
     Bukkit.getPluginManager().disablePlugin(Shop.instance());
     Bukkit.getPluginManager().enablePlugin(Shop.instance());
-    sender.sendMessage(MsgUtil.getMessage("command.now-debuging", sender));
+    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("command.now-debuging", sender));
   }
 
   public void printHandlerList(@NotNull CommandSender sender, String event) {

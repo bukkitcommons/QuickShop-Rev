@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.VersionUpdater;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.VersionData;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -56,9 +55,9 @@ public class UpdateWatcher implements Listener {
         ShopLogger.instance()
             .info("Update here: https://www.spigotmc.org/resources/62575/");
         
-        List<String> messages = MsgUtil.getI18nFile().getStringList("updatenotify.list");
+        List<String> messages = QuickShop.instance().getLocaleManager().getI18nFile().getStringList("updatenotify.list");
         
-        String notify = MsgUtil.fillArgs(
+        String notify = QuickShop.instance().getLocaleManager().fillArgs(
             messages.isEmpty() ?
                 "New update {0} now avaliable! Please update!" :
                   
@@ -71,9 +70,9 @@ public class UpdateWatcher implements Listener {
         );
         
         TextComponent updatenow = new TextComponent(
-            ChatColor.AQUA + MsgUtil.getMessage("updatenotify.buttontitle", sender));
+            ChatColor.AQUA + QuickShop.instance().getLocaleManager().getMessage("updatenotify.buttontitle", sender));
         TextComponent onekeyupdate = new TextComponent(
-            ChatColor.YELLOW + MsgUtil.getMessage("updatenotify.onekeybuttontitle", sender));
+            ChatColor.YELLOW + QuickShop.instance().getLocaleManager().getMessage("updatenotify.onekeybuttontitle", sender));
         updatenow.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL,
             "https://www.spigotmc.org/resources/62575/"));
         onekeyupdate

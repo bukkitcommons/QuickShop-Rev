@@ -12,12 +12,9 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.command.CommandProcesser;
-
 import cc.bukkit.shop.data.ShopData;
 
 public class CommandInfo extends QuickShopCommand {

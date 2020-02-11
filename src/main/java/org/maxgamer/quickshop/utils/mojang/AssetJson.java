@@ -1,9 +1,9 @@
 package org.maxgamer.quickshop.utils.mojang;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -36,7 +36,7 @@ public class AssetJson {
       Util.debug("Json object is null.");
       return null;
     }
-    JsonObject langObj = objs.getAsJsonObject(MsgUtil.fillArgs(pathTemplate, languageCode));
+    JsonObject langObj = objs.getAsJsonObject(fillArgs(pathTemplate, languageCode));
     if (langObj == null || langObj.isJsonNull()) {
       Util.debug("Cannot find request path.");
       Util.debug(this.gameAssets);
@@ -48,5 +48,21 @@ public class AssetJson {
       return null;
     }
     return hashObj.getAsString();
+  }
+  
+  public static String fillArgs(@Nullable String raw, @Nullable String... args) {
+    if (raw == null) {
+      return "Invalid message: null";
+    }
+    if (raw.isEmpty()) {
+      return "";
+    }
+    if (args == null) {
+      return raw;
+    }
+    for (int i = 0; i < args.length; i++) {
+      raw = StringUtils.replace(raw, "{" + i + "}", args[i] == null ? "" : args[i]);
+    }
+    return raw;
   }
 }

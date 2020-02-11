@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.hologram.DisplayItem;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

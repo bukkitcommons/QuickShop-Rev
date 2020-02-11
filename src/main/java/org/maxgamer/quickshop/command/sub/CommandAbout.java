@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
+
 
 public class CommandAbout extends QuickShopCommand {
   @Override
@@ -19,25 +19,25 @@ public class CommandAbout extends QuickShopCommand {
         + QuickShop.instance().getVersion());
     if (QuickShop.instance().getVersion().toUpperCase().contains("LTS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.lts", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.lts", sender));
     } else if (QuickShop.instance().getVersion().toUpperCase().contains("STABLE")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.stable", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.stable", sender));
     } else if (QuickShop.instance().getVersion().toUpperCase().contains("QV")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.qualityverifyed", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.qualityverifyed", sender));
     } else if (QuickShop.instance().getVersion().toUpperCase().contains("BETA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.unstable", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
     } else if (QuickShop.instance().getVersion().toUpperCase().contains("ALPHA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.unstable", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
     } else if (QuickShop.instance().getVersion().toUpperCase().contains("EARLY ACCESS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.unstable", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
     } else if (QuickShop.instance().getVersion().toUpperCase().contains("SNAPSHOT")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + MsgUtil.getMessage("updatenotify.label.unstable", sender));
+          + QuickShop.instance().getLocaleManager().getMessage("updatenotify.label.unstable", sender));
     } else {
       sender.sendMessage(
           ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN + "[Main Line]");

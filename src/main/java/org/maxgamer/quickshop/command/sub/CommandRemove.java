@@ -4,13 +4,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.command.CommandProcesser;
-
 import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
 import cc.bukkit.shop.viewer.ViewAction;
@@ -26,7 +23,7 @@ public class CommandRemove extends QuickShopCommand {
     }
     
     BlockViewer viwer = BlockViewer.get(((Player) sender), 10);
-    Runnable notLookingAtShop = () -> sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+    Runnable notLookingAtShop = () -> sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
     
     viwer
       .ifEmpty(notLookingAtShop)
@@ -39,7 +36,7 @@ public class CommandRemove extends QuickShopCommand {
               || PermissionManager.instance().has(sender, "quickshop.other.destroy")) {
             Shop.getLoader().delete(shop.get());
           } else {
-            sender.sendMessage(ChatColor.RED + MsgUtil.getMessage("no-permission", sender));
+            sender.sendMessage(ChatColor.RED + QuickShop.instance().getLocaleManager().getMessage("no-permission", sender));
           }
           
           return ViewAction.BREAK;

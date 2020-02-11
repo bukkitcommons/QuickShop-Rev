@@ -9,12 +9,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.command.CommandProcesser;
-
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandEmpty extends QuickShopCommand {
@@ -34,7 +32,7 @@ public class CommandEmpty extends QuickShopCommand {
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
       return;
     }
 
@@ -56,14 +54,14 @@ public class CommandEmpty extends QuickShopCommand {
         }
 
         cs.getInventory().clear();
-        sender.sendMessage(MsgUtil.getMessage("empty-success", sender));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("empty-success", sender));
       } else {
-        sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+        sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
       }
 
       return;
     }
 
-    sender.sendMessage(MsgUtil.getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(QuickShop.instance().getLocaleManager().getMessage("not-looking-at-shop", sender));
   }
 }

@@ -15,10 +15,10 @@ import cc.bukkit.shop.util.ShopLogger;
 
 public class ShopMessager {
   @NotNull
-  private static HashMap<UUID, String> playerMessages = Maps.newHashMap();
+  private final HashMap<UUID, String> playerMessages = Maps.newHashMap();
 
   /** Deletes any messages that are older than a week in the database, to save on space. */
-  public static void clean() {
+  public void clean() {
     ShopLogger.instance()
         .info("Cleaning purchase messages from the database that are over a week old...");
     // 604800,000 msec = 1 week.
@@ -33,7 +33,7 @@ public class ShopMessager {
    * @param args args
    * @return filled text
    */
-  public static String fillArgs(@Nullable String raw, @Nullable String... args) {
+  public String fillArgs(@Nullable String raw, @Nullable String... args) {
     if (raw == null) {
       return "Invalid message: null";
     }
@@ -55,12 +55,12 @@ public class ShopMessager {
    * @param p The player to message
    * @return True if success, False if the player is offline or null
    */
-  public static void flushMessagesFor(@NotNull Player player) {
+  public void flushMessagesFor(@NotNull Player player) {
     UUID uuid = player.getUniqueId();
     String message = playerMessages.remove(uuid);
     
     if (message != null) {
-      MsgUtil.sendMessage(player, message);
+      player.sendMessage(message);
       QuickShop.instance().getDatabaseHelper().cleanMessageForPlayer(uuid);
     }
   }
@@ -71,18 +71,18 @@ public class ShopMessager {
    *        Else, if they're not online, queues it for them in the database.
    * @param isUnlimited The shop is or unlimited
    */
-  public static void send(@NotNull UUID uuid, @NotNull String message) {
+  public void send(@NotNull UUID uuid, @NotNull String message) {
     Player player = Bukkit.getPlayer(uuid);
     if (player == null) {
       playerMessages.put(uuid, message);
       QuickShop.instance().getDatabaseHelper().sendMessage(uuid, message, System.currentTimeMillis());
     } else {
-      MsgUtil.sendMessage(player, message);
+      player.sendMessage(message);
     }
   }
   
   /** loads all player purchase messages from the database. */
-  public static void loadTransactionMessages() {
+  public void loadTransactionMessages() {
     playerMessages.clear(); // Delete old messages
     
     try {
