@@ -44,7 +44,6 @@ public class CommandReset extends QuickShopCommand {
         sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
         break;
       case "config":
-        QuickShop.instance().saveDefaultConfig();
         QuickShop.instance().reloadConfig();
         Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
         Bukkit.getPluginManager().enablePlugin(QuickShop.instance());

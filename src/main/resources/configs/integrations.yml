@@ -1,0 +1,22 @@
+integrations:
+  factions:
+    create:
+      flags: []
+      require-open: false
+      require-normal: false
+      require-wilderness: false
+      require-peaceful: false
+      require-permanent: false
+      require-safezone: false
+      require-own: false
+      require-warzone: false
+    enabled: false
+    trade:
+      require-open: false
+      require-normal: false
+      require-wilderness: false
+      require-peaceful: false
+      require-permanent: false
+      require-safezone: false
+      require-own: false
+      require-warzone: false

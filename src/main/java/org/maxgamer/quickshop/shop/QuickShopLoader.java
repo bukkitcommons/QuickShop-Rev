@@ -169,11 +169,6 @@ public class QuickShopLoader implements ShopLoader, Listener {
     
     Shop.getManager().unload(shop);
     
-    // Delete the display item
-    if (shop.getDisplay() != null) {
-      shop.getDisplay().remove();
-    }
-    
     // Delete the signs around it
     for (Sign s : shop.getShopSigns())
       s.getBlock().setType(Material.AIR);

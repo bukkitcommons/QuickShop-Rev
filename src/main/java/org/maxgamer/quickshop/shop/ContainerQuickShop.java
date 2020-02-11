@@ -91,6 +91,11 @@ public class ContainerQuickShop implements ContainerShop, Managed {
       }
     }
   }
+  
+  public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
+      @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
+    this(shopLocation, price, item, moderator, unlimited, type, true);
+  }
 
   /**
    * Adds a new shop.
@@ -104,7 +109,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    * @param unlimited The unlimited
    */
   public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
-      @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
+      @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type, boolean spawnDisplay) {
     this.location = shopLocation;
     this.price = price;
     this.moderator = moderator;
@@ -112,15 +117,17 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     this.shopType = type;
     this.unlimited = unlimited;
 
-    if (DisplayConfig.displayItems) {
-      DisplayData data = DisplayDataMatcher.create(this.item);
-      switch (data.type()) {
-        case ARMOR_STAND:
-          display = new ArmorStandDisplayItem(this, data);
-          break;
-        default:
-          display = new RealDisplayItem(this);
-          break;
+    if (spawnDisplay) {
+      if (DisplayConfig.displayItems) {
+        DisplayData data = DisplayDataMatcher.create(this.item);
+        switch (data.type()) {
+          case ARMOR_STAND:
+            display = new ArmorStandDisplayItem(this, data);
+            break;
+          default:
+            display = new RealDisplayItem(this);
+            break;
+        }
       }
     }
   }

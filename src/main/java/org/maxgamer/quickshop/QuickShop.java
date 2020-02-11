@@ -155,9 +155,9 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   /*
    * Softdepend plugins
    */
-  private Optional<Plugin> openInvPlugin;
+  private Optional<Plugin> openInvPlugin = Optional.empty();
 
-  private Optional<Plugin> placeHolderAPI;
+  private Optional<Plugin> placeHolderAPI = Optional.empty();
   
   /*
    * Database
@@ -192,8 +192,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     }
     return max;
   }
-  
-  
   
   private void loadSoftdepends() {
     if (BaseConfig.openInv) {
@@ -398,7 +396,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
      */
     reloadConfig();
     getConfig().options().copyDefaults(true);
-    saveDefaultConfig();
     Util.loadFromConfig();
     
     /*

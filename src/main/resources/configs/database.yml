@@ -1,0 +1,8 @@
+settings:
+  prefix: ''
+  mysql:
+    enable: false
+    ssl: false
+    host: localhost
+    port: '3306'
+    name: quickshop

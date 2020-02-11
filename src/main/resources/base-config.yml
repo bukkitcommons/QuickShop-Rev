@@ -1,0 +1,99 @@
+settings:
+  permission:
+    provider: Bukkit
+  plugin:
+    developer-mode: false
+    language: default
+    logger:
+      use-log4j: true
+      log-actions: true
+      debug: false
+    enable-updater: true
+    enable-error-reporter: true
+  find-distance: 45
+  effects:
+    sound:
+      on-tab-complete: true
+      on-click: true
+    currency-symbol: $
+    display:
+      despawner:
+        enable: false
+        range: 20
+  auto-sign: true
+  allow-no-sign: false
+  trade-all-word: all
+  allow-loan: false
+  tax:
+    account: ''
+    rate: 0.01
+  enable-protection: true
+  eco:
+    price:
+      mod-fee: -1.0
+      minimum: -1.0
+      create-cost: 0.0
+      maximum: -1.0
+      maximum-digitals: -1
+      integer-only: false
+      allow-free-shops: true
+      use-decimal-format: true
+    system-type: 0
+    mixed:
+      command:
+        deposit: eco give {0} {1}
+        withdraw: eco take {0} {1}
+    refund:
+      enable: true
+      cost: 0.0
+    show-tax: true
+  ignore-chat-cancelling: false
+  safety:
+    enhanced-display-protection: false
+    enhanced-shop-protection: false
+    enable-alert: false
+    explosion-protection: true
+    entity-protection: true
+  lockette:
+    enable: true
+    private-text: '[Private]'
+    more-users-text: '[More Users]'
+  lock: true
+  limits:
+    enable: true
+    ranks:
+    - qs.limits.5: 5
+shop:
+  ignore-unlimited-shop-messages: false
+  display-items-check-ticks: 20
+  ongoing-fee:
+    cost-per-shop: 20
+    ignore-unlimited: true
+  max-shops-checks-in-once: 20
+  blacklist: []
+  price-restriction: []
+  sign-material: OAK_WALL_SIGN
+  disable-vault-format: false
+  blacklist-world: []
+  limits:
+    default: 2
+  plugin:
+    OpenInv: false
+    PlaceHolderAPI: false
+    enable-metrics: true
+  update-sign-when-inventory-moving: true
+  sneak-to-control: false
+  sneak-to-trade: false
+  sneak-to-creat: false
+  auto-fetch-shop-messages: false
+  display-name-visible: false
+  pay-unlimited-shop-owners: false
+  force-load-downgrade-items:
+    enable: false
+    method: 0
+  blacklist-lores: []
+show-owner-uuid-in-controlpanel-if-op: false
+server:
+  platform: ''
+  uuid: 4e69d4d9-9e2a-4f6c-b298-f9748db92fb6
+decimal-format: '#,###,###.###'

@@ -1,0 +1,68 @@
+settings:
+  matcher: 0
+  damage: true
+  attribute: true
+  custom-model-data: false
+  display-name: true
+  enchant: true
+  localized-name: true
+  flag: true
+  unbreakable: true
+  custom-tags: true
+  lore: true
+  type:
+    potion:
+      enable: true
+      attributes:
+        data: true
+        custom-effects: true
+        colour: true
+    map:
+      enable: true
+      attributes:
+        scaling: true
+        id: true
+        location-name: true
+        colour: true
+    banner:
+      enable: true
+      attributes:
+        pattern: true
+        base-colour: true
+    skull:
+      enable: true
+    spawn-egg:
+      enable: true
+    leather-armour:
+      enable: true
+    firework:
+      enable: true
+      attributes:
+        power: true
+        effects: true
+    firework-charge:
+      enable: true
+    enchant-book:
+      enable: true
+    book:
+      enable: true
+      attributes:
+        title: true
+        author: true
+        pages: true
+        generation: true
+    crossbow:
+      enable: true
+    knowledge-book:
+      enable: true
+    suspicious-stew:
+      enable: true
+    tropical-fish-bucket:
+      enable: true
+      attributes:
+        pattern: true
+        pattern-colour: true
+        body-colour: true
+    repair-cost:
+      enable: true
+  repair-cost: true

@@ -43,7 +43,7 @@ public class CommandClean extends QuickShopCommand {
         ContainerShop shop = new ContainerQuickShop(
             ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
             data.price(), Util.deserialize(data.item()),
-            data.moderators(), data.unlimited(), data.type());
+            data.moderators(), data.unlimited(), data.type(), false);
         
         if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0) {
           if (!Util.canBeShopIgnoreBlocklist(shop.getLocation().block().getState())) {
@@ -82,6 +82,7 @@ public class CommandClean extends QuickShopCommand {
 
     Shop.getMessager().clean();
     sender.sendMessage(Shop.getLocaleManager().getMessage("command.cleaned", sender, "" + count[0]));
-    sender.sendMessage("There is " + count[1] + " shops with non-goods items inside have been ignored.");
+    if (count[1] > 0)
+      sender.sendMessage("There is " + count[1] + " shops with non-goods items inside have been ignored.");
   }
 }
