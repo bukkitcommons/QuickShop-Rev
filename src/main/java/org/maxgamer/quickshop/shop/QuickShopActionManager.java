@@ -23,6 +23,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopMessager;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -173,7 +174,7 @@ public class QuickShopActionManager implements ShopActionManager {
     }
 
     if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
-      MsgUtil.send(shop.getOwner(), msg);
+      ShopMessager.send(shop.getOwner(), msg);
     
     shop.buy(p, amount);
     MsgUtil.sendSellSuccess(p, shop, amount);
@@ -483,7 +484,7 @@ public class QuickShopActionManager implements ShopActionManager {
     }
 
     if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
-      MsgUtil.send(shop.getOwner(), msg);
+      ShopMessager.send(shop.getOwner(), msg);
     
     shop.sell(p, amount);
     MsgUtil.sendPurchaseSuccess(p, shop, amount, info);

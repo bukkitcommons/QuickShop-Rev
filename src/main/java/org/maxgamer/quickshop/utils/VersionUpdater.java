@@ -21,6 +21,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.github.GithubAPI;
 import org.maxgamer.quickshop.utils.github.ReleaseJsonContainer;
 import com.google.common.collect.Lists;
+import cc.bukkit.shop.util.VersionData;
 
 public class VersionUpdater {
   private static List<String> getHistoryVersions() throws IOException {

@@ -20,9 +20,23 @@ package org.maxgamer.quickshop.utils.nms;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
 
-public class ReflectionUtil {
+public class Reflections {
+  public static String getServerVersion() {
+    try {
+      Field consoleField = Bukkit.getServer().getClass().getDeclaredField("console");
+      consoleField.setAccessible(true); // protected
+      Object console = consoleField.get(Bukkit.getServer()); // dedicated server
+      return String
+          .valueOf(console.getClass().getSuperclass().getMethod("getVersion").invoke(console));
+    } catch (Exception e) {
+      e.printStackTrace();
+      return "Unknown";
+    }
+  }
+  
   public static Class<?> getClass(String name) {
     try {
       return Class.forName(name);

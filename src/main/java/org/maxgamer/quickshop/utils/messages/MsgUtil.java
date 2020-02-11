@@ -58,8 +58,6 @@ public class MsgUtil {
   private static LocaleFile messagei18n;
   
   @NotNull
-  private static HashMap<UUID, String> playerMessages = Maps.newHashMap();
-  @NotNull
   private static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
   @NotNull
   public final static MinecraftLocale MINECRAFT_LOCALE = new MinecraftLocale();
@@ -72,16 +70,6 @@ public class MsgUtil {
    */
   public static String translateBoolean(boolean bool) {
     return MsgUtil.getMessage(bool ? "booleanformat.success" : "booleanformat.failed", null);
-  }
-
-  /** Deletes any messages that are older than a week in the database, to save on space. */
-  @Deprecated // FIXME Move
-  public static void clean() {
-    ShopLogger.instance()
-        .info("Cleaning purchase messages from the database that are over a week old...");
-    // 604800,000 msec = 1 week.
-    long weekAgo = System.currentTimeMillis() - 604800000;
-    QuickShop.instance().getDatabaseHelper().cleanMessage(weekAgo);
   }
 
   /**
@@ -105,22 +93,6 @@ public class MsgUtil {
       raw = StringUtils.replace(raw, "{" + i + "}", args[i] == null ? "" : args[i]);
     }
     return raw;
-  }
-
-  /**
-   * Empties the queue of messages a player has and sends them to the player.
-   *
-   * @param p The player to message
-   * @return True if success, False if the player is offline or null
-   */
-  public static void flushMessagesFor(@NotNull Player player) {
-    UUID uuid = player.getUniqueId();
-    String message = playerMessages.remove(uuid);
-    
-    if (message != null) {
-      sendMessage(player, message);
-      QuickShop.instance().getDatabaseHelper().cleanMessageForPlayer(uuid);
-    }
   }
 
   /**
@@ -349,47 +321,6 @@ public class MsgUtil {
         potioni18n.set("potioni18n." + potion.getName(), potionName);
       }
     });
-  }
-
-  /** loads all player purchase messages from the database. */
-  public static void loadTransactionMessages() {
-    playerMessages.clear(); // Delete old messages
-    
-    try {
-      ResultSet rs = QuickShop.instance().getDatabaseHelper().selectAllMessages();
-      
-      while (rs.next()) {
-        String owner = rs.getString("owner");
-        UUID ownerUUID;
-        if (Util.isUUID(owner)) {
-          ownerUUID = UUID.fromString(owner);
-        } else {
-          ownerUUID = Bukkit.getOfflinePlayer(owner).getUniqueId();
-        }
-        
-        playerMessages.put(ownerUUID, rs.getString("message"));
-      }
-      
-    } catch (Throwable t) {
-      ShopLogger.instance().severe("Could not load transaction messages from database.");
-      t.printStackTrace();
-    }
-  }
-
-  /**
-   * @param player The name of the player to message
-   * @param message The message to send them Sends the given player a message if they're online.
-   *        Else, if they're not online, queues it for them in the database.
-   * @param isUnlimited The shop is or unlimited
-   */
-  public static void send(@NotNull UUID uuid, @NotNull String message) {
-    Player player = Bukkit.getPlayer(uuid);
-    if (player == null) {
-      playerMessages.put(uuid, message);
-      QuickShop.instance().getDatabaseHelper().sendMessage(uuid, message, System.currentTimeMillis());
-    } else {
-      sendMessage(player, message);
-    }
   }
   
   public static void sendMessage(@NotNull Player player, @NotNull String message) {

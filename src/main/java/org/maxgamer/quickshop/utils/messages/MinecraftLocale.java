@@ -16,7 +16,7 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.files.Rewriter;
 import org.maxgamer.quickshop.utils.mojang.AssetJson;
 import org.maxgamer.quickshop.utils.mojang.MojangAPI;
-import org.maxgamer.quickshop.utils.nms.ReflectFactory;
+import org.maxgamer.quickshop.utils.nms.Reflections;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -37,7 +37,7 @@ public class MinecraftLocale {
         cacheFile.createNewFile();
 
       YamlConfiguration cache = YamlConfiguration.loadConfiguration(cacheFile);
-      String serverVersion = ReflectFactory.getServerVersion();
+      String serverVersion = Reflections.getServerVersion();
 
       String cachedNMSVersion = cache.getString("ver", serverVersion);
       String langHash = cache.getString("hash", "");

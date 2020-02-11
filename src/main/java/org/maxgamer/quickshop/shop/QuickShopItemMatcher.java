@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils;
+package org.maxgamer.quickshop.shop;
 
 import java.util.Map;
 import org.bukkit.attribute.Attribute;
@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.MapMeta;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.MatcherConfig;
+import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Multimap;
 import cc.bukkit.shop.ShopItemMatcher;
 

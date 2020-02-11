@@ -31,6 +31,7 @@ import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopMessager;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -251,7 +252,7 @@ public class ShopActionListener implements Listener {
   @EventHandler(priority = EventPriority.MONITOR)
   public void onJoin(PlayerJoinEvent event) {
     if (BaseConfig.autoFetchShopMessages)
-      MsgUtil.flushMessagesFor(event.getPlayer());
+      ShopMessager.flushMessagesFor(event.getPlayer());
   }
   
   @EventHandler

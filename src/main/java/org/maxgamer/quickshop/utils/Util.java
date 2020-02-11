@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.AbstractMap.SimpleEntry;
@@ -64,19 +62,11 @@ import cc.bukkit.shop.DisplayInfo;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.database.connector.MySQLConnector;
-import cc.bukkit.shop.hologram.DisplayItem;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-/** @author MACHENIKE */
-/**
- * Utility class for plugin generally helper methods
- * 
- * @author Ghost_chu
- * @author Sotr
- */
 public class Util {
   static short tookLongTimeCostTimes;
   private static EnumSet<Material> blacklist = EnumSet.noneOf(Material.class);
@@ -84,9 +74,7 @@ public class Util {
   private static List<String> debugLogs = new LinkedList<>();
   private static EnumMap<Material, Entry<Double, Double>> restrictedPrices =
       new EnumMap<>(Material.class);
-  private static Object serverInstance;
   private static EnumSet<Material> blockListedBlocks = EnumSet.noneOf(Material.class);
-  private static Field tpsField;
   private static List<String> worldBlacklist = new ArrayList<>();
   
   public static Location getCenter(@NotNull ShopLocation shopLocation) {
@@ -423,19 +411,6 @@ public class Util {
       return itemStack.getItemMeta().getDisplayName();
     
     return MsgUtil.getLocalizedName(itemStack.getType().name());
-  }
-
-  public static Class<?> getNMSClass(@Nullable String className) {
-    if (className == null) {
-      className = "MinecraftServer";
-    }
-    String name = Bukkit.getServer().getClass().getPackage().getName();
-    String version = name.substring(name.lastIndexOf('.') + 1);
-    try {
-      return Class.forName("net.minecraft.server." + version + "." + className);
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   /**
@@ -809,19 +784,6 @@ public final static Gson GSON = new Gson();
     Container container = (Container) b.getState();
     return (container.getInventory() instanceof DoubleChestInventory);
   }
-
-  /**
-   * Returns true if the given location is loaded or not.
-   *
-   * @param location The location
-   * @return true if the given location is loaded or not.
-   */
-  public static boolean isChunkLoaded(@NotNull Location location) {
-    int chunkX = location.getBlockX() >> 4;
-    int chunkZ = location.getBlockZ() >> 4;
-    
-    return location.getWorld().isChunkLoaded(chunkX, chunkZ);
-  }
   
   public static boolean isChunkLoaded(@NotNull ShopLocation location) {
     int chunkX = location.x() >> 4;
@@ -1005,19 +967,6 @@ public final static Gson GSON = new Gson();
   }
 
   /**
-   * Parse colors for the List.
-   *
-   * @param list the list
-   * @return parsed list
-   */
-  public static List<String> parseColours(@NotNull List<String> list) {
-    final List<String> newList = new ArrayList<>();
-    list.forEach(s -> newList.add(parseColours(s)));
-
-    return newList;
-  }
-
-  /**
    * Converts a name like IRON_INGOT into Iron Ingot to improve readability
    *
    * @param ugly The string such as IRON_INGOT
@@ -1132,27 +1081,6 @@ public final static Gson GSON = new Gson();
       return Material.OAK_WALL_SIGN;
     } catch (Throwable e) {
       return Material.valueOf("WALL_SIGN");
-    }
-  }
-
-  /**
-   * Get MinecraftServer's TPS
-   *
-   * @return TPS (e.g 19.92)
-   */
-  public static Double getTPS() {
-    try {
-      serverInstance = getNMSClass("MinecraftServer").getMethod("getServer").invoke(null);
-      tpsField = serverInstance.getClass().getField("recentTps");
-    } catch (NoSuchFieldException | SecurityException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
-      e.printStackTrace();
-    }
-    try {
-      double[] tps = ((double[]) tpsField.get(serverInstance));
-      return tps[0];
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
     }
   }
 

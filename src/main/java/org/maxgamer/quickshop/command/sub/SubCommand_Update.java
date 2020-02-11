@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.utils.VersionData;
 import org.maxgamer.quickshop.utils.VersionUpdater;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
@@ -22,7 +21,7 @@ public class SubCommand_Update extends SneakyTabs implements CommandProcesser {
     Bukkit.getScheduler().runTaskAsynchronously(QuickShop.instance(), () -> {
       sender.sendMessage(ChatColor.YELLOW + "Checking for updates...");
 
-      final Optional<VersionData> data = VersionUpdater.acquire();
+      final Optional<cc.bukkit.shop.util.VersionData> data = VersionUpdater.acquire();
       if (!data.isPresent()) {
         sender.sendMessage(ChatColor.GREEN + "No updates can update now.");
         return;

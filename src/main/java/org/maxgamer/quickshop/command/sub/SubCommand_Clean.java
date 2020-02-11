@@ -12,6 +12,7 @@ import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopMessager;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -77,7 +78,7 @@ public class SubCommand_Clean extends SneakyTabs implements CommandProcesser {
     for (ContainerShop shop : pendingRemoval)
       QuickShopLoader.instance().delete(shop);
 
-    MsgUtil.clean();
+    ShopMessager.clean();
     sender.sendMessage(MsgUtil.getMessage("command.cleaned", sender, "" + count[0]));
     sender.sendMessage("There is " + count[1] + " shops with non-goods items inside have been ignored.");
   }

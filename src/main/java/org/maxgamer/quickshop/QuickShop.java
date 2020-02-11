@@ -51,14 +51,15 @@ import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
+import org.maxgamer.quickshop.shop.QuickShopItemMatcher;
 import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
-import org.maxgamer.quickshop.utils.QuickShopItemMatcher;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
-import org.maxgamer.quickshop.utils.nms.ReflectionUtil;
+import org.maxgamer.quickshop.utils.messages.ShopMessager;
+import org.maxgamer.quickshop.utils.nms.Reflections;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
 import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
@@ -342,18 +343,20 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   public QuickShop() {
     super();
     singleton = instance = this;
+    Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
   }
 
   protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
     super(loader, description, dataFolder, file);
     singleton = instance = this;
+    Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
 }
   
   private void onLoad0() throws IllegalArgumentException, IllegalAccessException {
     try {
-      Field logger = ReflectionUtil.getField(JavaPlugin.class, "logger");
+      Field logger = Reflections.getField(JavaPlugin.class, "logger");
       if (logger != null) {
         logger.set(this, ShopLogger.instance());
         // Note: Do this after onLoad
@@ -582,8 +585,8 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     }
     
     getLogger().info("Loading player messages..");
-    MsgUtil.loadTransactionMessages();
-    MsgUtil.clean();
+    ShopMessager.loadTransactionMessages();
+    ShopMessager.clean();
     
     getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
     

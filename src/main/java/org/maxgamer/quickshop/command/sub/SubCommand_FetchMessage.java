@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
-import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import org.maxgamer.quickshop.utils.messages.ShopMessager;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
 
@@ -22,6 +22,6 @@ public class SubCommand_FetchMessage extends SneakyTabs implements CommandProces
     QuickShop.instance()
              .getServer()
              .getScheduler()
-             .runTask(QuickShop.instance(), () -> MsgUtil.flushMessagesFor((Player) sender));
+             .runTask(QuickShop.instance(), () -> ShopMessager.flushMessagesFor((Player) sender));
   }
 }
