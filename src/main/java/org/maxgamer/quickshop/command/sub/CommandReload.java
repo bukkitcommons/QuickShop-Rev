@@ -1,5 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +12,11 @@ import cc.bukkit.shop.command.CommandProcesser;
 
 
 public class CommandReload extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.reload");
+  }
+  
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {

@@ -108,7 +108,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private IssuesHelper bootError;
   // Listeners - We decide which one to use at runtime
   private final ChatListener chatListener = new ChatListener();
-  private QuickShopCommandManager commandManager;
+  private final QuickShopCommandManager commandManager = new QuickShopCommandManager();
   /** WIP */
   private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
 
@@ -491,7 +491,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     /*
      * Commands
      */
-    commandManager = new QuickShopCommandManager();
     getCommand("qs").setExecutor(commandManager);
     getCommand("qs").setTabCompleter(commandManager);
     

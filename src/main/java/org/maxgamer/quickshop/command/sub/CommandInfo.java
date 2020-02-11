@@ -1,5 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,6 +21,10 @@ import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.data.ShopData;
 
 public class CommandInfo extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.info");
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

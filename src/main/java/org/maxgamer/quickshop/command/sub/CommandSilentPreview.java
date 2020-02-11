@@ -1,5 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -14,6 +16,11 @@ import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandSilentPreview extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.preview");
+  }
+  
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {

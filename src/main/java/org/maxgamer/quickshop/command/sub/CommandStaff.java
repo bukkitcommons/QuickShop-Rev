@@ -1,6 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -18,10 +19,14 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandStaff extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.staff");
+  }
+  
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,

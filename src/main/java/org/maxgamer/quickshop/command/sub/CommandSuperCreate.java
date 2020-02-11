@@ -1,6 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,11 +17,16 @@ import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
+import com.google.common.collect.Lists;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.data.ShopCreator;
 import cc.bukkit.shop.data.ShopLocation;
 
 public class CommandSuperCreate extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Lists.newArrayList("quickshop.create.sell", "quickshop.create.admin");
+  }
 
   @NotNull
   @Override

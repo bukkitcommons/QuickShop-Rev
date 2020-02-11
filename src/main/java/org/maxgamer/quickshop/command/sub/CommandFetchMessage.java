@@ -1,5 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,6 +13,10 @@ import cc.bukkit.shop.command.CommandProcesser;
 
 
 public class CommandFetchMessage  extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.fetchmessage");
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

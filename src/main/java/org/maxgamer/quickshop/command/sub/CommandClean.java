@@ -1,5 +1,6 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -21,6 +22,10 @@ import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.data.ShopLocation;
 
 public class CommandClean extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.clean");
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

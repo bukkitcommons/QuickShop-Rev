@@ -1,5 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,6 +13,11 @@ import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandUnlimited extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.unlimited");
+  }
+  
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {

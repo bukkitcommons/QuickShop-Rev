@@ -1,6 +1,6 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -15,12 +15,9 @@ import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandSetOwner extends QuickShopCommand {
-
-  @NotNull
   @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    return new ArrayList<>();
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.setowner");
   }
 
   @Override

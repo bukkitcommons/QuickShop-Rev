@@ -1,20 +1,23 @@
 package org.maxgamer.quickshop.command.sub;
 
 import java.sql.SQLException;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
+import com.google.common.collect.Lists;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.command.CommandProcesser;
 
 
 public class CommandCleanGhost extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Lists.newArrayList("quickshop.create.sell", "quickshop.cleanghost");
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

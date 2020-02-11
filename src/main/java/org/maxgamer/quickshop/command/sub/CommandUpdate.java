@@ -1,6 +1,8 @@
 package org.maxgamer.quickshop.command.sub;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -9,10 +11,15 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.VersionUpdater;
-import cc.bukkit.shop.command.CommandProcesser;
+import cc.bukkit.shop.util.VersionData;
 
 
 public class CommandUpdate extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.alert");
+  }
+  
   @Override
   public void onCommand(
       @NotNull CommandSender sender,
@@ -22,7 +29,7 @@ public class CommandUpdate extends QuickShopCommand {
     Bukkit.getScheduler().runTaskAsynchronously(QuickShop.instance(), () -> {
       sender.sendMessage(ChatColor.YELLOW + "Checking for updates...");
 
-      final Optional<cc.bukkit.shop.util.VersionData> data = VersionUpdater.acquire();
+      final Optional<VersionData> data = VersionUpdater.acquire();
       if (!data.isPresent()) {
         sender.sendMessage(ChatColor.GREEN + "No updates can update now.");
         return;

@@ -3,6 +3,8 @@ package org.maxgamer.quickshop.command.sub;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -14,6 +16,10 @@ import org.maxgamer.quickshop.utils.paste.Paste;
 import cc.bukkit.shop.Shop;
 
 public class CommandPaste extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.paste");
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

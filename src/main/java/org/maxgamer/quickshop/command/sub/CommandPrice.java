@@ -1,6 +1,7 @@
 package org.maxgamer.quickshop.command.sub;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import org.bukkit.block.Block;
@@ -18,11 +19,14 @@ import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandPrice extends QuickShopCommand {
+  @Override
+  public List<String> permissions() {
+    return Collections.singletonList("quickshop.create.changeprice");
+  }
 
   @NotNull
   @Override
