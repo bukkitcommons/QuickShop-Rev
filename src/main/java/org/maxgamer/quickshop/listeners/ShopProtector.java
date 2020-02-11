@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -37,7 +37,7 @@ public class ShopProtector implements Listener {
       @NotNull Runnable protection,
       @NotNull Consumer<Shop> orElse) {
 
-    ShopManager
+    QuickShopManager
     .instance()
     .getLoadedShopFrom(location)
 
@@ -100,7 +100,7 @@ public class ShopProtector implements Listener {
     if (BaseConfig.enhancedShopProtection)
 
       for (BlockState block : event.getBlocks()) {
-        ShopViewer viewer = ShopManager.instance().getLoadedShopFrom(block.getLocation());
+        ShopViewer viewer = QuickShopManager.instance().getLoadedShopFrom(block.getLocation());
 
         if (viewer.isPresent()) {
           event.setCancelled(true);
@@ -113,7 +113,7 @@ public class ShopProtector implements Listener {
   public void onSpongeing(SpongeAbsorbEvent event) {
     if (BaseConfig.enhancedShopProtection)
       for (BlockState block : event.getBlocks())
-        ShopManager
+        QuickShopManager
         .instance()
         .getLoadedShopFrom(block.getLocation()).ifPresent(() -> event.setCancelled(true));
   }

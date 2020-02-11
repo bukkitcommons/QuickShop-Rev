@@ -24,7 +24,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.shop.ContainerShop;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
@@ -48,7 +48,7 @@ public class SubCommand_Empty extends SneakyTabs implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = ShopManager.instance().getLoadedShopAt(b.getLocation());
+      final ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(b.getLocation());
 
       if (!shop.isPresent()) {
         continue;

@@ -8,14 +8,14 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.hologram.DisplayItem;
 
 public interface Shop extends Managed {
   /**
    * Delete the shop from database.
-   * @see ShopManager#delete(Shop)
+   * @see QuickShopManager#delete(Shop)
    */
   @Deprecated
   default public void delete() {
@@ -47,13 +47,13 @@ public interface Shop extends Managed {
   
   /**
    * Invokes on shop being loaded.
-   * @see ShopManager#load(String, Shop)
+   * @see QuickShopManager#load(String, Shop)
    */
   void onLoad();
 
   /**
    * Invokes on shop being unloaded.
-   * @see ShopManager#unload(Shop)
+   * @see QuickShopManager#unload(Shop)
    */
   void onUnload();
   

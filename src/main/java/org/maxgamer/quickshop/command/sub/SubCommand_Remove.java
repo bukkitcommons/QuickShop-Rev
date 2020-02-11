@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.command.CommandProcesser;
 import cc.bukkit.shop.command.SneakyTabs;
@@ -33,7 +33,7 @@ public class SubCommand_Remove extends SneakyTabs implements CommandProcesser {
       .ifEmpty(notLookingAtShop)
       
       .forEach(block -> {
-        ShopViewer shop = ShopManager.instance().getLoadedShopAt(block);
+        ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(block);
         
         if (shop.isPresent()) {
           if (shop.get().getModerator().isModerator(((Player) sender).getUniqueId())

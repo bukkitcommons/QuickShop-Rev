@@ -30,7 +30,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ContainerShop;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
@@ -134,7 +134,7 @@ public class SubCommand_Price implements CommandProcesser {
 
     while (bIt.hasNext()) {
       final Block b = bIt.next();
-      final ShopViewer shop = ShopManager.instance().getLoadedShopAt(b.getLocation());
+      final ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(b.getLocation());
 
       if (shop.isEmpty() || (!shop.get().getModerator().isModerator(((Player) sender).getUniqueId())
           && !PermissionManager.instance().has(sender, "quickshop.other.price"))) {

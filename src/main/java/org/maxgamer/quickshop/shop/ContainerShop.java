@@ -385,7 +385,7 @@ public class ContainerShop implements Shop, Managed {
     if (!c.isPresent())
       return null;
     
-    ShopViewer shop = ShopManager.instance().getLoadedShopAt(c.get());
+    ShopViewer shop = QuickShopManager.instance().getLoadedShopAt(c.get());
     return (ContainerShop) shop.get();
   }
 
@@ -413,7 +413,7 @@ public class ContainerShop implements Shop, Managed {
       ShopLogger.instance().severe("The container of a shop have probably gone, with current block type: " +
           location.block().getType() + " @ " + location);
       
-      ShopManager.instance().unload(this);
+      QuickShopManager.instance().unload(this);
       return null;
     }
   }

@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopActionManager;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.command.CommandProcesser;
@@ -80,7 +80,7 @@ public class SubCommand_SuperCreate implements CommandProcesser {
         continue;
       }
 
-      if (!ShopManager.canBuildShop(p, b)) {
+      if (!QuickShopManager.canBuildShop(p, b)) {
         // As of the new checking system, most plugins will tell the
         // player why they can't create a shop there.
         // So telling them a message would cause spam etc.

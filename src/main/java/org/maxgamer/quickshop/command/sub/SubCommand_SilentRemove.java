@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.command.CommandProcesser;
@@ -37,7 +37,7 @@ public class SubCommand_SilentRemove extends SneakyTabs implements CommandProces
 
     final Player p = (Player) sender;
     final ShopViewer shop =
-        ShopManager.instance().getLoadedShopAt(new Location(Bukkit.getWorld(cmdArg[0]),
+        QuickShopManager.instance().getLoadedShopAt(new Location(Bukkit.getWorld(cmdArg[0]),
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent()) {

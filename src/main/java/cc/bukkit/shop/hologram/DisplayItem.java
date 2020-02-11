@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 
 /**
@@ -54,7 +54,7 @@ public interface DisplayItem {
         
         if (shopProtectionFlag.getShopLocationData() != null) {
           ShopViewer viewer =
-              ShopManager.instance().getLoadedShopAt(deserialize(shopProtectionFlag.getShopLocationData()));
+              QuickShopManager.instance().getLoadedShopAt(deserialize(shopProtectionFlag.getShopLocationData()));
           
           viewer.ifPresent(shop -> {
             if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {

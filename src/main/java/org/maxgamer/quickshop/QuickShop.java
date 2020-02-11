@@ -51,7 +51,7 @@ import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.ShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.ItemMatcher;
 import org.maxgamer.quickshop.utils.BuildPerms;
@@ -402,7 +402,7 @@ public final class QuickShop extends JavaPlugin {
     }
     Util.debug("Unloading all shops...");
     try {
-      ShopManager.instance().clear();
+      QuickShopManager.instance().clear();
     } catch (Throwable th) {
       // ignore, we didn't care that
     }
@@ -421,7 +421,7 @@ public final class QuickShop extends JavaPlugin {
     Util.debug("Cleaning up resources and unloading all shops...");
     /* Remove all display items, and any dupes we can find */
     ShopActionManager.instance().getActions().clear();
-    ShopManager.instance().clear();
+    QuickShopManager.instance().clear();
     /* Close Database */
     if (database != null) {
       try {

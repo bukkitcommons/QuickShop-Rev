@@ -41,7 +41,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
@@ -128,7 +128,7 @@ public class LockListener implements Listener {
     final Player p = e.getPlayer();
     // If the chest was a chest
     if (Util.canBeShop(b)) {
-      ShopManager.instance().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
+      QuickShopManager.instance().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
         // If they owned it or have bypass perms, they can destroy it
         if (!shop.getOwner().equals(p.getUniqueId())
             && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
@@ -151,7 +151,7 @@ public class LockListener implements Listener {
       if (!chest.isPresent())
         return;
 
-      ShopManager.instance().getLoadedShopAt(b.getLocation()).ifPresent(shop -> {
+      QuickShopManager.instance().getLoadedShopAt(b.getLocation()).ifPresent(shop -> {
         // If they're the shop owner or have bypass perms, they can destroy
         // it.
         if (!shop.getOwner().equals(p.getUniqueId())
@@ -183,7 +183,7 @@ public class LockListener implements Listener {
     }
 
     // Make sure they're not using the non-shop half of a double chest.
-    ShopManager.instance().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
+    QuickShopManager.instance().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
       if (!shop.getModerator().isModerator(p.getUniqueId())) {
         if (PermissionManager.instance().has(p, "quickshop.other.open")) {
           p.sendMessage(MsgUtil.getMessage("bypassing-lock", p));

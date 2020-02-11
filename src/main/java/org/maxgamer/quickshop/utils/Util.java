@@ -60,7 +60,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
@@ -103,7 +103,7 @@ public class Util {
     final Optional<Block> shopBlock = Util.getSignAttached(sign);
     
     return shopBlock.isPresent() ?
-        ShopManager
+        QuickShopManager
           .instance()
           .getLoadedShopAt(shopBlock.get()) : ShopViewer.empty();
   }
@@ -702,13 +702,13 @@ public class Util {
     blocks[3] = b.getRelative(-1, 0, 0);
     blocks[4] = b.getRelative(0, 1, 0);
     for (Block c : blocks) {
-      ShopViewer firstShop = ShopManager.instance().getLoadedShopAt(c.getLocation());
+      ShopViewer firstShop = QuickShopManager.instance().getLoadedShopAt(c.getLocation());
       // If firstShop is null but is container, it can be used to drain contents from a shop created
       // on secondHalf.
       Optional<Location> secondHalf = getSecondHalf(c);
       ShopViewer secondShop =
           secondHalf.isPresent() ?
-              ShopManager.instance().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
+              QuickShopManager.instance().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
       
       if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
           || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {

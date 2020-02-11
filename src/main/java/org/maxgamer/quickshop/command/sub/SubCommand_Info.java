@@ -10,7 +10,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.command.CommandProcesser;
@@ -41,7 +41,7 @@ public class SubCommand_Info extends SneakyTabs implements CommandProcesser {
           }
           
           try {
-            shop = ShopManager.instance().load(Bukkit.getWorld(data.world()), data);
+            shop = QuickShopManager.instance().load(Bukkit.getWorld(data.world()), data);
           } catch (InvalidConfigurationException e) {
             continue;
           }

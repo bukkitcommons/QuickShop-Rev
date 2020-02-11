@@ -203,7 +203,7 @@ public class ShopActionManager {
       QuickShop.instance().getCompatibilityTool().toggleProtectionListeners(true, p);
     }
 
-    if (ShopManager.instance().getLoadedShopAt(info.location()).isPresent()) {
+    if (QuickShopManager.instance().getLoadedShopAt(info.location()).isPresent()) {
       p.sendMessage(MsgUtil.getMessage("shop-already-owned", p));
       return;
     }
@@ -376,7 +376,7 @@ public class ShopActionManager {
     }
 
     /* The shop has hereforth been successfully created */
-    ShopManager.instance().createShop(shop, info);
+    QuickShopManager.instance().createShop(shop, info);
     // Figures out which way we should put the sign on and
     // sets its text.
 
@@ -500,7 +500,7 @@ public class ShopActionManager {
 
     // Shop gone
     // Get the shop they interacted with
-    ShopViewer shopOp = ShopManager.instance().getLoadedShopAt(info.location());
+    ShopViewer shopOp = QuickShopManager.instance().getLoadedShopAt(info.location());
     // It's not valid anymore
     if (!shopOp.isPresent() || !Util.canBeShop(info.location().block())) {
       p.sendMessage(MsgUtil.getMessage("chest-was-removed", p));

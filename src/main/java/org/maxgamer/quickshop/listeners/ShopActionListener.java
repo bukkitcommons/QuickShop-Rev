@@ -29,7 +29,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ShopActionManager;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.Shop;
@@ -54,7 +54,7 @@ public class ShopActionListener implements Listener {
       return;
     Util.debug(ChatColor.YELLOW + "> Handling interact");
     
-    ShopViewer viewer = ShopManager.instance().getLoadedShopFrom(block);
+    ShopViewer viewer = QuickShopManager.instance().getLoadedShopFrom(block);
     /*
      * Effect handling
      */
@@ -163,7 +163,7 @@ public class ShopActionListener implements Listener {
         PermissionManager.instance().has(player, "quickshop.create.sell"))
       
       .filter(shop -> !BaseConfig.sneakToCreat || player.isSneaking())
-      .filter(shop -> ShopManager.canBuildShop(player, block))
+      .filter(shop -> QuickShopManager.canBuildShop(player, block))
       
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling creation.");
@@ -240,7 +240,7 @@ public class ShopActionListener implements Listener {
       @Nullable Location chest = event.getInventory().getLocation();
       
       if (chest != null)
-        ShopManager.instance().getLoadedShopAt(chest).ifPresent(Shop::setSignText);
+        QuickShopManager.instance().getLoadedShopAt(chest).ifPresent(Shop::setSignText);
       
     } catch (NullPointerException npe) {
       return;

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.bukkit.Bukkit;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 
@@ -14,7 +14,7 @@ public class SyncDisplayDespawner implements Runnable {
   public void run() {
     int range = BaseConfig.despawnerRange;
 
-    ShopManager.instance().viewLoadedShops(shops ->
+    QuickShopManager.instance().viewLoadedShops(shops ->
       shops.parallelStream()
         .filter(shop -> shop.getDisplay() != null).forEach(shop -> {
           // Check the range has player?

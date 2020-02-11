@@ -6,13 +6,10 @@ import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopLoader;
 import cc.bukkit.shop.ShopModerator;
-import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.data.ShopData;
-import cc.bukkit.shop.data.ShopLocation;
 import cc.bukkit.shop.event.ShopDeleteEvent;
 import cc.bukkit.shop.util.Utils;
 import cc.bukkit.shop.viewer.ShopViewer;
-import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -23,10 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-import javax.annotation.Nonnull;
-import lombok.Data;
 import lombok.Getter;
-import lombok.experimental.Accessors;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -126,7 +120,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
   public Optional<Map<Long, ShopData>> getShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
     Optional<Map<Long, Map<Long, ShopData>>> inWorld = getShopsInWorld(world);
     if (inWorld.isPresent())
-      return Optional.of(inWorld.get().get(Utils.chunkKey(chunkX, chunkZ)));
+      return Optional.ofNullable(inWorld.get().get(Utils.chunkKey(chunkX, chunkZ)));
     
     return Optional.empty();
   }
@@ -147,11 +141,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
   public void onWorldUnload(WorldUnloadEvent event) {
     String world = event.getWorld().getName();
     
-    ShopManager.instance()
+    QuickShopManager.instance()
                .getLoadedShops()
                .getOrDefault(world, Collections.emptyMap())
                .values()
-               .forEach(blockMap -> blockMap.values().forEach(shop -> ShopManager.instance().unload(shop)));
+               .forEach(blockMap -> blockMap.values().forEach(shop -> QuickShopManager.instance().unload(shop)));
     // Note: we do not actually remove the shop from memory,
     // to ensures it is able to get right data of existence when needed,
     // such as shop cleaner.
@@ -172,7 +166,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     if (inChunk.isPresent() && !inChunk.get().isEmpty())
       inChunk.get().remove(shop.getLocation().blockKey());
     
-    ShopManager.instance().unload(shop);
+    QuickShopManager.instance().unload(shop);
     
     // Delete the display item
     if (shop.getDisplay() != null) {
@@ -196,7 +190,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
   
   public void delete(@NotNull ShopData data) throws SQLException {
     ShopViewer viewer =
-        ShopManager.instance().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());
+        QuickShopManager.instance().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());
     
     if (viewer.isPresent()) {
       delete(viewer.get());
@@ -217,7 +211,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         inChunk.get().values().forEach(shop -> {
           try {
             if (Util.canBeShop(event.getWorld(), shop.x(), shop.y(), shop.z())) {
-              ShopManager.instance().load(event.getWorld(), shop);
+              QuickShopManager.instance().load(event.getWorld(), shop);
             } else {
               QuickShop.instance().getDatabaseHelper().deleteShop(shop.x(), shop.y(), shop.z(), shop.world());
             }
@@ -230,11 +224,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
-    @Nullable Map<Long, Shop> inChunk = ShopManager.instance().getLoadedShopsInChunk(e.getChunk());
+    @Nullable Map<Long, Shop> inChunk = QuickShopManager.instance().getLoadedShopsInChunk(e.getChunk());
 
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
-        inChunk.values().forEach(shop -> ShopManager.instance().unload(shop));
+        inChunk.values().forEach(shop -> QuickShopManager.instance().unload(shop));
       });
   }
   
@@ -302,7 +296,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         // Load to World
         if (Util.canBeShop(world, data.x(), data.y(), data.z())) {
           loadedShops++;
-          ShopManager.instance().load(world, data);
+          QuickShopManager.instance().load(world, data);
           inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), data);
         } else {
           QuickShop.instance().getDatabaseHelper().deleteShop(data.x(), data.y(), data.z(), data.world());

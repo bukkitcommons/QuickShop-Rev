@@ -40,17 +40,17 @@ import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import org.maxgamer.quickshop.utils.messages.ShopLogger;
 import org.maxgamer.quickshop.utils.messages.ShopPluginLogger;
 
-public class ShopManager {
+public class QuickShopManager {
   /*
    * Singleton
    */
   private static class LazySingleton {
-    private static final ShopManager INSTANCE = new ShopManager();
+    private static final QuickShopManager INSTANCE = new QuickShopManager();
   }
   
-  private ShopManager() {}
+  private QuickShopManager() {}
   
-  public static ShopManager instance() {
+  public static QuickShopManager instance() {
     return LazySingleton.INSTANCE;
   }
 
@@ -306,7 +306,6 @@ public class ShopManager {
   private Map<Long, Shop> getLoadedShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
     @Nullable Map<Long, Map<Long, Shop>> inWorld = loadedShops.get(world);
     if (inWorld == null) {
-      Util.debug("World map not found: " + world);
       return null;
     }
     

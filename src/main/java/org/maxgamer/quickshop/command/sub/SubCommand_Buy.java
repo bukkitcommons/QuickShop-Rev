@@ -4,7 +4,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.ShopManager;
+import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.messages.MsgUtil;
 import cc.bukkit.shop.ShopType;
@@ -34,7 +34,7 @@ public class SubCommand_Buy extends SneakyTabs implements CommandProcesser {
         
         .forEach(block -> {
 
-          return ShopManager
+          return QuickShopManager
               .instance()
               .getLoadedShopAt(block)
               
