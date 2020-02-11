@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package cc.bukkit.shop.economy.impl;
+package org.maxgamer.quickshop.economy;
 
 import java.math.BigDecimal;
 import java.util.Objects;

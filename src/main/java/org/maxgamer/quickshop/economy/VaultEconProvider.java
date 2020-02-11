@@ -1,4 +1,4 @@
-package cc.bukkit.shop.economy.impl;
+package org.maxgamer.quickshop.economy;
 
 import java.util.Objects;
 import java.util.UUID;
