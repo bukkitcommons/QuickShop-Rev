@@ -17,7 +17,6 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;

@@ -250,7 +250,7 @@
         <dependency>
             <groupId>cc.bukkit.shop</groupId>
             <artifactId>Shop</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

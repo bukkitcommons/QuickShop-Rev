@@ -19,7 +19,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.maxgamer.quickshop.command.QuickShopCommands;
+import org.maxgamer.quickshop.command.QuickShopCommandManager;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DatabaseConfig;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
@@ -108,7 +108,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private IssuesHelper bootError;
   // Listeners - We decide which one to use at runtime
   private final ChatListener chatListener = new ChatListener();
-  private QuickShopCommands commandManager;
+  private QuickShopCommandManager commandManager;
   /** WIP */
   private NoCheatPlusExemptor compatibilityTool = new NoCheatPlusExemptor();
 
@@ -491,7 +491,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     /*
      * Commands
      */
-    commandManager = new QuickShopCommands();
+    commandManager = new QuickShopCommandManager();
     getCommand("qs").setExecutor(commandManager);
     getCommand("qs").setTabCompleter(commandManager);
     
