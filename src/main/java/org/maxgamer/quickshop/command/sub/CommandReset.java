@@ -34,6 +34,7 @@ public class CommandReset extends QuickShopCommand {
       @NotNull String[] cmdArg) {
 
     if (cmdArg.length < 1) {
+      // FIXME wrong message
       sender.sendMessage(Shop.getLocaleManager().getMessage("command.no-type-given", sender));
       return;
     }

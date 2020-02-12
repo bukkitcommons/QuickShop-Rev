@@ -322,14 +322,14 @@ public class QuickShopLoader implements ShopLoader, Listener {
     }
   }
 
-  private static boolean canLoad(@NotNull ShopData info) {
+  public static boolean canLoad(@NotNull ShopData info) {
     if (info.item() == null)
       return false;
     
     if (info.type() == null)
       return false;
     
-    if (info.moderators() == null)
+    if (info.serializedModerators() == null)
       return false;
     
     if (info.world() == null)
