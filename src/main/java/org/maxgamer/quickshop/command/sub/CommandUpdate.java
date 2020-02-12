@@ -1,6 +1,5 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -10,9 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.VersionUpdater;
+import org.maxgamer.quickshop.utils.VersionDataFetcher;
 import cc.bukkit.shop.util.VersionData;
-
 
 public class CommandUpdate extends QuickShopCommand {
   @Override
@@ -29,46 +27,15 @@ public class CommandUpdate extends QuickShopCommand {
     Bukkit.getScheduler().runTaskAsynchronously(QuickShop.instance(), () -> {
       sender.sendMessage(ChatColor.YELLOW + "Checking for updates...");
 
-      final Optional<VersionData> data = VersionUpdater.acquire();
+      final Optional<VersionData> data = VersionDataFetcher.acquire();
       if (!data.isPresent()) {
         sender.sendMessage(ChatColor.GREEN + "No updates can update now.");
         return;
+      } else {
+        VersionData versionData = data.get();
+        sender.sendMessage(ChatColor.GREEN + "Found a new version: " + versionData.version() +
+            " (Current " + QuickShop.instance().getVersion() + " )");
       }
-
-      sender.sendMessage(ChatColor.YELLOW + "Downloading update, this may need a while...");
-      final byte[] pluginBin;
-      
-      try {
-        pluginBin = VersionUpdater.downloadUpdatedJar();
-      } catch (IOException e) {
-        sender.sendMessage(ChatColor.RED + "Update failed, get details to look the console.");
-        QuickShop.instance().getSentryErrorReporter().ignoreThrow();
-        e.printStackTrace();
-        return;
-      }
-      
-      if (pluginBin.length < 1) {
-        sender.sendMessage(
-            ChatColor.RED + "Download failed, check your connection before contact the author.");
-        return;
-      }
-      
-      sender.sendMessage(ChatColor.YELLOW + "Installing update...");
-      
-      try {
-        VersionUpdater.replaceTheJar(pluginBin);
-      } catch (IOException ioe) {
-        sender.sendMessage(ChatColor.RED + "Update failed, get details to look the console.");
-        QuickShop.instance().getSentryErrorReporter().ignoreThrow();
-        ioe.printStackTrace();
-        return;
-      } catch (RuntimeException re) {
-        sender.sendMessage(ChatColor.RED + "Update failed, " + re.getMessage());
-        return;
-      }
-
-      sender.sendMessage(
-          ChatColor.GREEN + "Successfully, restart your server to apply the changes!");
     });
   }
 }

@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.VersionUpdater;
+import org.maxgamer.quickshop.utils.VersionDataFetcher;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.VersionData;
@@ -30,7 +30,7 @@ public class UpdateWatcher implements Listener {
   public static void init() {
     taskId = Bukkit.getScheduler().runTaskTimerAsynchronously(QuickShop.instance(), () -> {
       
-      (data = VersionUpdater.acquire()).ifPresent(data -> {
+      (data = VersionDataFetcher.acquire()).ifPresent(data -> {
         if (!data.beta()) {
           ShopLogger.instance()
               .info("A new version of QuickShop has been released! [" + data.version() + "]");
