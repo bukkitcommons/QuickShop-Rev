@@ -219,7 +219,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     LocaleFile json;
     languageCode = "en".equals(languageCode) ?
         languageCode :
-          (Shop.instance().getResource("messages/" + languageCode + ".json") == null ? "en" : languageCode);
+          (Shop.instance().getResource("messages/" + languageCode + ".json") == null ? "en_US" : languageCode);
     json = new JsonLocale(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json", plugin);
     json.create();
     
