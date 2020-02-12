@@ -108,7 +108,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
     if (shopDisplayItemSpawnEvent.isCancelled()) {
       Util.debug(
-          "Canceled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
+          "Cancelled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
       return;
     }
 
@@ -119,6 +119,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
           armorStand.setGravity(false);
           armorStand.setVisible(false);
           armorStand.setMarker(true);
+          armorStand.setInvulnerable(true);
           armorStand.setCollidable(false);
           armorStand.setSmall(data.get(DisplayAttribute.SMALL, true));
           armorStand.setArms(false);

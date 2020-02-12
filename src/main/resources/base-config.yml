@@ -24,6 +24,7 @@ settings:
   allow-no-sign: false
   trade-all-word: all
   allow-loan: false
+# tsasde
   tax:
     account: ''
     rate: 0.01
@@ -31,6 +32,7 @@ settings:
   eco:
     price:
       mod-fee: -1.0
+# tsasde
       minimum: -1.0
       create-cost: 0.0
       maximum: -1.0
@@ -94,6 +96,9 @@ shop:
   blacklist-lores: []
 show-owner-uuid-in-controlpanel-if-op: false
 server:
+  # Server platform to make use of exclusive benefits
+  # SPIGOT - The default platform, should support common platforms
+  # PAPER - Provides better performance, but only available in Paper
+  # Do not edit this if you don't understand what are them.
   platform: ''
-  uuid: 4e69d4d9-9e2a-4f6c-b298-f9748db92fb6
 decimal-format: '#,###,###.###'
