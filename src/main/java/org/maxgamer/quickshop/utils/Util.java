@@ -306,8 +306,10 @@ public class Util {
     Map<Object, Object> root = yaml.load(config);
     // noinspection unchecked
     Map<String, Object> item = (Map<String, Object>) root.get("item");
-    int itemDataVersion = Integer.parseInt(String.valueOf(item.get("v")));
     try {
+      Object version = item.get("v");
+      int itemDataVersion = version == null ?
+          Bukkit.getUnsafe().getDataVersion() : Integer.parseInt(String.valueOf(version));
       // Try load the itemDataVersion to do some checks.
       // noinspection deprecation
       if (itemDataVersion > Bukkit.getUnsafe().getDataVersion()) {

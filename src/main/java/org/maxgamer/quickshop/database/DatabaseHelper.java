@@ -150,9 +150,7 @@ public class DatabaseHelper {
     st.execute(createTable);
   }
 
-  public boolean deleteShop(int x, int y, int z, @NotNull String worldName) throws SQLException {
-    Util.debug("Deletes shop");
-    
+  public void deleteShop(int x, int y, int z, @NotNull String worldName) throws SQLException {
     String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix
         + "shops WHERE x = ? AND y = ? AND z = ? AND world = ?"
         + (db.getConnector() instanceof MySQLConnector ? " LIMIT 1" : "");
@@ -162,7 +160,7 @@ public class DatabaseHelper {
     ps.setInt(2, y);
     ps.setInt(3, z);
     ps.setString(4, worldName);
-    return ps.execute();
+    dispatcher.add(ps);
   }
 
   public ResultSet selectAllMessages() throws SQLException {

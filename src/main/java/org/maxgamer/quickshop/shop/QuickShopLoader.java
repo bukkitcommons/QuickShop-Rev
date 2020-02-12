@@ -185,7 +185,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      if (BaseConfig.refundable)
+      if (BaseConfig.refundable) // Workaround for very legacy data
         QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
     }
   }
@@ -272,6 +272,8 @@ public class QuickShopLoader implements ShopLoader, Listener {
   public void loadShopsFor(@NotNull ResultSet set, @NotNull World world) throws SQLException, JsonSyntaxException, InvalidConfigurationException {
     Map<Long, Map<Long, ShopData>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
     
+    long worldShops = 0;
+    long worldLoadedShops = 0;
     long durTotalShopsNano = 0;
     
     while (set.next()) {
@@ -296,6 +298,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         // Load to World
         if (Util.canBeShop(world, data.x(), data.y(), data.z())) {
           loadedShops++;
+          worldLoadedShops++;
           Shop.getManager().load(world, data);
           inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), data);
         } else {
@@ -306,19 +309,20 @@ public class QuickShopLoader implements ShopLoader, Listener {
       }
       
       shops++;
+      worldShops++;
       durTotalShopsNano = System.nanoTime() - onPerShop;
     }
     
-    if (loadedShops > 0) {
-      long averagePerShop = durTotalShopsNano / loadedShops;
+    if (worldLoadedShops > 0) {
+      long averagePerShop = durTotalShopsNano / worldLoadedShops;
       
       ShopLogger.instance().info(
-          "Loaded " + ChatColor.GREEN + loadedShops + ChatColor.RESET + " of " + shops +
+          "Loaded " + ChatColor.GREEN + worldLoadedShops + ChatColor.RESET + " of " + shops +
           " shops in " + world.getName() +
           " (Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
     } else {
-      if (shops > 0)
-        ShopLogger.instance().info("Found " + ChatColor.GREEN + loadedShops + ChatColor.RESET +
+      if (worldShops > 0)
+        ShopLogger.instance().info("Found " + ChatColor.GREEN + worldShops + ChatColor.RESET +
             " shops in " + world.getName() +
             " and would be loaded when needed");
       else
@@ -339,9 +343,6 @@ public class QuickShopLoader implements ShopLoader, Listener {
     if (info.world() == null)
       return false;
     
-    if (info.moderators() == null)
-      return false;
-    
     return true;
   }
 
@@ -355,24 +356,6 @@ public class QuickShopLoader implements ShopLoader, Listener {
       Util.debug("Failed to load data to the ItemStack: " + itemConfig);
       return null;
     }
-  }
-
-  @SuppressWarnings("deprecation")
-  private static @Nullable ShopModerator deserializeModerator(@NotNull String moderatorJson) {
-    ShopModerator shopModerator;
-    if (Util.isUUID(moderatorJson)) {
-      Util.debug("Updating old shop data... for " + moderatorJson);
-      shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
-    } else {
-      try {
-        shopModerator = ShopModerator.deserialize(moderatorJson);
-      } catch (JsonSyntaxException ex) {
-        Util.debug("Updating old shop data... for " + moderatorJson);
-        moderatorJson = Bukkit.getOfflinePlayer(moderatorJson).getUniqueId().toString();
-        shopModerator = new ShopModerator(UUID.fromString(moderatorJson)); // New one
-      }
-    }
-    return shopModerator;
   }
   
   private static Object getSafely(ResultSet set, String pos, List<Throwable> handler) {
