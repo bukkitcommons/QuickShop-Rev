@@ -261,7 +261,9 @@ public class Util {
    * @param logs logs
    */
   public static void debug(@NotNull String... logs) {
-    long startTime = System.currentTimeMillis();
+    if (!BaseConfig.developerMode)
+      return;
+    
     StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
     String className = stackTraceElement.getClassName();
     try {
@@ -273,39 +275,17 @@ public class Util {
     } catch (ClassNotFoundException e) {
       // Ignore
     }
-    //String methodName = stackTraceElement.getMethodName();
-    int codeLine = stackTraceElement.getLineNumber();
 
+    int codeLine = stackTraceElement.getLineNumber();
     for (String log : logs) {
       String text = "["
-          // + ChatColor.DARK_GREEN
-          // + ChatColor.BOLD
-          // + "DEBUG"
-          // + ChatColor.RESET
-          // + "] ["
           + ChatColor.DARK_GREEN + className + ChatColor.RESET + "] ("
-          /*
-           * + " [" + ChatColor.DARK_GREEN + methodName + ChatColor.RESET
-           */
           + ChatColor.DARK_GREEN + codeLine + ChatColor.RESET + ") " + log;
       debugLogs.add(Colorizer.stripColors(text));
       if (debugLogs.size() > 500000) /* Keep debugLogs max can have 500k lines. */ {
         debugLogs.remove(0);
       }
       ShopLogger.instance().info(text);
-    }
-    long debugLogCost = System.currentTimeMillis() - startTime;
-    if (false) {
-      if (debugLogCost > 5) {
-        tookLongTimeCostTimes++;
-        if (tookLongTimeCostTimes > 15000) {
-          BaseConfig.debugLogger = false;
-          QuickShop.instance().getConfigurationManager().save(BaseConfig.class);
-          QuickShop.instance().saveConfig();
-          ShopLogger.instance().warning(
-              "Detected the debug logger tooked time keep too lang, QuickShop already auto-disable debug logger, your server performance should back to normal. But you must re-enable it if you want to report any bugs.");
-        }
-      }
     }
   }
 

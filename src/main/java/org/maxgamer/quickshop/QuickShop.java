@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -72,6 +73,7 @@ import cc.bukkit.shop.ShopPlugin;
 import cc.bukkit.shop.action.ShopActionManager;
 import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.configuration.ConfigurationManager;
+import cc.bukkit.shop.configuration.YamlComments;
 import cc.bukkit.shop.database.Database;
 import cc.bukkit.shop.database.Dispatcher;
 import cc.bukkit.shop.database.connector.DatabaseConnector;
@@ -576,13 +578,21 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         ConfigurationData data = QuickShop.instance().getConfigurationManager().get(DatabaseConfig.class);
         YamlConfiguration src = data.conf();
         
+        boolean save = false;
         String user = src.getString("settings.mysql.user");
-        if (user == null)
+        if (user == null) {
+          save = true;
           src.set("settings.mysql.user", user = "root");
+        }
         
         String pass = src.getString("settings.mysql.password");
-        if (pass == null)
+        if (pass == null) {
+          save = true;
           src.set("settings.mysql.password", pass = "passwd");
+        }
+        
+        if (save)
+          YamlComments.save(data.file(), src); 
         
         connector = new MySQLConnector(DatabaseConfig.host,
             user, pass,
@@ -606,72 +616,22 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   }
 
   private void submitMeritcs() {
-    if (!getConfig().getBoolean("disabled-metrics")) {
+    if (BaseConfig.enableMetrics) {
       String serverVer = Bukkit.getVersion();
       String bukkitVer = Bukkit.getBukkitVersion();
-      String vaultVer;
-      Plugin vault = Bukkit.getPluginManager().getPlugin("Vault");
-      if (vault != null) {
-        vaultVer = vault.getDescription().getVersion();
-      } else {
-        vaultVer = "Vault not found";
-      }
-      // Use internal Metric class not Maven for solve plugin name issues
-      String display_Items;
-      if (DisplayConfig.displayItems) { // Maybe mod server use this plugin more?
-                                                          // Or have big
-        // number items need disabled?
-        display_Items = "Enabled";
-      } else {
-        display_Items = "Disabled";
-      }
-      String locks;
-      if (getConfig().getBoolean("shop.lock")) {
-        locks = "Enabled";
-      } else {
-        locks = "Disabled";
-      }
-      String sneak_action;
-      if (getConfig().getBoolean("shop.sneak-to-create")
-          || getConfig().getBoolean("shop.sneak-to-trade")) {
-        sneak_action = "Enabled";
-      } else {
-        sneak_action = "Disabled";
-      }
-      String shop_find_distance = String.valueOf(BaseConfig.findDistance);
       String economyType = EconomyType.fromID(BaseConfig.economyType).name();
-      String useDisplayAutoDespawn =
-          String.valueOf(BaseConfig.enableDespawner);
-      String useEnhanceDisplayProtect =
-          String.valueOf(BaseConfig.enhancedDisplayProtection);
-      String useEnhanceShopProtect =
-          String.valueOf(BaseConfig.enhancedShopProtection);
-      String useOngoingFee = String.valueOf(getConfig().getBoolean("shop.ongoing-fee.enable"));
-      String disableDebugLoggger = BaseConfig.debugLogger ? "Enabled" : "Disabled";
+      String disableDebugLoggger = BaseConfig.developerMode ? "Enabled" : "Disabled";
 
-      // Version
+      // Custom charts
       metrics.addCustomChart(new Metrics.SimplePie("server_version", () -> serverVer));
       metrics.addCustomChart(new Metrics.SimplePie("bukkit_version", () -> bukkitVer));
-      metrics.addCustomChart(new Metrics.SimplePie("vault_version", () -> vaultVer));
-      metrics.addCustomChart(new Metrics.SimplePie("use_display_items", () -> display_Items));
-      metrics.addCustomChart(new Metrics.SimplePie("use_locks", () -> locks));
-      metrics.addCustomChart(new Metrics.SimplePie("use_sneak_action", () -> sneak_action));
-      metrics.addCustomChart(new Metrics.SimplePie("shop_find_distance", () -> shop_find_distance));
-      metrics.addCustomChart(new Metrics.SimplePie("economy_type", () -> economyType));
-      metrics.addCustomChart(
-          new Metrics.SimplePie("use_display_auto_despawn", () -> useDisplayAutoDespawn));
-      metrics.addCustomChart(
-          new Metrics.SimplePie("use_enhance_display_protect", () -> useEnhanceDisplayProtect));
-      metrics.addCustomChart(
-          new Metrics.SimplePie("use_enhance_shop_protect", () -> useEnhanceShopProtect));
-      metrics.addCustomChart(new Metrics.SimplePie("use_ongoing_fee", () -> useOngoingFee));
-      metrics.addCustomChart(
-          new Metrics.SimplePie("disable_background_debug_logger", () -> disableDebugLoggger));
-      // Exp for stats, maybe i need improve this, so i add this.
-      metrics.submitData(); // Submit now!
-      getLogger().info("Metrics submitted.");
-    } else {
-      getLogger().info("You have disabled mertics, Skipping...");
+      metrics.addCustomChart(new Metrics.SimplePie("economy_system", () -> economyType));
+      metrics.addCustomChart(new Metrics.SimplePie("developer_mode", () -> disableDebugLoggger));
+      
+      metrics.addCustomChart(new Metrics.SingleLineChart("shops", () -> QuickShopLoader.instance().getShops()));
+      metrics.addCustomChart(new Metrics.SingleLineChart("loaded_shops", () -> QuickShopLoader.instance().getLoadedShops()));
+      
+      metrics.submitData();
     }
   }
 }

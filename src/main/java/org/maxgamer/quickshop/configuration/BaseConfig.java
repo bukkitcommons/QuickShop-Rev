@@ -29,9 +29,6 @@ public class BaseConfig {
   
   @Node(value = "settings.plugin.logger.log-actions")
   public static boolean logActions = true;
-
-  @Node(value = "settings.plugin.logger.debug", rewrite = true)
-  public static boolean debugLogger = false;
   
   @Node(value = "shop.ignore-unlimited-shop-messages")
   public static boolean ignoreUnlimitedMessages = false;

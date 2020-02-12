@@ -52,6 +52,8 @@ public class CommandSell extends QuickShopCommand {
           
           return ViewAction.NEXT;
         });
+      
+      return;
     }
     
     sender.sendMessage(Shop.getLocaleManager().getMessage("Can't run command by Console"));

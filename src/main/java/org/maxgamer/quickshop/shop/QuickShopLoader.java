@@ -72,6 +72,12 @@ public class QuickShopLoader implements ShopLoader, Listener {
    */
   @Getter
   private final Map<String, Map<Long, Map<Long, ShopData>>> shopsMap = Maps.newConcurrentMap();
+  
+  @Getter
+  private int shops;
+  
+  @Getter
+  private int loadedShops;
 
   /**
    * Returns all shops in the whole database, include unloaded.
@@ -266,8 +272,6 @@ public class QuickShopLoader implements ShopLoader, Listener {
   public void loadShopsFor(@NotNull ResultSet set, @NotNull World world) throws SQLException, JsonSyntaxException, InvalidConfigurationException {
     Map<Long, Map<Long, ShopData>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
     
-    long foundShops = 0;
-    long loadedShops = 0;
     long durTotalShopsNano = 0;
     
     while (set.next()) {
@@ -301,7 +305,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), data);
       }
       
-      foundShops++;
+      shops++;
       durTotalShopsNano = System.nanoTime() - onPerShop;
     }
     
@@ -309,11 +313,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
       long averagePerShop = durTotalShopsNano / loadedShops;
       
       ShopLogger.instance().info(
-          "Loaded " + ChatColor.GREEN + loadedShops + ChatColor.RESET + " of " + foundShops +
+          "Loaded " + ChatColor.GREEN + loadedShops + ChatColor.RESET + " of " + shops +
           " shops in " + world.getName() +
           " (Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
     } else {
-      if (foundShops > 0)
+      if (shops > 0)
         ShopLogger.instance().info("Found " + ChatColor.GREEN + loadedShops + ChatColor.RESET +
             " shops in " + world.getName() +
             " and would be loaded when needed");

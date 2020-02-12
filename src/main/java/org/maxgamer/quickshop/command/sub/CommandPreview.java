@@ -54,16 +54,20 @@ public class CommandPreview extends QuickShopCommand {
   }
   
   private final static void handleAt(@NotNull Player player, @NotNull String world, @NotNull String... pos) {
-    ShopViewer viewer = Shop.getManager().getLoadedShopAt(world,
-        Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
-    
-    if (viewer.isEmpty()) {
-      // FIXME not exist
-      player.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", player));
-      return;
+    try {
+      ShopViewer viewer = Shop.getManager().getLoadedShopAt(world,
+          Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+      
+      if (viewer.isEmpty()) {
+        // FIXME not exist
+        player.sendMessage(Shop.getLocaleManager().getMessage("shop-not-exist", player));
+        return;
+      }
+      
+      handleShop(player, viewer.get());
+    } catch (NumberFormatException e) {
+      player.sendMessage(Shop.getLocaleManager().getMessage("not-a-integer", player));
     }
-    
-    handleShop(player, viewer.get());
   }
   
   private final static void handleShop(@NotNull Player player, @NotNull ContainerShop shop) {

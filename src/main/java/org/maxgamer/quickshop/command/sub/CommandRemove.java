@@ -31,7 +31,6 @@ public class CommandRemove extends QuickShopCommand {
       }
       
       BlockViewer viwer = BlockViewer.get(((Player) sender), 10);
-      
       viwer
         .forEach(block -> {
           ShopViewer shopViewer = Shop.getManager().getLoadedShopAt(block);
@@ -44,6 +43,8 @@ public class CommandRemove extends QuickShopCommand {
           return ViewAction.NEXT;
         })
         .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender)));
+      
+      return;
     }
     
     sender.sendMessage(ChatColor.RED + "Only players may use that command.");
@@ -51,16 +52,20 @@ public class CommandRemove extends QuickShopCommand {
   }
   
   private final static void handleAt(@NotNull CommandSender sender, @NotNull String world, @NotNull String... pos) {
-    ShopViewer viewer = Shop.getManager().getLoadedShopAt(world,
-        Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
-    
-    if (viewer.isEmpty()) {
-      // FIXME not exist
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
-      return;
+    try {
+      ShopViewer viewer = Shop.getManager().getLoadedShopAt(world,
+          Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+      
+      if (viewer.isEmpty()) {
+        // FIXME not exist
+        sender.sendMessage(Shop.getLocaleManager().getMessage("shop-not-exist", sender));
+        return;
+      }
+      
+      handleShop(sender, viewer.get());
+    } catch (NumberFormatException e) {
+      sender.sendMessage(Shop.getLocaleManager().getMessage("not-a-integer", sender));
     }
-    
-    handleShop(sender, viewer.get());
   }
   
   private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {

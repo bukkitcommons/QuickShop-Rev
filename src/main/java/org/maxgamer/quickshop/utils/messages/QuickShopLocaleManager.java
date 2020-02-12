@@ -28,6 +28,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
+import com.google.common.io.Files;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.LocaleFile;
 import cc.bukkit.shop.LocaleManager;
@@ -244,24 +245,25 @@ public class QuickShopLocaleManager implements LocaleManager {
   
   public void loadCustomMinecraftLocale(@NotNull String filePrefix, @NotNull Consumer<YamlConfiguration> consumer) {
     String fileName = filePrefix.concat(".yml");
-    ShopLogger.instance().info("Loading custom locale for " + fileName);
     
-    File file = new File(QuickShop.instance().getDataFolder(), fileName);
-    QuickShop.instance().saveResource(fileName, true);
+    File parent = new File(QuickShop.instance().getDataFolder(), "locales");
+    File file = new File(parent, fileName);
+    
+    try {
+      Files.createParentDirs(file);
+      file.createNewFile();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     
     YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
-    yaml.options().copyDefaults(false);
-    YamlConfiguration def = YamlConfiguration.loadConfiguration(new InputStreamReader(Shop.instance().getResource(fileName)));
-    yaml.setDefaults(def);
-    
     Util.parseColours(yaml);
     consumer.accept(yaml);
     
     try {
       yaml.save(file);
-      ShopLogger.instance().info("Loaded custom locale: " + fileName);
     } catch (IOException io) {
-      ShopLogger.instance().severe("Could not save custom locale for " + fileName);
+      ShopLogger.instance().severe("Could not save minecraft locale for " + fileName);
       io.printStackTrace();
     }
   }
