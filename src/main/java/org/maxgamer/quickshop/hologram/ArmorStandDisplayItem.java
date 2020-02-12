@@ -3,7 +3,6 @@ package org.maxgamer.quickshop.hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Directional;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.EquipmentSlot;
@@ -31,8 +30,8 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     BlockFace containerBlockFace = BlockFace.NORTH; // Set default vaule
     
     try {
-      if (shop.getLocation().block().getBlockData() instanceof Directional)
-        containerBlockFace = ((Directional) shop.getLocation().block().getBlockData()).getFacing();
+      if (shop.getLocation().block().getBlockData() instanceof org.bukkit.block.data.Directional)
+        containerBlockFace = ((org.bukkit.block.data.Directional) shop.getLocation().block().getBlockData()).getFacing();
       
     } catch (Throwable t) {
       org.bukkit.material.MaterialData data = shop.getLocation().block().getState().getData();

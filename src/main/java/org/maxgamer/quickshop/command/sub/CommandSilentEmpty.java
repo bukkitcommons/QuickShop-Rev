@@ -19,6 +19,11 @@ public class CommandSilentEmpty extends QuickShopCommand {
   public List<String> permissions() {
     return Collections.singletonList("quickshop.empty");
   }
+  
+  @Override
+  public boolean hidden() {
+    return true;
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

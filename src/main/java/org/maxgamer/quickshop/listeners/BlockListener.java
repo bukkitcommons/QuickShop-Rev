@@ -65,9 +65,11 @@ public class BlockListener implements Listener {
       }
       
       if (player.getGameMode() == GameMode.CREATIVE) {
-        if (player.getInventory().getItemInMainHand().getType() != Material.GOLDEN_AXE) {
+        Material tool = Material.getMaterial("GOLDEN_AXE");
+        tool = tool == null ? Material.getMaterial("GOLD_AXE") : tool;
+        if (player.getInventory().getItemInMainHand().getType() != tool) {
           event.setCancelled(true);
-          player.sendMessage(Shop.getLocaleManager().getMessage("no-creative-break", player, Shop.getLocaleManager().getLocalizedName(Material.GOLDEN_AXE.name())));
+          player.sendMessage(Shop.getLocaleManager().getMessage("no-creative-break", player, Shop.getLocaleManager().getLocalizedName(tool.name())));
           return;
         } else {
           player.sendMessage(Shop.getLocaleManager().getMessage("break-shop-use-supertool", player));

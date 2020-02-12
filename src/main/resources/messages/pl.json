@@ -90,7 +90,7 @@
         "this-shop-is-selling": "&aTen sklep &bSPRZEDAJE&a itemy.",
         "effects": "&aEfekty",
         "commands": {
-            "preview": "\/qs silentpreview {0} {1} {2} {3}"
+            "preview": "\/qs preview {0} {1} {2} {3}"
         }
     },
     "bypassing-lock": "&cOmijanie blokady Quick Shop!",
@@ -173,11 +173,11 @@
             "setowner": "\/qs setowner [Gracz]",
             "unlimited": "\/qs slientunlimited {0} {1} {2} {3}",
             "buy": "\/qs silentbuy {0} {1} {2} {3}",
-            "sell": "\/qs silentsell {0} {1} {2} {3}",
+            "sell": "\/qs sell {0} {1} {2} {3}",
             "price": "\/qs price [Nowa cena]",
             "refill": "\/qs refill [Ilo\u015b\u0107]",
             "empty": "\/qs silentempty {0} {1} {2} {3}",
-            "remove": "\/qs silentremove {0} {1} {2} {3}"
+            "remove": "\/qs remove {0} {1} {2} {3}"
         }
     },
     "tableformat": {

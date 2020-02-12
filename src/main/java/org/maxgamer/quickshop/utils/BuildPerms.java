@@ -38,7 +38,8 @@ public class BuildPerms {
       return true;
     
     BlockPlaceEvent facadePlace;
-    Material signType = Material.getMaterial("SIGN", true);
+    Material signType = Material.getMaterial("OAK_WALL_SIGN");
+    signType = signType == null ? Material.getMaterial("WALL_SIGN") : signType;
     BlockState air = block.getState();
                air.setType(Material.AIR);
     

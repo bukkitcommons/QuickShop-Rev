@@ -25,7 +25,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -81,8 +80,21 @@ public class Util {
     return new Location(shopLocation.world(), shopLocation.x() + .5, shopLocation.y() + .5,
         shopLocation.z() + .5);
   }
-  
-  
+
+  public static final BlockFace[] axis =
+    {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
+
+  /**
+   * Gets the horizontal Block Face from a given yaw angle<br>
+   * This includes the NORTH_WEST faces
+   *
+   * @param yaw angle
+   * @return The Block Face of the angle
+   */
+  public static BlockFace yawToFace(float yaw) {
+    return axis[Math.round(yaw / 90f) & 0x3];
+  }
+
   @NotNull
   private final static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
   
@@ -308,35 +320,41 @@ public class Util {
     Map<String, Object> item = (Map<String, Object>) root.get("item");
     try {
       Object version = item.get("v");
-      int itemDataVersion = version == null ?
-          Bukkit.getUnsafe().getDataVersion() : Integer.parseInt(String.valueOf(version));
-      // Try load the itemDataVersion to do some checks.
-      // noinspection deprecation
-      if (itemDataVersion > Bukkit.getUnsafe().getDataVersion()) {
-        Util.debug("WARNING: DataVersion not matched with ItemStack: " + config);
-        // okay we need some things to do
-        if (BaseConfig.forceLoadDowngradeItems) {
-          // okay it enabled
-          Util.debug("QuickShop is trying force loading " + config);
-          if (BaseConfig.forceLoadDowngradeItemsMethod == 0) { // Mode 0
-            // noinspection deprecation
-            item.put("v", Bukkit.getUnsafe().getDataVersion() - 1);
-          } else { // Mode other
-            // noinspection deprecation
-            item.put("v", Bukkit.getUnsafe().getDataVersion());
-          }
-          // Okay we have hacked the dataVersion, now put it back
-          root.put("item", item);
-          config = yaml.dump(root);
+      
+      try {
+        int itemDataVersion = version == null ?
+            Bukkit.getUnsafe().getDataVersion() : Integer.parseInt(String.valueOf(version));
+        // Try load the itemDataVersion to do some checks.
+        // noinspection deprecation
+        if (itemDataVersion > Bukkit.getUnsafe().getDataVersion()) {
+          Util.debug("WARNING: DataVersion not matched with ItemStack: " + config);
+          // okay we need some things to do
+          if (BaseConfig.forceLoadDowngradeItems) {
+            // okay it enabled
+            Util.debug("QuickShop is trying force loading " + config);
+            if (BaseConfig.forceLoadDowngradeItemsMethod == 0) { // Mode 0
+              // noinspection deprecation
+              item.put("v", Bukkit.getUnsafe().getDataVersion() - 1);
+            } else { // Mode other
+              // noinspection deprecation
+              item.put("v", Bukkit.getUnsafe().getDataVersion());
+            }
+            // Okay we have hacked the dataVersion, now put it back
+            root.put("item", item);
+            config = yaml.dump(root);
 
-          Util.debug("Updated, we will try load as hacked ItemStack: " + config);
-        } else {
-          ShopLogger.instance().warning("Cannot load ItemStack " + config
-              + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
-          ShopLogger.instance().warning(
-              "You can try force load this ItemStack by our hacked ItemStack read util(shop.force-load-downgrade-items), but beware, the data may damaged if you load on this lower Minecraft server version, Please backup your world and database before enable!");
+            Util.debug("Updated, we will try load as hacked ItemStack: " + config);
+          } else {
+            ShopLogger.instance().warning("Cannot load ItemStack " + config
+                + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
+            ShopLogger.instance().warning(
+                "You can try force load this ItemStack by our hacked ItemStack read util(shop.force-load-downgrade-items), but beware, the data may damaged if you load on this lower Minecraft server version, Please backup your world and database before enable!");
+          }
         }
+      } catch (NoSuchMethodError e) {
+        ; // Legacy versions (1.12.2), getDataVersion
       }
+      
       yamlConfiguration.loadFromString(config);
       return yamlConfiguration.getItemStack("item");
     } catch (Exception e) {
@@ -879,9 +897,16 @@ public final static Gson GSON = new Gson();
       return false;
     }
     try {
-      return Tag.WALL_SIGNS.isTagged(material);
-    } catch (NoSuchFieldError e) {
+      return BlockDataWrapper.isWallSigns(material);
+    } catch (NoClassDefFoundError | ClassNotFoundException e) {
       return "WALL_SIGN".equals(material.name());
+    }
+  }
+  
+  private static class BlockDataWrapper {
+    private static boolean isWallSigns(Material material)
+        throws NoClassDefFoundError, ClassNotFoundException {
+      return org.bukkit.Tag.WALL_SIGNS.isTagged(material);
     }
   }
 

@@ -90,7 +90,7 @@
         "this-shop-is-selling": "&a\uc774 \uc0c1\uc810\uc740 \uc544\uc774\ud15c\uc744 &d\ud310\ub9e4&a\uc911\uc778 \uc0c1\uc810\uc785\ub2c8\ub2e4.",
         "effects": "&a\ud6a8\uacfc : &e{0}",
         "commands": {
-            "preview": "\/qs silentpreview {0} {1} {2} {3}"
+            "preview": "\/qs preview {0} {1} {2} {3}"
         }
     },
     "bypassing-lock": "&a QuickShop \uc7a0\uae08 \ubb34\uc2dc!",
@@ -173,11 +173,11 @@
             "setowner": "\/qs setowner [\ud50c\ub808\uc774\uc5b4]",
             "unlimited": "\/qs silentunlimited {0} {1} {2} {3}",
             "buy": "\/qs silentbuy {0} {1} {2} {3}",
-            "sell": "\/qs silentsell {0} {1} {2} {3}",
+            "sell": "\/qs sell {0} {1} {2} {3}",
             "price": "\/qs price [\uc0c8 \uac00\uaca9]",
             "refill": "\/qs refill [\uc218\ub7c9]",
             "empty": "\/qs silentempty {0} {1} {2} {3}",
-            "remove": "\/qs silentremove {0} {1} {2} {3}"
+            "remove": "\/qs remove {0} {1} {2} {3}"
         }
     },
     "tableformat": {

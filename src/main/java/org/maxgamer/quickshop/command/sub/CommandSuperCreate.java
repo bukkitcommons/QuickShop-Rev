@@ -88,7 +88,9 @@ public class CommandSuperCreate extends QuickShopCommand {
         return;
       }
       // Send creation menu.
-      final ShopCreator info = ShopCreator.create(ShopLocation.of(b.getLocation()), b.getRelative(p.getFacing().getOppositeFace()), item);
+      final ShopCreator info = ShopCreator.create(
+          ShopLocation.of(b.getLocation()),
+          b.getRelative(Util.yawToFace(p.getLocation().getYaw())), item);
 
       QuickShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(

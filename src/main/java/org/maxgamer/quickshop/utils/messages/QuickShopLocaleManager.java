@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,6 +31,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.nms.ItemNMS;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.LocaleFile;
@@ -80,7 +84,12 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @return Enchantment's i18n name.
    */
   public String getLocalizedName(@NotNull Enchantment enchantment) {
-    String namespaceKey = enchantment.getKey().getKey();
+    String namespaceKey;
+    try {
+      namespaceKey = enchantment.getKey().getKey();;
+    } catch (NoSuchMethodError e) {
+      namespaceKey = enchantment.getName();
+    }
     
     String enchI18n = enchi18n.getString("enchi18n.".concat(namespaceKey));
     
@@ -151,6 +160,27 @@ public class QuickShopLocaleManager implements LocaleManager {
     }
     return filled;
   }
+  
+  public void sendParsed(@NotNull UUID player, @NotNull String message, boolean isUnlimited) {
+    if (BaseConfig.ignoreUnlimitedMessages && isUnlimited) {
+      return; // Ignore unlimited shops messages.
+    }
+    String[] msgData = message.split("##########");
+    Player p = Bukkit.getPlayer(player);
+    if (p != null) {
+      try {
+        sendItemHologram(p, msgData[0], Util.deserialize(msgData[1]), msgData[2]);
+      } catch (InvalidConfigurationException e) {
+        p.sendMessage(msgData[0] + msgData[1] + msgData[2]);
+      } catch (ArrayIndexOutOfBoundsException e2) {
+        try {
+          sendItemHologram(p, msgData[0], Util.deserialize(msgData[1]), "");
+        } catch (Exception any) {
+          p.sendMessage(message);
+        }
+      }
+    }
+  }
 
   /**
    * Get potion effect's i18n name.
@@ -213,14 +243,45 @@ public class QuickShopLocaleManager implements LocaleManager {
       enchi18n = yaml;
         
       Enchantment[] enchsi18n = Enchantment.values();
-      for (Enchantment ench : enchsi18n) {
-        String enchi18nString = enchi18n.getString("enchi18n." + ench.getKey().getKey().trim());
-        if (enchi18nString != null && !enchi18nString.isEmpty()) {
-          continue;
+      try {
+        for (Enchantment ench : enchsi18n) {
+          String enchi18nString = enchi18n.getString("enchi18n." + ench.getKey().getKey().trim());
+          if (enchi18nString != null && !enchi18nString.isEmpty()) {
+            continue;
+          }
+          String enchName = MINECRAFT_LOCALE.getEnchantment(ench.getKey().getKey());
+          enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
+          //ShopLogger.instance().info("Found new ench [" + enchName + "] , adding it to the config...");
         }
-        String enchName = MINECRAFT_LOCALE.getEnchantment(ench.getKey().getKey());
-        enchi18n.set("enchi18n." + ench.getKey().getKey(), enchName);
-        //ShopLogger.instance().info("Found new ench [" + enchName + "] , adding it to the config...");
+      } catch (NoSuchMethodError e) {
+        for (Enchantment ench : enchsi18n) {
+          String name = ench.getName().toLowerCase();
+          // Subtypes
+          name = StringUtils.replace(name, "protection_", "protect.");
+          name = StringUtils.replace(name, "damage_", "damage.");
+          name = StringUtils.replace(name, "arrow_", "arrow.");
+          
+          // Name casting
+          name = StringUtils.replace(name, "worker", "Worker");
+          
+          // Partly emitting
+          name = StringUtils.replace(name, "sweeping_edge", "sweeping");
+          name = StringUtils.replace(name, "dig_speed", "digging");
+          name = StringUtils.replace(name, "fire_aspect", "fire");
+          name = StringUtils.replace(name, "loot_bonus_mobs", "lootBonus");
+          
+          // Replacing
+          name = StringUtils.replace(name, "loot_bonus_blocks", "lootBonusDigger");
+          name = StringUtils.replace(name, "silk_touch", "untouching");
+          name = StringUtils.replace(name, "explosions", "explosion");
+          name = StringUtils.replace(name, "environmental", "all");
+          name = StringUtils.replace(name, "lure", "fishingSpeed");
+          name = StringUtils.replace(name, "luck", "lootBonusFishing");
+          
+          String enchName = MINECRAFT_LOCALE.getEnchantment(name);
+          // Put key with default name, so won't harm runtime performance
+          enchi18n.set("enchi18n." + ench.getName(), name);
+        }
       }
     });
   }
@@ -273,6 +334,9 @@ public class QuickShopLocaleManager implements LocaleManager {
       potioni18n = yaml;
       
       for (PotionEffectType potion : PotionEffectType.values()) {
+        if (potion == null)
+          continue;
+        
         String potionI18n = potioni18n.getString("potioni18n." + potion.getName().trim());
         if (potionI18n != null && !potionI18n.isEmpty()) {
           continue;

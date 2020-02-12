@@ -17,6 +17,11 @@ public class CommandReset extends QuickShopCommand {
     return Collections.singletonList("quickshop.reset");
   }
   
+  @Override
+  public boolean hidden() {
+    return true;
+  }
+  
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,

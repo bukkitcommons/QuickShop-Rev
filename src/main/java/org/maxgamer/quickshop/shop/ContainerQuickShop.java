@@ -619,6 +619,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
       save();
     }
     
+    setSignText();
     checkDisplay();
   }
 

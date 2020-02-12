@@ -1,9 +1,13 @@
 package org.maxgamer.quickshop.utils.messages;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -19,6 +23,7 @@ import org.maxgamer.quickshop.utils.nms.Reflections;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.file.Rewriter;
 
@@ -60,17 +65,17 @@ public class MinecraftLocale {
 
         if (assetJson != null) {
           AssetJson versionJson = new AssetJson(assetJson);
-          langHash = versionJson.getLanguageHash(BaseConfig.language.toLowerCase());
+          String jsonLangHash = versionJson.getLanguageHash(BaseConfig.language.toLowerCase());
 
-          if (langHash != null) {
-            String langJson = mojangAPI.downloadTextFileFromMojang(langHash);
+          if (jsonLangHash != null) {
+            String langJson = mojangAPI.downloadTextFileFromMojang(jsonLangHash);
 
             if (langJson != null) {
-              new Rewriter(new File(Util.getCacheFolder(), langHash))
+              new Rewriter(new File(Util.getCacheFolder(), jsonLangHash))
               .accept(new ByteArrayInputStream(langJson.getBytes(StandardCharsets.UTF_8)));
 
               cache.set("ver", serverVersion);
-              cache.set("hash", langHash);
+              cache.set("hash", jsonLangHash);
               cache.set("lang", BaseConfig.language);
               cache.save(cacheFile);
             } else {
@@ -78,6 +83,8 @@ public class MinecraftLocale {
               ShopLogger.instance().warning(
                   "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
             }
+            
+            langHash = jsonLangHash;
           } else {
             Util.debug("Cannot get file hash for language " + BaseConfig.language.toLowerCase());
             ShopLogger.instance().warning(
@@ -89,10 +96,21 @@ public class MinecraftLocale {
               "Cannot download require files, some items/blocks/potions/enchs language will use default English name.");
         }
       }
-
+      
       String json = Util.readToString(new File(Util.getCacheFolder(), langHash));
-      if (json != null && !json.isEmpty())
-        lang = new JsonParser().parse(json).getAsJsonObject();
+      if (json != null && !json.isEmpty()) {
+        try {
+          lang = new JsonParser().parse(json).getAsJsonObject();
+        } catch (JsonSyntaxException e) {
+          // Legacy 1.12 lang
+          JsonObject jsonObject = new JsonObject();
+          new BufferedReader(new StringReader(json)).lines().forEach(line -> {
+            int separator = line.indexOf('=');
+            jsonObject.addProperty(line.substring(0, separator), line.substring(separator));
+          });
+          lang = jsonObject;
+        }
+      }
     } catch (Throwable t) {
       // FIXME stop plugin
       QuickShop.instance().getSentryErrorReporter().ignoreThrow();

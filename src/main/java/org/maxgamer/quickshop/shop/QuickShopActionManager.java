@@ -21,6 +21,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.messages.QuickShopLocaleManager;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -133,8 +134,8 @@ public class QuickShopActionManager implements ShopActionManager {
       boolean withdrawOwner = QuickShop.instance().getEconomy().withdraw(shop.getOwner(), totalPrice); // Withdraw owner's money
       if (!withdrawOwner) {
         p.sendMessage(Shop.getLocaleManager().getMessage("the-owner-cant-afford-to-buy-from-you", p,
-            Objects.requireNonNull(format(totalPrice)),
-            Objects.requireNonNull(format(QuickShop.instance().getEconomy().getBalance(shop.getOwner())))));
+            format(totalPrice),
+            format(QuickShop.instance().getEconomy().getBalance(shop.getOwner()))));
         return false;
       }
     }
@@ -160,18 +161,20 @@ public class QuickShopActionManager implements ShopActionManager {
     if (tax != 0 && !BaseConfig.taxAccount.isEmpty())
       QuickShop.instance().getEconomy().deposit(Bukkit.getOfflinePlayer(BaseConfig.taxAccount).getUniqueId(), totalPrice * tax);
 
-    // Notify the owner of the purchase.
-    String msg = Shop.getLocaleManager().getMessage("player-sold-to-your-store", p, p.getName(),
-        String.valueOf(amount), "##########" + Util.serialize(shop.getItem()) + "##########");
-
     int space = shop.getRemainingSpace();
     if (space == amount) {
-      msg += "\n" + Shop.getLocaleManager().getMessage("shop-out-of-space", p, "" + shop.getLocation().x(),
+      String msg = "\n" + Shop.getLocaleManager().getMessage("shop-out-of-space", p, "" + shop.getLocation().x(),
           "" + shop.getLocation().y(), "" + shop.getLocation().z());
+      
+      if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+        Shop.getMessager().send(shop.getOwner(), msg);
+    } else {
+      String msg = Shop.getLocaleManager().getMessage("player-sold-to-your-store", p, p.getName(),
+          String.valueOf(amount), "##########" + Util.serialize(shop.getItem()) + "##########");
+      
+      if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+        ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(p.getUniqueId(), message, shop.isUnlimited());
     }
-
-    if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
-      Shop.getMessager().send(shop.getOwner(), msg);
     
     shop.buy(p, amount);
     Shop.getLocaleManager().sendSellSuccess(p, shop, amount);
@@ -331,8 +334,6 @@ public class QuickShopActionManager implements ShopActionManager {
       }
     }
     
-    Util.debug("232");
-    
     if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location().bukkit())) {
       Util.debug("Cancelled by integrations");
       return;
@@ -364,7 +365,7 @@ public class QuickShopActionManager implements ShopActionManager {
     if (createCost > 0) {
       if (!QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), createCost)) {
         p.sendMessage(Shop.getLocaleManager().getMessage("you-cant-afford-a-new-shop", p,
-            Objects.requireNonNull(format(createCost))));
+            format(createCost)));
         return;
       }
       try {
@@ -478,10 +479,13 @@ public class QuickShopActionManager implements ShopActionManager {
       msg += "\n" + Shop.getLocaleManager().getMessage("shop-out-of-stock", p, "" + shop.getLocation().x(),
           "" + shop.getLocation().y(), "" + shop.getLocation().z(),
           Util.getItemStackName(shop.getItem()));
+      
+      if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+        Shop.getMessager().send(shop.getOwner(), msg);
+    } else {
+      if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+        ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(p.getUniqueId(), message, shop.isUnlimited());
     }
-
-    if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
-      Shop.getMessager().send(shop.getOwner(), msg);
     
     shop.sell(p, amount);
     Shop.getLocaleManager().sendPurchaseSuccess(p, shop, amount, info);
@@ -559,6 +563,7 @@ public class QuickShopActionManager implements ShopActionManager {
       // They wanted to do something.
       ShopActionData info = actionData.remove(p.getUniqueId());
       
+      ShopLogger.instance().warning("info: " + info);
       if (!info.location().worldName().equals(p.getLocation().getWorld().getName())
           || info.location().bukkit().distanceSquared(p.getLocation()) > 25) {
         p.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", p));

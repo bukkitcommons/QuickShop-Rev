@@ -20,6 +20,11 @@ public class CommandPreview extends QuickShopCommand {
   }
   
   @Override
+  public boolean hidden() {
+    return true;
+  }
+  
+  @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
     if (sender instanceof Player) {
       Player player = (Player) sender;

@@ -18,6 +18,11 @@ public class CommandSilentBuy extends QuickShopCommand {
   public List<String> permissions() {
     return Collections.singletonList("quickshop.create.buy");
   }
+  
+  @Override
+  public boolean hidden() {
+    return true;
+  }
 
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,

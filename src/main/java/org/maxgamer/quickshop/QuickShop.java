@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -85,6 +86,7 @@ import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationManager;
 import cc.bukkit.shop.util.ShopLogger;
 import cc.bukkit.shop.util.file.ResourceAccessor;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 
 @Getter
@@ -392,6 +394,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     long start = System.currentTimeMillis();
     Shop.setPlugin(this);
     sentryErrorReporter = new SentryErrorReporter(this);
+    new NBTItem(new ItemStack(Material.AIR)); // Initalize to avoid runtime lag
     
     /*
      * Configs

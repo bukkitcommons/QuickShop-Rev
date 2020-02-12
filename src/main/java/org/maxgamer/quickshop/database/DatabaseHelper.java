@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.UUID;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
@@ -76,27 +77,19 @@ public class DatabaseHelper {
   }
 
   public void cleanMessage(long weekAgo) {
-    try {
-      // QuickShop.instance().getDB().execute("DELETE FROM " + QuickShop.instance
-      // .getDbPrefix() + "messages WHERE time < ?", weekAgo);
-      String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE time < ?";
-      PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-      ps.setLong(1, weekAgo);
-      dispatcher.add(ps);
-    } catch (SQLException sqle) {
-      sqle.printStackTrace();
-    }
+    String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE time < ?";
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(weekAgo));
+    dispatcher.add(sqlString);
+  }
+  
+  private static String proc(String string) {
+    return "'".concat(string).concat("'");
   }
 
   public void cleanMessageForPlayer(@NotNull UUID player) {
-    try {
-      String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE owner = ?";
-      PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-      ps.setString(1, player.toString());
-      dispatcher.add(ps);
-    } catch (SQLException sqle) {
-      sqle.printStackTrace();
-    }
+    String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix + "messages WHERE owner = ?";
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(player.toString()));
+    dispatcher.add(sqlString);
   }
 
   /**
@@ -123,19 +116,18 @@ public class DatabaseHelper {
     Util.debug("Creates shop");
     String sqlString = "INSERT INTO " + DatabaseConfig.databasePrefix
         + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    // QuickShop.instance().getDB().execute(q, owner, price, Util.serialize(item), x, y, z, world,
-    // unlimited, shopType);
-    PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-    ps.setString(1, owner);
-    ps.setDouble(2, price);
-    ps.setString(3, Util.serialize(item));
-    ps.setInt(4, x);
-    ps.setInt(5, y);
-    ps.setInt(6, z);
-    ps.setString(7, world);
-    ps.setInt(8, unlimited);
-    ps.setInt(9, shopType);
-    dispatcher.add(ps);
+    
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serialize(item)));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(world));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(unlimited));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopType));
+    
+    dispatcher.add(sqlString);
   }
 
   /**
@@ -154,13 +146,13 @@ public class DatabaseHelper {
     String sqlString = "DELETE FROM " + DatabaseConfig.databasePrefix
         + "shops WHERE x = ? AND y = ? AND z = ? AND world = ?"
         + (db.getConnector() instanceof MySQLConnector ? " LIMIT 1" : "");
+    
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(worldName));
 
-    PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-    ps.setInt(1, x);
-    ps.setInt(2, y);
-    ps.setInt(3, z);
-    ps.setString(4, worldName);
-    dispatcher.add(ps);
+    dispatcher.add(sqlString);
   }
 
   public ResultSet selectAllMessages() throws SQLException {
@@ -176,19 +168,14 @@ public class DatabaseHelper {
   }
 
   public void sendMessage(@NotNull UUID player, @NotNull String message, long time) {
-    try {
-      String sqlString = "INSERT INTO " + DatabaseConfig.databasePrefix
-          + "messages (owner, message, time) VALUES (?, ?, ?)";
-      // QuickShop.instance().getDB().execute(q, player.toString(), message,
-      // System.currentTimeMillis());
-      PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-      ps.setString(1, player.toString());
-      ps.setString(2, message);
-      ps.setLong(3, time);
-      dispatcher.add(ps);
-    } catch (SQLException sqle) {
-      sqle.printStackTrace();
-    }
+    String sqlString = "INSERT INTO " + DatabaseConfig.databasePrefix
+        + "messages (owner, message, time) VALUES (?, ?, ?)";
+    
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(player.toString()));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(message));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(time));
+    
+    dispatcher.add(sqlString);
   }
 
   public void updateOwner2UUID(@NotNull String ownerUUID, int x, int y, int z,
@@ -201,13 +188,14 @@ public class DatabaseHelper {
     String sqlString = "UPDATE " + DatabaseConfig.databasePrefix
         + "shops SET owner = ? WHERE x = ? AND y = ? AND z = ? AND world = ?"
         + (db.getConnector() instanceof MySQLConnector ? " LIMIT 1" : "");
-    PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-    ps.setString(1, ownerUUID);
-    ps.setInt(2, x);
-    ps.setInt(3, y);
-    ps.setInt(4, z);
-    ps.setString(5, worldName);
-    dispatcher.add(ps);
+    
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(ownerUUID));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(worldName));
+    
+    dispatcher.add(sqlString);
   }
 
   public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited,
@@ -215,17 +203,17 @@ public class DatabaseHelper {
     
       String sqlString = "UPDATE " + DatabaseConfig.databasePrefix
           + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
-      PreparedStatement ps = db.getConnection().prepareStatement(sqlString);
-      ps.setString(1, owner);
-      ps.setString(2, Util.serialize(item));
-      ps.setInt(3, unlimited);
-      ps.setInt(4, shopType);
-      ps.setDouble(5, price);
-      ps.setInt(6, x);
-      ps.setInt(7, y);
-      ps.setInt(8, z);
-      ps.setString(9, world);
-      dispatcher.add(ps);
-      // db.execute(q, owner, Util.serialize(item), unlimited, shopType, price, x, y, z, world);
+      
+      sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serialize(item)));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(unlimited));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopType));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", proc(world));
+      
+      dispatcher.add(sqlString);
   }
 }

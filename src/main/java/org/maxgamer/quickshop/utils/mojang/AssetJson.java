@@ -10,6 +10,7 @@ import com.google.gson.JsonPrimitive;
 
 public class AssetJson {
   final String pathTemplate = "minecraft/lang/{0}.json";
+  final String pathTemplateLegacy = "minecraft/lang/{0}.lang";
   @NotNull
   String gameAssets;
 
@@ -37,9 +38,13 @@ public class AssetJson {
     }
     JsonObject langObj = objs.getAsJsonObject(Util.fillArgs(pathTemplate, languageCode));
     if (langObj == null || langObj.isJsonNull()) {
-      Util.debug("Cannot find request path.");
-      Util.debug(this.gameAssets);
-      return null;
+      langObj = objs.getAsJsonObject(Util.fillArgs(pathTemplateLegacy, languageCode));
+      
+      if (langObj == null || langObj.isJsonNull()) {
+        Util.debug("Cannot find request path.");
+        Util.debug(this.gameAssets);
+        return null;
+      }
     }
     JsonPrimitive hashObj = langObj.getAsJsonPrimitive("hash");
     if (hashObj == null || hashObj.isJsonNull()) {

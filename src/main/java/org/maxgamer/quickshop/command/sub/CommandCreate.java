@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -19,13 +20,14 @@ import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.action.data.ShopCreator;
 import cc.bukkit.shop.util.ShopLocation;
+import cc.bukkit.shop.util.ShopLogger;
 
 public class CommandCreate extends QuickShopCommand {
   @Override
   public List<String> permissions() {
     return Collections.singletonList("quickshop.create.cmd");
   }
-  
+
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
@@ -92,7 +94,9 @@ public class CommandCreate extends QuickShopCommand {
 
       // Send creation menu.
       Shop.getActions().setAction(p.getUniqueId(),
-          ShopCreator.create(ShopLocation.of(b.getLocation()), b.getRelative(p.getFacing().getOppositeFace()), item));
+          ShopCreator.create(
+              ShopLocation.of(b.getLocation()),
+              b.getRelative(Util.yawToFace(p.getLocation().getYaw())), item));
 
       if (cmdArg.length >= 1) {
         Shop.getActions().handleChat(p, cmdArg[0], false);

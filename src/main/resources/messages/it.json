@@ -90,7 +90,7 @@
         "this-shop-is-selling": "&aThis shop is &bSELLING&a items.",
         "effects": "&aEffects",
         "commands": {
-            "preview": "\/qs silentpreview {0} {1} {2} {3}"
+            "preview": "\/qs preview {0} {1} {2} {3}"
         }
     },
     "bypassing-lock": "&cBypassing a QuickShop lock!",
@@ -173,11 +173,11 @@
             "setowner": "\/qs setowner [Player]",
             "unlimited": "\/qs silentunlimited {0} {1} {2} {3}",
             "buy": "\/qs silentbuy {0} {1} {2} {3}",
-            "sell": "\/qs silentsell {0} {1} {2} {3}",
+            "sell": "\/qs sell {0} {1} {2} {3}",
             "price": "\/qs price [New Price]",
             "refill": "\/qs refill [Amount]",
             "empty": "\/qs silentempty {0} {1} {2} {3}",
-            "remove": "\/qs silentremove {0} {1} {2} {3}"
+            "remove": "\/qs remove {0} {1} {2} {3}"
         }
     },
     "tableformat": {

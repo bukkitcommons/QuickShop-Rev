@@ -64,7 +64,7 @@
     "owner": "&aOwner: {0}",
     "total-value-of-chest": "&aTotal value of Chest: &e{0}",
     "commands": {
-      "preview": "/qs silentpreview {0} {1} {2} {3}"
+      "preview": "/qs preview {0} {1} {2} {3}"
     },
     "price-per": "&aPrice per &e{0} &a- &e{1}",
     "space": "&aSpace: &e{0}",
@@ -133,11 +133,11 @@
     "refill": "&aRefill: Refill the shop items &e[&d&lOK&e]",
     "mode-selling-hover": "&eClick to convert the shop to be in the buying mode.",
     "commands": {
-      "sell": "/qs silentsell {0} {1} {2} {3}",
+      "sell": "/qs sell {0} {1} {2} {3}",
       "buy": "/qs silentbuy {0} {1} {2} {3}",
       "price": "/qs price [New Price]",
       "unlimited": "/qs silentunlimited {0} {1} {2} {3}",
-      "remove": "/qs silentremove {0} {1} {2} {3}",
+      "remove": "/qs remove {0} {1} {2} {3}",
       "setowner": "/qs setowner [Player]",
       "refill": "/qs refill [Amount]",
       "empty": "/qs silentempty {0} {1} {2} {3}"

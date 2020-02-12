@@ -19,6 +19,11 @@ public class CommandUpdate extends QuickShopCommand {
   }
   
   @Override
+  public boolean hidden() {
+    return true;
+  }
+  
+  @Override
   public void onCommand(
       @NotNull CommandSender sender,
       @NotNull String commandLabel,

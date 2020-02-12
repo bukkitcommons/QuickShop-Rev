@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.Nullable;
+import cc.bukkit.shop.util.ShopLogger;
 
 public class Reflections {
   public static String getServerVersion() {
@@ -29,8 +30,10 @@ public class Reflections {
       Field consoleField = Bukkit.getServer().getClass().getDeclaredField("console");
       consoleField.setAccessible(true); // protected
       Object console = consoleField.get(Bukkit.getServer()); // dedicated server
-      return String
+      String version = String
           .valueOf(console.getClass().getSuperclass().getMethod("getVersion").invoke(console));
+      ShopLogger.instance().info("Server Version: " + version);
+      return version;
     } catch (Exception e) {
       e.printStackTrace();
       return "Unknown";

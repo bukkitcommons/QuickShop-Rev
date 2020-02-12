@@ -19,6 +19,11 @@ public class CommandSilentUnlimited extends QuickShopCommand {
   }
   
   @Override
+  public boolean hidden() {
+    return true;
+  }
+  
+  @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (cmdArg.length < 4) {
