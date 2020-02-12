@@ -187,8 +187,8 @@
         "left_begin": "| "
     },
     "booleanformat": {
-        "success": "&a\u2714",
-        "failed": "&c\u2718"
+        "success": "&a✔",
+        "failed": "&c✘"
     },
     "tabcomplete": {
         "price": "[price]",
