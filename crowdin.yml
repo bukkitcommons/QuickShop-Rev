@@ -1,0 +1,3 @@
+files:
+  - source: /src/main/resources/messages/en_US.json
+    translation: /src/main/resources/messages/%locale_with_underscore%.json
