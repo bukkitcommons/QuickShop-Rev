@@ -208,19 +208,21 @@ public class QuickShopLocaleManager implements LocaleManager {
     loadItemi18n();
     loadPotioni18n();
   }
+  
+  private final static String DEFAULT_LOCALE = "en_US";
 
   public void loadCfgMessages() throws InvalidConfigurationException {
     /* Check & Load & Create default messages.yml */
     // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
-    String languageCode = BaseConfig.language.equalsIgnoreCase("default") ? "en_US" : BaseConfig.language;
+    String languageCode = BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language;
     languageCode = languageCode.replace('-', '_');
     MINECRAFT_LOCALE.reload();
     
     // Init nJson
     LocaleFile json;
-    languageCode = "en_US".equals(languageCode) ?
+    languageCode = DEFAULT_LOCALE.equalsIgnoreCase(languageCode) ?
         languageCode :
-          (Shop.instance().getResource("messages/" + languageCode + ".json") == null ? "en_US" : languageCode);
+          (Shop.instance().getResource("messages/" + languageCode + ".json") == null ? DEFAULT_LOCALE : languageCode);
     json = new JsonLocale(new File(QuickShop.instance().getDataFolder(), "messages.json"), "messages/" + languageCode + ".json", plugin);
     json.create();
     
