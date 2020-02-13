@@ -36,7 +36,7 @@ public class FunnyEasterEgg {
           && currentDate.getDay() < 26) {
         return this.getXMas().split("\n");
       }
-      if (chineseSpringDay()) {
+      if (false && chineseSpringDay()) { // FIXME wrong checking
         return this.getChineseNewYear().split("\n");
       }
     } catch (Exception ignored) {
