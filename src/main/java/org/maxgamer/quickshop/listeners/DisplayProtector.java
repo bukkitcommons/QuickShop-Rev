@@ -43,11 +43,10 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
-import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
-public class DisplayProtectionListener implements Listener {
+public class DisplayProtector implements Listener {
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
   public void block(BlockFromToEvent event) {
     if (!BaseConfig.enhancedDisplayProtection)

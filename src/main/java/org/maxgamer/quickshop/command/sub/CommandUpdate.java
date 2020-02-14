@@ -9,8 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.VersionDataFetcher;
-import cc.bukkit.shop.util.VersionData;
+import org.maxgamer.quickshop.scheduler.UpdateWatcher;
+import cc.bukkit.shop.util.version.VersionData;
 
 public class CommandUpdate extends QuickShopCommand {
   @Override
@@ -32,7 +32,7 @@ public class CommandUpdate extends QuickShopCommand {
     Bukkit.getScheduler().runTaskAsynchronously(QuickShop.instance(), () -> {
       sender.sendMessage(ChatColor.YELLOW + "Checking for updates...");
 
-      final Optional<VersionData> data = VersionDataFetcher.acquire();
+      final Optional<VersionData> data = UpdateWatcher.FETCHER.acquire();
       if (!data.isPresent()) {
         sender.sendMessage(ChatColor.GREEN + "No updates can update now.");
         return;

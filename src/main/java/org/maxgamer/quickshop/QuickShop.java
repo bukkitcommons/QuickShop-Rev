@@ -37,8 +37,7 @@ import org.maxgamer.quickshop.listeners.ChatListener;
 import org.maxgamer.quickshop.listeners.ClearLaggListener;
 import org.maxgamer.quickshop.listeners.CustomInventoryListener;
 import org.maxgamer.quickshop.listeners.DisplayBugFixListener;
-import org.maxgamer.quickshop.listeners.DisplayProtectionListener;
-import org.maxgamer.quickshop.listeners.InternalListener;
+import org.maxgamer.quickshop.listeners.DisplayProtector;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
@@ -494,11 +493,10 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
     Bukkit.getPluginManager().registerEvents(new ShopActionListener(), this);
     Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-    Bukkit.getPluginManager().registerEvents(new DisplayProtectionListener(), this);
+    Bukkit.getPluginManager().registerEvents(new DisplayProtector(), this);
     Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(), this);
     Bukkit.getPluginManager().registerEvents(new DisplayBugFixListener(), this);
     Bukkit.getPluginManager().registerEvents(new ShopProtector(), this);
-    Bukkit.getPluginManager().registerEvents(new InternalListener(), this);
 
     if (BaseConfig.lock)
       Bukkit.getPluginManager().registerEvents(new LockListener(), this);

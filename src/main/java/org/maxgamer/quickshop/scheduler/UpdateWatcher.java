@@ -10,17 +10,18 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.utils.JavaUtils;
-import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.VersionDataFetcher;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.logger.ShopLogger;
-import cc.bukkit.shop.util.VersionData;
+import cc.bukkit.shop.util.version.VersionData;
+import cc.bukkit.shop.util.version.VersionFetcher;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class UpdateWatcher implements Listener {
   private volatile static Optional<VersionData> data = Optional.empty();
   private static int taskId = 1;
+  
+  public static final VersionFetcher FETCHER = VersionFetcher.create("66351");
   
   public static boolean isLatest() {
     return !data.isPresent();
@@ -29,7 +30,7 @@ public class UpdateWatcher implements Listener {
   public static void init() {
     taskId = Bukkit.getScheduler().runTaskTimerAsynchronously(QuickShop.instance(), () -> {
       
-      (data = VersionDataFetcher.acquire()).ifPresent(data -> {
+      (data = FETCHER.acquire()).ifPresent(data -> {
         if (!data.beta()) {
           ShopLogger.instance()
               .info("A new version of QuickShop has been released! [" + data.version() + "]");
