@@ -116,7 +116,7 @@ public abstract class EntityDisplay implements DisplayItem {
   }
   
   @Override
-  public synchronized boolean isSpawned() {
+  public boolean isSpawned() {
     return this.entity == null ? false : this.entity.isValid();
   }
 
