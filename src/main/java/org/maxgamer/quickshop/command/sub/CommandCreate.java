@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,11 +15,13 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.action.data.ShopCreator;
-import cc.bukkit.shop.logger.ShopLogger;
 
 public class CommandCreate extends QuickShopCommand {
   @Override
@@ -62,7 +63,7 @@ public class CommandCreate extends QuickShopCommand {
       final Block b = bIt.next();
       Util.debug("Checking block for shop creation: " + b);
 
-      if (!Util.canBeShop(b)) {
+      if (!ShopUtils.canBeShop(b)) {
         Util.debug("Block cannot be shop.");
         continue;
       }
@@ -80,7 +81,7 @@ public class CommandCreate extends QuickShopCommand {
         return;
       }
 
-      if (Util.getSecondHalf(b).isPresent()
+      if (BlockUtils.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(p, "quickshop.create.double")) {
         p.sendMessage(Shop.getLocaleManager().get("no-double-chests", sender));
         return;
@@ -96,7 +97,7 @@ public class CommandCreate extends QuickShopCommand {
       Shop.getActions().setAction(p.getUniqueId(),
           ShopCreator.create(
               ShopLocation.of(b.getLocation()),
-              b.getRelative(Util.yawToFace(p.getLocation().getYaw())), item));
+              b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), item));
 
       if (cmdArg.length >= 1) {
         Shop.getActions().handleChat(p, cmdArg[0], false);
@@ -105,7 +106,7 @@ public class CommandCreate extends QuickShopCommand {
       }
 
       p.sendMessage(
-          Shop.getLocaleManager().get("how-much-to-trade-for", sender, Util.getItemStackName(item)));
+          Shop.getLocaleManager().get("how-much-to-trade-for", sender, ItemUtils.getItemStackName(item)));
       Util.debug("Created by wait chat");
       return;
     }

@@ -1,8 +1,6 @@
 package org.maxgamer.quickshop.scheduler;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -11,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.VersionDataFetcher;
 import cc.bukkit.shop.Shop;
@@ -57,7 +56,7 @@ public class UpdateWatcher implements Listener {
         ShopLogger.instance()
             .info("Update here: https://www.spigotmc.org/resources/62575/");
         
-        String notify = Util.fillArgs(
+        String notify = JavaUtils.fillArgs(
             "New update {0} now avaliable! Please update!",
             data.version(), Shop.getVersion()
         );

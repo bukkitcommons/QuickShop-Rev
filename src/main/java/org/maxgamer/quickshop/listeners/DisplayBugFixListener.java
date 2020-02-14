@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
 import lombok.AllArgsConstructor;
 
@@ -25,7 +26,7 @@ public class DisplayBugFixListener implements Listener {
 
     for (Entity entity : entities) {
       if (!(entity instanceof ArmorStand)
-          || !Util.isDisplayItem(((ArmorStand) entity).getItemInHand(), null)) {
+          || !ItemUtils.isDisplayItem(((ArmorStand) entity).getItemInHand(), null)) {
         continue;
       }
 

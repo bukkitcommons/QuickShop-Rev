@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.economy.VaultEconProvider;
+import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.economy.EconomyProvider;
@@ -87,12 +88,12 @@ public class Paste {
     finalReport.append("\tJava: ").append(System.getProperty("java.version")).append("\n");
     RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
     List<String> arguments = runtimeMxBean.getInputArguments();
-    finalReport.append("\tInput Args: ").append(Util.list2String(arguments)).append("\n");
+    finalReport.append("\tInput Args: ").append(JavaUtils.list2String(arguments)).append("\n");
     finalReport.append("\tVM Name: ").append(runtimeMxBean.getVmName()).append("\n");
     Map<String, String> sys = runtimeMxBean.getSystemProperties();
     List<String> sysData = new ArrayList<>();
     sys.keySet().forEach(key -> sysData.add(key + "=" + sys.get(key)));
-    finalReport.append("\tSystem Properties: ").append(Util.list2String(sysData)).append("\n");
+    finalReport.append("\tSystem Properties: ").append(JavaUtils.list2String(sysData)).append("\n");
     finalReport.append("\tPlayers: ").append(Bukkit.getOnlinePlayers().size()).append("/")
         .append(Bukkit.getMaxPlayers()).append("\n");
     finalReport.append("\tOnlineMode: ").append(Bukkit.getOnlineMode()).append("\n");
@@ -100,7 +101,7 @@ public class Paste {
     finalReport.append("\tWorldContainer: ").append(Bukkit.getWorldContainer()).append("\n");
     List<String> modules = new ArrayList<>();
     plugin.getIntegrationHelper().getIntegrations().forEach(m -> modules.add(m.getName()));
-    finalReport.append("\tLoaded Integrations: ").append(Util.list2String(modules)).append("\n");
+    finalReport.append("\tLoaded Integrations: ").append(JavaUtils.list2String(modules)).append("\n");
     finalReport.append("================================================\n");
     finalReport.append("Worlds:\n");
     finalReport.append("\tTotal: ").append(Bukkit.getWorlds().size()).append("\n");
@@ -128,7 +129,7 @@ public class Paste {
       finalReport.append("\t\t\n")
           .append(new String(
               Objects.requireNonNull(
-                  Util.inputStream2ByteArray(plugin.getDataFolder() + "/config.yml")),
+                  JavaUtils.inputStream2ByteArray(plugin.getDataFolder() + "/config.yml")),
               StandardCharsets.UTF_8))
           .append("\n");
       finalReport.append("\t*********************************\n");
@@ -136,7 +137,7 @@ public class Paste {
       finalReport.append("\t\t\n")
           .append(new String(
               Objects.requireNonNull(
-                  Util.inputStream2ByteArray(plugin.getDataFolder() + "/messages.json")),
+                  JavaUtils.inputStream2ByteArray(plugin.getDataFolder() + "/messages.json")),
               StandardCharsets.UTF_8))
           .append("\n");
       finalReport.append("\t*********************************\n");
@@ -144,7 +145,7 @@ public class Paste {
       finalReport.append("\titemi18n.yml:\n");
       finalReport.append("\t\t\n")
           .append(new String(
-              Objects.requireNonNull(Util.inputStream2ByteArray(
+              Objects.requireNonNull(JavaUtils.inputStream2ByteArray(
                   new File(plugin.getDataFolder(), "itemi18n.yml").getPath())),
               StandardCharsets.UTF_8))
           .append("\n");
@@ -153,7 +154,7 @@ public class Paste {
       finalReport.append("\tenchi18n.yml:\n");
       finalReport.append("\t\t\n")
           .append(new String(
-              Objects.requireNonNull(Util.inputStream2ByteArray(
+              Objects.requireNonNull(JavaUtils.inputStream2ByteArray(
                   new File(plugin.getDataFolder(), "enchi18n.yml").getPath())),
               StandardCharsets.UTF_8))
           .append("\n");
@@ -162,7 +163,7 @@ public class Paste {
       finalReport.append("\tpotioni18n.yml:\n");
       finalReport.append("\t\t\n")
           .append(new String(
-              Objects.requireNonNull(Util.inputStream2ByteArray(
+              Objects.requireNonNull(JavaUtils.inputStream2ByteArray(
                   new File(plugin.getDataFolder(), "potioni18n.yml").getPath())),
               StandardCharsets.UTF_8))
           .append("\n");
@@ -170,7 +171,7 @@ public class Paste {
       finalReport.append("\t*********************************\n");
       finalReport.append("\tInternal Debug Log:\n");
       finalReport.append("\t\t\n")
-          .append(Util.list2String(Util.getDebugLogs()).replaceAll(",", "\n")).append("\n");
+          .append(JavaUtils.list2String(Util.getDebugLogs()).replaceAll(",", "\n")).append("\n");
       finalReport.append("\t*********************************\n");
       // try {
       // finalReport.append("\t*********************************\n");
@@ -191,7 +192,7 @@ public class Paste {
         finalReport.append("\t\t\n")
             .append(new String(
                 Objects.requireNonNull(
-                    Util.inputStream2ByteArray(new File(new File("."), "bukkit.yml").getPath())),
+                    JavaUtils.inputStream2ByteArray(new File(new File("."), "bukkit.yml").getPath())),
                 StandardCharsets.UTF_8))
             .append("\n");
         finalReport.append("\t*********************************\n");
@@ -207,7 +208,7 @@ public class Paste {
         finalReport.append("\t\t\n")
             .append(new String(
                 Objects.requireNonNull(
-                    Util.inputStream2ByteArray(new File(new File("."), "spigot.yml").getPath())),
+                    JavaUtils.inputStream2ByteArray(new File(new File("."), "spigot.yml").getPath())),
                 StandardCharsets.UTF_8))
             .append("\n");
         finalReport.append("\t*********************************\n");
@@ -223,7 +224,7 @@ public class Paste {
         finalReport.append("\t\t\n")
             .append(new String(
                 Objects.requireNonNull(
-                    Util.inputStream2ByteArray(new File(new File("."), "paper.yml").getPath())),
+                    JavaUtils.inputStream2ByteArray(new File(new File("."), "paper.yml").getPath())),
                 StandardCharsets.UTF_8))
             .append("\n");
         finalReport.append("\t*********************************\n");

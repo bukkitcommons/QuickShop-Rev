@@ -21,6 +21,10 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.QuickShopLocaleManager;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.JavaUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.ContainerShop;
@@ -85,16 +89,16 @@ public class QuickShopActionManager implements ShopActionManager {
     if (!shop.isUnlimited() && space < amount) {
       p.sendMessage(
           Shop.getLocaleManager().get("shop-has-no-space", p, "" + space,
-              Util.getItemStackName(shop.getItem())));
+              ItemUtils.getItemStackName(shop.getItem())));
       return false;
     }
 
     // Not enough items
-    int count = Util.countStacks(p.getInventory(), shop.getItem());
+    int count = ShopUtils.countStacks(p.getInventory(), shop.getItem());
     amount = amount == -1 ? count : amount;
     if (amount > count) {
       p.sendMessage(Shop.getLocaleManager().get("you-dont-have-that-many-items", p, "" + count * info.item().getAmount(),
-          Util.getItemStackName(shop.getItem())));
+          ItemUtils.getItemStackName(shop.getItem())));
       return false;
     }
 
@@ -170,7 +174,7 @@ public class QuickShopActionManager implements ShopActionManager {
         Shop.getMessager().send(shop.getOwner(), msg);
     } else {
       String msg = Shop.getLocaleManager().get("player-sold-to-your-store", p, p.getName(),
-          String.valueOf(amount), "##########" + Util.serialize(shop.getItem()) + "##########");
+          String.valueOf(amount), "##########" + Util.serializeItem(shop.getItem()) + "##########");
       
       if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
         ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(p.getUniqueId(), message, shop.isUnlimited());
@@ -216,13 +220,13 @@ public class QuickShopActionManager implements ShopActionManager {
       return;
     }
 
-    if (Util.getSecondHalf(info.location().block()).isPresent()
+    if (BlockUtils.getSecondHalf(info.location().block()).isPresent()
         && !PermissionManager.instance().has(p, "quickshop.create.double")) {
       p.sendMessage(Shop.getLocaleManager().get("no-double-chests", p));
       return;
     }
     
-    if (!Util.canBeShop(info.location().block())) {
+    if (!ShopUtils.canBeShop(info.location().block())) {
       p.sendMessage(Shop.getLocaleManager().get("chest-was-removed", p));
       return;
     }
@@ -241,7 +245,7 @@ public class QuickShopActionManager implements ShopActionManager {
       }
 
       Material signType = info.sign().getType();
-      if (!Util.isAir(signType) && signType != Material.WATER) {
+      if (!BlockUtils.isAir(signType) && signType != Material.WATER) {
         
         boolean wallSign;
         try {
@@ -301,13 +305,13 @@ public class QuickShopActionManager implements ShopActionManager {
     if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
         p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p,
-            (decFormat) ? Util.formatPrice(minPrice) : "" + minPrice));
+            (decFormat) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     } else {
       if (price < minPrice) {
         p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p,
-            (decFormat) ? Util.formatPrice(minPrice) : "" + minPrice));
+            (decFormat) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     }
@@ -316,7 +320,7 @@ public class QuickShopActionManager implements ShopActionManager {
     if (price_limit != -1) {
       if (price > price_limit) {
         p.sendMessage(Shop.getLocaleManager().get("price-too-high", p,
-            (decFormat) ? Util.formatPrice(price_limit) : "" + price_limit));
+            (decFormat) ? ShopUtils.formatPrice(price_limit) : "" + price_limit));
         return;
       }
     }
@@ -329,7 +333,7 @@ public class QuickShopActionManager implements ShopActionManager {
         // "+info.getItem().getType()+": min "+priceRestriction.getKey()+", max
         // "+priceRestriction.getValue());
         p.sendMessage(Shop.getLocaleManager().get("restricted-prices", p,
-            Util.getItemStackName(info.item()), String.valueOf(priceRestriction.getKey()),
+            ItemUtils.getItemStackName(info.item()), String.valueOf(priceRestriction.getKey()),
             String.valueOf(priceRestriction.getValue())));
       }
     }
@@ -409,7 +413,7 @@ public class QuickShopActionManager implements ShopActionManager {
     String stacks = info.item().getAmount() > 1 ? " * " + info.item().getAmount() : "";
     if (stock < amount) {
       p.sendMessage(Shop.getLocaleManager().get("shop-stock-too-low", p, String.valueOf(stock),
-          Util.getItemStackName(shop.getItem()) + stacks));
+          ItemUtils.getItemStackName(shop.getItem()) + stacks));
       return;
     }
     if (amount < 1) {
@@ -417,7 +421,7 @@ public class QuickShopActionManager implements ShopActionManager {
       p.sendMessage(Shop.getLocaleManager().get("negative-amount", p));
       return;
     }
-    int pSpace = Util.countSpace(p.getInventory(), shop.getItem());
+    int pSpace = ShopUtils.countSpace(p.getInventory(), shop.getItem());
     if (amount > pSpace) {
       p.sendMessage(Shop.getLocaleManager().get("not-enough-space", p, String.valueOf(pSpace)));
       return;
@@ -469,16 +473,16 @@ public class QuickShopActionManager implements ShopActionManager {
     // Notify the shop owner
     if (BaseConfig.showTax) {
       msg = Shop.getLocaleManager().get("player-bought-from-your-store-tax", p, p.getName(), "" + amount,
-          "##########" + Util.serialize(shop.getItem()) + "##########", Util.format((tax * total)));
+          "##########" + Util.serializeItem(shop.getItem()) + "##########", JavaUtils.format((tax * total)));
     } else {
       msg = Shop.getLocaleManager().get("player-bought-from-your-store", p, p.getName(), "" + amount,
-          "##########" + Util.serialize(shop.getItem()) + "##########");
+          "##########" + Util.serializeItem(shop.getItem()) + "##########");
     }
     // Transfers the item from A to B
     if (stock == amount) {
       msg += "\n" + Shop.getLocaleManager().get("shop-out-of-stock", p, "" + shop.getLocation().x(),
           "" + shop.getLocation().y(), "" + shop.getLocation().z(),
-          Util.getItemStackName(shop.getItem()));
+          ItemUtils.getItemStackName(shop.getItem()));
       
       if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
         Shop.getMessager().send(shop.getOwner(), msg);
@@ -513,7 +517,7 @@ public class QuickShopActionManager implements ShopActionManager {
     // Get the shop they interacted with
     ShopViewer shopOp = Shop.getManager().getLoadedShopAt(info.location());
     // It's not valid anymore
-    if (!shopOp.isPresent() || !Util.canBeShop(info.location().block())) {
+    if (!shopOp.isPresent() || !ShopUtils.canBeShop(info.location().block())) {
       p.sendMessage(Shop.getLocaleManager().get("chest-was-removed", p));
       return;
     }

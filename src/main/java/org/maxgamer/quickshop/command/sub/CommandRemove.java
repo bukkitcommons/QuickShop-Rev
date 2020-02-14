@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.PermissionManager;
-import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.BlockViewer;
@@ -79,6 +79,6 @@ public class CommandRemove extends QuickShopCommand {
     
     sender.sendMessage(
         Shop.getLocaleManager().get(
-            "command.now-selling", sender, Util.getItemStackName(shop.getItem())));
+            "command.now-selling", sender, ItemUtils.getItemStackName(shop.getItem())));
   }
 }

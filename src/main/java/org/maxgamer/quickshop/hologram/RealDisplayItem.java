@@ -6,6 +6,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.event.ShopDisplayItemSpawnEvent;
@@ -31,7 +34,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
   @Override
   public boolean isDisplayItem(@NotNull Entity entity) {
     if (entity instanceof Item)
-      return Util.isDisplayItem(((Item) entity).getItemStack(), null);
+      return ItemUtils.isDisplayItem(((Item) entity).getItemStack(), null);
     else
       return false;
   }
@@ -41,7 +44,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
     if (entity != null && entity.isValid() && !entity.isDead())
       return;
     
-    if (!Util.hasSpaceForDisplay(getDisplayLocation().getBlock().getType()))
+    if (!BlockUtils.hasSpaceForDisplay(getDisplayLocation().getBlock().getType()))
       return;
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
@@ -60,7 +63,7 @@ public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
     Item item = (Item) entity;
     // Set item protect in the armorstand's hand
     if (BaseConfig.displayNameVisible) {
-      item.setCustomName(Util.getItemStackName(displayItemStack));
+      item.setCustomName(ItemUtils.getItemStackName(displayItemStack));
       item.setCustomNameVisible(true);
     }
     item.setPickupDelay(Integer.MAX_VALUE);

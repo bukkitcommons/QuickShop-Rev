@@ -67,7 +67,6 @@ public class CommandStaff extends QuickShopCommand {
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
-    Util.debug(Util.array2String(cmdArg));
     if (!(sender instanceof Player)) {
       sender.sendMessage("Only player can execute this command.");
       return;

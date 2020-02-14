@@ -29,6 +29,9 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -114,7 +117,7 @@ public class ShopActionListener implements Listener {
 
         if (shop.is(ShopType.SELLING)) {
           // Consider player inv space, money afforable
-          int afforable = Math.min(Util.countSpace(player.getInventory(), shop.getItem()),
+          int afforable = Math.min(ShopUtils.countSpace(player.getInventory(), shop.getItem()),
               (int) Math.floor(money / price));
 
           // Consider shop remaining stock
@@ -128,7 +131,7 @@ public class ShopActionListener implements Listener {
           player.sendMessage(Shop.getLocaleManager().get("how-many-buy", player, "" + afforable));
         } else {
           double ownerBalance = QuickShop.instance().getEconomy().getBalance(shop.getOwner());
-          int totalItems = Util.countStacks(player.getInventory(), shop.getItem()) * shop.getItem().getAmount();
+          int totalItems = ShopUtils.countStacks(player.getInventory(), shop.getItem()) * shop.getItem().getAmount();
           int ownerAfforableItems = (int) (ownerBalance / price) * shop.getItem().getAmount();
 
           if (!shop.isUnlimited()) {
@@ -168,7 +171,7 @@ public class ShopActionListener implements Listener {
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling creation.");
         
-        if (!Util.canBeShopIgnoreBlocklist(block.getState())) {
+        if (!ShopUtils.canBeShopIgnoreBlocklist(block.getState())) {
           Util.debug("Block cannot be shop.");
           return;
           /*
@@ -184,7 +187,7 @@ public class ShopActionListener implements Listener {
           return;
         }
         
-        if (Util.getSecondHalf(block).isPresent() &&
+        if (BlockUtils.getSecondHalf(block).isPresent() &&
             !PermissionManager.instance().has(player, "quickshop.create.double")) {
           player.sendMessage(Shop.getLocaleManager().get("no-double-chests", player));
           return;
@@ -213,7 +216,7 @@ public class ShopActionListener implements Listener {
           expectedSign = n;
         }
         
-        if (expectedSign != null && Util.isWallSign(expectedSign.getType()) &&
+        if (expectedSign != null && BlockUtils.isWallSign(expectedSign.getType()) &&
             !Arrays.stream(((Sign) expectedSign.getState()).getLines()).allMatch(String::isEmpty))
           return;
         
@@ -222,7 +225,7 @@ public class ShopActionListener implements Listener {
 
         QuickShopActionManager.instance().getActions().put(player.getUniqueId(), info);
         player.sendMessage(Shop.getLocaleManager().get("how-much-to-trade-for", player,
-            Util.getItemStackName(Objects.requireNonNull(e.getItem()))));
+            ItemUtils.getItemStackName(Objects.requireNonNull(e.getItem()))));
       });
     
     Util.debug(ChatColor.YELLOW + "> Handled interact");
@@ -268,10 +271,10 @@ public class ShopActionListener implements Listener {
 
     // This method will only match by using modern material name,
     // since this will only happen after 1.14
-    if (!Util.isDyes(item.getType()))
+    if (!ItemUtils.isDyes(item.getType()))
       return;
 
-    Util.getShopBySign(block).ifPresent(() -> {
+    ShopUtils.getShopBySign(block).ifPresent(() -> {
       event.setCancelled(true);
       Util.debug("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
     });

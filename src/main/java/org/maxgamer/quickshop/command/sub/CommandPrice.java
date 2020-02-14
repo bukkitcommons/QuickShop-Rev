@@ -13,6 +13,7 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -79,13 +80,13 @@ public class CommandPrice extends QuickShopCommand {
     if (BaseConfig.allowFreeShops) {
       if (price != 0 && price < minPrice) {
         p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p,
-            (format) ? Util.formatPrice(minPrice) : "" + minPrice));
+            (format) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     } else {
       if (price < minPrice) {
         p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p,
-            (format) ? Util.formatPrice(minPrice) : "" + minPrice));
+            (format) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
         return;
       }
     }
@@ -94,7 +95,7 @@ public class CommandPrice extends QuickShopCommand {
 
     if (price_limit != -1 && price > price_limit) {
       p.sendMessage(Shop.getLocaleManager().get("price-too-high", p,
-          (format) ? Util.formatPrice(price_limit) : "" + price_limit));
+          (format) ? ShopUtils.formatPrice(price_limit) : "" + price_limit));
       return;
     }
 

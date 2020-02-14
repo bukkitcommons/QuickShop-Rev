@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
+import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
 import cc.bukkit.shop.ShopMessager;
@@ -67,7 +68,7 @@ public class QuickShopMessager implements ShopMessager {
       while (rs.next()) {
         String owner = rs.getString("owner");
         UUID ownerUUID;
-        if (Util.isUUID(owner)) {
+        if (JavaUtils.isUUID(owner)) {
           ownerUUID = UUID.fromString(owner);
         } else {
           ownerUUID = Bukkit.getOfflinePlayer(owner).getUniqueId();

@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -85,6 +85,6 @@ public class CommandSell extends QuickShopCommand {
     
     sender.sendMessage(
         Shop.getLocaleManager().get(
-            "command.now-selling", sender, Util.getItemStackName(shop.getItem())));
+            "command.now-selling", sender, ItemUtils.getItemStackName(shop.getItem())));
   }
 }

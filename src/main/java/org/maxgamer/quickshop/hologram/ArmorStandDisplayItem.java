@@ -7,6 +7,8 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.event.ShopDisplayItemSpawnEvent;
@@ -41,7 +43,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
         containerBlockFace = ((org.bukkit.material.EnderChest) data).getFacing();
     }
 
-    Location asloc = Util.getCenter(shop.getLocation());
+    Location asloc = BlockUtils.getCenter(shop.getLocation());
     if (!displayItemStack.getType().isBlock())
       asloc.add(0, -0.5, 0);
 
@@ -76,7 +78,7 @@ public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayI
     if (!(entity instanceof ArmorStand))
       return false;
     
-    return Util.isDisplayItem(
+    return ItemUtils.isDisplayItem(
         ((ArmorStand) entity).getItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD)), null);
   }
 

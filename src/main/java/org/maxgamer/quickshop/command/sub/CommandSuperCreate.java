@@ -14,6 +14,9 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.Shop;
@@ -58,7 +61,7 @@ public class CommandSuperCreate extends QuickShopCommand {
     while (bIt.hasNext()) {
       final Block b = bIt.next();
 
-      if (!Util.canBeShop(b)) {
+      if (!ShopUtils.canBeShop(b)) {
         Util.debug("Block cannot be shop.");
         continue;
       }
@@ -71,7 +74,7 @@ public class CommandSuperCreate extends QuickShopCommand {
         return;
       }
 
-      if (Util.getSecondHalf(b).isPresent()
+      if (BlockUtils.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(sender, "quickshop.create.double")) {
         p.sendMessage(Shop.getLocaleManager().get("no-double-chests", sender));
         return;
@@ -90,11 +93,11 @@ public class CommandSuperCreate extends QuickShopCommand {
       // Send creation menu.
       final ShopCreator info = ShopCreator.create(
           ShopLocation.of(b.getLocation()),
-          b.getRelative(Util.yawToFace(p.getLocation().getYaw())), item);
+          b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), item);
 
       QuickShopActionManager.instance().getActions().put(p.getUniqueId(), info);
       p.sendMessage(
-          Shop.getLocaleManager().get("how-much-to-trade-for", sender, Util.getItemStackName(item)));
+          Shop.getLocaleManager().get("how-much-to-trade-for", sender, ItemUtils.getItemStackName(item)));
       return;
     }
     sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));

@@ -7,6 +7,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
 
 public class ClearLaggListener implements Listener {
@@ -18,7 +19,7 @@ public class ClearLaggListener implements Listener {
 
     for (Entity entity : entities) {
       if (!(entity instanceof Item)
-          || !Util.isDisplayItem(((Item) entity).getItemStack(), null)) {
+          || !ItemUtils.isDisplayItem(((Item) entity).getItemStack(), null)) {
         continue;
       }
 

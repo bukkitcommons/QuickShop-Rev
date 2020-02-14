@@ -55,6 +55,7 @@ import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.BuildPerms;
 import org.maxgamer.quickshop.utils.FunnyEasterEgg;
+import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
@@ -81,7 +82,6 @@ import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationManager;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.util.Reflections;
-import cc.bukkit.shop.util.file.ResourceAccessor;
 import cc.bukkit.wrappers.bukkit.BukkitWrapper;
 import cc.bukkit.wrappers.bukkit.PaperWrapper;
 import cc.bukkit.wrappers.bukkit.SpigotWrapper;
@@ -367,7 +367,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         coreColor + "" + " \\_\\/__)   ||   Version  " + getVersion().substring(4) + "\r\n" +
         sideColor + "           ||   ");
     
-    getLogger().info("Developers: " + Util.list2String(getDescription().getAuthors()));
+    getLogger().info("Developers: " + JavaUtils.list2String(getDescription().getAuthors()));
     getLogger().info("Original Author: Netherfoam, Timtower, KaiNoMood");
     
     getDataFolder().mkdirs();
@@ -441,7 +441,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         getLogger().info("Plugin now running under Paper mode.");
       case "":
       default:
-        if (Util.isClassAvailable("com.destroystokyo.paper.PaperConfig")) {
+        if (JavaUtils.isClassAvailable("com.destroystokyo.paper.PaperConfig")) {
           bukkitAPIWrapper = new PaperWrapper();
           getLogger().info("Plugin now running under Paper mode.");
         } else {

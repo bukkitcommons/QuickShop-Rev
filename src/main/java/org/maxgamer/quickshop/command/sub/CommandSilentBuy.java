@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -46,6 +47,6 @@ public class CommandSilentBuy extends QuickShopCommand {
     shop.get().save();
     Shop.getLocaleManager().sendControlPanelInfo((Player) sender, shop.get());
     sender.sendMessage(
-        Shop.getLocaleManager().get("command.now-buying", sender, Util.getItemStackName(shop.get().getItem())));
+        Shop.getLocaleManager().get("command.now-buying", sender, ItemUtils.getItemStackName(shop.get().getItem())));
   }
 }

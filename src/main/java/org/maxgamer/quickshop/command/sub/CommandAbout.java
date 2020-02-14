@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.JavaUtils;
 import cc.bukkit.shop.Shop;
 
 
@@ -44,7 +44,7 @@ public class CommandAbout extends QuickShopCommand {
           ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN + "[Main Line]");
     }
     sender.sendMessage(ChatColor.AQUA + "Dev " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-        + Util.list2String(QuickShop.instance().getDescription().getAuthors()));
+        + JavaUtils.list2String(QuickShop.instance().getDescription().getAuthors()));
     sender.sendMessage(ChatColor.GOLD + "Powered by Bukkit Common Studio");
     sender.sendMessage(ChatColor.RED + "Made with ❤");
   }

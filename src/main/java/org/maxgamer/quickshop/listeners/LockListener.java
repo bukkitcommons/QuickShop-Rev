@@ -22,6 +22,8 @@ import org.bukkit.inventory.ItemStack;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.logger.ShopLogger;
@@ -101,7 +103,7 @@ public class LockListener implements Listener {
 
     final Player p = e.getPlayer();
     // If the chest was a chest
-    if (Util.canBeShop(b)) {
+    if (ShopUtils.canBeShop(b)) {
       Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
         // If they owned it or have bypass perms, they can destroy it
         if (!shop.getOwner().equals(p.getUniqueId())
@@ -110,18 +112,17 @@ public class LockListener implements Listener {
           p.sendMessage(Shop.getLocaleManager().get("no-permission", p));
         }
       });
-    } else if (Util.isWallSign(b.getType())) {
-      if (b instanceof Sign) {
-        final Sign sign = (Sign) b;
+    } else if (BlockUtils.isWallSign(b.getType())) {
+      Sign sign = (Sign) b;
 
-        if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
-            || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
-          // Ignore break lockette sign
-          Util.debug("Skipped a dead-lock shop sign.(Lockette)");
-          return;
-        }
+      if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
+          || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
+        // Ignore break lockette sign
+        Util.debug("Skipped a dead-lock shop sign.(Lockette)");
+        return;
       }
-      Optional<Block> chest = Util.getSignAttached(b);
+      
+      Optional<Block> chest = BlockUtils.getSignAttached(b);
       if (!chest.isPresent())
         return;
 
@@ -146,7 +147,7 @@ public class LockListener implements Listener {
       return;
     }
 
-    if (!Util.canBeShop(b)) {
+    if (!ShopUtils.canBeShop(b)) {
       return;
     }
 

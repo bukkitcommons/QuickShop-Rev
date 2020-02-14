@@ -15,7 +15,7 @@ import org.bukkit.plugin.RegisteredListener;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.JavaUtils;
 import cc.bukkit.shop.Shop;
 
 public class CommandDebug extends QuickShopCommand {
@@ -66,7 +66,7 @@ public class CommandDebug extends QuickShopCommand {
 
         List<String> arguments = runtimeMxBean.getInputArguments();
         sender.sendMessage(
-            ChatColor.GOLD + "Arguments: " + ChatColor.AQUA + Util.list2String(arguments));
+            ChatColor.GOLD + "Arguments: " + ChatColor.AQUA + JavaUtils.list2String(arguments));
         sender.sendMessage(ChatColor.GOLD + "Name: " + ChatColor.AQUA + runtimeMxBean.getName());
         sender
             .sendMessage(ChatColor.GOLD + "VM Name: " + ChatColor.AQUA + runtimeMxBean.getVmName());
@@ -78,7 +78,7 @@ public class CommandDebug extends QuickShopCommand {
         List<String> sysData = new ArrayList<>();
         sys.keySet().forEach(key -> sysData.add(key + "=" + sys.get(key)));
         sender
-            .sendMessage(ChatColor.GOLD + "Sys Pro: " + ChatColor.AQUA + Util.list2String(sysData));
+            .sendMessage(ChatColor.GOLD + "Sys Pro: " + ChatColor.AQUA + JavaUtils.list2String(sysData));
         break;
       default:
         sender.sendMessage("Error, no correct args given.");

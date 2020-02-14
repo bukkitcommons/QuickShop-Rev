@@ -18,6 +18,8 @@ import org.bukkit.inventory.Inventory;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -48,7 +50,7 @@ public class BlockListener implements Listener {
           sign.getLine(0).equals(BaseConfig.locketteMoreUsersText))
         return;
       
-      viewer = Util.getShopBySign(block);
+      viewer = ShopUtils.getShopBySign(block);
     } else {
       viewer = Shop.getManager().getLoadedShopAt(block);
     }
@@ -107,7 +109,7 @@ public class BlockListener implements Listener {
       return;
     }
 
-    Util.getSecondHalf(event.getBlock()).ifPresent(chest -> {
+    BlockUtils.getSecondHalf(event.getBlock()).ifPresent(chest -> {
       final Player player = event.getPlayer();
       
       if (!PermissionManager.instance().has(player, "quickshop.create.double") &&

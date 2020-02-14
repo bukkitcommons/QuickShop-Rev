@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -28,6 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,7 +39,6 @@ import cc.bukkit.shop.ShopLoader;
 import cc.bukkit.shop.action.data.ShopData;
 import cc.bukkit.shop.event.ShopDeleteEvent;
 import cc.bukkit.shop.logger.ShopLogger;
-import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.util.Utils;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
@@ -212,7 +212,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
         inChunk.get().values().forEach(shop -> {
           try {
-            if (Util.canBeShop(event.getWorld(), shop.x(), shop.y(), shop.z())) {
+            if (ShopUtils.canBeShop(event.getWorld(), shop.x(), shop.y(), shop.z())) {
               Shop.getManager().load(event.getWorld(), shop);
             } else {
               QuickShop.instance().getDatabaseHelper().deleteShop(shop.x(), shop.y(), shop.z(), shop.world());
@@ -296,7 +296,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
       
       if (Util.isChunkLoaded(world, data.x() >> 4, data.z() >> 4)) {
         // Load to World
-        if (Util.canBeShop(world, data.x(), data.y(), data.z())) {
+        if (ShopUtils.canBeShop(world, data.x(), data.y(), data.z())) {
           loadedShops++;
           worldLoadedShops++;
           Shop.getManager().load(world, data);
@@ -348,7 +348,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
 
   private static @Nullable ItemStack deserializeItem(@NotNull String itemConfig) {
     try {
-      return Util.deserialize(itemConfig);
+      return ItemUtils.deserialize(itemConfig);
     } catch (InvalidConfigurationException e) {
       e.printStackTrace();
       ShopLogger.instance().warning(

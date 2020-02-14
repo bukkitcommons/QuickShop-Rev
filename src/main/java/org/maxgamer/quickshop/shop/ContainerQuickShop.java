@@ -27,6 +27,10 @@ import org.maxgamer.quickshop.hologram.ArmorStandDisplayItem;
 import org.maxgamer.quickshop.hologram.DisplayDataMatcher;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
 import org.maxgamer.quickshop.hologram.RealDisplayItem;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.JavaUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ContainerShop;
@@ -164,7 +168,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Override
   public int getRemainingStock() {
-    return unlimited ? -1 : Util.countStacks(getInventory(), item);
+    return unlimited ? -1 : ShopUtils.countStacks(getInventory(), item);
   }
 
   /**
@@ -174,7 +178,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Override
   public int getRemainingSpace() {
-    return unlimited ? -1 : Util.countSpace(getInventory(), item);
+    return unlimited ? -1 : ShopUtils.countSpace(getInventory(), item);
   }
 
   /**
@@ -270,7 +274,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     
     if (totalAmount > 0) {
       ShopLogger.instance().severe("Could not take all items from a players inventory on purchase! " + p.getName()
-              + ", missing: " + stackAmount + ", item: " + Util.getItemStackName(this.getItem())
+              + ", missing: " + stackAmount + ", item: " + ItemUtils.getItemStackName(this.getItem())
               + "!");
     } else if (!unlimited) {
       ItemStack offer = new ItemStack(item);
@@ -386,7 +390,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Nullable
   public ContainerQuickShop getAttachedShop() {
-    Optional<Location> c = Util.getSecondHalf(location.block());
+    Optional<Location> c = BlockUtils.getSecondHalf(location.block());
     if (!c.isPresent())
       return null;
     
@@ -489,12 +493,12 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     lines[2] = Shop.getLocaleManager().get(
         "signs.item",
         player,
-        Util.getItemStackName(getItem()) + stacks);
+        ItemUtils.getItemStackName(getItem()) + stacks);
     
     lines[3] = Shop.getLocaleManager().get(
         "signs.price",
         player,
-        Util.format(price));
+        JavaUtils.format(price));
     
     setSignText(lines);
   }
@@ -534,7 +538,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     for (BlockFace face : SIGN_FACES) {
       Block block = chest.getRelative(face);
       
-      if (!Util.isWallSign(block.getType()) || !isAttached(block))
+      if (!BlockUtils.isWallSign(block.getType()) || !isAttached(block))
         continue;
       
       Sign sign = (Sign) block.getState();
@@ -552,7 +556,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
 
   @Override
   public boolean isAttached(@NotNull Block sign) {
-    return location.bukkit().equals(Util.getSignAttached(sign).get().getLocation());
+    return location.bukkit().equals(BlockUtils.getSignAttached(sign).get().getLocation());
   }
 
   /**
@@ -580,7 +584,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    * @return true if create on double chest.
    */
   public boolean isDoubleChestShop() {
-    return Util.isDoubleChest(this.getLocation().block());
+    return BlockUtils.isDoubleChest(this.getLocation().block());
   }
 
   /**
@@ -590,7 +594,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Override
   public boolean isValid() {
-    return Util.canBeShop(location.block());
+    return ShopUtils.canBeShop(location.block());
   }
 
   @Override

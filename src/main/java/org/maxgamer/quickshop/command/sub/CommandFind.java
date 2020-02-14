@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.action.data.ShopData;
@@ -73,7 +74,7 @@ public class CommandFind extends QuickShopCommand {
 
         try {
           for (ShopData shop : inChunk.get().values()) {
-            if (!Util.getItemStackName(Util.deserialize(shop.item())).toLowerCase().contains(lookFor)) {
+            if (!ItemUtils.getItemStackName(ItemUtils.deserialize(shop.item())).toLowerCase().contains(lookFor)) {
               continue;
             }
 

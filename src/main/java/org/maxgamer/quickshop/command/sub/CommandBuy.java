@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.utils.Util;
+import org.maxgamer.quickshop.utils.ItemUtils;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.viewer.BlockViewer;
@@ -46,7 +46,7 @@ public class CommandBuy extends QuickShopCommand {
                 shop.setSignText();
                 shop.save();
                 sender.sendMessage(
-                    Shop.getLocaleManager().get("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
+                    Shop.getLocaleManager().get("command.now-buying", sender, ItemUtils.getItemStackName(shop.getItem())));
 
                 return ViewAction.BREAK;
               }, ViewAction.NEXT);

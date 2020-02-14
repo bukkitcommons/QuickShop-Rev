@@ -21,10 +21,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+import org.maxgamer.quickshop.utils.BlockUtils;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.collection.LongHashMap;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
-import com.bekvon.bukkit.cmiLib.CMIBlock.blockDirection;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -76,7 +78,7 @@ public class QuickShopManager implements ShopManager {
 
     ContainerShop shop = new ContainerQuickShop(
         ShopLocation.from(world, data.x(), data.y(), data.z()),
-        data.price(), Util.deserialize(data.item()),
+        data.price(), ItemUtils.deserialize(data.item()),
         data.moderators(), data.unlimited(), data.type());
 
     inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), shop);
@@ -120,7 +122,7 @@ public class QuickShopManager implements ShopManager {
 
         int max = QuickShop.instance().getShopLimit(player);
 
-        if (owned >= max && Util.canBeShop(block)) {
+        if (owned >= max && ShopUtils.canBeShop(block)) {
           player.sendMessage(
               Shop.getLocaleManager().get("reached-maximum-can-create", player,
                   String.valueOf(owned), String.valueOf(max)));
@@ -201,8 +203,8 @@ public class QuickShopManager implements ShopManager {
 
     // Create sign
     if (info.sign() != null && BaseConfig.autoSign) {
-      if (!Util.isAir(info.sign().getType()) &&
-          !(Util.isWallSign(info.sign().getType()) &&
+      if (!BlockUtils.isAir(info.sign().getType()) &&
+          !(BlockUtils.isWallSign(info.sign().getType()) &&
               Arrays.stream(((org.bukkit.block.Sign) info.sign().getState()).getLines())
               .allMatch(String::isEmpty))) {
 
@@ -256,7 +258,7 @@ public class QuickShopManager implements ShopManager {
 
         Util.debug("Putting into memory shop database: " + location.toString());
 
-        ShopData data = new ShopData(Util.serialize(info.item()), shop.getModerator().serialize(),
+        ShopData data = new ShopData(Util.serializeItem(info.item()), shop.getModerator().serialize(),
             shop.getLocation().worldName(), shop.getShopType(), shop.getPrice(),
             shop.isUnlimited(), shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z());
 
@@ -391,12 +393,12 @@ public class QuickShopManager implements ShopManager {
             return viewerAt;
 
         default:
-          ShopViewer bySign = Util.getShopBySign(block);
+          ShopViewer bySign = ShopUtils.getShopBySign(block);
           if (bySign.isPresent())
             return bySign;
 
           if (secondHalf) {
-            Optional<Location> half = Util.getSecondHalf(block);
+            Optional<Location> half = BlockUtils.getSecondHalf(block);
             if (half.isPresent()) {
               ShopViewer viewerHalf = getLoadedShopAt(half.get());
               if (viewerHalf.isPresent())

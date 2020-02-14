@@ -25,6 +25,9 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.messages.ChatSheetPrinter;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.utils.ItemNMS;
+import org.maxgamer.quickshop.utils.ItemUtils;
+import org.maxgamer.quickshop.utils.JavaUtils;
+import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.LocaleManager;
@@ -49,7 +52,7 @@ public class QuickShopLocaleManager implements LocaleManager {
   public MinecraftLocale minecraftLocale;
   
   public QuickShopLocaleManager() {
-    this.minecraftLocale = new MinecraftLocale(new File(Util.getCacheFolder(), "cache"));
+    this.minecraftLocale = new MinecraftLocale(new File(Shop.instance().getDataFolder(), "cache"));
   }
   
   /**
@@ -83,7 +86,7 @@ public class QuickShopLocaleManager implements LocaleManager {
 
       return loc;
     }
-    String filled = Util.fillArgs(raw, args);
+    String filled = JavaUtils.fillArgs(raw, args);
     
     if (player instanceof OfflinePlayer) {
       if (QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled()) {
@@ -111,12 +114,12 @@ public class QuickShopLocaleManager implements LocaleManager {
     Player p = Bukkit.getPlayer(player);
     if (p != null) {
       try {
-        sendItemHologram(p, msgData[0], Util.deserialize(msgData[1]), msgData[2]);
+        sendItemHologram(p, msgData[0], ItemUtils.deserialize(msgData[1]), msgData[2]);
       } catch (InvalidConfigurationException e) {
         p.sendMessage(msgData[0] + msgData[1] + msgData[2]);
       } catch (ArrayIndexOutOfBoundsException e2) {
         try {
-          sendItemHologram(p, msgData[0], Util.deserialize(msgData[1]), "");
+          sendItemHologram(p, msgData[0], ItemUtils.deserialize(msgData[1]), "");
         } catch (Exception any) {
           p.sendMessage(message);
         }
@@ -158,7 +161,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     
     if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {
       ResourceAccessor.save("messages/" + languageCode + ".json", "messages.json");
-      json.loadFromString(Util.parseColours(Util.readToString(new File(QuickShop.instance().getDataFolder(), "messages.json").getAbsolutePath())));
+      json.loadFromString(Util.parseColours(JavaUtils.readToString(new File(QuickShop.instance().getDataFolder(), "messages.json").getAbsolutePath())));
     } else {
       json.loadFromString(Util.parseColours(json.saveToString()));
     }
@@ -182,7 +185,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     if (json == null)
       return;
     
-    TextComponent centerItem = new TextComponent(left + Util.getItemStackName(itemStack) + right);
+    TextComponent centerItem = new TextComponent(left + ItemUtils.getItemStackName(itemStack) + right);
     centerItem.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(json).create()));
     player.spigot().sendMessage(centerItem);
   }
@@ -260,7 +263,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     if (PermissionManager.instance().has(sender, "quickshop.other.price")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text = get("controlpanel.price", sender,
-          BaseConfig.decimalFormatPrice ? Util.formatPrice(shop.getPrice()) : "" + shop.getPrice());
+          BaseConfig.decimalFormatPrice ? ShopUtils.formatPrice(shop.getPrice()) : "" + shop.getPrice());
       String hoverText = get("controlpanel.price-hover", sender);
       String clickCommand = get("controlpanel.commands.price", sender);
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
@@ -372,7 +375,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     int stacks = info.item().getAmount();
     String stackMessage = stacks > 1 ? " * " + stacks : "";
     chatSheetPrinter.printLine(get("menu.item-name-and-price", p, "" + amount,
-        Util.getItemStackName(shop.getItem()) + stackMessage, Util.format((amount * shop.getPrice()))));
+        ItemUtils.getItemStackName(shop.getItem()) + stackMessage, JavaUtils.format((amount * shop.getPrice()))));
     Map<Enchantment, Integer> enchs = new HashMap<>();
     if (shop.getItem().hasItemMeta()
         && Objects.requireNonNull(shop.getItem().getItemMeta()).hasEnchants()) {
@@ -411,14 +414,14 @@ public class QuickShopLocaleManager implements LocaleManager {
     chatSheetPrinter.printLine(get("menu.successfully-sold", p));
     String stackMessage = shop.getItem().getAmount() > 1 ? " * " + shop.getItem().getAmount() : "";
     chatSheetPrinter.printLine(get("menu.item-name-and-price", p, "" + amount,
-        Util.getItemStackName(shop.getItem()) + stackMessage, Util.format((amount * shop.getPrice()))));
+        ItemUtils.getItemStackName(shop.getItem()) + stackMessage, JavaUtils.format((amount * shop.getPrice()))));
     if (BaseConfig.showTax) {
       double tax = BaseConfig.taxRate;
       double total = amount * shop.getPrice();
       if (tax != 0) {
         if (!p.getUniqueId().equals(shop.getOwner())) {
           chatSheetPrinter
-              .printLine(get("menu.sell-tax", p, Util.format((tax * total))));
+              .printLine(get("menu.sell-tax", p, JavaUtils.format((tax * total))));
         } else {
           chatSheetPrinter.printLine(get("menu.sell-tax-self", p));
         }
@@ -466,10 +469,10 @@ public class QuickShopLocaleManager implements LocaleManager {
     String stackMessage = shop.getItem().getAmount() > 1 ? " * " + shop.getItem().getAmount() : "";
     sendItemholochat(shop, items, p,
         ChatColor.DARK_PURPLE + get("tableformat.left_begin", p) + " "
-            + get("menu.item", p, Util.getItemStackName(items) + stackMessage));
-    if (Util.hasDurability(items.getType())) {
+            + get("menu.item", p, ItemUtils.getItemStackName(items) + stackMessage));
+    if (ItemUtils.hasDurability(items.getType())) {
       chatSheetPrinter.printLine(
-          get("menu.damage-percent-remaining", p, Util.getToolPercentage(items)));
+          get("menu.damage-percent-remaining", p, ItemUtils.getToolPercentage(items)));
     }
     if (shop.is(ShopType.SELLING)) {
       if (shop.isUnlimited()) {
@@ -490,7 +493,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     }
     Util.debug("Item type " + shop.getItem().getType());
     chatSheetPrinter.printLine(get("menu.price-per", p,
-        Util.getItemStackName(shop.getItem()), Util.format(shop.getPrice() / shop.getItem().getAmount())));
+        ItemUtils.getItemStackName(shop.getItem()), JavaUtils.format(shop.getPrice() / shop.getItem().getAmount())));
     if (shop.is(ShopType.BUYING)) {
       chatSheetPrinter.printLine(get("menu.this-shop-is-buying", p));
     } else {

@@ -119,7 +119,7 @@ public class DatabaseHelper {
     
     sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
     sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
-    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serialize(item)));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
     sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
     sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
     sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));
@@ -205,7 +205,7 @@ public class DatabaseHelper {
           + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
       
       sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
-      sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serialize(item)));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(unlimited));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopType));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
