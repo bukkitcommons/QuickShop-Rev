@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -150,7 +151,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private NoCheatPlusExemptor ncpExemptor = new NoCheatPlusExemptor();
   
   @NotNull
-  private final Metrics metrics = new Metrics(this);
+  private final Metrics metrics = new Metrics(this, 6392);
   
   private EconomyProvider economy;
   
@@ -634,8 +635,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       
       metrics.addCustomChart(new Metrics.SingleLineChart("shops", () -> QuickShopLoader.instance().getShops()));
       metrics.addCustomChart(new Metrics.SingleLineChart("loaded_shops", () -> QuickShopLoader.instance().getLoadedShops()));
-      
-      metrics.submitData();
     }
   }
 }

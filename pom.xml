@@ -67,6 +67,10 @@
 							<pattern>de.tr7zw.changeme.nbtapi</pattern>
 							<shadedPattern>org.maxgamer.quickshop.nbtapi</shadedPattern>
 						</relocation>
+						<relocation>
+							<pattern>org.bstats</pattern>
+							<shadedPattern>org.maxgamer.quickshop.bstats</shadedPattern>
+						</relocation>
 					</relocations>
 				</configuration>
 				<executions>
@@ -232,6 +236,12 @@
 					<artifactId>TNELib</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.bstats</groupId>
+			<artifactId>bstats-bukkit</artifactId>
+			<version>1.7</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.lishid</groupId>
