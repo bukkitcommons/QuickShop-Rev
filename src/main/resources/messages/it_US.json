@@ -52,7 +52,7 @@
     "reached-maximum-can-create": "&cHai raggiunto il limite, possiedi {0} su {1}negozi",
     "restricted-prices": "&cRestricted prices for {0}: min {1} , max {2}",
     "no-enough-money-to-keep-shops": "&cYou didn't have enough money to keep your shops! All shops have now been removed...",
-    "nothing-to-flush": "&aYou had no new shop message.",
+    "nothing-to-flush": "&aYou have no new messages.",
     "break-shop-use-supertool": "&eYou can break the shop by using the SuperTool.",
     "failed-to-put-sign": "&cNot enough space around the shop to place the information sign.",
     "failed-to-paste": "&cFailed to upload the data to Pastebin, Check your internet and try again. (See console for details)",
@@ -74,7 +74,7 @@
         "successfully-sold": "&aSuccessfully Sold:",
         "item-name-and-price": "&e{0} {1} &afor &e{2}",
         "sell-tax": "&aYou paid &e{0} &ain taxes.",
-        "sell-tax-self": "&aYou own this shop so you don't pay taxes.",
+        "sell-tax-self": "&aYou are the owner of this shop, so you don't need to pay taxes.",
         "enchants": "&5Enchants",
         "stored-enchants": "&5Stored Enchants",
         "shop-information": "&aShop Information:",
@@ -228,7 +228,7 @@
             "master": "[Master]"
         }
     },
-    "shop-removed-cause-ongoing-fee": "&cYou shop at {0} was removed cause you had no enough money to keep it!",
+    "shop-removed-cause-ongoing-fee": "&cYour shop at {0} was removed cause you had no enough money to keep it!",
     "digits-reach-the-limit": "&cYou have reach the limit of the digits after the dot in price.",
     "complete": "&aComplete!"
 }

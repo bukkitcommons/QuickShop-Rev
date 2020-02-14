@@ -228,7 +228,7 @@
             "master": "[Master]"
         }
     },
-    "shop-removed-cause-ongoing-fee": "&cYou shop at {0} was removed cause you had no enough money to keep it!",
+    "shop-removed-cause-ongoing-fee": "&cYour shop at {0} was removed cause you had no enough money to keep it!",
     "digits-reach-the-limit": "&cYou have reach the limit of the digits after the dot in price.",
     "complete": "&aComplete!"
 }
