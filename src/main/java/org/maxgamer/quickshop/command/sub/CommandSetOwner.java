@@ -51,7 +51,7 @@ public class CommandSetOwner extends QuickShopCommand {
       final OfflinePlayer p = Bukkit.getOfflinePlayer(cmdArg[0]);
       final String shopOwner = Bukkit.getOfflinePlayer(shop.get().getOwner()).getName();
       if (!p.hasPlayedBefore()) {
-        sender.sendMessage(Shop.getLocaleManager().get("unknown-player").get());
+        sender.sendMessage(Shop.getLocaleManager().get("unknown-player"));
         return;
       }
       shop.get().setOwner(p.getUniqueId());

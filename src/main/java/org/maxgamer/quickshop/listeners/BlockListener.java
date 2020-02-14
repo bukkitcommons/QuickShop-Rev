@@ -5,7 +5,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,23 +19,13 @@ import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
-import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class BlockListener implements Listener {
-  /*
-   * Removes chests when they're destroyed.
-   */
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+  @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onBreak(BlockBreakEvent event) {
     Player player = event.getPlayer();
-    
-    if (event.isCancelled()) {
-      player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
-      Util.debug("The action was cancelled by other plugin");
-      return;
-    }
     
     Block block = event.getBlock();
     BlockState state = block.getState();
@@ -56,32 +45,32 @@ public class BlockListener implements Listener {
     }
     
     viewer
-    .nonNull()
-    .accept(shop -> {
-      boolean isOwner = shop.getModerator().isOwner(player.getUniqueId());
-      if (!isOwner &&
-          !QuickShopPermissionManager.instance().has(player, "quickshop.other.destroy")) {
-        event.setCancelled(true);
-        player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
-        return;
-      }
-      
-      if (player.getGameMode() == GameMode.CREATIVE) {
-        Material tool = Material.getMaterial("GOLDEN_AXE");
-        tool = tool == null ? Material.getMaterial("GOLD_AXE") : tool;
-        if (player.getInventory().getItemInMainHand().getType() != tool) {
+      .nonNull()
+      .accept(shop -> {
+        boolean isOwner = shop.getModerator().isOwner(player.getUniqueId());
+        if (!isOwner &&
+            !QuickShopPermissionManager.instance().has(player, "quickshop.other.destroy")) {
           event.setCancelled(true);
-          player.sendMessage(Shop.getLocaleManager().get("no-creative-break", player, Shop.getLocaleManager().get(tool)));
+          player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
           return;
-        } else {
-          player.sendMessage(Shop.getLocaleManager().get("break-shop-use-supertool", player));
         }
-      }
-      
-      Shop.getActions().removeAction(player.getUniqueId());
-      Shop.getLoader().delete(shop);
-      player.sendMessage(Shop.getLocaleManager().get("success-removed-shop", player));
-    });
+        
+        if (player.getGameMode() == GameMode.CREATIVE) {
+          Material tool = Material.getMaterial("GOLDEN_AXE");
+          tool = tool == null ? Material.getMaterial("GOLD_AXE") : tool;
+          if (player.getInventory().getItemInMainHand().getType() != tool) {
+            event.setCancelled(true);
+            player.sendMessage(Shop.getLocaleManager().get("no-creative-break", player, Shop.getLocaleManager().get(tool)));
+            return;
+          } else {
+            player.sendMessage(Shop.getLocaleManager().get("break-shop-use-supertool", player));
+          }
+        }
+        
+        Shop.getActions().removeAction(player.getUniqueId());
+        Shop.getLoader().delete(shop);
+        player.sendMessage(Shop.getLocaleManager().get("success-removed-shop", player));
+      });
   }
 
   @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
@@ -93,22 +82,14 @@ public class BlockListener implements Listener {
       if (location != null) {
         // Delayed task. Event triggers when item is moved, not when it is received.
         Shop.getManager()
-        .getLoadedShopFrom(location)
-        .ifPresent(shop -> ScheduledSignUpdater.schedule(shop));
+          .getLoadedShopFrom(location)
+          .ifPresent(shop -> ScheduledSignUpdater.schedule(shop));
       }
     }
   }
 
-  /*
-   * Listens for chest placement, so a doublechest shop can't be created.
-   */
   @EventHandler(ignoreCancelled = true)
   public void onPlace(BlockPlaceEvent event) {
-    final BlockState state = event.getBlock().getState();
-    if (!(state instanceof DoubleChest)) {
-      return;
-    }
-
     BlockUtils.getSecondHalf(event.getBlock()).ifPresent(chest -> {
       final Player player = event.getPlayer();
       

@@ -36,15 +36,14 @@ import org.maxgamer.quickshop.integration.WorldGuardIntegration;
 import org.maxgamer.quickshop.listeners.BlockListener;
 import org.maxgamer.quickshop.listeners.ChatListener;
 import org.maxgamer.quickshop.listeners.ClearLaggListener;
-import org.maxgamer.quickshop.listeners.CustomInventoryListener;
-import org.maxgamer.quickshop.listeners.DisplayBugFixListener;
+import org.maxgamer.quickshop.listeners.InvDisplayProtecter;
 import org.maxgamer.quickshop.listeners.DisplayProtector;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.messages.QuickShopMessager;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
-import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
+import org.maxgamer.quickshop.scheduler.LogWriter;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
@@ -83,11 +82,13 @@ import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationManager;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.util.Reflections;
+import cc.bukkit.shop.util.locale.MinecraftLocale;
 import cc.bukkit.wrappers.bukkit.BukkitWrapper;
 import cc.bukkit.wrappers.bukkit.PaperWrapper;
 import cc.bukkit.wrappers.bukkit.SpigotWrapper;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 @Getter
 public final class QuickShop extends JavaPlugin implements ShopPlugin {
@@ -179,7 +180,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   /*
    * Misc
    */
-  private AsyncLogWatcher logWatcher;
+  private LogWriter logWatcher;
 
   private BuildPerms permissionChecker;
 
@@ -264,6 +265,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
 
   /** Reloads QuickShops config */
   @Override
+  @SneakyThrows
   public void reloadConfig() {
     super.reloadConfig(); // This cannot be removed, or NPE
     
@@ -274,18 +276,20 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     configurationManager.load(DatabaseConfig.class);
     
     if (BaseConfig.logActions)
-      logWatcher = new AsyncLogWatcher(this, new File(getDataFolder(), "qs.log"));
+      logWatcher = new LogWriter(new File(getDataFolder(), "qs.log"));
   }
   
   public QuickShop() {
     super();
     singleton = this;
+    Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
   }
 
   protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
     super(loader, description, dataFolder, file);
     singleton = this;
+    Shop.setPlugin(this);
     ShopLogger.initalize(this, BaseConfig.useLog4j);
   }
 
@@ -345,7 +349,9 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   public void onEnable() {
     Bukkit.getScheduler().runTask(this, () -> {
       try {
+        // Never do this before we actually enabled
         Shop.setPlugin(this);
+        
         enablePlugin();
       } catch (Throwable t) {
         t.printStackTrace();
@@ -396,7 +402,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_LOAD);
     
     long start = System.currentTimeMillis();
-    Shop.setPlugin(this);
     sentryErrorReporter = new SentryErrorReporter(this);
     new NBTItem(new ItemStack(Material.AIR)); // Initalize to avoid runtime lag
     
@@ -495,8 +500,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     Bukkit.getPluginManager().registerEvents(new ShopActionListener(), this);
     Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
     Bukkit.getPluginManager().registerEvents(new DisplayProtector(), this);
-    Bukkit.getPluginManager().registerEvents(new CustomInventoryListener(), this);
-    Bukkit.getPluginManager().registerEvents(new DisplayBugFixListener(), this);
+    Bukkit.getPluginManager().registerEvents(new InvDisplayProtecter(), this);
     Bukkit.getPluginManager().registerEvents(new ShopProtector(), this);
 
     if (BaseConfig.lock)

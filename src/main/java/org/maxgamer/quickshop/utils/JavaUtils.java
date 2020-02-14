@@ -188,26 +188,6 @@ public class JavaUtils {
   /**
    * Read the file to the String
    *
-   * @param fileName Target file.
-   * @return Target file's content.
-   */
-  public static String readToString(@NotNull String fileName) {
-    File file = new File(fileName);
-    long filelength = file.length();
-    byte[] filecontent = new byte[(int) filelength];
-    try {
-      FileInputStream in = new FileInputStream(file);
-      in.read(filecontent);
-      in.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return new String(filecontent, StandardCharsets.UTF_8);
-  }
-
-  /**
-   * Read the file to the String
-   *
    * @param file Target file.
    * @return Target file's content.
    */
@@ -223,6 +203,7 @@ public class JavaUtils {
     }
     return new String(filecontent, StandardCharsets.UTF_8);
   }
+  
   private static byte[] toByteArray(@NotNull InputStream in) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     byte[] buffer = new byte[1024 * 4];

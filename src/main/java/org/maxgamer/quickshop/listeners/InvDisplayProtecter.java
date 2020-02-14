@@ -14,12 +14,11 @@ import org.maxgamer.quickshop.shop.ItemPreviewer;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class CustomInventoryListener implements Listener {
+public class InvDisplayProtecter implements Listener {
   @EventHandler(ignoreCancelled = true)
   public void invEvent(InventoryInteractEvent e) {
-
-    final Inventory inventory = e.getInventory();
-    final ItemStack[] stacks = inventory.getContents();
+    Inventory inventory = e.getInventory();
+    ItemStack[] stacks = inventory.getContents();
 
     for (ItemStack itemStack : stacks) {
       if (!ItemPreviewer.isPreviewItem(itemStack)) {
@@ -33,7 +32,6 @@ public class CustomInventoryListener implements Listener {
 
   @EventHandler(ignoreCancelled = true)
   public void invEvent(InventoryMoveItemEvent e) {
-
     if (ItemPreviewer.isPreviewItem(e.getItem())) {
       e.setCancelled(true);
     }
@@ -41,12 +39,6 @@ public class CustomInventoryListener implements Listener {
 
   @EventHandler
   public void invEvent(InventoryClickEvent e) {
-
-    if (ItemPreviewer.isPreviewItem(e.getCursor())) {
-      e.setCancelled(true);
-      e.setResult(Result.DENY);
-    }
-
     if (ItemPreviewer.isPreviewItem(e.getCurrentItem())) {
       e.setCancelled(true);
       e.setResult(Result.DENY);
@@ -55,9 +47,7 @@ public class CustomInventoryListener implements Listener {
 
   @EventHandler
   public void invEvent(InventoryDragEvent e) {
-
-    if (ItemPreviewer.isPreviewItem(e.getCursor())
-        || ItemPreviewer.isPreviewItem(e.getOldCursor())) {
+    if (ItemPreviewer.isPreviewItem(e.getOldCursor())) {
       e.setCancelled(true);
       e.setResult(Result.DENY);
     }
@@ -65,9 +55,8 @@ public class CustomInventoryListener implements Listener {
 
   @EventHandler
   public void invEvent(InventoryPickupItemEvent e) {
-
-    final Inventory inventory = e.getInventory();
-    final ItemStack[] stacks = inventory.getContents();
+    Inventory inventory = e.getInventory();
+    ItemStack[] stacks = inventory.getContents();
 
     for (ItemStack itemStack : stacks) {
       if (!ItemPreviewer.isPreviewItem(itemStack)) {

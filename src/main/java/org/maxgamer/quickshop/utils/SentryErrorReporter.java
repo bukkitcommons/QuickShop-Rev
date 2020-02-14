@@ -251,7 +251,7 @@ public class SentryErrorReporter {
       plugin.getLogger().warning("Event    ID: " + this.context.getLastEventId());
       plugin.getLogger().warning("Server   ID: " + BaseConfig.serverUUID);
       plugin.getLogger().warning("====QuickShop Error Report E N D===");
-      if (Util.isDevMode()) {
+      if (BaseConfig.developerMode) {
         throwable.printStackTrace();
       }
       return this.context.getLastEventId();
@@ -292,7 +292,7 @@ public class SentryErrorReporter {
       if (level != Level.WARNING && level != Level.SEVERE) {
         return true;
       }
-      if (Util.isDevMode()) {
+      if (BaseConfig.developerMode) {
         sendError(record.getThrown(), record.getMessage());
         return true;
       } else {
@@ -322,7 +322,7 @@ public class SentryErrorReporter {
         Util.debug("Error not sended cause thrown is null");
         return true;
       }
-      if (Util.isDevMode()) {
+      if (BaseConfig.developerMode) {
         sendError(record.getThrown(), record.getMessage());
         return true;
       } else {

@@ -2,11 +2,12 @@ package org.maxgamer.quickshop;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -29,6 +30,7 @@ import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
+import com.google.common.io.Files;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.LocaleManager;
 import cc.bukkit.shop.MinecraftLocaleProvider;
@@ -52,7 +54,7 @@ public class QuickShopLocaleManager implements LocaleManager {
   public MinecraftLocale minecraftLocale;
   
   public QuickShopLocaleManager() {
-    this.minecraftLocale = new MinecraftLocale(new File(Shop.instance().getDataFolder(), "cache"));
+    minecraftLocale = new MinecraftLocale(new File(QuickShop.instance().getDataFolder(), "cache"));
   }
   
   /**
@@ -144,33 +146,34 @@ public class QuickShopLocaleManager implements LocaleManager {
   @Override
   @SneakyThrows
   public void load() throws InvalidConfigurationException {
-    minecraftLocale.load(BaseConfig.language);
+    minecraftLocale.load(BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language);
     loadCfgMessages();
   }
   
-  private final static String DEFAULT_LOCALE = "en_US";
+  private final static String DEFAULT_LOCALE;
+  
+  static {
+    Locale defaultLocale = Locale.getDefault();
+    
+    DEFAULT_LOCALE = BaseConfig.language.equalsIgnoreCase("default") ?
+      (defaultLocale.getLanguage().toLowerCase(Locale.ROOT)
+      .concat("_")
+      .concat(defaultLocale.getCountry().toUpperCase(Locale.ROOT))) : BaseConfig.language;
+  }
 
   public void loadCfgMessages() throws InvalidConfigurationException, IOException {
-    /* Check & Load & Create default messages.yml */
-    // Use try block to hook any possible exception, make sure not effect our cfgMessnages code.
-    String languageCode = BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language;
-    languageCode = languageCode.replace('-', '_');
+    String locale = BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language;
+    locale = locale.replace('-', '_');
     
-    // Init nJson
-    FileConfiguration json;
-    languageCode = DEFAULT_LOCALE.equalsIgnoreCase(languageCode) ?
-        languageCode :
-          (Shop.instance().getResource("messages/" + languageCode + ".json") == null ? DEFAULT_LOCALE : languageCode);
-    json = JsonReader.read(new File(QuickShop.instance().getDataFolder(), "messages.json"));
-    
-    if (!new File(QuickShop.instance().getDataFolder(), "messages.json").exists()) {
-      ResourceAccessor.save("messages/" + languageCode + ".json", "messages.json");
-      json.loadFromString(Util.parseColours(JavaUtils.readToString(new File(QuickShop.instance().getDataFolder(), "messages.json").getAbsolutePath())));
-    } else {
-      json.loadFromString(Util.parseColours(json.saveToString()));
+    File messages = new File(Shop.instance().getDataFolder(), "messages.json");
+    if (!messages.exists()) {
+      InputStream stream = ResourceAccessor.get("messages/".concat(locale = DEFAULT_LOCALE).concat(".json")).get();
+      byte[] buffer = new byte[stream.available()];
+      stream.read(buffer);
+      Files.write(buffer, messages);
     }
     
-    pluginLocale = json;
+    Util.parseColours(pluginLocale = JsonReader.read(messages));
     /* Print to console this language file's author, contributors, and region */
     ShopLogger.instance().info(get("translation-author"));
     ShopLogger.instance().info(get("translation-contributors"));
@@ -320,7 +323,7 @@ public class QuickShopLocaleManager implements LocaleManager {
   public void sendGlobalAlert(@NotNull String content) {
     sendMessageToOps(content);
     ShopLogger.instance().warning(content);
-    QuickShop.instance().getLogWatcher().add(content);
+    QuickShop.instance().getLogWatcher().log(content);
   }
 
   /**
@@ -552,8 +555,8 @@ public class QuickShopLocaleManager implements LocaleManager {
   }
 
   @Override
-  public Optional<String> get(@NotNull String key) {
-    return minecraftLocale.get(key);
+  public String get(@NotNull String key) {
+    return pluginLocale.getString(key);
   }
 
   @Override

@@ -18,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -283,12 +284,12 @@ public class Util {
   /**
    * Parse colors for the YamlConfiguration.
    *
-   * @param config yaml config
+   * @param fileConfiguration yaml config
    */
-  public static void parseColours(@NotNull YamlConfiguration config) {
-    Set<String> keys = config.getKeys(true);
+  public static void parseColours(@NotNull FileConfiguration fileConfiguration) {
+    Set<String> keys = fileConfiguration.getKeys(true);
     for (String key : keys) {
-      String filtered = config.getString(key);
+      String filtered = fileConfiguration.getString(key);
       if (filtered == null) {
         continue;
       }
@@ -296,7 +297,7 @@ public class Util {
         continue;
       }
       filtered = parseColours(filtered);
-      config.set(key, filtered);
+      fileConfiguration.set(key, filtered);
     }
   }
 
@@ -367,15 +368,6 @@ public class Util {
     return (version.contains("dev") || version.contains("develop") || version.contains("alpha")
         || version.contains("beta") || version.contains("test") || version.contains("snapshot")
         || version.contains("preview"));
-  }
-
-  /**
-   * Get the plugin is under dev-mode(debug mode)
-   *
-   * @return under dev-mode
-   */
-  public static boolean isDevMode() {
-    return true; // FIXME
   }
 
   /**

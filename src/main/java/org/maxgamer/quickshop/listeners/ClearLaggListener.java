@@ -8,10 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.maxgamer.quickshop.utils.ItemUtils;
-import org.maxgamer.quickshop.utils.Util;
 
 public class ClearLaggListener implements Listener {
-
   @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
   public void plugin(me.minebuilders.clearlag.events.EntityRemoveEvent clearlaggEvent) {
     final List<Entity> entities = clearlaggEvent.getEntityList();
@@ -19,7 +17,7 @@ public class ClearLaggListener implements Listener {
 
     for (Entity entity : entities) {
       if (!(entity instanceof Item)
-          || !ItemUtils.isDisplayItem(((Item) entity).getItemStack(), null)) {
+          || !ItemUtils.isDisplayItem(((Item) entity).getItemStack())) {
         continue;
       }
 
@@ -27,6 +25,5 @@ public class ClearLaggListener implements Listener {
     }
 
     pendingExclude.forEach(clearlaggEvent::removeEntity);
-    Util.debug("Prevent " + pendingExclude.size() + " displays removal by ClearLagg.");
   }
 }

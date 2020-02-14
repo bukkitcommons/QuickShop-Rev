@@ -29,60 +29,6 @@ import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.logger.ShopLogger;
 
 public class LockListener implements Listener {
-  @EventHandler(ignoreCancelled = true)
-  public void invEvent(InventoryMoveItemEvent e) {
-    if (!ItemPreviewer.isPreviewItem(e.getItem())) {
-      return;
-    }
-
-    e.setCancelled(true);
-  }
-
-  @EventHandler
-  public void invEvent(InventoryClickEvent e) {
-    if (ItemPreviewer.isPreviewItem(e.getCursor())) {
-      e.setCancelled(true);
-      e.setResult(Event.Result.DENY);
-      return;
-    }
-
-    if (ItemPreviewer.isPreviewItem(e.getCurrentItem())) {
-      e.setCancelled(true);
-      e.setResult(Event.Result.DENY);
-    }
-  }
-
-  @EventHandler
-  public void invEvent(InventoryDragEvent e) {
-    if (ItemPreviewer.isPreviewItem(e.getCursor())) {
-      e.setCancelled(true);
-      e.setResult(Event.Result.DENY);
-      return;
-    }
-
-    if (ItemPreviewer.isPreviewItem(e.getOldCursor())) {
-      e.setCancelled(true);
-      e.setResult(Event.Result.DENY);
-    }
-  }
-
-  @EventHandler
-  public void invEvent(InventoryPickupItemEvent e) {
-    final Inventory inventory = e.getInventory();
-    final ItemStack[] stacks = inventory.getContents();
-
-    for (ItemStack itemStack : stacks) {
-      if (itemStack == null) {
-        continue;
-      }
-
-      if (ItemPreviewer.isPreviewItem(itemStack)) {
-        e.setCancelled(true);
-        return;
-      }
-    }
-  }
-
   /*
    * Removes chests when they're destroyed.
    */
@@ -113,7 +59,7 @@ public class LockListener implements Listener {
         }
       });
     } else if (BlockUtils.isWallSign(b.getType())) {
-      Sign sign = (Sign) b;
+      Sign sign = (Sign) b.getState();
 
       if (sign.getLine(0).equals(BaseConfig.lockettePrivateText)
           || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText)) {
