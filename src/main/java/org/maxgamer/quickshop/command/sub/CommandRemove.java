@@ -5,7 +5,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
@@ -69,7 +69,7 @@ public class CommandRemove extends QuickShopCommand {
   }
   
   private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
-    if (!PermissionManager.instance().has(sender, "quickshop.other.destroy") &&
+    if (!QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy") &&
         !shop.isModerator(((Player) sender).getUniqueId())) {
       sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
       return;

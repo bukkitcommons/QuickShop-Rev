@@ -4,19 +4,20 @@ import java.util.Locale;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+import cc.bukkit.shop.PermissionManager;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.permission.PermissionProvider;
 import cc.bukkit.shop.permission.provider.BukkitPermsProvider;
 
-public class PermissionManager {
+public class QuickShopPermissionManager implements PermissionManager {
   /*
    * Singleton
    */
   private static class LazySingleton {
-    private static final PermissionManager INSTANCE = new PermissionManager();
+    private static final QuickShopPermissionManager INSTANCE = new QuickShopPermissionManager();
   }
   
-  private PermissionManager() {
+  private QuickShopPermissionManager() {
     switch (BaseConfig.permsProvider.toUpperCase(Locale.ROOT)) {
       case "VAULT":
         provider = new VaultPermsProvider();
@@ -28,23 +29,16 @@ public class PermissionManager {
     ShopLogger.instance().info("Selected permission provider: " + provider.getType());
   }
   
-  public static PermissionManager instance() {
+  public static QuickShopPermissionManager instance() {
     return LazySingleton.INSTANCE;
   }
   
   private final PermissionProvider provider;
 
-  /**
-   * Check the permission for sender
-   *
-   * @param sender The CommandSender you want check
-   * @param permission The permission node wait to check
-   * @return The result of check
+  /*
+   * Permission
    */
-  public boolean has(@NotNull CommandSender sender, @NotNull String permission) {
-    return sender.isOp() ? true : provider.hasPermission(sender, permission);
-  }
-  
+  @Override
   public boolean hasExact(@NotNull CommandSender sender, @NotNull String permission) {
     return provider.hasPermission(sender, permission);
   }

@@ -20,7 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
@@ -107,7 +107,7 @@ public class LockListener implements Listener {
       Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
         // If they owned it or have bypass perms, they can destroy it
         if (!shop.getOwner().equals(p.getUniqueId())
-            && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
+            && !QuickShopPermissionManager.instance().has(p, "quickshop.other.destroy")) {
           e.setCancelled(true);
           p.sendMessage(Shop.getLocaleManager().get("no-permission", p));
         }
@@ -130,7 +130,7 @@ public class LockListener implements Listener {
         // If they're the shop owner or have bypass perms, they can destroy
         // it.
         if (!shop.getOwner().equals(p.getUniqueId())
-            && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
+            && !QuickShopPermissionManager.instance().has(p, "quickshop.other.destroy")) {
           e.setCancelled(true);
           p.sendMessage(Shop.getLocaleManager().get("no-permission", p));
         }
@@ -160,7 +160,7 @@ public class LockListener implements Listener {
     // Make sure they're not using the non-shop half of a double chest.
     Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
       if (!shop.getModerator().isModerator(p.getUniqueId())) {
-        if (PermissionManager.instance().has(p, "quickshop.other.open")) {
+        if (QuickShopPermissionManager.instance().has(p, "quickshop.other.open")) {
           p.sendMessage(Shop.getLocaleManager().get("bypassing-lock", p));
           return;
         }
@@ -188,7 +188,7 @@ public class LockListener implements Listener {
       return;
     }
 
-    if (PermissionManager.instance().has(p, "quickshop.other.open")) {
+    if (QuickShopPermissionManager.instance().has(p, "quickshop.other.open")) {
       p.sendMessage(Shop.getLocaleManager().get("bypassing-lock", p));
       return;
     }

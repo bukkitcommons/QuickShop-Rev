@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
@@ -122,7 +122,7 @@ public class CommandPrice extends QuickShopCommand {
       final ShopViewer shop = Shop.getManager().getLoadedShopAt(b.getLocation());
 
       if (shop.isEmpty() || (!shop.get().getModerator().isModerator(p.getUniqueId())
-          && !PermissionManager.instance().has(sender, "quickshop.other.price"))) {
+          && !QuickShopPermissionManager.instance().has(sender, "quickshop.other.price"))) {
         continue;
       }
       

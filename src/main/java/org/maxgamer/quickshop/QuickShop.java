@@ -43,7 +43,7 @@ import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
 import org.maxgamer.quickshop.messages.QuickShopMessager;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
@@ -61,6 +61,7 @@ import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.LocaleManager;
+import cc.bukkit.shop.PermissionManager;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopItemMatcher;
 import cc.bukkit.shop.ShopLoader;
@@ -106,6 +107,12 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   
   @NotNull
   private final ShopItemMatcher itemMatcher = new QuickShopItemMatcher();
+  
+
+  @Override
+  public PermissionManager getPermissions() {
+    return QuickShopPermissionManager.instance();
+  }
   
   @Override
   public ShopManager getManager() {
@@ -187,7 +194,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   public int getShopLimit(@NotNull Player p) {
     int max = BaseConfig.defaultLimits;
     for (Entry<String, Integer> entry : shopPermLimits.entrySet()) {
-      if (entry.getValue() > max && PermissionManager.instance().has(p, entry.getKey())) {
+      if (entry.getValue() > max && QuickShopPermissionManager.instance().has(p, entry.getKey())) {
         max = entry.getValue();
       }
     }

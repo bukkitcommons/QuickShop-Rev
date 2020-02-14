@@ -26,7 +26,7 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.BlockUtils;
@@ -103,7 +103,7 @@ public class ShopActionListener implements Listener {
       .filter(shop ->
         !BaseConfig.sneakToTrade || e.getPlayer().isSneaking())
       .filter(shop ->
-        PermissionManager.instance().has(player, "quickshop.use"))    
+        QuickShopPermissionManager.instance().has(player, "quickshop.use"))    
       
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling trade");
@@ -163,7 +163,7 @@ public class ShopActionListener implements Listener {
       
       .filter(shop ->
         player.getGameMode() != GameMode.CREATIVE &&
-        PermissionManager.instance().has(player, "quickshop.create.sell"))
+        QuickShopPermissionManager.instance().has(player, "quickshop.create.sell"))
       
       .filter(shop -> !BaseConfig.sneakToCreat || player.isSneaking())
       .filter(shop -> QuickShopManager.canBuildShop(player, block))
@@ -188,13 +188,13 @@ public class ShopActionListener implements Listener {
         }
         
         if (BlockUtils.getSecondHalf(block).isPresent() &&
-            !PermissionManager.instance().has(player, "quickshop.create.double")) {
+            !QuickShopPermissionManager.instance().has(player, "quickshop.create.double")) {
           player.sendMessage(Shop.getLocaleManager().get("no-double-chests", player));
           return;
         }
 
         if (block.getType() == Material.ENDER_CHEST &&
-            !PermissionManager.instance().has(player, "quickshop.create.enderchest")) {
+            !QuickShopPermissionManager.instance().has(player, "quickshop.create.enderchest")) {
           return;
         }
         

@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.messages.ChatSheetPrinter;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.utils.ItemNMS;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.JavaUtils;
@@ -197,7 +197,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param shop Target shop
    */
   public void sendControlPanelInfo(@NotNull Player sender, @NotNull ContainerShop shop) {
-    if (!PermissionManager.instance().has(sender, "quickshop.use")) {
+    if (!QuickShopPermissionManager.instance().has(sender, "quickshop.use")) {
       return;
     }
     if (BaseConfig.sneakToControl) {
@@ -211,7 +211,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     chatSheetPrinter.printHeader();
     chatSheetPrinter.printLine(get("controlpanel.infomation", sender));
     // Owner
-    if (!PermissionManager.instance().has(sender, "quickshop.setowner")) {
+    if (!QuickShopPermissionManager.instance().has(sender, "quickshop.setowner")) {
       chatSheetPrinter.printLine(get("menu.owner", sender, shop.ownerName()));
     } else {
       chatSheetPrinter
@@ -225,7 +225,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     }
 
     // Unlimited
-    if (PermissionManager.instance().has(sender, "quickshop.unlimited")) {
+    if (QuickShopPermissionManager.instance().has(sender, "quickshop.unlimited")) {
       String text =
           get("controlpanel.unlimited", sender, get(shop.isUnlimited()));
       String hoverText = get("controlpanel.unlimited-hover", sender);
@@ -237,7 +237,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Buying/Selling Mode
-    if (PermissionManager.instance().has(sender, "quickshop.create.buy")
+    if (QuickShopPermissionManager.instance().has(sender, "quickshop.create.buy")
         && sender.hasPermission("quickshop.create.sell")) {
       if (shop.is(ShopType.SELLING)) {
         String text = get("controlpanel.mode-selling", sender);
@@ -260,7 +260,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       }
     }
     // Set Price
-    if (PermissionManager.instance().has(sender, "quickshop.other.price")
+    if (QuickShopPermissionManager.instance().has(sender, "quickshop.other.price")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text = get("controlpanel.price", sender,
           BaseConfig.decimalFormatPrice ? ShopUtils.formatPrice(shop.getPrice()) : "" + shop.getPrice());
@@ -269,7 +269,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
     }
     // Refill
-    if (PermissionManager.instance().has(sender, "quickshop.refill")) {
+    if (QuickShopPermissionManager.instance().has(sender, "quickshop.refill")) {
       String text =
           get("controlpanel.refill", sender, String.valueOf(shop.getPrice()));
       String hoverText = get("controlpanel.refill-hover", sender);
@@ -277,7 +277,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
     }
     // Refill
-    if (PermissionManager.instance().has(sender, "quickshop.empty")) {
+    if (QuickShopPermissionManager.instance().has(sender, "quickshop.empty")) {
       String text =
           get("controlpanel.empty", sender, String.valueOf(shop.getPrice()));
       String hoverText = get("controlpanel.empty-hover", sender);
@@ -289,7 +289,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
     }
     // Remove
-    if (PermissionManager.instance().has(sender, "quickshop.other.destroy")
+    if (QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy")
         || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
       String text =
           get("controlpanel.remove", sender, String.valueOf(shop.getPrice()));
@@ -334,7 +334,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       TextComponent normalmessage =
           new TextComponent(normalText + "   " + get("menu.preview", player));
       ComponentBuilder cBuilder = new ComponentBuilder(json);
-      if (PermissionManager.instance().has(player, "quickshop.preview")) {
+      if (QuickShopPermissionManager.instance().has(player, "quickshop.preview")) {
         normalmessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
             get("menu.commands.preview", player,
                 shop.getLocation().worldName(),
@@ -357,7 +357,7 @@ public class QuickShopLocaleManager implements LocaleManager {
   public void sendMessageToOps(@NotNull String message) {
     Bukkit.getOnlinePlayers()
           .stream()
-          .filter(player -> player.isOp() || PermissionManager.instance().has(player, "quickshop.alert"))
+          .filter(player -> player.isOp() || QuickShopPermissionManager.instance().has(player, "quickshop.alert"))
           .forEach(player -> player.sendMessage(message));
   }
 

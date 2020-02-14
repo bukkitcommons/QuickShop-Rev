@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.BlockUtils;
@@ -75,12 +75,12 @@ public class CommandSuperCreate extends QuickShopCommand {
       }
 
       if (BlockUtils.getSecondHalf(b).isPresent()
-          && !PermissionManager.instance().has(sender, "quickshop.create.double")) {
+          && !QuickShopPermissionManager.instance().has(sender, "quickshop.create.double")) {
         p.sendMessage(Shop.getLocaleManager().get("no-double-chests", sender));
         return;
       }
 
-      if (Util.isBlacklisted(item) && !PermissionManager.instance().has(p,
+      if (Util.isBlacklisted(item) && !QuickShopPermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
         p.sendMessage(Shop.getLocaleManager().get("blacklisted-item", sender));
         return;

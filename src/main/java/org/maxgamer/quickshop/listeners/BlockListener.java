@@ -16,7 +16,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.permission.PermissionManager;
+import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
@@ -60,7 +60,7 @@ public class BlockListener implements Listener {
     .accept(shop -> {
       boolean isOwner = shop.getModerator().isOwner(player.getUniqueId());
       if (!isOwner &&
-          !PermissionManager.instance().has(player, "quickshop.other.destroy")) {
+          !QuickShopPermissionManager.instance().has(player, "quickshop.other.destroy")) {
         event.setCancelled(true);
         player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
         return;
@@ -112,7 +112,7 @@ public class BlockListener implements Listener {
     BlockUtils.getSecondHalf(event.getBlock()).ifPresent(chest -> {
       final Player player = event.getPlayer();
       
-      if (!PermissionManager.instance().has(player, "quickshop.create.double") &&
+      if (!QuickShopPermissionManager.instance().has(player, "quickshop.create.double") &&
           Shop.getManager().hasLoadedShopAt(chest)) {
         event.setCancelled(true);
         player.sendMessage(Shop.getLocaleManager().get("no-double-chests", player));
