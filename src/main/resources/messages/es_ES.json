@@ -74,7 +74,7 @@
         "successfully-sold": "&aVendido con éxito:",
         "item-name-and-price": "&e{0} {1} &apor &e{2}",
         "sell-tax": "&aHas pagado &e{0} &aen impuestos.",
-        "sell-tax-self": "&aYou own this shop so you don't pay taxes.",
+        "sell-tax-self": "&aYou are the owner of this shop, so you don't need to pay taxes.",
         "enchants": "&5Encantamientos",
         "stored-enchants": "&5Encantamientos guardados",
         "shop-information": "&aInformación de la tienda:",
