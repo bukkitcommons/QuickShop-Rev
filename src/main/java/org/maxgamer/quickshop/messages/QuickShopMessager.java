@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.messages;
+package org.maxgamer.quickshop.messages;
 
 import java.sql.ResultSet;
 import java.util.Map;
@@ -10,7 +10,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
 import cc.bukkit.shop.ShopMessager;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 public class QuickShopMessager implements ShopMessager {
   @NotNull

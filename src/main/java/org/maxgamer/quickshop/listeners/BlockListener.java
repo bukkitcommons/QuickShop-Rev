@@ -31,7 +31,7 @@ public class BlockListener implements Listener {
     Player player = event.getPlayer();
     
     if (event.isCancelled()) {
-      player.sendMessage(Shop.getLocaleManager().getMessage("no-permission", player));
+      player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
       Util.debug("The action was cancelled by other plugin");
       return;
     }
@@ -60,7 +60,7 @@ public class BlockListener implements Listener {
       if (!isOwner &&
           !PermissionManager.instance().has(player, "quickshop.other.destroy")) {
         event.setCancelled(true);
-        player.sendMessage(Shop.getLocaleManager().getMessage("no-permission", player));
+        player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
         return;
       }
       
@@ -69,16 +69,16 @@ public class BlockListener implements Listener {
         tool = tool == null ? Material.getMaterial("GOLD_AXE") : tool;
         if (player.getInventory().getItemInMainHand().getType() != tool) {
           event.setCancelled(true);
-          player.sendMessage(Shop.getLocaleManager().getMessage("no-creative-break", player, Shop.getLocaleManager().getLocalizedName(tool.name())));
+          player.sendMessage(Shop.getLocaleManager().get("no-creative-break", player, Shop.getLocaleManager().get(tool)));
           return;
         } else {
-          player.sendMessage(Shop.getLocaleManager().getMessage("break-shop-use-supertool", player));
+          player.sendMessage(Shop.getLocaleManager().get("break-shop-use-supertool", player));
         }
       }
       
       Shop.getActions().removeAction(player.getUniqueId());
       Shop.getLoader().delete(shop);
-      player.sendMessage(Shop.getLocaleManager().getMessage("success-removed-shop", player));
+      player.sendMessage(Shop.getLocaleManager().get("success-removed-shop", player));
     });
   }
 
@@ -113,7 +113,7 @@ public class BlockListener implements Listener {
       if (!PermissionManager.instance().has(player, "quickshop.create.double") &&
           Shop.getManager().hasLoadedShopAt(chest)) {
         event.setCancelled(true);
-        player.sendMessage(Shop.getLocaleManager().getMessage("no-double-chests", player));
+        player.sendMessage(Shop.getLocaleManager().get("no-double-chests", player));
       }
     });
   }

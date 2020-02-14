@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.paste;
+package cc.bukkit.paste;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,9 +7,9 @@ import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.utils.HttpRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import cc.bukkit.shop.util.HttpRequest;
 
 public class EngineHubPaster implements PasteInterface {
   @Override

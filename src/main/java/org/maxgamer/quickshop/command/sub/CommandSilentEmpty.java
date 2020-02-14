@@ -38,7 +38,7 @@ public class CommandSilentEmpty extends QuickShopCommand {
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!(shop.get() instanceof ContainerQuickShop)) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
 
@@ -52,6 +52,6 @@ public class CommandSilentEmpty extends QuickShopCommand {
 
     inventory.clear();
     Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
-    sender.sendMessage(Shop.getLocaleManager().getMessage("empty-success", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("empty-success", sender));
   }
 }

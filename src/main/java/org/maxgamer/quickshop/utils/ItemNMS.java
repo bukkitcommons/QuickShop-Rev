@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.nms;
+package org.maxgamer.quickshop.utils;
 
 import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
@@ -6,7 +6,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 public abstract class ItemNMS {
   private static Method craftItemStack_asNMSCopyMethod;

@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils.paste;
+package cc.bukkit.paste;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

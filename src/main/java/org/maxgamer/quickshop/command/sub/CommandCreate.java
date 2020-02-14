@@ -18,9 +18,9 @@ import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.action.data.ShopCreator;
-import cc.bukkit.shop.util.ShopLocation;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 public class CommandCreate extends QuickShopCommand {
   @Override
@@ -34,7 +34,7 @@ public class CommandCreate extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(Shop.getLocaleManager().getMessage("tabcomplete.price", sender));
+    list.add(Shop.getLocaleManager().get("tabcomplete.price", sender));
 
     return list;
   }
@@ -51,7 +51,7 @@ public class CommandCreate extends QuickShopCommand {
     final ItemStack item = p.getInventory().getItemInMainHand();
 
     if (item.getType() == Material.AIR) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("no-anythings-in-your-hand", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-anythings-in-your-hand", sender));
       return;
     }
 
@@ -82,13 +82,13 @@ public class CommandCreate extends QuickShopCommand {
 
       if (Util.getSecondHalf(b).isPresent()
           && !PermissionManager.instance().has(p, "quickshop.create.double")) {
-        p.sendMessage(Shop.getLocaleManager().getMessage("no-double-chests", sender));
+        p.sendMessage(Shop.getLocaleManager().get("no-double-chests", sender));
         return;
       }
 
       if (Util.isBlacklisted(item) && !PermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
-        p.sendMessage(Shop.getLocaleManager().getMessage("blacklisted-item", sender));
+        p.sendMessage(Shop.getLocaleManager().get("blacklisted-item", sender));
         return;
       }
 
@@ -105,7 +105,7 @@ public class CommandCreate extends QuickShopCommand {
       }
 
       p.sendMessage(
-          Shop.getLocaleManager().getMessage("how-much-to-trade-for", sender, Util.getItemStackName(item)));
+          Shop.getLocaleManager().get("how-much-to-trade-for", sender, Util.getItemStackName(item)));
       Util.debug("Created by wait chat");
       return;
     }

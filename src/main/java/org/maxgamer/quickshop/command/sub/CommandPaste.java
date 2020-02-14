@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.paste.Paste;
+import cc.bukkit.paste.Paste;
 import cc.bukkit.shop.Shop;
 
 public class CommandPaste extends QuickShopCommand {

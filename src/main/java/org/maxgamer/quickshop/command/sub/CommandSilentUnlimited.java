@@ -36,7 +36,7 @@ public class CommandSilentUnlimited extends QuickShopCommand {
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent()) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
 
@@ -46,10 +46,10 @@ public class CommandSilentUnlimited extends QuickShopCommand {
     Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop.get());
 
     if (shop.get().isUnlimited()) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.toggle-unlimited.unlimited", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited", sender));
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().getMessage("command.toggle-unlimited.limited", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited", sender));
   }
 }

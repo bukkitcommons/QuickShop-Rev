@@ -40,24 +40,24 @@ public class CommandReset extends QuickShopCommand {
 
     if (cmdArg.length < 1) {
       // FIXME wrong message
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.no-type-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.no-type-given", sender));
       return;
     }
 
     switch (cmdArg[0]) {
       case "lang":
         Shop.getLocaleManager().load();
-        sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("complete", sender));
         break;
       case "config":
         QuickShop.instance().reloadConfig();
         Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
         Bukkit.getPluginManager().enablePlugin(QuickShop.instance());
-        sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("complete", sender));
         break;
       case "messages":
         Shop.getLocaleManager().load();
-        sender.sendMessage(Shop.getLocaleManager().getMessage("complete", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("complete", sender));
         break;
     }
   }

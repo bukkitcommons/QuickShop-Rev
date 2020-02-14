@@ -31,7 +31,7 @@ public class CommandEmpty extends QuickShopCommand {
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
 
@@ -53,14 +53,14 @@ public class CommandEmpty extends QuickShopCommand {
         }
 
         cs.getInventory().clear();
-        sender.sendMessage(Shop.getLocaleManager().getMessage("empty-success", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("empty-success", sender));
       } else {
-        sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       }
 
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
   }
 }

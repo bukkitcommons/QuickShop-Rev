@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
-import org.maxgamer.quickshop.utils.paste.Paste;
+import cc.bukkit.paste.Paste;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
 import io.sentry.context.Context;

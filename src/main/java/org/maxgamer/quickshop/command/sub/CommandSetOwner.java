@@ -23,19 +23,19 @@ public class CommandSetOwner extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("Only player can run this command", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("Only player can run this command", sender));
       return;
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.no-owner-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.no-owner-given", sender));
       return;
     }
 
     final BlockIterator bIt = new BlockIterator((Player) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
 
@@ -51,16 +51,16 @@ public class CommandSetOwner extends QuickShopCommand {
       final OfflinePlayer p = Bukkit.getOfflinePlayer(cmdArg[0]);
       final String shopOwner = Bukkit.getOfflinePlayer(shop.get().getOwner()).getName();
       if (!p.hasPlayedBefore()) {
-        sender.sendMessage(Shop.getLocaleManager().getMessage("unknown-player", null));
+        sender.sendMessage(Shop.getLocaleManager().get("unknown-player").get());
         return;
       }
       shop.get().setOwner(p.getUniqueId());
       shop.get().setSignText();
       shop.get().save();
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.new-owner", sender, shopOwner));
+      sender.sendMessage(Shop.getLocaleManager().get("command.new-owner", sender, shopOwner));
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
   }
 }

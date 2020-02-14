@@ -92,7 +92,7 @@ public class CommandDebug extends QuickShopCommand {
       Shop.instance().saveConfig();
       Bukkit.getPluginManager().disablePlugin(Shop.instance());
       Bukkit.getPluginManager().enablePlugin(Shop.instance());
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.now-nolonger-debuging", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.now-nolonger-debuging", sender));
       return;
     }
 
@@ -100,7 +100,7 @@ public class CommandDebug extends QuickShopCommand {
     Shop.instance().saveConfig();
     Bukkit.getPluginManager().disablePlugin(Shop.instance());
     Bukkit.getPluginManager().enablePlugin(Shop.instance());
-    sender.sendMessage(Shop.getLocaleManager().getMessage("command.now-debuging", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("command.now-debuging", sender));
   }
 
   public void printHandlerList(@NotNull CommandSender sender, String event) {

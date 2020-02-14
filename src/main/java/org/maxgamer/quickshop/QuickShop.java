@@ -42,6 +42,7 @@ import org.maxgamer.quickshop.listeners.InternalListener;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
+import org.maxgamer.quickshop.messages.QuickShopMessager;
 import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.scheduler.AsyncLogWatcher;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
@@ -57,12 +58,6 @@ import org.maxgamer.quickshop.utils.FunnyEasterEgg;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
-import org.maxgamer.quickshop.utils.messages.QuickShopLocaleManager;
-import org.maxgamer.quickshop.utils.messages.QuickShopMessager;
-import org.maxgamer.quickshop.utils.nms.Reflections;
-import org.maxgamer.quickshop.utils.wrappers.bukkit.BukkitWrapper;
-import org.maxgamer.quickshop.utils.wrappers.bukkit.PaperWrapper;
-import org.maxgamer.quickshop.utils.wrappers.bukkit.SpigotWrapper;
 import com.google.common.collect.Maps;
 import cc.bukkit.shop.LocaleManager;
 import cc.bukkit.shop.Shop;
@@ -84,8 +79,12 @@ import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegrationManager;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
+import cc.bukkit.shop.util.Reflections;
 import cc.bukkit.shop.util.file.ResourceAccessor;
+import cc.bukkit.wrappers.bukkit.BukkitWrapper;
+import cc.bukkit.wrappers.bukkit.PaperWrapper;
+import cc.bukkit.wrappers.bukkit.SpigotWrapper;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 
@@ -148,8 +147,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private final Metrics metrics = new Metrics(this);
   
   private EconomyProvider economy;
-  
-  private ResourceAccessor resourceAccessor;
   
   private BukkitWrapper bukkitAPIWrapper;
   
@@ -406,8 +403,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     /*
      * Locales
      */
-    resourceAccessor = new ResourceAccessor(this);
-    localeManager = new QuickShopLocaleManager(this);
+    localeManager = new QuickShopLocaleManager();
     try {
       localeManager.load();
     } catch (Exception e) {

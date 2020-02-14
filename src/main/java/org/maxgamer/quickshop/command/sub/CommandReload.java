@@ -19,7 +19,7 @@ public class CommandReload extends QuickShopCommand {
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
-    sender.sendMessage(Shop.getLocaleManager().getMessage("command.reloading", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("command.reloading", sender));
     Bukkit.getPluginManager().disablePlugin(QuickShop.instance());
     Bukkit.getPluginManager().enablePlugin(QuickShop.instance());
   }

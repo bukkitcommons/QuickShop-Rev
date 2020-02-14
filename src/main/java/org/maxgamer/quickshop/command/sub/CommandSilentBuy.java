@@ -37,7 +37,7 @@ public class CommandSilentBuy extends QuickShopCommand {
             Integer.parseInt(cmdArg[1]), Integer.parseInt(cmdArg[2]), Integer.parseInt(cmdArg[3])));
 
     if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
 
@@ -46,6 +46,6 @@ public class CommandSilentBuy extends QuickShopCommand {
     shop.get().save();
     Shop.getLocaleManager().sendControlPanelInfo((Player) sender, shop.get());
     sender.sendMessage(
-        Shop.getLocaleManager().getMessage("command.now-buying", sender, Util.getItemStackName(shop.get().getItem())));
+        Shop.getLocaleManager().get("command.now-buying", sender, Util.getItemStackName(shop.get().getItem())));
   }
 }

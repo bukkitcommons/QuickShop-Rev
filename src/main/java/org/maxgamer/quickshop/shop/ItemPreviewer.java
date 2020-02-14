@@ -72,7 +72,7 @@ public class ItemPreviewer implements Listener {
       return;
     
     final int size = 9;
-    inventory = Bukkit.createInventory(null, 9, Shop.getLocaleManager().getMessage("menu.preview", player));
+    inventory = Bukkit.createInventory(null, 9, Shop.getLocaleManager().get("menu.preview", player));
     for (int i = 0; i < size; i++) {
       inventory.setItem(i, shopInventoryPreview.getItemStack());
     }

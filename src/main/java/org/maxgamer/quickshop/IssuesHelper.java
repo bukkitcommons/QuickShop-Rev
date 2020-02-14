@@ -3,7 +3,7 @@ package org.maxgamer.quickshop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 public class IssuesHelper {
   public static IssuesHelper create() {

@@ -68,7 +68,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
         
         if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
           Shop.getMessager().send(shop.moderators().getOwner(),
-              Shop.getLocaleManager().getMessage("shop-removed-cause-ongoing-fee",
+              Shop.getLocaleManager().get("shop-removed-cause-ongoing-fee",
                   Bukkit.getOfflinePlayer(shop.moderators().getOwner()),
                   "World:" + shop.world() + " X:" + shop.x() +
                   " Y:" + shop.y() + " Z:" + shop.z()));

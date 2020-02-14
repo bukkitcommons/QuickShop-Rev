@@ -16,7 +16,7 @@ public class CommandAmount extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(Shop.getLocaleManager().getMessage("tabcomplete.amount", sender));
+    list.add(Shop.getLocaleManager().get("tabcomplete.amount", sender));
 
     return list;
   }
@@ -25,7 +25,7 @@ public class CommandAmount extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (cmdArg.length < 1) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.wrong-args", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args", sender));
       return;
     }
 
@@ -37,7 +37,7 @@ public class CommandAmount extends QuickShopCommand {
     final Player player = (Player) sender;
 
     if (!Shop.getActions().hasAction(player.getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("no-pending-action", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-pending-action", sender));
       return;
     }
 

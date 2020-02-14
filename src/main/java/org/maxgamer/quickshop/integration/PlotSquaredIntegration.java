@@ -27,7 +27,7 @@ import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 import cc.bukkit.shop.integration.IntegrationStage;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 @IntegrationStage(loadStage = IntegrateStage.POST_ENABLE)
 public class PlotSquaredIntegration implements IntegratedPlugin {

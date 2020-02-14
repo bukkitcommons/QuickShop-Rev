@@ -71,7 +71,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
   
   private void sendHelp(@NotNull CommandSender sender, @NotNull String commandLabel) {
     boolean player = sender instanceof Player;
-    sender.sendMessage(Shop.getLocaleManager().getMessage("command.description.title", player ? (Player) sender : null));
+    sender.sendMessage(Shop.getLocaleManager().get("command.description.title", player ? (Player) sender : null));
 
     for (CommandData container : commands) {
       if (container.hidden())
@@ -83,7 +83,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
 
       sender.sendMessage(
           ChatColor.GREEN + "/" + commandLabel + " " + container.label() + ChatColor.YELLOW
-              + " - " + Shop.getLocaleManager().getMessage("command.description." + container.label(), player ? (Player) sender : null));
+              + " - " + Shop.getLocaleManager().get("command.description." + container.label(), player ? (Player) sender : null));
     }
   }
 
@@ -106,7 +106,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
       
       for (String permission : container.permissions()) {
         if (!PermissionManager.instance().has(sender, permission)) {
-          sender.sendMessage(Shop.getLocaleManager().getMessage("no-permission", sender instanceof Player ? (Player) sender : null));
+          sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender instanceof Player ? (Player) sender : null));
           return true;
         }
       }

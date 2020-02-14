@@ -42,7 +42,7 @@ public class CommandRemove extends QuickShopCommand {
           
           return ViewAction.NEXT;
         })
-        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender)));
+        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender)));
       
       return;
     }
@@ -58,27 +58,27 @@ public class CommandRemove extends QuickShopCommand {
       
       if (viewer.isEmpty()) {
         // FIXME not exist
-        sender.sendMessage(Shop.getLocaleManager().getMessage("shop-not-exist", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("shop-not-exist", sender));
         return;
       }
       
       handleShop(sender, viewer.get());
     } catch (NumberFormatException e) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-a-integer", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-a-integer", sender));
     }
   }
   
   private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
     if (!PermissionManager.instance().has(sender, "quickshop.other.destroy") &&
         !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("no-permission", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
       return;
     }
     
     Shop.getLoader().delete(shop);
     
     sender.sendMessage(
-        Shop.getLocaleManager().getMessage(
+        Shop.getLocaleManager().get(
             "command.now-selling", sender, Util.getItemStackName(shop.getItem())));
   }
 }

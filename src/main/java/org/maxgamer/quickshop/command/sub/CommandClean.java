@@ -16,8 +16,8 @@ import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.util.ShopLocation;
 
 public class CommandClean extends QuickShopCommand {
   @Override
@@ -33,7 +33,7 @@ public class CommandClean extends QuickShopCommand {
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().getMessage("command.cleaning", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("command.cleaning", sender));
 
     List<ContainerShop> pendingRemoval = Lists.newArrayList();
     int[] count = {0, 0};
@@ -81,7 +81,7 @@ public class CommandClean extends QuickShopCommand {
       QuickShopLoader.instance().delete(shop);
 
     Shop.getMessager().clean();
-    sender.sendMessage(Shop.getLocaleManager().getMessage("command.cleaned", sender, "" + count[0]));
+    sender.sendMessage(Shop.getLocaleManager().get("command.cleaned", sender, "" + count[0]));
     if (count[1] > 0)
       sender.sendMessage("There is " + count[1] + " shops with non-goods items inside have been ignored.");
   }

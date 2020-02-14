@@ -38,7 +38,7 @@ public class CommandSell extends QuickShopCommand {
       BlockViewer viewer = BlockViewer.get(player, 10);
       viewer
         .ifEmpty(() -> {
-          sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
           return;
         })
         
@@ -56,7 +56,7 @@ public class CommandSell extends QuickShopCommand {
       return;
     }
     
-    sender.sendMessage(Shop.getLocaleManager().getMessage("Can't run command by Console"));
+    sender.sendMessage("Can't run command by Console");
     return;
   }
   
@@ -66,7 +66,7 @@ public class CommandSell extends QuickShopCommand {
     
     if (viewer.isEmpty()) {
       // FIXME not exist
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
     
@@ -75,7 +75,7 @@ public class CommandSell extends QuickShopCommand {
   
   private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
     if (!sender.isOp() && !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("no-permission", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
       return;
     }
     
@@ -84,7 +84,7 @@ public class CommandSell extends QuickShopCommand {
     shop.save();
     
     sender.sendMessage(
-        Shop.getLocaleManager().getMessage(
+        Shop.getLocaleManager().get(
             "command.now-selling", sender, Util.getItemStackName(shop.getItem())));
   }
 }

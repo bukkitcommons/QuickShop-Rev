@@ -51,7 +51,7 @@ public class CommandPreview extends QuickShopCommand {
           
           return ViewAction.NEXT;
         })
-        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender)));
+        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender)));
     }
     
     sender.sendMessage("Can't run this command from Console");
@@ -65,13 +65,13 @@ public class CommandPreview extends QuickShopCommand {
       
       if (viewer.isEmpty()) {
         // FIXME not exist
-        player.sendMessage(Shop.getLocaleManager().getMessage("shop-not-exist", player));
+        player.sendMessage(Shop.getLocaleManager().get("shop-not-exist", player));
         return;
       }
       
       handleShop(player, viewer.get());
     } catch (NumberFormatException e) {
-      player.sendMessage(Shop.getLocaleManager().getMessage("not-a-integer", player));
+      player.sendMessage(Shop.getLocaleManager().get("not-a-integer", player));
     }
   }
   

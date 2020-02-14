@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.paste;
+package cc.bukkit.paste;
 
 import org.jetbrains.annotations.NotNull;
 

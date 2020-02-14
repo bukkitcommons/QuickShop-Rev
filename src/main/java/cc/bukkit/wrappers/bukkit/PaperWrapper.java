@@ -1,4 +1,4 @@
-package org.maxgamer.quickshop.utils.wrappers.bukkit;
+package cc.bukkit.wrappers.bukkit;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

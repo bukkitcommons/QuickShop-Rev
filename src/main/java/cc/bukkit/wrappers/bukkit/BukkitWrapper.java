@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.maxgamer.quickshop.utils.wrappers.bukkit;
+package cc.bukkit.wrappers.bukkit;
 
 import java.util.concurrent.CompletableFuture;
 import org.bukkit.Chunk;

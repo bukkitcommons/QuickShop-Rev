@@ -24,7 +24,7 @@ import org.maxgamer.quickshop.permission.PermissionManager;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 public class LockListener implements Listener {
   @EventHandler(ignoreCancelled = true)
@@ -107,7 +107,7 @@ public class LockListener implements Listener {
         if (!shop.getOwner().equals(p.getUniqueId())
             && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
           e.setCancelled(true);
-          p.sendMessage(Shop.getLocaleManager().getMessage("no-permission", p));
+          p.sendMessage(Shop.getLocaleManager().get("no-permission", p));
         }
       });
     } else if (Util.isWallSign(b.getType())) {
@@ -131,7 +131,7 @@ public class LockListener implements Listener {
         if (!shop.getOwner().equals(p.getUniqueId())
             && !PermissionManager.instance().has(p, "quickshop.other.destroy")) {
           e.setCancelled(true);
-          p.sendMessage(Shop.getLocaleManager().getMessage("no-permission", p));
+          p.sendMessage(Shop.getLocaleManager().get("no-permission", p));
         }
       });
     }
@@ -160,10 +160,10 @@ public class LockListener implements Listener {
     Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
       if (!shop.getModerator().isModerator(p.getUniqueId())) {
         if (PermissionManager.instance().has(p, "quickshop.other.open")) {
-          p.sendMessage(Shop.getLocaleManager().getMessage("bypassing-lock", p));
+          p.sendMessage(Shop.getLocaleManager().get("bypassing-lock", p));
           return;
         }
-        p.sendMessage(Shop.getLocaleManager().getMessage("that-is-locked", p));
+        p.sendMessage(Shop.getLocaleManager().get("that-is-locked", p));
         e.setCancelled(true);
       }
     });
@@ -188,11 +188,11 @@ public class LockListener implements Listener {
     }
 
     if (PermissionManager.instance().has(p, "quickshop.other.open")) {
-      p.sendMessage(Shop.getLocaleManager().getMessage("bypassing-lock", p));
+      p.sendMessage(Shop.getLocaleManager().get("bypassing-lock", p));
       return;
     }
 
-    p.sendMessage(Shop.getLocaleManager().getMessage("that-is-locked", p));
+    p.sendMessage(Shop.getLocaleManager().get("that-is-locked", p));
     e.setCancelled(true);
   }
 }

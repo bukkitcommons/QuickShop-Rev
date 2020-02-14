@@ -20,12 +20,12 @@ public class CommandBuy extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     
     if (!(sender instanceof Player)) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("Can't run command by Console", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("Can't run command by Console", sender));
       return;
     }
 
     Runnable notLookingAtShop = () -> sender.sendMessage(
-        Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+        Shop.getLocaleManager().get("not-looking-at-shop", sender));
 
     BlockViewer
         .get((Player) sender, 10)
@@ -46,7 +46,7 @@ public class CommandBuy extends QuickShopCommand {
                 shop.setSignText();
                 shop.save();
                 sender.sendMessage(
-                    Shop.getLocaleManager().getMessage("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
+                    Shop.getLocaleManager().get("command.now-buying", sender, Util.getItemStackName(shop.getItem())));
 
                 return ViewAction.BREAK;
               }, ViewAction.NEXT);

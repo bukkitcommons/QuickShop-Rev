@@ -28,13 +28,13 @@ import com.bekvon.bukkit.cmiLib.CMIBlock.blockDirection;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.ShopManager;
 import cc.bukkit.shop.action.data.ShopCreator;
 import cc.bukkit.shop.action.data.ShopData;
 import cc.bukkit.shop.event.ShopCreateEvent;
 import cc.bukkit.shop.event.ShopPreCreateEvent;
-import cc.bukkit.shop.util.ShopLocation;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.util.Utils;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -122,7 +122,7 @@ public class QuickShopManager implements ShopManager {
 
         if (owned >= max && Util.canBeShop(block)) {
           player.sendMessage(
-              Shop.getLocaleManager().getMessage("reached-maximum-can-create", player,
+              Shop.getLocaleManager().get("reached-maximum-can-create", player,
                   String.valueOf(owned), String.valueOf(max)));
 
           return false;

@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import cc.bukkit.shop.economy.EconomyProvider;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 import lombok.Getter;
 import lombok.Setter;
 import net.tnemc.core.Reserve;

@@ -22,7 +22,7 @@ import cc.bukkit.shop.configuration.annotation.Configuration;
 import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 import cc.bukkit.shop.integration.IntegrationStage;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 
 @Configuration("configs/integrations.yml")
 @IntegrationStage(loadStage = IntegrateStage.POST_LOAD)

@@ -49,7 +49,6 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.hologram.EntityDisplayItem;
-import org.maxgamer.quickshop.utils.messages.Colorizer;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import com.google.common.io.Files;
@@ -57,10 +56,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.database.connector.MySQLConnector;
 import cc.bukkit.shop.hologram.DisplayInfo;
-import cc.bukkit.shop.util.ShopLocation;
-import cc.bukkit.shop.util.ShopLogger;
+import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -433,7 +432,7 @@ public class Util {
     if (itemStack.hasItemMeta() && itemStack.getItemMeta().hasDisplayName())
       return itemStack.getItemMeta().getDisplayName();
     
-    return Shop.getLocaleManager().getLocalizedName(itemStack.getType().name());
+    return Shop.getLocaleManager().get(itemStack.getType());
   }
 
   /**

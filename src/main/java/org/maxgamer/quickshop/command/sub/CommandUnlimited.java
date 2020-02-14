@@ -28,7 +28,7 @@ public class CommandUnlimited extends QuickShopCommand {
     final BlockIterator bIt = new BlockIterator((Player) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
 
@@ -43,15 +43,15 @@ public class CommandUnlimited extends QuickShopCommand {
       shop.get().setUnlimited(!shop.get().isUnlimited());
 
       if (shop.get().isUnlimited()) {
-        sender.sendMessage(Shop.getLocaleManager().getMessage("command.toggle-unlimited.unlimited", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited", sender));
         return;
       }
 
-      sender.sendMessage(Shop.getLocaleManager().getMessage("command.toggle-unlimited.limited", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited", sender));
 
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().getMessage("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
   }
 }
