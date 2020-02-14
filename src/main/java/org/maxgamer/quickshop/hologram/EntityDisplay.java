@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 
 @ToString
 @Accessors(fluent = true)
-public abstract class EntityDisplayItem implements DisplayItem {
+public abstract class EntityDisplay implements DisplayItem {
   @Getter
   @Nullable
   protected Entity entity;
@@ -41,7 +41,7 @@ public abstract class EntityDisplayItem implements DisplayItem {
   
   protected boolean pendingRemoval;
   
-  public EntityDisplayItem(@NotNull ContainerShop shop, @NotNull DisplayData data) {
+  public EntityDisplay(@NotNull ContainerShop shop, @NotNull DisplayData data) {
     this.shop = shop;
     this.data = data;
     

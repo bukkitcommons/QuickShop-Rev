@@ -23,10 +23,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
-import org.maxgamer.quickshop.hologram.ArmorStandDisplayItem;
+import org.maxgamer.quickshop.hologram.ArmorStandDisplay;
 import org.maxgamer.quickshop.hologram.DisplayDataMatcher;
-import org.maxgamer.quickshop.hologram.EntityDisplayItem;
-import org.maxgamer.quickshop.hologram.RealDisplayItem;
+import org.maxgamer.quickshop.hologram.EntityDisplay;
+import org.maxgamer.quickshop.hologram.DisplayDroppedItem;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.JavaUtils;
@@ -64,7 +64,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   @NotNull
   private final ShopLocation location;
   @Nullable
-  private EntityDisplayItem display;
+  private EntityDisplay display;
   
   @EqualsAndHashCode.Exclude
   private boolean isLoaded = false;
@@ -87,10 +87,10 @@ public class ContainerQuickShop implements ContainerShop, Managed {
       DisplayData data = DisplayDataMatcher.create(this.item);
       switch (data.type()) {
         case ARMOR_STAND:
-          display = new ArmorStandDisplayItem(this, data);
+          display = new ArmorStandDisplay(this, data);
           break;
         default:
-          display = new RealDisplayItem(this);
+          display = new DisplayDroppedItem(this);
           break;
       }
     }
@@ -126,10 +126,10 @@ public class ContainerQuickShop implements ContainerShop, Managed {
         DisplayData data = DisplayDataMatcher.create(this.item);
         switch (data.type()) {
           case ARMOR_STAND:
-            display = new ArmorStandDisplayItem(this, data);
+            display = new ArmorStandDisplay(this, data);
             break;
           default:
-            display = new RealDisplayItem(this);
+            display = new DisplayDroppedItem(this);
             break;
         }
       }

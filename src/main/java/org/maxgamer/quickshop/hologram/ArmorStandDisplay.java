@@ -18,8 +18,8 @@ import cc.bukkit.shop.hologram.DisplayItem;
 import lombok.ToString;
 
 @ToString
-public class ArmorStandDisplayItem extends EntityDisplayItem implements DisplayItem {
-  public ArmorStandDisplayItem(@NotNull ContainerShop shop, @NotNull DisplayData data) {
+public class ArmorStandDisplay extends EntityDisplay implements DisplayItem {
+  public ArmorStandDisplay(@NotNull ContainerShop shop, @NotNull DisplayData data) {
     super(shop, data);
   }
   

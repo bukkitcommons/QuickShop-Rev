@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.hologram.EntityDisplayItem;
+import org.maxgamer.quickshop.hologram.EntityDisplay;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import com.google.gson.Gson;
@@ -92,7 +92,7 @@ public class ItemUtils {
               return;
             }
             
-            if (((EntityDisplayItem) shop.getDisplay()).data().type().entityType() != item.getType()) {
+            if (((EntityDisplay) shop.getDisplay()).data().type().entityType() != item.getType()) {
               item.remove();
               Util.debug("Removed a duped item display entity by type not equals");
               return;

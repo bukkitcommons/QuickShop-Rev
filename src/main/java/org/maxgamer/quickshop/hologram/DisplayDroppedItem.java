@@ -18,10 +18,10 @@ import cc.bukkit.shop.hologram.DisplayType;
 import lombok.ToString;
 
 @ToString
-public class RealDisplayItem extends EntityDisplayItem implements DisplayItem {
+public class DisplayDroppedItem extends EntityDisplay implements DisplayItem {
   private static final DisplayData DATA = new DisplayData(DisplayType.DROPPED_ITEM);
   
-  public RealDisplayItem(@NotNull ContainerShop shop) {
+  public DisplayDroppedItem(@NotNull ContainerShop shop) {
     super(shop, DATA);
   }
   

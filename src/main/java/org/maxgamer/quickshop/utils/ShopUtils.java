@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.hologram.EntityDisplayItem;
+import org.maxgamer.quickshop.hologram.EntityDisplay;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.ContainerShop;
