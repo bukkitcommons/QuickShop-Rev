@@ -31,7 +31,7 @@ public class CommandPrice extends QuickShopCommand {
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
     if (sender instanceof Player)
-      return Collections.singletonList(Shop.getLocaleManager().get("tabcomplete.price", (Player) sender));
+      return Collections.singletonList(Shop.getLocaleManager().get("tabcomplete.price", sender));
     
     return Collections.emptyList();
   }

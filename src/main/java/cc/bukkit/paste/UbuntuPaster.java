@@ -33,6 +33,7 @@ public class UbuntuPaster implements PasteInterface {
    * @return Target paste URL.
    * @throws Exception the throws
    */
+  @Override
   @NotNull
   public String pasteTheText(@NotNull String text) throws Exception {
     URL url = new URL("https://paste.ubuntu.com");

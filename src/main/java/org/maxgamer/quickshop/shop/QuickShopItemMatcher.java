@@ -25,6 +25,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
         MatcherConfig.attribute && MatcherConfig.flag && MatcherConfig.customModelData;
   }
   
+  @Override
   public boolean matches(@Nullable ItemStack requireStack, @Nullable ItemStack givenStack) {
     return matches(requireStack, givenStack, true);
   }
@@ -37,6 +38,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
    * @param givenStack The second item stack
    * @return true if the itemstacks match. (Material, durability, enchants, name)
    */
+  @Override
   public boolean matches(@Nullable ItemStack requireStack, @Nullable ItemStack givenStack, boolean matchesAmount) {
     if (requireStack == givenStack)
       return true;
@@ -79,6 +81,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
    * Only return false if your common internals are unequal.
    * Checking your own internals is redundant if you are not common, as notUncommon is meant for checking those 'not common' variables.
    */
+  @Override
   public boolean equalsCommon(ItemMeta meta, ItemMeta that) {
     return
         (MatcherConfig.displayName ?
@@ -142,6 +145,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
         && (compareCustomModelData(meta, that));
   }
   
+  @Override
   public boolean compareCustomModelData(ItemMeta meta, ItemMeta that) {
     try {
       return MatcherConfig.customModelData ?
@@ -155,6 +159,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
     }
   }
   
+  @Override
   public boolean comparePersistentDataContainer(ItemMeta meta, ItemMeta that) {
     try {
       return MatcherConfig.customTags ?
@@ -164,12 +169,14 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
     }
   }
   
+  @Override
   public boolean matches(ItemMeta originMeta, ItemMeta testMeta) {
     return bukkit ?
         originMeta.equals(testMeta) :
         equalsCommon(originMeta, testMeta) && compareUncommon(originMeta, testMeta);
   }
 
+  @Override
   public boolean compareUncommon(ItemMeta origin, ItemMeta test) {
     Class<? extends ItemMeta> clazz = origin.getClass();
     if (isCommon(origin.getClass())) // Skip common types

@@ -114,7 +114,7 @@ public class ArmorStandDisplay extends EntityDisplay implements DisplayItem {
     }
 
     Location location = getDisplayLocation();
-    this.entity = (ArmorStand) this.shop.getLocation().world().spawn(location,
+    this.entity = this.shop.getLocation().world().spawn(location,
         ArmorStand.class, armorStand -> {
           // Set basic armorstand datas.
           armorStand.setGravity(false);

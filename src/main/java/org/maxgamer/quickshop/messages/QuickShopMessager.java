@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.JavaUtils;
-import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
 import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.logger.ShopLogger;
@@ -18,6 +17,7 @@ public class QuickShopMessager implements ShopMessager {
   private final Map<UUID, String> playerMessages = ObjectsHashMap.withExpectedSize(32);
 
   /** Deletes any messages that are older than a week in the database, to save on space. */
+  @Override
   public void clean() {
     ShopLogger.instance()
         .info("Cleaning purchase messages from the database that are over a week old...");
@@ -32,6 +32,7 @@ public class QuickShopMessager implements ShopMessager {
    * @param p The player to message
    * @return True if success, False if the player is offline or null
    */
+  @Override
   public void flushMessagesFor(@NotNull Player player) {
     UUID uuid = player.getUniqueId();
     String message = playerMessages.remove(uuid);
@@ -48,6 +49,7 @@ public class QuickShopMessager implements ShopMessager {
    *        Else, if they're not online, queues it for them in the database.
    * @param isUnlimited The shop is or unlimited
    */
+  @Override
   public void send(@NotNull UUID uuid, @NotNull String message) {
     Player player = Bukkit.getPlayer(uuid);
     if (player == null) {
@@ -59,6 +61,7 @@ public class QuickShopMessager implements ShopMessager {
   }
   
   /** loads all player purchase messages from the database. */
+  @Override
   public void loadTransactionMessages() {
     playerMessages.clear(); // Delete old messages
     

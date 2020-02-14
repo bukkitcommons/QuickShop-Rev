@@ -1,7 +1,6 @@
 package org.maxgamer.quickshop.utils;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.Optional;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -9,24 +8,16 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.EnderChest;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.hologram.EntityDisplay;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.hologram.DisplayInfo;
 import cc.bukkit.shop.viewer.ShopViewer;
-import lombok.SneakyThrows;
 
 public class ShopUtils {
   @NotNull

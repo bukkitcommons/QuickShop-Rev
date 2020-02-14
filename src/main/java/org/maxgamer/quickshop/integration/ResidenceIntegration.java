@@ -29,7 +29,7 @@ public class ResidenceIntegration implements IntegratedPlugin {
   public boolean canCreateShopHere(@NotNull Player player, @NotNull Location location) {
     ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
 
-    for (String limit : this.createLimits) {
+    for (String limit : ResidenceIntegration.createLimits) {
       if ("FLAG".equalsIgnoreCase(limit)) {
         if (residence == null) {
           // Check world permission
@@ -63,7 +63,7 @@ public class ResidenceIntegration implements IntegratedPlugin {
   public boolean canTradeShopHere(@NotNull Player player, @NotNull Location location) {
     ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
 
-    for (String limit : this.tradeLimits) {
+    for (String limit : ResidenceIntegration.tradeLimits) {
       if ("FLAG".equalsIgnoreCase(limit)) {
         if (residence == null) {
           // Check world permission

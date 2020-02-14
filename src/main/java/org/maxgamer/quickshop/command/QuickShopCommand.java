@@ -17,6 +17,7 @@ public abstract class QuickShopCommand implements ShopCommand {
     return label == null ? label = getClass().getSimpleName().substring(7).toLowerCase() : label;
   }
   
+  @Override
   @NotNull
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
     return Collections.emptyList();

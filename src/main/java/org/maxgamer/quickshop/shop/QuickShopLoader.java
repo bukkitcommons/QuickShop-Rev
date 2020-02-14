@@ -162,6 +162,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     });
   }
   
+  @Override
   public void delete(@NotNull ContainerShop shop) {
     ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
@@ -190,6 +191,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
     }
   }
   
+  @Override
   public void delete(@NotNull ShopData data) throws SQLException {
     ShopViewer viewer =
         Shop.getManager().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());

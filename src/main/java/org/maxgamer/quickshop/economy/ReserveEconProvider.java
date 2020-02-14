@@ -45,6 +45,7 @@ public class ReserveEconProvider implements EconomyProvider {
     setup();
   }
   
+  @Override
   public String getName() {
     return "Reserve";
   }

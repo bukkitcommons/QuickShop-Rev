@@ -61,10 +61,12 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param key The Enchantment.
    * @return Enchantment's i18n name.
    */
+  @Override
   public String get(@NotNull Enchantment enchantment) {
     return minecraftLocale.get(enchantment);
   }
   
+  @Override
   public String get(@NotNull String loc, @NotNull String... args) {
     return get(loc, null, args);
   }
@@ -77,6 +79,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param player The sender will send the message to
    * @return message
    */
+  @Override
   public String get(@NotNull String loc, @Nullable Object player, @NotNull String... args) {
     
     String raw = pluginLocale.getString(loc);
@@ -133,6 +136,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param potion potionType
    * @return Potion's i18n name.
    */
+  @Override
   public String get(@NotNull PotionEffectType potion) {
     return minecraftLocale.get(potion);
   }
@@ -174,6 +178,7 @@ public class QuickShopLocaleManager implements LocaleManager {
     /* Save the upgraded messages.yml */
   }
 
+  @Override
   @SneakyThrows
   public void sendItemHologram(
       @NotNull Player player,
@@ -196,13 +201,14 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param sender Target sender
    * @param shop Target shop
    */
+  @Override
   public void sendControlPanelInfo(@NotNull Player sender, @NotNull ContainerShop shop) {
     if (!QuickShopPermissionManager.instance().has(sender, "quickshop.use")) {
       return;
     }
     if (BaseConfig.sneakToControl) {
       if (sender instanceof Player) {
-        if (!((Player) sender).isSneaking()) { // sneaking
+        if (!sender.isSneaking()) { // sneaking
           return;
         }
       }
@@ -310,6 +316,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    *
    * @param content The content to send.
    */
+  @Override
   public void sendGlobalAlert(@NotNull String content) {
     sendMessageToOps(content);
     ShopLogger.instance().warning(content);
@@ -324,6 +331,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param player Target player
    * @param normalText The text you will see
    */
+  @Override
   public void sendItemholochat(@NotNull ContainerShop shop, @NotNull ItemStack itemStack,
       @NotNull Player player, @NotNull String normalText) {
     try {
@@ -354,6 +362,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    *
    * @param message The message you want send
    */
+  @Override
   public void sendMessageToOps(@NotNull String message) {
     Bukkit.getOnlinePlayers()
           .stream()
@@ -368,6 +377,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param shop Target shop
    * @param amount Trading item amounts.
    */
+  @Override
   public void sendPurchaseSuccess(@NotNull Player p, @NotNull ContainerShop shop, int amount, @NotNull ShopSnapshot info) {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
@@ -408,6 +418,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param shop Target shop
    * @param amount Trading item amounts.
    */
+  @Override
   public void sendSellSuccess(@NotNull Player p, @NotNull ContainerShop shop, int amount) {
     ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
     chatSheetPrinter.printHeader();
@@ -458,6 +469,7 @@ public class QuickShopLocaleManager implements LocaleManager {
    * @param p Target player
    * @param shop The shop
    */
+  @Override
   public void sendShopInfo(@NotNull Player p, @NotNull ContainerShop shop) {
     // Potentially faster with an array?
     ItemStack items = shop.getItem();

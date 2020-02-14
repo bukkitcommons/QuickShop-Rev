@@ -41,6 +41,7 @@ public class VaultEconProvider implements EconomyProvider, Listener {
     }
   }
   
+  @Override
   public String getName() {
     return "Vault";
   }
