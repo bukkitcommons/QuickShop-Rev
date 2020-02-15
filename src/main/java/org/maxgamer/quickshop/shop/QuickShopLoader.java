@@ -183,11 +183,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
     // Delete it from the database
     try {
       QuickShop.instance().getDatabaseHelper().deleteShop(shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z(), shop.getLocation().worldName());
+      
+      if (BaseConfig.refundable)
+        QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
     } catch (SQLException e) {
       e.printStackTrace();
-    } finally {
-      if (BaseConfig.refundable) // Workaround for very legacy data
-        QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
     }
   }
   
@@ -272,8 +272,6 @@ public class QuickShopLoader implements ShopLoader, Listener {
   }
   
   public void loadShopsFor(@NotNull ResultSet set, @NotNull World world) throws SQLException, JsonSyntaxException, InvalidConfigurationException {
-    Map<Long, Map<Long, ShopData>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
-    
     long worldShops = 0;
     long worldLoadedShops = 0;
     long durTotalShopsNano = 0;
@@ -293,6 +291,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         continue;
       }
       
+      Map<Long, Map<Long, ShopData>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
       Map<Long, ShopData> inChunk =
           inWorld.computeIfAbsent(Utils.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
       

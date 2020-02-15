@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -22,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
@@ -419,9 +417,6 @@ public class QuickShopManager implements ShopManager {
      */
     @Override
     public void unload(@NotNull ContainerShop shop) {
-      if (!shop.isLoaded())
-        return;
-
       @NotNull ShopLocation location = shop.getLocation();
 
       Map<Long, Map<Long, ContainerShop>> inWorld =

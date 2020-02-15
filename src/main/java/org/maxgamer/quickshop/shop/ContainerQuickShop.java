@@ -144,19 +144,14 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Override
   public void fill(int amount) {
-    if (this.unlimited)
+    if (unlimited)
       return;
     
     Inventory inv = getInventory();
     ItemStack offer = new ItemStack(item);
-    int remains = amount * offer.getAmount();
     
-    while (remains > 0) {
-      int stackSize = Math.min(remains, offer.getMaxStackSize());
-      offer.setAmount(stackSize);
+    while (amount --> 0)
       inv.addItem(offer);
-      remains -= stackSize;
-    }
     
     setSignText();
   }
@@ -341,23 +336,19 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     
     // Overslot Items to drop on floor
     List<ItemStack> floor = Lists.newArrayList();
-    int totalAmount = stackAmount * item.getAmount();
     
     Inventory playerInv = p.getInventory();
     ItemStack offer = new ItemStack(item);
     
     if (unlimited) {
-      while (totalAmount > 0) {
-        int offerAmount = Math.min(totalAmount, offer.getMaxStackSize());
-        offer.setAmount(offerAmount);
+      while (stackAmount --> 0)
         floor.addAll(playerInv.addItem(offer).values());
-        
-        totalAmount -= offerAmount;
-      }
+      
     } else {
       Inventory chestInv = getInventory();
       ItemStack[] contents = chestInv.getContents();
       
+      int totalAmount = stackAmount * item.getAmount();
       // Take items from chest and offer to player's inventory
       for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
         ItemStack chestItem = contents[i];
@@ -606,10 +597,10 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   /** Load ContainerShop. */
   @Override
   public void onLoad() {
-    if (Util.fireCancellableEvent(new ShopLoadEvent(this)))
+    if (isLoaded || Util.fireCancellableEvent(new ShopLoadEvent(this)))
       return;
 
-    this.isLoaded = true;
+    isLoaded = true;
     
     // check price restriction // FIXME move
     Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.item.getType());
@@ -630,12 +621,15 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   /** Unload ContainerShop. */
   @Override
   public void onUnload() {
-    if (this.display != null) {
-      this.display.remove();
+    if (!isLoaded)
+      return;
+    
+    if (display != null) {
+      display.remove();
     }
     
     save();
-    this.isLoaded = false;
+    isLoaded = false;
     
     ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
     Bukkit.getPluginManager().callEvent(shopUnloadEvent);

@@ -413,7 +413,10 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     
     // NBTItem
     try {
-      new NBTItem(new ItemStack(Material.AIR)); // Initalize to avoid runtime lag
+      // Initalize to avoid runtime lag
+      NBTItem nbtItem = new NBTItem(new ItemStack(Material.AIR));
+      nbtItem.setBoolean("isQuickShopPreview", Boolean.TRUE);
+      nbtItem.getItem();
     } catch (Throwable t) {
       Bukkit.getPluginManager().disablePlugin(this, true);
       return;
@@ -605,17 +608,16 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       info.forEach(clazz -> {
         if (clazz.getSimpleName().endsWith("Integration")) {
           try {
-            Object integration = Class.forName(clazz.getName()).newInstance();
-            if (integration instanceof IntegratedPlugin) {
-              String pluginName = StringUtils.substringBefore(clazz.getName(), "Integration");
+            String pluginName = StringUtils.substringBefore(clazz.getName(), "Integration");
+            
+            if (!getConfig().getBoolean("integration.".concat(pluginName.toLowerCase()).concat(".enable"))) {
+              Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
               
-              if (!getConfig().getBoolean("integration.".concat(pluginName.toLowerCase()).concat(".enable"))) {
-                Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-                
-                if (plugin != null && plugin.isEnabled())
+              if (plugin != null && plugin.isEnabled()) {
+                Object integration = Class.forName(clazz.getName()).newInstance();
+                if (integration instanceof IntegratedPlugin)
                   integrationManager.register((IntegratedPlugin) integration);
               }
-              
             }
           } catch (Throwable t) {
             t.printStackTrace();

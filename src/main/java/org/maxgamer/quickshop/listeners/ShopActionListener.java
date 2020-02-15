@@ -131,20 +131,20 @@ public class ShopActionListener implements Listener {
           player.sendMessage(Shop.getLocaleManager().get("how-many-buy", player, "" + afforable));
         } else {
           double ownerBalance = QuickShop.instance().getEconomy().getBalance(shop.getOwner());
-          int totalItems = ShopUtils.countStacks(player.getInventory(), shop.getItem()) * shop.getItem().getAmount();
-          int ownerAfforableItems = (int) (ownerBalance / price) * shop.getItem().getAmount();
+          int stackAmount = ShopUtils.countStacks(player.getInventory(), shop.getItem());
+          int ownerAfforableItems = (int) (ownerBalance / price);
 
           if (!shop.isUnlimited()) {
-            totalItems = Math.min(totalItems, shop.getRemainingSpace());
-            totalItems = Math.min(totalItems, ownerAfforableItems);
+            stackAmount = Math.min(stackAmount, shop.getRemainingSpace());
+            stackAmount = Math.min(stackAmount, ownerAfforableItems);
           } else if (BaseConfig.payUnlimitedShopOwners) {
-            totalItems = Math.min(totalItems, ownerAfforableItems);
+            stackAmount = Math.min(stackAmount, ownerAfforableItems);
           }
 
-          if (totalItems < 0)
-            totalItems = 0;
+          if (stackAmount < 0)
+            stackAmount = 0;
 
-          player.sendMessage(Shop.getLocaleManager().get("how-many-sell", player, "" + totalItems));
+          player.sendMessage(Shop.getLocaleManager().get("how-many-sell", player, "" + stackAmount));
         }
         
         QuickShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));

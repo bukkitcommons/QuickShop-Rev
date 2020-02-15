@@ -2,8 +2,9 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -19,6 +20,7 @@ import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandClean extends QuickShopCommand {
   @Override
@@ -27,13 +29,16 @@ public class CommandClean extends QuickShopCommand {
   }
 
   @Override
-  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    if (sender instanceof ConsoleCommandSender) {
-      sender.sendMessage("Can't run this command by Console");
-      return;
-    }
-
+  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+    boolean force = cmdArg.length > 0 && cmdArg[0].equalsIgnoreCase("force");
+    
+    if (sender instanceof Player)
+      handleCleanShops(((Player) sender).getWorld(), sender, force);
+    else
+      Bukkit.getWorlds().forEach(world -> handleCleanShops(world, sender, force));
+  }
+  
+  private static void handleCleanShops(World world, CommandSender sender, boolean force) {
     sender.sendMessage(Shop.getLocaleManager().get("command.cleaning", sender));
 
     List<ContainerShop> pendingRemoval = Lists.newArrayList();
@@ -41,8 +46,12 @@ public class CommandClean extends QuickShopCommand {
     
     Shop.getLoader().getAllShops().forEach(data -> {
       try {
-        ContainerShop shop = new ContainerQuickShop(
-            ShopLocation.from(((Player) sender).getWorld(), data.x(), data.y(), data.z()),
+        ContainerShop shop;
+        ShopViewer viewer = Shop.getManager().getLoadedShopAt(data.location());
+        // Do not create shop instance for loaded shop to avoid dupe display
+        shop = viewer.isPresent() ? viewer.get() :
+          new ContainerQuickShop(
+            ShopLocation.from(world, data.x(), data.y(), data.z()),
             data.price(), ItemUtils.deserialize(data.item()),
             data.moderators(), data.unlimited(), data.type(), false);
         
@@ -52,25 +61,22 @@ public class CommandClean extends QuickShopCommand {
             return;
           }
           
-          if (cmdArg.length < 1 || !"force".equalsIgnoreCase(cmdArg[0])) {
+          if (!force) {
             ItemStack[] contents =
                 ((InventoryHolder) shop.getLocation().block().getState()).getInventory().getContents();
             
             for (ItemStack i : contents)
               if (i != null) {
                 count[1]++;
-                return;
+                return; // Next shop
               }
           }
           
           ContainerQuickShop cs = (ContainerQuickShop) shop;
-          if (cs.isDualShop()) {
-            return;
+          if (!cs.isDualShop()) {
+            pendingRemoval.add(shop);
+            count[0]++;
           }
-          pendingRemoval.add(shop); // Is selling, but has no stock, and is a chest shop, but is not
-                                    // a double shop.
-          // Can be deleted safely.
-          count[0]++;
         }
       } catch (IllegalStateException | InvalidConfigurationException e) {
         e.printStackTrace();
@@ -83,7 +89,12 @@ public class CommandClean extends QuickShopCommand {
 
     Shop.getMessager().clean();
     sender.sendMessage(Shop.getLocaleManager().get("command.cleaned", sender, "" + count[0]));
-    if (count[1] > 0)
-      sender.sendMessage("There is " + count[1] + " shops with non-goods items inside have been ignored.");
+    
+    if (!force && count[1] > 0)
+      sender.sendMessage(
+          count[1] +
+          " out-of-stock shops have non-goods items inside and have been ignored," +
+          " use '/qs clean force' to forcefully clean them," +
+          " by that, items in the chests will no longer be protected by QuickShop.");
   }
 }
