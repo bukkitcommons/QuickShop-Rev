@@ -2,56 +2,88 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
+import cc.bukkit.shop.ContainerShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
+import cc.bukkit.shop.viewer.ViewAction;
 
 public class CommandUnlimited extends QuickShopCommand {
+  private final static List<String> PERMS = Collections.singletonList("quickshop.unlimited");
+  
   @Override
   public List<String> permissions() {
-    return Collections.singletonList("quickshop.unlimited");
+    return PERMS;
   }
   
   @Override
-  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    if (!(sender instanceof Player)) {
-      sender.sendMessage("Only player can run this command.");
+  public void onCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+    if (args.length == 4) { // With world param, can be executed by console
+      handleAt(sender, args[0], args[1], args[2], args[3]);
       return;
     }
+    
+    if (sender instanceof Player) {
+      Player player = (Player) sender;
+      
+      if (args.length == 3) { // With pos param
+        handleAt(sender, player.getWorld().getName(), args);
+        return;
+      }
+      
+      BlockViewer viewer = BlockViewer.get(player, 10);
+      viewer
+        .ifEmpty(() -> {
+          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+          return;
+        })
+        
+        .forEach(block -> {
+          ShopViewer shopViewer = Shop.getManager().getLoadedShopAt(block);
 
-    final BlockIterator bIt = new BlockIterator((Player) sender, 10);
-
-    if (!bIt.hasNext()) {
+          if (shopViewer.isPresent()) {
+            handleShop(sender, shopViewer.get());
+            return ViewAction.BREAK;
+          }
+          
+          return ViewAction.NEXT;
+        });
+      
+      return;
+    }
+    
+    sender.sendMessage("Can't run command by Console");
+    return;
+  }
+  
+  private final static void handleAt(@NotNull CommandSender sender, @NotNull String world, @NotNull String... pos) {
+    ShopViewer viewer = Shop.getManager().getLoadedShopAt(world,
+        Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+    
+    if (viewer.isEmpty()) {
       sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
-
-    while (bIt.hasNext()) {
-      final Block b = bIt.next();
-      final ShopViewer shop = Shop.getManager().getLoadedShopAt(b.getLocation());
-
-      if (!shop.isPresent()) {
-        continue;
-      }
-
-      shop.get().setUnlimited(!shop.get().isUnlimited());
-
-      if (shop.get().isUnlimited()) {
-        sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited", sender));
-        return;
-      }
-
-      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited", sender));
-
+    
+    handleShop(sender, viewer.get());
+  }
+  
+  private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
+    if (!sender.isOp() && !shop.isModerator(((Player) sender).getUniqueId())) {
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
       return;
     }
+    
+    shop.setUnlimited(!shop.isUnlimited());
+    Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop);
 
-    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+    if (shop.isUnlimited())
+      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited", sender));
+    else
+      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited", sender));
   }
 }

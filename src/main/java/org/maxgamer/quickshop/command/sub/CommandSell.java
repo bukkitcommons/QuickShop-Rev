@@ -65,7 +65,6 @@ public class CommandSell extends QuickShopCommand {
         Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
     
     if (viewer.isEmpty()) {
-      // FIXME not exist
       sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
       return;
     }
