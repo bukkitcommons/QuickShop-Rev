@@ -223,7 +223,7 @@ public class ShopActionListener implements Listener {
         // Send creation menu.
         ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), expectedSign, item);
 
-        QuickShopActionManager.instance().getActions().put(player.getUniqueId(), info);
+        Shop.getActions().setAction(player.getUniqueId(), info);
         player.sendMessage(Shop.getLocaleManager().get("how-much-to-trade-for", player,
             ItemUtils.getItemStackName(Objects.requireNonNull(e.getItem()))));
       });
@@ -258,7 +258,7 @@ public class ShopActionListener implements Listener {
   
   @EventHandler
   public void onPlayerQuit(PlayerQuitEvent e) {
-    QuickShopActionManager.instance().getActions().remove(e.getPlayer().getUniqueId());
+    Shop.getActions().removeAction(e.getPlayer().getUniqueId());
   }
   
   @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -294,7 +294,7 @@ public class ShopActionListener implements Listener {
   }
   
   public void handlePlayerMovement(Player player, Location to) {
-    ShopActionData info = QuickShopActionManager.instance().getActions().get(player.getUniqueId());
+    ShopActionData info = Shop.getActions().getAction(player.getUniqueId());
     if (info == null)
       return;
 
@@ -307,7 +307,7 @@ public class ShopActionListener implements Listener {
         player.sendMessage(Shop.getLocaleManager().get("shop-purchase-cancelled", player));
       
       Util.debug(player.getName() + " too far with the shop location.");
-      QuickShopActionManager.instance().getActions().remove(player.getUniqueId());
+      Shop.getActions().removeAction(player.getUniqueId());
     }
   }
 }

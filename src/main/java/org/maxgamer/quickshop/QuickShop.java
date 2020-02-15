@@ -1,6 +1,7 @@
 package org.maxgamer.quickshop;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -8,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
+import org.apache.commons.lang.StringUtils;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,6 +23,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
+import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.command.QuickShopCommandManager;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DatabaseConfig;
@@ -59,6 +63,8 @@ import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
 import cc.bukkit.shop.LocaleManager;
 import cc.bukkit.shop.PermissionManager;
 import cc.bukkit.shop.Shop;
@@ -68,10 +74,12 @@ import cc.bukkit.shop.ShopManager;
 import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.ShopPlugin;
 import cc.bukkit.shop.action.ShopActionManager;
+import cc.bukkit.shop.command.ShopCommand;
 import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.configuration.ConfigurationManager;
 import cc.bukkit.shop.configuration.YamlComments;
 import cc.bukkit.shop.database.Database;
+import cc.bukkit.shop.database.Database.ConnectionException;
 import cc.bukkit.shop.database.Dispatcher;
 import cc.bukkit.shop.database.connector.DatabaseConnector;
 import cc.bukkit.shop.database.connector.MySQLConnector;
@@ -79,10 +87,10 @@ import cc.bukkit.shop.database.connector.SQLiteConnector;
 import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
 import cc.bukkit.shop.integration.IntegrateStage;
+import cc.bukkit.shop.integration.IntegratedPlugin;
 import cc.bukkit.shop.integration.IntegrationManager;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.util.Reflections;
-import cc.bukkit.shop.util.locale.MinecraftLocale;
 import cc.bukkit.wrappers.bukkit.BukkitWrapper;
 import cc.bukkit.wrappers.bukkit.PaperWrapper;
 import cc.bukkit.wrappers.bukkit.SpigotWrapper;
@@ -138,7 +146,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   /*
    * Exclusive implements
    */
-  private IntegrationManager integrationHelper; // FIXME API
+  private IntegrationManager integrationManager; // FIXME API
   
   private QuickShopCommandManager commandManager; // FIXME API
   
@@ -207,14 +215,14 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       openInvPlugin = Optional.ofNullable(Bukkit.getPluginManager().getPlugin("OpenInv"));
       
       if (openInvPlugin.isPresent())
-        getLogger().info("Successfully loaded OpenInv support!");
+        ShopLogger.instance().info("OpenInv has been found");
     }
     
     if (BaseConfig.placeHolderAPI) {
       placeHolderAPI = Optional.ofNullable(Bukkit.getPluginManager().getPlugin("PlaceholderAPI"));
       
       if (placeHolderAPI.isPresent())
-        getLogger().info("Successfully loaded PlaceHolderAPI support!");
+        ShopLogger.instance().info("PlaceholderAPI has been found");
     }
   }
 
@@ -236,11 +244,8 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         break;
       default:
         issuesHelper.econError();
-        Util.debug("No economy provider can be selected.");
         return false;
     }
-    
-    QuickShop.instance().log("Economy Provider: " + core.getName());
     
     if (!core.isValid()) {
       issuesHelper.econError();
@@ -248,19 +253,8 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       return false;
     }
     
+    ShopLogger.instance().info("Economy Provider: " + core.getName());
     return true;
-  }
-
-  /**
-   * Logs the given string to qs.log, if QuickShop is configured to do so.
-   *
-   * @param s The string to log. It will be prefixed with the date and time.
-   */
-  public void log(@NotNull String s) {
-    if (this.getLogWatcher() == null) {
-      return;
-    }
-    this.getLogWatcher().log(s);
   }
 
   /** Reloads QuickShops config */
@@ -298,7 +292,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     if (issuesHelper.hasErrored())
       return;
     
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.UNLOAD);
+    this.integrationManager.callIntegrationsLoad(IntegrateStage.UNLOAD);
     getLogger().info("QuickShop is finishing remaining work, this may need a while...");
 
     Util.debug("Closing all GUIs...");
@@ -341,8 +335,13 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     
     // this.reloadConfig();
     Util.debug("Calling integrations...");
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
+    this.integrationManager.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
     Util.debug("All shutdown work is finished.");
+  }
+  
+  public void reloadPlugin() {
+    onDisable();
+    onEnable();
   }
   
   @Override
@@ -383,90 +382,133 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     getLogger().info("Developers: " + JavaUtils.list2String(getDescription().getAuthors()));
     getLogger().info("Original Author: Netherfoam, Timtower, KaiNoMood");
     
+    if (!fine) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
+   
+    long start = System.currentTimeMillis();
     getDataFolder().mkdirs();
 
-    getLogger().info("Loading up integration modules.");
-    this.integrationHelper = new IntegrationManager();
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.LOAD);
-    if (getConfig().getBoolean("integration.worldguard.enable")) {
-      Plugin wg = Bukkit.getPluginManager().getPlugin("WorldGuard");
-      Util.debug("Check WG plugin...");
-      if (wg != null) {
-        Util.debug("Loading WG modules.");
-        this.integrationHelper.register(new WorldGuardIntegration()); // WG require register
-                                                                          // flags when onLoad
-                                                                          // called.
-      }
+    // LOAD integrations
+    try {
+      getLogger().info("Loading up integration modules.");
+      integrationManager = new IntegrationManager();
+      registerIntegrations();
+      
+      integrationManager.callIntegrationsLoad(IntegrateStage.LOAD);
+      integrationManager.callIntegrationsLoad(IntegrateStage.POST_LOAD);
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
     }
-
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_LOAD);
     
-    long start = System.currentTimeMillis();
-    sentryErrorReporter = new SentryErrorReporter(this);
-    new NBTItem(new ItemStack(Material.AIR)); // Initalize to avoid runtime lag
+    // Sentry
+    try {
+      sentryErrorReporter = new SentryErrorReporter(this);
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
+    
+    // NBTItem
+    try {
+      new NBTItem(new ItemStack(Material.AIR)); // Initalize to avoid runtime lag
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
     
     /*
      * Configs
      */
-    reloadConfig();
-    getConfig().options().copyDefaults(true);
-    Util.loadFromConfig();
+    try {
+      reloadConfig();
+      getConfig().options().copyDefaults(true);
+      Util.loadFromConfig();
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
     
     /*
      * Locales
      */
-    localeManager = new QuickShopLocaleManager();
     try {
+      localeManager = new QuickShopLocaleManager();
       localeManager.load();
-    } catch (Exception e) {
-      getLogger().warning("An error throws when loading messages");
-      e.printStackTrace();
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
     }
     
     /*
      * Economy
      */
-    Util.debug("Loading economy system...");
-    loadEconomy();
+    try {
+      loadEconomy();
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
     
     /*
      * Third party
      */
-    loadSoftdepends();
-    registerIntegrations();
-    integrationHelper.callIntegrationsLoad(IntegrateStage.ENABLE);
+    try {
+      loadSoftdepends();
+      integrationManager.callIntegrationsLoad(IntegrateStage.ENABLE);
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
     
     /*
      * Commands
      */
-    commandManager = new QuickShopCommandManager();
-    getCommand("qs").setExecutor(commandManager);
-    getCommand("qs").setTabCompleter(commandManager);
+    try {
+      commandManager = new QuickShopCommandManager();
+      getCommand("qs").setExecutor(commandManager);
+      getCommand("qs").setTabCompleter(commandManager);
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
     
-    switch (BaseConfig.serverPlatform) {
-      case "Spigot":
-        bukkitAPIWrapper = new SpigotWrapper();
-        getLogger().info(
-            "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
-      case "Paper":
-        bukkitAPIWrapper = new PaperWrapper();
-        getLogger().info("Plugin now running under Paper mode.");
-      case "":
-      default:
-        if (JavaUtils.isClassAvailable("com.destroystokyo.paper.PaperConfig")) {
-          bukkitAPIWrapper = new PaperWrapper();
-          getLogger().info("Plugin now running under Paper mode.");
-        } else {
+    /*
+     * Server platform
+     */
+    try {
+      switch (BaseConfig.serverPlatform) {
+        case "Spigot":
           bukkitAPIWrapper = new SpigotWrapper();
           getLogger().info(
               "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
-        }
+        case "Paper":
+          bukkitAPIWrapper = new PaperWrapper();
+          getLogger().info("Plugin now running under Paper mode.");
+        case "":
+        default:
+          if (JavaUtils.isClassAvailable("com.destroystokyo.paper.PaperConfig")) {
+            bukkitAPIWrapper = new PaperWrapper();
+            getLogger().info("Plugin now running under Paper mode.");
+          } else {
+            bukkitAPIWrapper = new SpigotWrapper();
+            getLogger().info(
+                "Plugin now running under Spigot mode. Paper performance profile is disabled, if you switch to Paper, we can use a lot paper api to improve the server performance.");
+          }
+      }
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
     }
 
-    boolean success = setupDatabase(); // Load the database
-    if (!success) {
-      issuesHelper.databaseError();
-      ShopLogger.instance().severe("Fatal error: Failed to setup database");
+    /*
+     * Database
+     */
+    try {
+      setupDatabase();
+    } catch (Throwable t) {
       Bukkit.getPluginManager().disablePlugin(this, true);
       return;
     }
@@ -489,25 +531,39 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
       }
     }
     if (getConfig().getInt("shop.find-distance") > 100) {
-      getLogger()
-      .severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
+      getLogger().severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
     }
 
-    /* Load all shops. */
-    Shop.getLoader().loadShops();
+    /*
+     * Load all shops
+     */
+    try {
+      Shop.getLoader().loadShops();
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
 
-    Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
-    Bukkit.getPluginManager().registerEvents(new ShopActionListener(), this);
-    Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
-    Bukkit.getPluginManager().registerEvents(new DisplayProtector(), this);
-    Bukkit.getPluginManager().registerEvents(new InvDisplayProtecter(), this);
-    Bukkit.getPluginManager().registerEvents(new ShopProtector(), this);
-
-    if (BaseConfig.lock)
-      Bukkit.getPluginManager().registerEvents(new LockListener(), this);
-    
-    if (Bukkit.getPluginManager().getPlugin("ClearLag") != null)
-      Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
+    /*
+     * Listeners
+     */
+    try {
+      Bukkit.getPluginManager().registerEvents(new BlockListener(), this);
+      Bukkit.getPluginManager().registerEvents(new ShopActionListener(), this);
+      Bukkit.getPluginManager().registerEvents(new ChatListener(), this);
+      Bukkit.getPluginManager().registerEvents(new DisplayProtector(), this);
+      Bukkit.getPluginManager().registerEvents(new InvDisplayProtecter(), this);
+      Bukkit.getPluginManager().registerEvents(new ShopProtector(), this);
+      
+      if (BaseConfig.lock)
+        Bukkit.getPluginManager().registerEvents(new LockListener(), this);
+      
+      if (Bukkit.getPluginManager().getPlugin("ClearLag") != null)
+        Bukkit.getPluginManager().registerEvents(new ClearLaggListener(), this);
+    } catch (Throwable t) {
+      Bukkit.getPluginManager().disablePlugin(this, true);
+      return;
+    }
 
     Util.debug("Registering shop watcher...");
     Bukkit.getScheduler().runTaskTimer(this, new ScheduledSignUpdater(), 40, 40);
@@ -522,7 +578,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     }
     
     UpdateWatcher.init();
-    submitMeritcs();
+    prepareMeritcs();
     
     getLogger().info("Loading player messages..");
     messager.loadTransactionMessages();
@@ -530,7 +586,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     
     getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
     
-    this.integrationHelper.callIntegrationsLoad(IntegrateStage.POST_ENABLE);
+    this.integrationManager.callIntegrationsLoad(IntegrateStage.POST_ENABLE);
     
     try {
       String[] easterEgg = new FunnyEasterEgg().getRandomEasterEgg();
@@ -542,35 +598,32 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   }
 
   private void registerIntegrations() {
-    Plugin towny = Bukkit.getPluginManager().getPlugin("Towny");
-    if (towny != null && towny.isEnabled()) {
-      if (getConfig().getBoolean("integration.towny.enable"))
-        integrationHelper.register(new TownyIntegration(this));
-    }
-    
-    Plugin worldGuard = Bukkit.getPluginManager().getPlugin("WorldGuard");
-    if (worldGuard != null && worldGuard.isEnabled()) {
-      if (getConfig().getBoolean("integration.worldguard.enable"))
-        integrationHelper.register(new WorldGuardIntegration());
-    }
-    
-    Plugin plotSquared = Bukkit.getPluginManager().getPlugin("PlotSquared");
-    if (plotSquared != null && plotSquared.isEnabled()) {
-      if (getConfig().getBoolean("integration.plotsquared.enable"))
-        integrationHelper.register(new PlotSquaredIntegration());
-    }
-    
-    Plugin residence = Bukkit.getPluginManager().getPlugin("Residence");
-    if (residence != null && residence.isEnabled()) {
-      if (getConfig().getBoolean("integration.residence.enable"))
-        integrationHelper.register(new ResidenceIntegration());
-    }
-    
-    Plugin factions = Bukkit.getPluginManager().getPlugin("Factions");
-    if (factions != null && factions.isEnabled()) {
-      configurationManager.load(FactionsIntegration.class);
-      if (FactionsIntegration.enabled)
-        integrationHelper.register(new FactionsIntegration());
+    try {
+      ClassPath classPath = ClassPath.from(QuickShop.class.getClassLoader());
+      Set<ClassInfo> info = classPath.getTopLevelClasses("org.maxgamer.quickshop.integration");
+      
+      info.forEach(clazz -> {
+        if (clazz.getSimpleName().endsWith("Integration")) {
+          try {
+            Object integration = Class.forName(clazz.getName()).newInstance();
+            if (integration instanceof IntegratedPlugin) {
+              String pluginName = StringUtils.substringBefore(clazz.getName(), "Integration");
+              
+              if (!getConfig().getBoolean("integration.".concat(pluginName.toLowerCase()).concat(".enable"))) {
+                Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+                
+                if (plugin != null && plugin.isEnabled())
+                  integrationManager.register((IntegratedPlugin) integration);
+              }
+              
+            }
+          } catch (Throwable t) {
+            t.printStackTrace();
+          }
+        }
+      });
+    } catch (Throwable t) {
+      t.printStackTrace();
     }
   }
 
@@ -578,53 +631,47 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
    * Setup the database
    *
    * @return The setup result
+   * @throws IOException 
+   * @throws ConnectionException 
+   * @throws SQLException 
    */
-  private boolean setupDatabase() {
-    try {
-      DatabaseConnector connector;
+  private void setupDatabase() throws IOException, ConnectionException, SQLException {
+    DatabaseConnector connector;
+    
+    if (DatabaseConfig.enableMySQL) {
+      ConfigurationData data = QuickShop.instance().getConfigurationManager().get(DatabaseConfig.class);
+      YamlConfiguration src = data.conf();
       
-      if (DatabaseConfig.enableMySQL) {
-        ConfigurationData data = QuickShop.instance().getConfigurationManager().get(DatabaseConfig.class);
-        YamlConfiguration src = data.conf();
-        
-        boolean save = false;
-        String user = src.getString("settings.mysql.user");
-        if (user == null) {
-          save = true;
-          src.set("settings.mysql.user", user = "root");
-        }
-        
-        String pass = src.getString("settings.mysql.password");
-        if (pass == null) {
-          save = true;
-          src.set("settings.mysql.password", pass = "passwd");
-        }
-        
-        if (save)
-          YamlComments.save(data.file(), src); 
-        
-        connector = new MySQLConnector(DatabaseConfig.host,
-            user, pass,
-            DatabaseConfig.name, DatabaseConfig.port, DatabaseConfig.enableSSL);
-      } else {
-        connector = new SQLiteConnector(new File(getDataFolder(), "shops.db"));
+      boolean saveDefault = false;
+      String user = src.getString("settings.mysql.user");
+      if (user == null) {
+        saveDefault = true;
+        user = "root";
+        src.set("settings.mysql.user", user);
       }
       
-      ShopLogger.instance().info("Database Connector: " + connector.getClass().getSimpleName());
-      database = new Database(connector);
-      dispatcher = new Dispatcher(database);
-      databaseHelper = new DatabaseHelper(dispatcher, database);
+      String pass = src.getString("settings.mysql.password");
+      if (pass == null) {
+        saveDefault = true;
+        pass = "passwd";
+        src.set("settings.mysql.password", pass);
+      }
       
-    } catch (Throwable t) {
-      t.printStackTrace();
-      issuesHelper.databaseError();
-      return false;
+      if (saveDefault)
+        YamlComments.save(data.file(), src); 
+      
+      connector = new MySQLConnector(DatabaseConfig.host, user, pass, DatabaseConfig.name, DatabaseConfig.port, DatabaseConfig.enableSSL);
+    } else {
+      connector = new SQLiteConnector(new File(getDataFolder(), "shops.db"));
     }
     
-    return true;
+    ShopLogger.instance().info("Database Connector: " + connector.getClass().getSimpleName());
+    database = new Database(connector);
+    dispatcher = new Dispatcher(database);
+    databaseHelper = new DatabaseHelper(dispatcher, database);
   }
 
-  private void submitMeritcs() {
+  private void prepareMeritcs() {
     if (BaseConfig.enableMetrics) {
       String serverVer = Bukkit.getVersion();
       String bukkitVer = Bukkit.getBukkitVersion();

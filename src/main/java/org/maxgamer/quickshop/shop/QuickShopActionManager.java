@@ -43,7 +43,6 @@ import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class QuickShopActionManager implements ShopActionManager {
-  // TODO delayed remove
   /*
    * Singleton
    */
@@ -65,6 +64,11 @@ public class QuickShopActionManager implements ShopActionManager {
   @Override
   public boolean hasAction(@NotNull UUID player) {
     return actionData.containsKey(player);
+  }
+  
+  @Override
+  public ShopActionData getAction(@NotNull UUID player) {
+    return actionData.get(player);
   }
   
   @Override
@@ -338,7 +342,7 @@ public class QuickShopActionManager implements ShopActionManager {
       }
     }
     
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanCreate(p, info.location().bukkit())) {
+    if (!QuickShop.instance().getIntegrationManager().callIntegrationsCanCreate(p, info.location().bukkit())) {
       Util.debug("Cancelled by integrations");
       return;
     }
@@ -508,7 +512,7 @@ public class QuickShopActionManager implements ShopActionManager {
       return;
     }
 
-    if (!QuickShop.instance().getIntegrationHelper().callIntegrationsCanTrade(p, info.location().bukkit())) {
+    if (!QuickShop.instance().getIntegrationManager().callIntegrationsCanTrade(p, info.location().bukkit())) {
       Util.debug("Cancel by integrations.");
       return;
     }
@@ -592,10 +596,6 @@ public class QuickShopActionManager implements ShopActionManager {
       });
     else
       runnable.run();
-  }
-
-  public Map<UUID, ShopActionData> getActions() {
-    return this.actionData;
   }
   
   /**

@@ -147,7 +147,7 @@ public class QuickShopLocaleManager implements LocaleManager {
   @SneakyThrows
   public void load() throws InvalidConfigurationException {
     minecraftLocale.load(BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language);
-    loadCfgMessages();
+    loadPluginLocales();
   }
   
   private final static String DEFAULT_LOCALE;
@@ -161,7 +161,7 @@ public class QuickShopLocaleManager implements LocaleManager {
       .concat(defaultLocale.getCountry().toUpperCase(Locale.ROOT))) : BaseConfig.language;
   }
 
-  public void loadCfgMessages() throws InvalidConfigurationException, IOException {
+  public void loadPluginLocales() throws InvalidConfigurationException, IOException {
     String locale = BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language;
     locale = locale.replace('-', '_');
     

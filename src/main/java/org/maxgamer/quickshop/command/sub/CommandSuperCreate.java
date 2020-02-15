@@ -1,6 +1,6 @@
 package org.maxgamer.quickshop.command.sub;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,7 +12,6 @@ import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
-import org.maxgamer.quickshop.shop.QuickShopActionManager;
 import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
@@ -24,20 +23,17 @@ import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.action.data.ShopCreator;
 
 public class CommandSuperCreate extends QuickShopCommand {
+  private final static List<String> PERMS = Lists.newArrayList("quickshop.create.sell", "quickshop.create.admin");
+  
   @Override
   public List<String> permissions() {
-    return Lists.newArrayList("quickshop.create.sell", "quickshop.create.admin");
+    return PERMS;
   }
 
   @NotNull
   @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    final ArrayList<String> list = new ArrayList<>();
-
-    list.add(Shop.getLocaleManager().get("tabcomplete.amount", sender));
-
-    return list;
+  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+    return Collections.singletonList(Shop.getLocaleManager().get("tabcomplete.amount", sender));
   }
 
   @Override
@@ -95,7 +91,7 @@ public class CommandSuperCreate extends QuickShopCommand {
           ShopLocation.of(b.getLocation()),
           b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), item);
 
-      QuickShopActionManager.instance().getActions().put(p.getUniqueId(), info);
+      Shop.getActions().setAction(p.getUniqueId(), info);
       p.sendMessage(
           Shop.getLocaleManager().get("how-much-to-trade-for", sender, ItemUtils.getItemStackName(item)));
       return;
