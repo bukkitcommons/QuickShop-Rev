@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.hologram.DisplayScheme;
 import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.seller.ChestSeller;

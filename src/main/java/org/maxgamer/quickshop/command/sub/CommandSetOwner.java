@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.feature.Attached;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandSetOwner extends QuickShopCommand {

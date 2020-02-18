@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
+import org.maxgamer.quickshop.shop.DisplayData;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.hologram.DisplayAttribute;
-import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.hologram.DisplayType;
 import lombok.RequiredArgsConstructor;
 

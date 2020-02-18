@@ -45,7 +45,6 @@ import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.feature.Displayed;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class DisplayProtector implements Listener {

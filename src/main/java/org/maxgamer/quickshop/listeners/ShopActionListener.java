@@ -33,7 +33,6 @@ import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;

@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -13,13 +12,11 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
-import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandClean extends QuickShopCommand {

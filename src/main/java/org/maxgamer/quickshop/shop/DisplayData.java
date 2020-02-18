@@ -11,7 +11,6 @@ import org.bukkit.util.EulerAngle;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import com.google.common.collect.Maps;
-import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.hologram.DisplayAttribute;
 import cc.bukkit.shop.hologram.DisplayScheme;

@@ -28,7 +28,6 @@ import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
-import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;

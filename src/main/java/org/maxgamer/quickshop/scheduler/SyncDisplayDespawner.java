@@ -1,9 +1,7 @@
 package org.maxgamer.quickshop.scheduler;
 
 import org.bukkit.Bukkit;
-import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;

@@ -9,7 +9,6 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
 import cc.bukkit.shop.viewer.ViewAction;

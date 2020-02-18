@@ -12,7 +12,6 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import cc.bukkit.shop.BasicShop;
-import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.action.ShopData;
