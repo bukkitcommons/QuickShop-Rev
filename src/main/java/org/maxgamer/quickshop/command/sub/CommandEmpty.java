@@ -8,7 +8,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -38,7 +38,7 @@ public class CommandEmpty extends QuickShopCommand {
       BlockViewer viewer = BlockViewer.get(player, 10);
       viewer
         .ifEmpty(() -> {
-          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
           return;
         })
         
@@ -65,16 +65,16 @@ public class CommandEmpty extends QuickShopCommand {
         Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
     
     if (viewer.isEmpty()) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
       return;
     }
     
     handleShop(sender, viewer.get());
   }
   
-  private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
+  private final static void handleShop(@NotNull CommandSender sender, @NotNull ChestShop shop) {
     if (!sender.isOp() && !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission"));
       return;
     }
     
@@ -83,7 +83,7 @@ public class CommandEmpty extends QuickShopCommand {
     if (inventory != null) {
       inventory.clear(); // FIXME
       Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop);
-      sender.sendMessage(Shop.getLocaleManager().get("empty-success", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("empty-success"));
     }
   }
 }

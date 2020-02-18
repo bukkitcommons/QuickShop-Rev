@@ -43,7 +43,9 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.feature.Displayed;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class DisplayProtector implements Listener {
@@ -59,8 +61,8 @@ public class DisplayProtector implements Listener {
       return;
     }
     event.setCancelled(true);
-    if (shop.get().getDisplay() != null) {
-      shop.get().getDisplay().remove();
+    if (shop.<ChestShop>get().display() != null) {
+      //shop.<ChestShop>get().display().remove();
     }
     sendAlert("[DisplayGuard] Liuqid " + targetBlock.getLocation()
         + " trying flow to top of shop, QuickShop already cancel it.");
@@ -90,8 +92,8 @@ public class DisplayProtector implements Listener {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
           + " trying push somethings on the shop top, QuickShop already cancel it.");
-      if (shop.get().getDisplay() != null) {
-        shop.get().getDisplay().remove();
+      if (shop.<ChestShop>get().display() != null) {
+        //shop.<ChestShop>get().display().remove();
       }
       return;
     }
@@ -103,8 +105,8 @@ public class DisplayProtector implements Listener {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
               + " trying push somethings on the shop top, QuickShop already cancel it.");
-          if (shop.get().getDisplay() != null) {
-            shop.get().getDisplay().remove();
+          if (shop.<ChestShop>get().display() != null) {
+            //shop.<ChestShop>get().display().remove();
           }
           return;
         }
@@ -123,8 +125,8 @@ public class DisplayProtector implements Listener {
       event.setCancelled(true);
       sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
           + " trying pull somethings on the shop top, QuickShop already cancel it.");
-      if (shop.get().getDisplay() != null) {
-        shop.get().getDisplay().remove();
+      if (shop.<ChestShop>get().display() != null) {
+        //shop.<ChestShop>get().display().remove();
       }
       return;
     }
@@ -136,8 +138,8 @@ public class DisplayProtector implements Listener {
           event.setCancelled(true);
           sendAlert("[DisplayGuard] Piston  " + event.getBlock().getLocation()
               + " trying push somethings on the shop top, QuickShop already cancel it.");
-          if (shop.get().getDisplay() != null) {
-            shop.get().getDisplay().remove();
+          if (shop.<ChestShop>get().display() != null) {
+            //shop.<ChestShop>get().display().remove();
           }
           return;
         }

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
-import cc.bukkit.shop.util.version.VersionData;
+import cc.bukkit.shop.version.VersionData;
 
 public class CommandUpdate extends QuickShopCommand {
   @Override

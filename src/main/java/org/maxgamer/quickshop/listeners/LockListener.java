@@ -5,26 +5,19 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
-import org.maxgamer.quickshop.shop.ItemPreviewer;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
+import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.logger.ShopLogger;
 
@@ -50,7 +43,7 @@ public class LockListener implements Listener {
     final Player p = e.getPlayer();
     // If the chest was a chest
     if (ShopUtils.canBeShop(b)) {
-      Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
+      Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent((BasicShop shop) -> {
         // If they owned it or have bypass perms, they can destroy it
         if (!shop.getOwner().equals(p.getUniqueId())
             && !QuickShopPermissionManager.instance().has(p, "quickshop.other.destroy")) {
@@ -72,7 +65,7 @@ public class LockListener implements Listener {
       if (!chest.isPresent())
         return;
 
-      Shop.getManager().getLoadedShopAt(b.getLocation()).ifPresent(shop -> {
+      Shop.getManager().getLoadedShopAt(b.getLocation()).ifPresent((BasicShop shop) -> {
         // If they're the shop owner or have bypass perms, they can destroy
         // it.
         if (!shop.getOwner().equals(p.getUniqueId())
@@ -104,8 +97,8 @@ public class LockListener implements Listener {
     }
 
     // Make sure they're not using the non-shop half of a double chest.
-    Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent(shop -> {
-      if (!shop.getModerator().isModerator(p.getUniqueId())) {
+    Shop.getManager().getLoadedShopFrom(b.getLocation()).ifPresent((BasicShop shop) -> {
+      if (!shop.moderator().isModerator(p.getUniqueId())) {
         if (QuickShopPermissionManager.instance().has(p, "quickshop.other.open")) {
           p.sendMessage(Shop.getLocaleManager().get("bypassing-lock", p));
           return;

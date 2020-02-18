@@ -23,7 +23,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.command.QuickShopCommandManager;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DatabaseConfig;
@@ -32,16 +31,11 @@ import org.maxgamer.quickshop.configuration.MatcherConfig;
 import org.maxgamer.quickshop.database.DatabaseHelper;
 import org.maxgamer.quickshop.economy.ReserveEconProvider;
 import org.maxgamer.quickshop.economy.VaultEconProvider;
-import org.maxgamer.quickshop.integration.FactionsIntegration;
-import org.maxgamer.quickshop.integration.PlotSquaredIntegration;
-import org.maxgamer.quickshop.integration.ResidenceIntegration;
-import org.maxgamer.quickshop.integration.TownyIntegration;
-import org.maxgamer.quickshop.integration.WorldGuardIntegration;
 import org.maxgamer.quickshop.listeners.BlockListener;
 import org.maxgamer.quickshop.listeners.ChatListener;
 import org.maxgamer.quickshop.listeners.ClearLaggListener;
-import org.maxgamer.quickshop.listeners.InvDisplayProtecter;
 import org.maxgamer.quickshop.listeners.DisplayProtector;
+import org.maxgamer.quickshop.listeners.InvDisplayProtecter;
 import org.maxgamer.quickshop.listeners.LockListener;
 import org.maxgamer.quickshop.listeners.ShopActionListener;
 import org.maxgamer.quickshop.listeners.ShopProtector;
@@ -65,16 +59,8 @@ import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
-import cc.bukkit.shop.LocaleManager;
-import cc.bukkit.shop.PermissionManager;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopItemMatcher;
-import cc.bukkit.shop.ShopLoader;
-import cc.bukkit.shop.ShopManager;
-import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.ShopPlugin;
-import cc.bukkit.shop.action.ShopActionManager;
-import cc.bukkit.shop.command.ShopCommand;
 import cc.bukkit.shop.configuration.ConfigurationData;
 import cc.bukkit.shop.configuration.ConfigurationManager;
 import cc.bukkit.shop.configuration.YamlComments;
@@ -90,6 +76,13 @@ import cc.bukkit.shop.integration.IntegrateStage;
 import cc.bukkit.shop.integration.IntegratedPlugin;
 import cc.bukkit.shop.integration.IntegrationManager;
 import cc.bukkit.shop.logger.ShopLogger;
+import cc.bukkit.shop.manager.LocaleManager;
+import cc.bukkit.shop.manager.PermissionManager;
+import cc.bukkit.shop.manager.ShopActionManager;
+import cc.bukkit.shop.manager.ShopLoader;
+import cc.bukkit.shop.manager.ShopManager;
+import cc.bukkit.shop.manager.ShopMessager;
+import cc.bukkit.shop.misc.ItemStackMatcher;
 import cc.bukkit.shop.util.Reflections;
 import cc.bukkit.wrappers.bukkit.BukkitWrapper;
 import cc.bukkit.wrappers.bukkit.PaperWrapper;
@@ -115,7 +108,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
   private final ShopMessager messager = new QuickShopMessager();
   
   @NotNull
-  private final ShopItemMatcher itemMatcher = new QuickShopItemMatcher();
+  private final ItemStackMatcher itemMatcher = new QuickShopItemMatcher();
   
 
   @Override

@@ -28,17 +28,22 @@ import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.collection.LongHashMap;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
 import com.google.gson.JsonSyntaxException;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
-import cc.bukkit.shop.ShopManager;
-import cc.bukkit.shop.action.data.ShopCreator;
-import cc.bukkit.shop.action.data.ShopData;
+import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.action.ShopCreator;
+import cc.bukkit.shop.action.ShopData;
 import cc.bukkit.shop.event.ShopCreateEvent;
 import cc.bukkit.shop.event.ShopPreCreateEvent;
+import cc.bukkit.shop.feature.Concrete;
 import cc.bukkit.shop.logger.ShopLogger;
+import cc.bukkit.shop.manager.ShopManager;
+import cc.bukkit.shop.misc.ShopLocation;
+import cc.bukkit.shop.stack.Stack;
+import cc.bukkit.shop.stack.StackItem;
 import cc.bukkit.shop.util.Utils;
 import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.Getter;
 
 public class QuickShopManager implements ShopManager {
   /*
@@ -54,10 +59,8 @@ public class QuickShopManager implements ShopManager {
     return LazySingleton.INSTANCE;
   }
 
-  /*
-   * Shop containers
-   */
-  private final Map<String, Map<Long, Map<Long, ContainerShop>>> loadedShops = ObjectsHashMap.withExpectedSize(3);
+  @Getter
+  private final @NotNull Map<String, Map<Long, Map<Long, BasicShop>>> loadedShops = ObjectsHashMap.withExpectedSize(3);
 
   /**
    * Adds a shop to the world. Does NOT require the chunk or world to be loaded Call shop.onLoad by
@@ -69,36 +72,45 @@ public class QuickShopManager implements ShopManager {
    * @throws JsonSyntaxException 
    */
   @Override
-  public ContainerShop load(@NotNull World world, @NotNull ShopData data) throws JsonSyntaxException, InvalidConfigurationException {
-    Map<Long, Map<Long, ContainerShop>> inWorld =
+  @NotNull
+  public BasicShop load(@NotNull World world, @NotNull ShopData data) throws JsonSyntaxException, InvalidConfigurationException {
+    Map<Long, Map<Long, BasicShop>> inWorld =
         loadedShops.computeIfAbsent(data.world(), s -> LongHashMap.withExpectedSize(8));
 
-    Map<Long, ContainerShop> inChunk =
+    Map<Long, BasicShop> inChunk =
         inWorld.computeIfAbsent(Utils.chunkKey(data.x() >> 4, data.z() >> 4), s -> LongHashMap.withExpectedSize(16));
 
-    ContainerShop shop = new ContainerQuickShop(
-        ShopLocation.from(world, data.x(), data.y(), data.z()),
-        data.price(), ItemUtils.deserialize(data.item()),
-        data.moderators(), data.unlimited(), data.type());
+    ContainerQuickShop shop;
+    
+    if (data.type() == ShopType.SELLING)
+      shop = new QuickShopSeller(
+          ShopLocation.from(world, data.x(), data.y(), data.z()),
+          Stack.of(data.price()), StackItem.of(ItemUtils.deserialize(data.item())),
+          data.moderators(), data.unlimited(), data.type());
+    else
+      shop = new QuickShopBuyer(
+          ShopLocation.from(world, data.x(), data.y(), data.z()),
+          Stack.of(data.price()), StackItem.of(ItemUtils.deserialize(data.item())),
+          data.moderators(), data.unlimited(), data.type());
 
     inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), shop);
-    shop.onLoad();
+    shop.load();
 
     return shop;
   }
 
   @Override
-  public ContainerShop load(@NotNull ContainerShop shop) {
-    Map<Long, Map<Long, ContainerShop>> inWorld =
-        loadedShops.computeIfAbsent(shop.getLocation().worldName(), s -> LongHashMap.withExpectedSize(8));
+  public BasicShop load(@NotNull BasicShop shop) {
+    Map<Long, Map<Long, BasicShop>> inWorld =
+        loadedShops.computeIfAbsent(shop.location().worldName(), s -> LongHashMap.withExpectedSize(8));
 
-    Map<Long, ContainerShop> inChunk =
+    Map<Long, BasicShop> inChunk =
         inWorld.computeIfAbsent(Utils.chunkKey(
-            shop.getLocation().x() >> 4, shop.getLocation().z() >> 4), s -> LongHashMap.withExpectedSize(16));
+            shop.location().x() >> 4, shop.location().z() >> 4), s -> LongHashMap.withExpectedSize(16));
 
     inChunk.put(Utils.blockKey(
-        shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z()), shop);
-    shop.onLoad();
+        shop.location().x(), shop.location().y(), shop.location().z()), shop);
+    shop.load();
 
     return shop;
   }
@@ -154,12 +166,12 @@ public class QuickShopManager implements ShopManager {
    */
   @Override
   public void clear() {
-    viewLoadedShops(shops -> shops.forEach(ContainerShop::onUnload));
+    viewLoadedShops(shops -> shops.forEach(Concrete::unload));
     loadedShops.clear();
   }
 
   @Override
-  public void viewLoadedShops(Consumer<Collection<ContainerShop>> con) {
+  public void viewLoadedShops(Consumer<Collection<BasicShop>> con) {
     loadedShops.values()
     .forEach(inChunk -> inChunk.values()
         .forEach(blockMap -> con.accept(blockMap.values())));
@@ -191,8 +203,9 @@ public class QuickShopManager implements ShopManager {
    * @param shop The shop object
    * @param info The info object
    */
+  @SuppressWarnings("deprecation")
   @Override
-  public void createShop(@NotNull ContainerShop shop, @NotNull ShopCreator info) {
+  public void createShop(@NotNull BasicShop shop, @NotNull ShopCreator info) {
     Player player = Bukkit.getPlayer(shop.getOwner());
     if (player == null)
       return;
@@ -237,14 +250,14 @@ public class QuickShopManager implements ShopManager {
       }
       
       signState.update();
-      @NotNull ShopLocation location = shop.getLocation();
+      @NotNull ShopLocation location = shop.location();
       try {
         QuickShop
         .instance()
         .getDatabaseHelper()
-        .createShop(shop.getModerator().serialize(),
-            shop.getPrice(), shop.getItem(),
-            shop.isUnlimited() ? 1 : 0, shop.getShopType().toID(),
+        .createShop(shop.moderator().serialize(),
+            Stack.of(shop.price()), shop.stack(),
+            shop.isUnlimited() ? 1 : 0, shop.type().toID(),
                 location.worldName(),
                 location.x(), location.y(), location.z());
 
@@ -258,9 +271,9 @@ public class QuickShopManager implements ShopManager {
 
         Util.debug("Putting into memory shop database: " + location.toString());
 
-        ShopData data = new ShopData(Util.serializeItem(info.item()), shop.getModerator().serialize(),
-            shop.getLocation().worldName(), shop.getShopType(), shop.getPrice(),
-            shop.isUnlimited(), shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z());
+        ShopData data = new ShopData(Util.serializeItem(info.stack().stack()), shop.moderator().serialize(),
+            shop.location().worldName(), shop.type(), Stack.of(shop.price()),
+            shop.isUnlimited(), shop.location().x(), shop.location().y(), shop.location().z());
 
         inChunk.put(location.blockKey(), data);
 
@@ -309,7 +322,7 @@ public class QuickShopManager implements ShopManager {
      */
     @Override
     public ShopViewer getLoadedShopAt(@NotNull ShopLocation loc) {
-      @Nullable Map<Long, ContainerShop> inChunk = getLoadedShopsInChunk(loc.chunk());
+      @Nullable Map<Long, BasicShop> inChunk = getLoadedShopsInChunk(loc.chunk());
       if (inChunk == null)
         return ShopViewer.empty();
 
@@ -318,14 +331,14 @@ public class QuickShopManager implements ShopManager {
 
     @Override
     @Nullable
-    public Map<Long, ContainerShop> getLoadedShopsInChunk(@NotNull Chunk c) {
+    public Map<Long, BasicShop> getLoadedShopsInChunk(@NotNull Chunk c) {
       return getLoadedShopsInChunk(c.getWorld().getName(), c.getX(), c.getZ());
     }
 
     @Override
     @Nullable
-    public Map<Long, ContainerShop> getLoadedShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
-      @Nullable Map<Long, Map<Long, ContainerShop>> inWorld = loadedShops.get(world);
+    public Map<Long, BasicShop> getLoadedShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
+      @Nullable Map<Long, Map<Long, BasicShop>> inWorld = loadedShops.get(world);
       if (inWorld == null) {
         return null;
       }
@@ -335,7 +348,7 @@ public class QuickShopManager implements ShopManager {
 
     @Override
     public ShopViewer getLoadedShopAt(Location loc) {
-      @Nullable Map<Long, ContainerShop> inChunk = getLoadedShopsInChunk(loc.getChunk());
+      @Nullable Map<Long, BasicShop> inChunk = getLoadedShopsInChunk(loc.getChunk());
       if (inChunk == null) {
         Util.debug("Chunk not found: " + loc);
         return ShopViewer.empty();
@@ -346,7 +359,7 @@ public class QuickShopManager implements ShopManager {
 
     @Override
     public ShopViewer getLoadedShopAt(String world, int x, int y, int z) {
-      @Nullable Map<Long, ContainerShop> inChunk = getLoadedShopsInChunk(world, x >> 4, z >> 4);
+      @Nullable Map<Long, BasicShop> inChunk = getLoadedShopsInChunk(world, x >> 4, z >> 4);
       if (inChunk == null)
         return ShopViewer.empty();
 
@@ -355,7 +368,7 @@ public class QuickShopManager implements ShopManager {
 
     @Override
     public boolean hasLoadedShopAt(@NotNull Location loc) {
-      @Nullable Map<Long, ContainerShop> inChunk = getLoadedShopsInChunk(loc.getChunk());
+      @Nullable Map<Long, BasicShop> inChunk = getLoadedShopsInChunk(loc.getChunk());
       if (inChunk == null)
         return false;
 
@@ -416,31 +429,20 @@ public class QuickShopManager implements ShopManager {
      * @param shop The shop to remove
      */
     @Override
-    public void unload(@NotNull ContainerShop shop) {
-      @NotNull ShopLocation location = shop.getLocation();
+    public void unload(@NotNull BasicShop shop) {
+      @NotNull ShopLocation location = shop.location();
 
-      Map<Long, Map<Long, ContainerShop>> inWorld =
+      Map<Long, Map<Long, BasicShop>> inWorld =
           loadedShops.get(location.worldName());
 
       if (inWorld != null) {
-        Map<Long, ContainerShop> inChunk =
+        Map<Long, BasicShop> inChunk =
             inWorld.get(Utils.chunkKey(location.x() >> 4, location.z() >> 4));
 
         if (inChunk != null)
           inChunk.remove(location.blockKey());
       }
 
-      shop.onUnload();
-    }
-
-    /**
-     * Get all loaded shops.
-     *
-     * @return All loaded shops.
-     */
-    @Override
-    @NotNull
-    public Map<String, Map<Long, Map<Long, ContainerShop>>> getLoadedShops() {
-      return this.loadedShops;
+      shop.unload();
     }
   }

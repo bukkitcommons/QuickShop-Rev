@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -38,7 +38,7 @@ public class CommandUnlimited extends QuickShopCommand {
       BlockViewer viewer = BlockViewer.get(player, 10);
       viewer
         .ifEmpty(() -> {
-          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
           return;
         })
         
@@ -65,16 +65,16 @@ public class CommandUnlimited extends QuickShopCommand {
         Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
     
     if (viewer.isEmpty()) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
       return;
     }
     
     handleShop(sender, viewer.get());
   }
   
-  private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
+  private final static void handleShop(@NotNull CommandSender sender, @NotNull ChestShop shop) {
     if (!sender.isOp() && !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission"));
       return;
     }
     
@@ -82,8 +82,8 @@ public class CommandUnlimited extends QuickShopCommand {
     Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop);
 
     if (shop.isUnlimited())
-      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited"));
     else
-      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited"));
   }
 }

@@ -14,11 +14,14 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
+import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -46,8 +49,8 @@ public class BlockListener implements Listener {
     
     viewer
       .nonNull()
-      .accept(shop -> {
-        boolean isOwner = shop.getModerator().isOwner(player.getUniqueId());
+      .accept((ChestShop shop) -> {
+        boolean isOwner = shop.moderator().isOwner(player.getUniqueId());
         if (!isOwner &&
             !QuickShopPermissionManager.instance().has(player, "quickshop.other.destroy")) {
           event.setCancelled(true);
@@ -83,7 +86,7 @@ public class BlockListener implements Listener {
         // Delayed task. Event triggers when item is moved, not when it is received.
         Shop.getManager()
           .getLoadedShopFrom(location)
-          .ifPresent(shop -> ScheduledSignUpdater.schedule(shop));
+          .ifPresent((ChestShop shop) -> ScheduledSignUpdater.schedule(shop));
       }
     }
   }

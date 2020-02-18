@@ -18,7 +18,7 @@ public class CommandReload extends QuickShopCommand {
   
   @Override
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
-    sender.sendMessage(Shop.getLocaleManager().get("command.reloading", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("command.reloading"));
     QuickShop.instance().reloadPlugin();
   }
 }

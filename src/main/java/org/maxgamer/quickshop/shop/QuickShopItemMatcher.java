@@ -12,10 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.configuration.MatcherConfig;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Multimap;
-import cc.bukkit.shop.ShopItemMatcher;
+import cc.bukkit.shop.misc.ItemStackMatcher;
 
 /** A util allow quickshop check item matches easy and quick. */
-public class QuickShopItemMatcher implements ShopItemMatcher {
+public class QuickShopItemMatcher implements ItemStackMatcher {
   private boolean bukkit;
 
   public QuickShopItemMatcher() {
@@ -249,6 +249,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
     return true;
   }
   
+  @SuppressWarnings("deprecation")
   public static boolean matchesMap(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == MapMeta.class) {
       MapMeta meta = (MapMeta) originMeta, that = (MapMeta) testMeta;
@@ -288,6 +289,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
     }
   }
   
+  @SuppressWarnings("deprecation")
   public static boolean matchesSpawnEgg(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.SpawnEggMeta.class) {
       org.bukkit.inventory.meta.SpawnEggMeta that = (org.bukkit.inventory.meta.SpawnEggMeta) testMeta;
@@ -298,6 +300,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
     }
   }
   
+  @SuppressWarnings("deprecation")
   public static boolean matchesSkull(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.SkullMeta.class) {
       org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) originMeta,
@@ -377,6 +380,7 @@ public class QuickShopItemMatcher implements ShopItemMatcher {
     }
   }
   
+  @SuppressWarnings("deprecation")
   public static boolean matchesBanner(Class<? extends ItemMeta> clazz, ItemMeta originMeta, ItemMeta testMeta) {
     if (clazz == org.bukkit.inventory.meta.BannerMeta.class) {
       org.bukkit.inventory.meta.BannerMeta meta = (org.bukkit.inventory.meta.BannerMeta) originMeta,

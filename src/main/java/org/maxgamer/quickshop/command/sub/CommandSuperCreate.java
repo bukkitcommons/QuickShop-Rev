@@ -19,8 +19,9 @@ import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
-import cc.bukkit.shop.action.data.ShopCreator;
+import cc.bukkit.shop.action.ShopCreator;
+import cc.bukkit.shop.misc.ShopLocation;
+import cc.bukkit.shop.stack.StackItem;
 
 public class CommandSuperCreate extends QuickShopCommand {
   private final static List<String> PERMS = Lists.newArrayList("quickshop.create.sell", "quickshop.create.admin");
@@ -33,7 +34,7 @@ public class CommandSuperCreate extends QuickShopCommand {
   @NotNull
   @Override
   public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
-    return Collections.singletonList(Shop.getLocaleManager().get("tabcomplete.amount", sender));
+    return Collections.singletonList(Shop.getLocaleManager().get("tabcomplete.amount"));
   }
 
   @Override
@@ -48,7 +49,7 @@ public class CommandSuperCreate extends QuickShopCommand {
     final ItemStack item = p.getInventory().getItemInMainHand();
 
     if (item.getType() == Material.AIR) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-anythings-in-your-hand", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-anythings-in-your-hand"));
       return;
     }
 
@@ -72,13 +73,13 @@ public class CommandSuperCreate extends QuickShopCommand {
 
       if (BlockUtils.getSecondHalf(b).isPresent()
           && !QuickShopPermissionManager.instance().has(sender, "quickshop.create.double")) {
-        p.sendMessage(Shop.getLocaleManager().get("no-double-chests", sender));
+        p.sendMessage(Shop.getLocaleManager().get("no-double-chests"));
         return;
       }
 
       if (Util.isBlacklisted(item) && !QuickShopPermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
-        p.sendMessage(Shop.getLocaleManager().get("blacklisted-item", sender));
+        p.sendMessage(Shop.getLocaleManager().get("blacklisted-item"));
         return;
       }
 
@@ -89,13 +90,13 @@ public class CommandSuperCreate extends QuickShopCommand {
       // Send creation menu.
       final ShopCreator info = ShopCreator.create(
           ShopLocation.of(b.getLocation()),
-          b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), item);
+          b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), StackItem.of(item));
 
       Shop.getActions().setAction(p.getUniqueId(), info);
       p.sendMessage(
-          Shop.getLocaleManager().get("how-much-to-trade-for", sender, ItemUtils.getItemStackName(item)));
+          Shop.getLocaleManager().get("how-much-to-trade-for", ItemUtils.getItemStackName(item)));
       return;
     }
-    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
   }
 }

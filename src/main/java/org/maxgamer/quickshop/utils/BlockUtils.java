@@ -13,7 +13,7 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import cc.bukkit.shop.ShopLocation;
+import cc.bukkit.shop.misc.ShopLocation;
 
 public class BlockUtils {
 

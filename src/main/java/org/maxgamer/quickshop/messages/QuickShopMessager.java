@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
-import cc.bukkit.shop.ShopMessager;
 import cc.bukkit.shop.logger.ShopLogger;
+import cc.bukkit.shop.manager.ShopMessager;
 
 public class QuickShopMessager implements ShopMessager {
   @NotNull

@@ -75,7 +75,7 @@ public class CommandStaff extends QuickShopCommand {
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
       return;
     }
 
@@ -83,44 +83,44 @@ public class CommandStaff extends QuickShopCommand {
       final Block b = bIt.next();
       final ShopViewer shop = Shop.getManager().getLoadedShopAt(b.getLocation());
 
-      if (!shop.isPresent() || !shop.get().getModerator().isModerator(((Player) sender).getUniqueId())) {
+      if (!shop.isPresent() || !shop.get().moderator().isModerator(((Player) sender).getUniqueId())) {
         continue;
       }
 
       switch (cmdArg.length) {
         case 0:
-          sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args", sender));
+          sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
           return;
         case 1:
           switch (cmdArg[0]) {
             case "add":
-              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args", sender));
+              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
               return;
             case "del":
-              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args", sender));
+              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
               return;
             case "clear":
               shop.get().clearStaffs();
-              sender.sendMessage(Shop.getLocaleManager().get("shop-staff-cleared", sender));
+              sender.sendMessage(Shop.getLocaleManager().get("shop-staff-cleared"));
               return;
             case "list":
               final Set<UUID> staffs = shop.get().getStaffs();
 
               if (staffs.isEmpty()) {
                 sender.sendMessage(ChatColor.GREEN
-                    + Shop.getLocaleManager().get("tableformat.left_begin", sender) + "Empty");
+                    + Shop.getLocaleManager().get("tableformat.left_begin") + "Empty");
                 return;
               }
 
               for (UUID uuid : staffs) {
                 sender.sendMessage(
-                    ChatColor.GREEN + Shop.getLocaleManager().get("tableformat.left_begin", sender)
+                    ChatColor.GREEN + Shop.getLocaleManager().get("tableformat.left_begin")
                         + Bukkit.getOfflinePlayer(uuid).getName());
               }
 
               return;
             default:
-              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args", sender));
+              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
           }
 
           break;
@@ -135,14 +135,14 @@ public class CommandStaff extends QuickShopCommand {
           switch (cmdArg[0]) {
             case "add":
               shop.get().addStaff(offlinePlayer.getUniqueId());
-              sender.sendMessage(Shop.getLocaleManager().get("shop-staff-added", sender, offlinePlayerName));
+              sender.sendMessage(Shop.getLocaleManager().get("shop-staff-added", offlinePlayerName));
               return;
             case "del":
               sender
-                  .sendMessage(Shop.getLocaleManager().get("shop-staff-deleted", sender, offlinePlayerName));
+                  .sendMessage(Shop.getLocaleManager().get("shop-staff-deleted", offlinePlayerName));
               return;
             default:
-              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args", sender));
+              sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
           }
 
           break;

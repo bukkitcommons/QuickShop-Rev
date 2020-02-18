@@ -9,50 +9,36 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.event.ShopDisplayItemSpawnEvent;
 import cc.bukkit.shop.hologram.DisplayData;
-import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.hologram.DisplayScheme;
+import cc.bukkit.shop.hologram.Display;
 import cc.bukkit.shop.hologram.DisplayType;
 import lombok.ToString;
 
 @ToString
-public class DisplayDroppedItem extends EntityDisplay implements DisplayItem {
+public class DisplayDroppedItem extends EntityDisplay implements Display {
   private static final DisplayData DATA = new DisplayData(DisplayType.DROPPED_ITEM);
   
-  public DisplayDroppedItem(@NotNull ContainerShop shop) {
-    super(shop, DATA);
-  }
-  
-  @NotNull
-  @Override
-  public Location getDisplayLocation() {
-    return location == null ? (location = shop.getLocation().bukkit().clone().add(0.5, 1.2, 0.5)) : location;
+  public DisplayDroppedItem(@NotNull ChestShop shop) {
+    super(shop, DATA, null); // FIXME
   }
 
-  @Override
-  public boolean isDisplayItem(@NotNull Entity entity) {
-    if (entity instanceof Item)
-      return ItemUtils.isDisplayItem(((Item) entity).getItemStack(), null);
-    else
-      return false;
-  }
-
-  @Override
+  //@Override
   public void spawn() {
     if (entity != null && entity.isValid() && !entity.isDead())
       return;
     
-    if (!BlockUtils.hasSpaceForDisplay(getDisplayLocation().getBlock().getType()))
+    if (!BlockUtils.hasSpaceForDisplay(location().block().getType()))
       return;
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-        new ShopDisplayItemSpawnEvent(shop, displayItemStack, DisplayDataMatcher.create(displayItemStack));
+        new ShopDisplayItemSpawnEvent(shop, displayItemStack, (@NotNull DisplayScheme) DisplayDataMatcher.create(displayItemStack));
     if (Util.fireCancellableEvent(shopDisplayItemSpawnEvent))
       return;
     
-    this.entity =
-        this.shop.getLocation().world().dropItem(getDisplayLocation(), this.displayItemStack);
+    //this.entity = this.shop.location().world().dropItem(getDisplayLocation(), this.displayItemStack);
     
     Util.debug(
         "Spawned item @ " + this.entity.getLocation() + " with UUID " + this.entity.getUniqueId());

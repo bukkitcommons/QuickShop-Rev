@@ -10,7 +10,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
-import org.bukkit.event.block.SpongeAbsorbEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -18,7 +17,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -33,7 +32,7 @@ public class ShopProtector implements Listener {
       @NotNull Location location,
       @NotNull boolean predicate,
       @NotNull Runnable protection,
-      @NotNull Consumer<ContainerShop> orElse) {
+      @NotNull Consumer<ChestShop> orElse) {
 
     Shop.getManager()
     .getLoadedShopFrom(location)
@@ -42,7 +41,7 @@ public class ShopProtector implements Listener {
       if (predicate)
         protection.run();
       else
-        orElse.accept(shop);
+        orElse.accept((ChestShop) shop);
     });
   }
 
@@ -104,13 +103,5 @@ public class ShopProtector implements Listener {
           return;
         }
       }
-  }
-
-  @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-  public void onSpongeing(SpongeAbsorbEvent event) {
-    if (BaseConfig.enhancedShopProtection)
-      for (BlockState block : event.getBlocks())
-        Shop.getManager()
-        .getLoadedShopFrom(block.getLocation()).ifPresent(() -> event.setCancelled(true));
   }
 }

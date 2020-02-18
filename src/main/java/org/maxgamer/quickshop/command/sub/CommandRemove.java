@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.utils.ItemUtils;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -42,7 +42,7 @@ public class CommandRemove extends QuickShopCommand {
           
           return ViewAction.NEXT;
         })
-        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender)));
+        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop")));
       
       return;
     }
@@ -58,20 +58,20 @@ public class CommandRemove extends QuickShopCommand {
       
       if (viewer.isEmpty()) {
         // FIXME not exist
-        sender.sendMessage(Shop.getLocaleManager().get("shop-not-exist", sender));
+        sender.sendMessage(Shop.getLocaleManager().get("shop-not-exist"));
         return;
       }
       
       handleShop(sender, viewer.get());
     } catch (NumberFormatException e) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-a-integer", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-a-integer"));
     }
   }
   
-  private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
+  private final static void handleShop(@NotNull CommandSender sender, @NotNull ChestShop shop) {
     if (!QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy") &&
         !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission"));
       return;
     }
     
@@ -79,6 +79,6 @@ public class CommandRemove extends QuickShopCommand {
     
     sender.sendMessage(
         Shop.getLocaleManager().get(
-            "command.now-selling", sender, ItemUtils.getItemStackName(shop.getItem())));
+            "command.now-selling", ItemUtils.getItemStackName(shop.stack())));
   }
 }

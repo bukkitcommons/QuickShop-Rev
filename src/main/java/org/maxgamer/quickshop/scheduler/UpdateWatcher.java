@@ -12,8 +12,8 @@ import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.utils.JavaUtils;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.logger.ShopLogger;
-import cc.bukkit.shop.util.version.VersionData;
-import cc.bukkit.shop.util.version.VersionFetcher;
+import cc.bukkit.shop.version.VersionData;
+import cc.bukkit.shop.version.VersionFetcher;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -21,7 +21,8 @@ public class UpdateWatcher implements Listener {
   private volatile static Optional<VersionData> data = Optional.empty();
   private static int taskId = 1;
   
-  public static final VersionFetcher FETCHER = VersionFetcher.create("66351");
+  private static final String RESOURCE_ID = "75211";
+  public static final VersionFetcher FETCHER = VersionFetcher.create(RESOURCE_ID);
   
   public static boolean isLatest() {
     return !data.isPresent();
@@ -35,7 +36,7 @@ public class UpdateWatcher implements Listener {
           ShopLogger.instance()
               .info("A new version of QuickShop has been released! [" + data.version() + "]");
           ShopLogger.instance()
-              .info("Update here: https://www.spigotmc.org/resources/62575/");
+              .info("Update here: https://www.spigotmc.org/resources/".concat(RESOURCE_ID));
           Bukkit.getOnlinePlayers().forEach(player -> alert(player));
         }
       });

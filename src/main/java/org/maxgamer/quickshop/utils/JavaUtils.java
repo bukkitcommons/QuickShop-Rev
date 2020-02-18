@@ -55,20 +55,6 @@ public class JavaUtils {
   }
 
   /**
-   * First uppercase for every words the first char for a text.
-   *
-   * @param string text
-   * @return Processed text.
-   */
-  public static String firstUppercase(@NotNull String string) {
-    if (string.length() > 1) {
-      return Character.toUpperCase(string.charAt(0)) + string.substring(1).toLowerCase();
-    } else {
-      return string.toUpperCase();
-    }
-  }
-
-  /**
    * Formats the given number according to how vault would like it. E.g. $50 or 5 dollars.
    *
    * @param n price
@@ -162,27 +148,6 @@ public class JavaUtils {
       }
     }
     return builder.toString();
-  }
-
-  /**
-   * Converts a name like IRON_INGOT into Iron Ingot to improve readability
-   *
-   * @param ugly The string such as IRON_INGOT
-   * @return A nicer version, such as Iron Ingot
-   */
-  public static String prettifyText(@NotNull String ugly) {
-    String[] nameParts = ugly.split("_");
-    if (nameParts.length == 1) {
-      return firstUppercase(ugly);
-    }
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < nameParts.length; i++) {
-      sb.append(firstUppercase(nameParts[i]));
-      if (i + 1 != nameParts.length) {
-        sb.append(" ");
-      }
-    }
-    return sb.toString();
   }
 
   /**

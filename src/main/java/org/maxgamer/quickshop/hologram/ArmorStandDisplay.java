@@ -10,81 +10,22 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.event.ShopDisplayItemSpawnEvent;
 import cc.bukkit.shop.hologram.DisplayAttribute;
 import cc.bukkit.shop.hologram.DisplayData;
-import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.hologram.DisplayScheme;
+import cc.bukkit.shop.hologram.Display;
 import lombok.ToString;
 
 @ToString
-public class ArmorStandDisplay extends EntityDisplay implements DisplayItem {
-  public ArmorStandDisplay(@NotNull ContainerShop shop, @NotNull DisplayData data) {
-    super(shop, data);
-  }
-  
-  @Override
-  @SuppressWarnings("deprecation")
-  public Location getDisplayLocation() {
-    if (location != null)
-      return location;
-    
-    BlockFace containerBlockFace = BlockFace.NORTH; // Set default vaule
-    
-    try {
-      if (shop.getLocation().block().getBlockData() instanceof org.bukkit.block.data.Directional)
-        containerBlockFace = ((org.bukkit.block.data.Directional) shop.getLocation().block().getBlockData()).getFacing();
-      
-    } catch (Throwable t) {
-      org.bukkit.material.MaterialData data = shop.getLocation().block().getState().getData();
-      if (data instanceof org.bukkit.material.Chest)
-        containerBlockFace = ((org.bukkit.material.Chest) data).getFacing();
-      else if (data instanceof org.bukkit.material.EnderChest)
-        containerBlockFace = ((org.bukkit.material.EnderChest) data).getFacing();
-    }
-
-    Location asloc = BlockUtils.getCenter(shop.getLocation());
-    if (!displayItemStack.getType().isBlock())
-      asloc.add(0, -0.5, 0);
-
-    switch (containerBlockFace) {
-      case WEST:
-        asloc.setYaw(90);
-        break;
-      case EAST:
-        asloc.setYaw(-90);
-        break;
-      case NORTH:
-        asloc.setYaw(180);
-        break;
-      case SOUTH:
-      default:
-        break;
-    }
-    
-    asloc.setYaw(asloc.getYaw() + data.get(DisplayAttribute.OFFSET_YAW, 0f));
-    asloc.setPitch(asloc.getYaw() + data.get(DisplayAttribute.OFFSET_PITCH, 0f));
-    
-    asloc.add(
-        data.get(DisplayAttribute.OFFSET_X, 0d),
-        data.get(DisplayAttribute.OFFSET_Y, 0d),
-        data.get(DisplayAttribute.OFFSET_Z, 0d));
-    
-    return (location = asloc);
+public class ArmorStandDisplay extends EntityDisplay implements Display {
+  public ArmorStandDisplay(@NotNull ChestShop shop, @NotNull DisplayData data) {
+    super(shop, data, null);
   }
 
-  @Override
-  public boolean isDisplayItem(@NotNull Entity entity) {
-    if (!(entity instanceof ArmorStand))
-      return false;
-    
-    return ItemUtils.isDisplayItem(
-        ((ArmorStand) entity).getItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD)), null);
-  }
-
-  @Override
   public void spawn() {
-    if (shop.getLocation().world() == null) {
+    if (shop.location().world() == null) {
       Util.debug("Canceled the displayItem spawning because the location in the world is null.");
       return;
     }
@@ -105,7 +46,7 @@ public class ArmorStandDisplay extends EntityDisplay implements DisplayItem {
     }
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-        new ShopDisplayItemSpawnEvent(shop, displayItemStack, data);
+        new ShopDisplayItemSpawnEvent(shop, displayItemStack, (@NotNull DisplayScheme) data);
     Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
     if (shopDisplayItemSpawnEvent.isCancelled()) {
       Util.debug(
@@ -113,6 +54,7 @@ public class ArmorStandDisplay extends EntityDisplay implements DisplayItem {
       return;
     }
 
+    /*
     Location location = getDisplayLocation();
     this.entity = this.shop.getLocation().world().spawn(location,
         ArmorStand.class, armorStand -> {
@@ -132,6 +74,7 @@ public class ArmorStandDisplay extends EntityDisplay implements DisplayItem {
           // Set pose
           data.setPoseForArmorStand(armorStand);
         });
+    */
     Util.debug("Spawned armor stand @ " + this.entity.getLocation() + " with UUID "
         + this.entity.getUniqueId());
     // Helmet must be set after spawning

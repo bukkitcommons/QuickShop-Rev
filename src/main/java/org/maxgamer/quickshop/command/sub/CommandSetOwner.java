@@ -10,7 +10,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.feature.Attached;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandSetOwner extends QuickShopCommand {
@@ -23,19 +25,19 @@ public class CommandSetOwner extends QuickShopCommand {
   public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
       @NotNull String[] cmdArg) {
     if (!(sender instanceof Player)) {
-      sender.sendMessage(Shop.getLocaleManager().get("Only player can run this command", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("Only player can run this command"));
       return;
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(Shop.getLocaleManager().get("command.no-owner-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.no-owner-given"));
       return;
     }
 
     final BlockIterator bIt = new BlockIterator((Player) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
       return;
     }
 
@@ -55,12 +57,12 @@ public class CommandSetOwner extends QuickShopCommand {
         return;
       }
       shop.get().setOwner(p.getUniqueId());
-      shop.get().setSignText();
-      shop.get().save();
-      sender.sendMessage(Shop.getLocaleManager().get("command.new-owner", sender, shopOwner));
+      shop.<ChestShop>get().setSignText();
+      shop.<ChestShop>get().save();
+      sender.sendMessage(Shop.getLocaleManager().get("command.new-owner", shopOwner));
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
   }
 }

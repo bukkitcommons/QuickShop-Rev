@@ -33,12 +33,13 @@ import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLoader;
-import cc.bukkit.shop.action.data.ShopData;
+import cc.bukkit.shop.action.ShopData;
 import cc.bukkit.shop.event.ShopDeleteEvent;
+import cc.bukkit.shop.feature.Attached;
 import cc.bukkit.shop.logger.ShopLogger;
+import cc.bukkit.shop.manager.ShopLoader;
 import cc.bukkit.shop.util.Utils;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
@@ -163,26 +164,27 @@ public class QuickShopLoader implements ShopLoader, Listener {
   }
   
   @Override
-  public void delete(@NotNull ContainerShop shop) {
+  public void delete(@NotNull BasicShop shop) {
     ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
     if (Util.fireCancellableEvent(shopDeleteEvent)) {
       Util.debug("Shop deletion was canceled because a plugin canceled it.");
       return;
     }
     
-    Optional<Map<Long, ShopData>> inChunk = getShopsInChunk(shop.getLocation().chunk());
+    Optional<Map<Long, ShopData>> inChunk = getShopsInChunk(shop.location().chunk());
     if (inChunk.isPresent() && !inChunk.get().isEmpty())
-      inChunk.get().remove(shop.getLocation().blockKey());
+      inChunk.get().remove(shop.location().blockKey());
     
     Shop.getManager().unload(shop);
     
-    // Delete the signs around it
-    for (Sign s : shop.getShopSigns())
-      s.getBlock().setType(Material.AIR);
+    if (shop instanceof Attached)
+      // Delete the signs around it
+      for (Sign s : ((Attached) shop).getAttached())
+        s.getBlock().setType(Material.AIR);
     
     // Delete it from the database
     try {
-      QuickShop.instance().getDatabaseHelper().deleteShop(shop.getLocation().x(), shop.getLocation().y(), shop.getLocation().z(), shop.getLocation().worldName());
+      QuickShop.instance().getDatabaseHelper().deleteShop(shop.location().x(), shop.location().y(), shop.location().z(), shop.location().worldName());
       
       if (BaseConfig.refundable)
         QuickShop.instance().getEconomy().deposit(shop.getOwner(), BaseConfig.refundCost);
@@ -197,7 +199,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         Shop.getManager().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());
     
     if (viewer.isPresent()) {
-      delete(viewer.get());
+      delete(viewer.<BasicShop>get());
     } else {
       QuickShop.instance().getDatabaseHelper().deleteShop(data.x(), data.y(), data.z(), data.world());
     }
@@ -228,7 +230,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
   
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
   public void onChunkUnload(ChunkUnloadEvent e) {
-    @Nullable Map<Long, ContainerShop> inChunk = Shop.getManager().getLoadedShopsInChunk(e.getChunk());
+    @Nullable Map<Long, BasicShop> inChunk = Shop.getManager().getLoadedShopsInChunk(e.getChunk());
 
     if (inChunk != null && !inChunk.isEmpty())
       Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {

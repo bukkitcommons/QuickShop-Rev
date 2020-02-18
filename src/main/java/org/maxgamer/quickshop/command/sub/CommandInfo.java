@@ -11,10 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.BasicShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.action.data.ShopData;
+import cc.bukkit.shop.action.ShopData;
 
 public class CommandInfo extends QuickShopCommand {
   @Override
@@ -28,7 +29,7 @@ public class CommandInfo extends QuickShopCommand {
     int buying, selling, doubles, chunks, worlds, doubleschests;
     buying = selling = doubles = chunks = worlds = doubleschests = 0;
     int nostock = 0;
-    ContainerShop shop;
+    @NotNull BasicShop shop;
 
     for (Map<Long, Map<Long, ShopData>> inWorld : Shop.getLoader().getShopsMap().values()) {
       worlds++;

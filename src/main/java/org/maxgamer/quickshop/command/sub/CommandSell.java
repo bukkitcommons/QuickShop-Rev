@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.ItemUtils;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.viewer.BlockViewer;
@@ -38,7 +38,7 @@ public class CommandSell extends QuickShopCommand {
       BlockViewer viewer = BlockViewer.get(player, 10);
       viewer
         .ifEmpty(() -> {
-          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+          sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
           return;
         })
         
@@ -65,25 +65,25 @@ public class CommandSell extends QuickShopCommand {
         Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
     
     if (viewer.isEmpty()) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
       return;
     }
     
     handleShop(sender, viewer.get());
   }
   
-  private final static void handleShop(@NotNull CommandSender sender, @NotNull ContainerShop shop) {
+  private final static void handleShop(@NotNull CommandSender sender, @NotNull ChestShop shop) {
     if (!sender.isOp() && !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-permission", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-permission"));
       return;
     }
     
-    shop.setShopType(ShopType.SELLING);
+    //shop.setShopType(ShopType.SELLING); // FIXME
     shop.setSignText();
     shop.save();
     
     sender.sendMessage(
         Shop.getLocaleManager().get(
-            "command.now-selling", sender, ItemUtils.getItemStackName(shop.getItem())));
+            "command.now-selling", ItemUtils.getItemStackName(shop.stack())));
   }
 }

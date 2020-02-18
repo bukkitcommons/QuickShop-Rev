@@ -33,14 +33,16 @@ import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.BasicShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.action.ShopAction;
 import cc.bukkit.shop.action.ShopActionData;
-import cc.bukkit.shop.action.data.ShopCreator;
-import cc.bukkit.shop.action.data.ShopSnapshot;
+import cc.bukkit.shop.action.ShopCreator;
+import cc.bukkit.shop.action.ShopSnapshot;
+import cc.bukkit.shop.misc.ShopLocation;
+import cc.bukkit.shop.stack.Stack;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.AllArgsConstructor;
 
@@ -64,9 +66,9 @@ public class ShopActionListener implements Listener {
     viewer
       .nonNull()
       .filter(shop -> BaseConfig.clickSound)
-      .accept(shop -> {
+      .accept((ChestShop shop) -> {
         e.getPlayer().playSound(
-            shop.getLocation().bukkit(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
+            shop.location().bukkit(), Sound.BLOCK_DISPENSER_FAIL, 80.f, 1.0f);
       });
     
     /*
@@ -82,7 +84,7 @@ public class ShopActionListener implements Listener {
         .filter(shop ->
           shop.getOwner().equals(e.getPlayer().getUniqueId()) || e.getPlayer().isOp())
         
-        .accept(shop -> {
+        .accept((ChestShop shop) -> {
           Util.debug(ChatColor.GREEN + "Handling control");
           
           Shop.getLocaleManager().sendControlPanelInfo(e.getPlayer(), shop);
@@ -105,19 +107,18 @@ public class ShopActionListener implements Listener {
       .filter(shop ->
         QuickShopPermissionManager.instance().has(player, "quickshop.use"))    
       
-      .accept(shop -> {
+      .accept((ChestShop shop)  -> {
         Util.debug(ChatColor.GREEN + "Handling trade");
         
-        shop.onClick();
         Shop.getLocaleManager().sendShopInfo(player, shop);
         shop.setSignText();
         
-        double price = shop.getPrice();
+        double price = shop.price().stack();
         double money = QuickShop.instance().getEconomy().getBalance(player.getUniqueId());
 
         if (shop.is(ShopType.SELLING)) {
           // Consider player inv space, money afforable
-          int afforable = Math.min(ShopUtils.countSpace(player.getInventory(), shop.getItem()),
+          int afforable = Math.min(ShopUtils.countSpace(player.getInventory(), shop.stack()),
               (int) Math.floor(money / price));
 
           // Consider shop remaining stock
@@ -131,7 +132,7 @@ public class ShopActionListener implements Listener {
           player.sendMessage(Shop.getLocaleManager().get("how-many-buy", player, "" + afforable));
         } else {
           double ownerBalance = QuickShop.instance().getEconomy().getBalance(shop.getOwner());
-          int stackAmount = ShopUtils.countStacks(player.getInventory(), shop.getItem());
+          int stackAmount = ShopUtils.countStacks(player.getInventory(), shop.stack());
           int ownerAfforableItems = (int) (ownerBalance / price);
 
           if (!shop.isUnlimited()) {
@@ -221,7 +222,7 @@ public class ShopActionListener implements Listener {
           return;
         
         // Send creation menu.
-        ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), expectedSign, item);
+        ShopCreator info = ShopCreator.create(ShopLocation.of(block.getLocation()), expectedSign, Stack.of(item));
 
         Shop.getActions().setAction(player.getUniqueId(), info);
         player.sendMessage(Shop.getLocaleManager().get("how-much-to-trade-for", player,
@@ -243,7 +244,7 @@ public class ShopActionListener implements Listener {
       @Nullable Location chest = event.getInventory().getLocation();
       
       if (chest != null)
-        Shop.getManager().getLoadedShopAt(chest).ifPresent(ContainerShop::setSignText);
+        Shop.getManager().getLoadedShopAt(chest).ifPresent(ChestShop::setSignText);
       
     } catch (NullPointerException npe) {
       return;

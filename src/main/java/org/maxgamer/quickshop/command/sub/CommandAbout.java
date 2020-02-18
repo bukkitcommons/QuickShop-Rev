@@ -20,25 +20,25 @@ public class CommandAbout extends QuickShopCommand {
         + Shop.getVersion());
     if (Shop.getVersion().toUpperCase().contains("LTS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.lts", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.lts"));
     } else if (Shop.getVersion().toUpperCase().contains("STABLE")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.stable", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.stable"));
     } else if (Shop.getVersion().toUpperCase().contains("QV")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.qualityverifyed", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.qualityverifyed"));
     } else if (Shop.getVersion().toUpperCase().contains("BETA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.unstable", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.unstable"));
     } else if (Shop.getVersion().toUpperCase().contains("ALPHA")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.unstable", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.unstable"));
     } else if (Shop.getVersion().toUpperCase().contains("EARLY ACCESS")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.unstable", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.unstable"));
     } else if (Shop.getVersion().toUpperCase().contains("SNAPSHOT")) {
       sender.sendMessage(ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN
-          + Shop.getLocaleManager().get("updatenotify.label.unstable", sender));
+          + Shop.getLocaleManager().get("updatenotify.label.unstable"));
     } else {
       sender.sendMessage(
           ChatColor.AQUA + "Release " + ChatColor.YELLOW + ">> " + ChatColor.GREEN + "[Main Line]");

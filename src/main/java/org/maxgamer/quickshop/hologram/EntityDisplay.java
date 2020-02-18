@@ -1,99 +1,95 @@
 package org.maxgamer.quickshop.hologram;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.ContainerShop;
-import cc.bukkit.shop.event.ShopDisplayItemDespawnEvent;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.hologram.DisplayAttribute;
 import cc.bukkit.shop.hologram.DisplayData;
-import cc.bukkit.shop.hologram.DisplayItem;
-import cc.bukkit.shop.hologram.DisplayType;
-import lombok.Getter;
-import lombok.ToString;
+import cc.bukkit.shop.hologram.GenericDisplay;
+import cc.bukkit.shop.misc.ShopLocation;
+import lombok.Data;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
-@ToString
+/**
+ * Represents a shop display that have the actual entity.
+ * This is a wrapper of the entity instead of its manager.
+ */
+@Data
 @Accessors(fluent = true)
-public abstract class EntityDisplay implements DisplayItem {
-  @Getter
-  @Nullable
-  protected Entity entity;
-  
-  @Getter
+public abstract class EntityDisplay implements GenericDisplay {
   @NotNull
-  protected ContainerShop shop;
-  @Getter
+  protected Entity entity;
+  @NotNull
+  protected ChestShop shop;
   @NotNull
   protected DisplayData data;
   @NotNull
   protected ItemStack displayItemStack;
-  @Nullable
-  protected Location location;
-  
+  @NotNull
+  protected ShopLocation location;
+  @Setter
   protected boolean pendingRemoval;
   
-  public EntityDisplay(@NotNull ContainerShop shop, @NotNull DisplayData data) {
+  public EntityDisplay(@NotNull ChestShop shop, @NotNull DisplayData data, @NotNull Entity entity) {
     this.shop = shop;
     this.data = data;
+    this.entity = entity;
     
-    this.displayItemStack = new ItemStack(shop.getItem());
-    this.displayItemStack.setAmount(1);
-    this.displayItemStack = ItemUtils.createGuardItemStack(this.displayItemStack, this.shop);
+    displayItemStack = new ItemStack(shop.<ItemStack>stack());
+    displayItemStack.setAmount(1);
+    displayItemStack = ItemUtils.createGuardItemStack(displayItemStack, shop);
+  }
+  
+  @SuppressWarnings("unchecked")
+  @NotNull
+  @Override
+  public ItemStack sample() {
+    return displayItemStack;
   }
   
   @Override
-  public void respawn() {
-    remove();
-    spawn();
-  }
-
-  @Override
-  @Nullable
-  public Entity getDisplay() {
-    return this.entity;
-  }
-
-  @Override
-  public boolean pendingRemoval() {
-    return pendingRemoval = true;
-  }
-
-  @Override
-  public boolean isPendingRemoval() {
-    return pendingRemoval;
+  @NotNull
+  public Entity stack() {
+    return entity;
   }
   
   @Override
-  public void fixPosition() {
-    if (entity == null)
+  public void tick() {
+    if (!DisplayConfig.displayItems)
       return;
     
-    if (!entity.isValid() || this.entity.isDead()) {
-      respawn();
+    if (!Util.isChunkLoaded(location))
+      return;
+
+    if (entity.isValid()) {
+      //fixPosition();
     } else {
-      Location location = getDisplayLocation();
-      boolean fix = data.type() == DisplayType.DROPPED_ITEM ?
-          entity.getLocation().distance(location) > 0.6 :
-          entity.getLocation().equals(location);
-      
-      if (fix)
-        entity.teleport(location);
+      Util.debug("Spawning display at: " + location);
+      //display.spawn();
     }
+
+    removeDupe();
+    
+    /*
+    Location location = data.scheme();
+    boolean fix = data.type() == DisplayType.DROPPED_ITEM ?
+        entity.getLocation().distance(location) > 0.6 :
+        entity.getLocation().equals(location);
+    
+    if (fix)
+      entity.teleport(location);
+    */ // FIXME
   }
 
   public void removeDupe() {
-    if (entity == null)
-      return;
-    
     for (Entity entity : entity.getNearbyEntities(1.5, 1.5, 1.5)) {
       switch (entity.getType()) {
         case ARMOR_STAND:
@@ -113,23 +109,5 @@ public abstract class EntityDisplay implements DisplayItem {
           continue;
       }
     }
-  }
-  
-  @Override
-  public boolean isSpawned() {
-    return this.entity == null ? false : this.entity.isValid();
-  }
-
-  @Override
-  public void remove() {
-    if (this.entity == null)
-      return;
-    
-    this.entity.remove();
-    this.entity = null;
-    
-    ShopDisplayItemDespawnEvent shopDisplayItemDespawnEvent =
-        new ShopDisplayItemDespawnEvent(this.shop, displayItemStack, data);
-    Bukkit.getPluginManager().callEvent(shopDisplayItemDespawnEvent);
   }
 }

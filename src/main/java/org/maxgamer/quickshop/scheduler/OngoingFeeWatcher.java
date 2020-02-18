@@ -9,7 +9,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.action.data.ShopData;
+import cc.bukkit.shop.action.ShopData;
 
 /**
  * Check the shops after server booted up, make sure shop can correct self-deleted when container

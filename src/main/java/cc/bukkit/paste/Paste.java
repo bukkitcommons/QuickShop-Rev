@@ -38,15 +38,12 @@ public class Paste {
   @SneakyThrows
   public @NotNull String genNewPaste() {
     StringBuilder finalReport = new StringBuilder();
-    finalReport.append("###############################\n");
-    finalReport.append("QuickShop(Rev) Paste Result\n");
-    finalReport.append("###############################\n");
+    finalReport.append("-----------------------------------\n");
+    finalReport.append("  QuickShop Rev  |  Paste Result\n");
+    finalReport.append("-----------------------------------\n");
     finalReport.append("\n");
-    finalReport.append("\n");
-    finalReport.append("================================================\n");
-    finalReport.append("QuickShop:\n");
+    finalReport.append("Plugin information:\n");
     finalReport.append("\tVersion: ").append(Shop.getVersion()).append("\n");
-    finalReport.append("\tFork: ").append("Rev").append("\n");
     finalReport.append("\tServer ID: ").append(BaseConfig.serverUUID).append("\n");
     finalReport.append("\tOpenInv Hook: ")
         .append(plugin.getOpenInvPlugin() == null ? "Disabled" : "Enabled").append("\n");

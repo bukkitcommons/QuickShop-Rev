@@ -2,7 +2,6 @@ package org.maxgamer.quickshop.shop;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -14,30 +13,27 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.hologram.ArmorStandDisplay;
 import org.maxgamer.quickshop.hologram.DisplayDataMatcher;
-import org.maxgamer.quickshop.hologram.EntityDisplay;
 import org.maxgamer.quickshop.hologram.DisplayDroppedItem;
+import org.maxgamer.quickshop.hologram.EntityDisplay;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
-import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import com.google.common.collect.Lists;
-import cc.bukkit.shop.ContainerShop;
+import com.google.common.graph.ElementOrder.Type;
+import cc.bukkit.shop.ChestShop;
+import cc.bukkit.shop.GenericChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.ShopType;
-import cc.bukkit.shop.event.ShopClickEvent;
 import cc.bukkit.shop.event.ShopLoadEvent;
 import cc.bukkit.shop.event.ShopModeratorChangedEvent;
 import cc.bukkit.shop.event.ShopPriceChangeEvent;
@@ -45,46 +41,80 @@ import cc.bukkit.shop.event.ShopPriceChangeEvent.Reason;
 import cc.bukkit.shop.event.ShopSaveEvent;
 import cc.bukkit.shop.event.ShopUnloadEvent;
 import cc.bukkit.shop.hologram.DisplayData;
-import cc.bukkit.shop.hologram.DisplayItem;
+import cc.bukkit.shop.hologram.DisplayScheme;
+import cc.bukkit.shop.hologram.Display;
+import cc.bukkit.shop.hologram.DisplayAttribute;
 import cc.bukkit.shop.logger.ShopLogger;
-import cc.bukkit.shop.moderator.Managed;
+import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.moderator.ShopModerator;
+import cc.bukkit.shop.stack.ItemStacked;
+import cc.bukkit.shop.stack.Stack;
+import cc.bukkit.shop.stack.StackItem;
+import cc.bukkit.shop.stack.Stacked;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/** ChestShop core */
 @Getter
 @Setter
 @EqualsAndHashCode
-public class ContainerQuickShop implements ContainerShop, Managed {
+public abstract class ContainerQuickShop implements GenericChestShop {
   @NotNull
-  private final ItemStack item;
+  protected final ItemStacked stack;
   @NotNull
-  private final ShopLocation location;
+  protected final ShopLocation location;
   @Nullable
-  private EntityDisplay display;
+  protected EntityDisplay display;
   
   @EqualsAndHashCode.Exclude
-  private boolean isLoaded = false;
+  protected boolean isLoaded = false;
   
-  private ShopModerator moderator;
-  private double price;
-  private ShopType shopType;
-  private boolean unlimited;
+  protected ShopModerator moderator;
+  protected Stacked price;
+  protected DisplayData displayData;
+  protected boolean unlimited;
+  
+  @NotNull
+  @Override
+  public abstract ShopType type();
+  
+  @Override
+  public @NotNull DisplayScheme scheme() {
+    return (@NotNull DisplayScheme) displayData;
+  }
+  
+  @Override
+  public ItemStack stack() {
+    return stack.stack();
+  }
 
-  private ContainerQuickShop(@NotNull ContainerQuickShop s) {
-    this.shopType = s.shopType;
+  @Override
+  public Stacked price() {
+    return price;
+  }
+
+  @Override
+  public @NotNull ShopModerator moderator() {
+    return moderator;
+  }
+
+  @Override
+  public @NotNull ShopLocation location() {
+    return location;
+  }
+
+  protected ContainerQuickShop(@NotNull ContainerQuickShop s) {
+    this.displayData = s.displayData;
     this.unlimited = s.unlimited;
     this.price = s.price;
     
-    this.item = new ItemStack(s.item);
+    this.stack = StackItem.of(new ItemStack(s.stack()));
     this.location = s.location.clone();
     this.moderator = s.moderator.clone();
     
     if (DisplayConfig.displayItems) {
-      DisplayData data = DisplayDataMatcher.create(this.item);
+      DisplayData data = DisplayDataMatcher.create(this.stack.stack());
       switch (data.type()) {
         case ARMOR_STAND:
           display = new ArmorStandDisplay(this, data);
@@ -96,7 +126,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     }
   }
   
-  public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
+  public ContainerQuickShop(@NotNull ShopLocation shopLocation, Stack price, @NotNull ItemStacked item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
     this(shopLocation, price, item, moderator, unlimited, type, true);
   }
@@ -112,18 +142,17 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    * @param type The shop type
    * @param unlimited The unlimited
    */
-  public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStack item,
+  public ContainerQuickShop(@NotNull ShopLocation shopLocation, Stack price, @NotNull ItemStacked item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type, boolean spawnDisplay) {
     this.location = shopLocation;
     this.price = price;
     this.moderator = moderator;
-    this.item = new ItemStack(item);
-    this.shopType = type;
+    this.stack = StackItem.of(new ItemStack(item.stack()));
     this.unlimited = unlimited;
 
     if (spawnDisplay) {
       if (DisplayConfig.displayItems) {
-        DisplayData data = DisplayDataMatcher.create(this.item);
+        DisplayData data = DisplayDataMatcher.create(this.stack.stack());
         switch (data.type()) {
           case ARMOR_STAND:
             display = new ArmorStandDisplay(this, data);
@@ -139,7 +168,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   /**
    * Add an item to shops chest.
    *
-   * @param item The itemstack. The amount does not matter, just everything else
+   * @param stack The itemstack. The amount does not matter, just everything else
    * @param amount The amount to add to the shop.
    */
   @Override
@@ -148,7 +177,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
       return;
     
     Inventory inv = getInventory();
-    ItemStack offer = new ItemStack(item);
+    ItemStack offer = new ItemStack(stack.stack());
     
     while (amount --> 0)
       inv.addItem(offer);
@@ -163,7 +192,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Override
   public int getRemainingStock() {
-    return unlimited ? -1 : ShopUtils.countStacks(getInventory(), item);
+    return unlimited ? -1 : ShopUtils.countStacks(getInventory(), stack.stack());
   }
 
   /**
@@ -173,18 +202,21 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @Override
   public int getRemainingSpace() {
-    return unlimited ? -1 : ShopUtils.countSpace(getInventory(), item);
+    return unlimited ? -1 : ShopUtils.countSpace(getInventory(), stack.stack());
   }
 
   /**
    * Returns true if the ItemStack matches what this shop is selling/buying
    *
-   * @param item The ItemStack
+   * @param stack The ItemStack
    * @return True if the ItemStack is the same (Excludes amounts)
    */
   @Override
-  public boolean isShoppingItem(@Nullable ItemStack item) {
-    return QuickShop.instance().getItemMatcher().matches(this.item, item, false);
+  public boolean isStack(@Nullable Object that) {
+    if (that instanceof ItemStack)
+      return QuickShop.instance().getItemMatcher().matches(stack.stack(), (ItemStack) that, false);
+    else
+      return false;
   }
 
   /**
@@ -193,7 +225,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    * @param price The new price of the shop.
    */
   @Override
-  public void setPrice(double newPrice) {
+  public void setPrice(Stack newPrice) {
     ShopPriceChangeEvent event = new ShopPriceChangeEvent(newPrice, price, false, this, Reason.RESTRICT);
     if (Util.fireCancellableEvent(event))
       return;
@@ -214,10 +246,10 @@ public class ContainerQuickShop implements ContainerShop, Managed {
                .getDatabaseHelper()
                .updateShop(
                   moderator.serialize(),
-                  item,
+                  stack.stack(),
                   unlimited ? 1 : 0,
-                  shopType.toID(),
-                  price,
+                  displayData.type().id(),
+                  price.stack(),
                   location.x(),
                   location.y(),
                   location.z(),
@@ -228,148 +260,6 @@ public class ContainerQuickShop implements ContainerShop, Managed {
           "Could not update a shop in the database! Changes will revert after a reboot!");
       
       t.printStackTrace();
-    }
-  }
-
-  /** @return The durability of the item */
-  @Override
-  public short getDurability() {
-    return (short) ((Damageable) this.item.getItemMeta()).getDamage();
-  }
-
-  /**
-   * Buys amount of item from Player p. Does NOT check our inventory, or balances
-   *
-   * @param p The player to buy from
-   * @param stackAmount The amount to buy
-   */
-  @Override
-  public void buy(@NotNull Player p, int stackAmount) {
-    if (stackAmount < 0)
-      sell(p, -stackAmount);
-    
-    int totalAmount = stackAmount * item.getAmount();
-    
-    Inventory playerInv = p.getInventory();
-    ItemStack[] contents = playerInv.getStorageContents();
-    
-    for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
-      ItemStack playerItem = contents[i];
-      
-      if (playerItem == null || !isShoppingItem(playerItem)) {
-        continue;
-      }
-      
-      int buyAmount = Math.min(totalAmount, playerItem.getAmount());
-      playerItem.setAmount(playerItem.getAmount() - buyAmount);
-      totalAmount -= buyAmount;
-    }
-    
-    playerInv.setStorageContents(contents);
-    
-    if (totalAmount > 0) {
-      ShopLogger.instance().severe("Could not take all items from a players inventory on purchase! " + p.getName()
-              + ", missing: " + stackAmount + ", item: " + ItemUtils.getItemStackName(this.getItem())
-              + "!");
-    } else if (!unlimited) {
-      ItemStack offer = new ItemStack(item);
-      offer.setAmount(stackAmount * item.getAmount());
-      getInventory().addItem(offer);
-      
-      setSignText();
-    }
-  }
-
-  @Override
-  public void checkDisplay() {
-    try {
-      // Workaround for error tracing when this is executed by tasks
-      checkDisplay0();
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-  }
-
-  private void checkDisplay0() {
-    if (!DisplayConfig.displayItems || !this.isLoaded) {
-      return;
-    }
-    
-    if (!Util.isChunkLoaded(location))
-      return;
-
-    if (this.display == null) {
-      Util.debug("Warning: DisplayItem is null, this shouldn't happend...");
-      Util.debug("Call from: " + Thread.currentThread().getStackTrace()[2].getClassName() + "#"
-          + Thread.currentThread().getStackTrace()[2].getMethodName() + "%"
-          + Thread.currentThread().getStackTrace()[2].getLineNumber());
-      return;
-    }
-
-    if (!this.display.isSpawned()) {
-      /* Not spawned yet. */
-      Util.debug("Target item not spawned, spawning...");
-      this.display.spawn();
-    } else {
-      this.display.fixPosition();
-    }
-
-    this.display.removeDupe();
-  }
-
-  @Override
-  @NotNull
-  public ContainerQuickShop clone() {
-    return new ContainerQuickShop(this);
-  }
-
-  /**
-   * Sells amount of item to Player p. Does NOT check our inventory, or balances
-   *
-   * @param p The player to sell to
-   * @param stackAmount The amount to sell
-   */
-  @Override
-  public void sell(@NotNull Player p, int stackAmount) {
-    if (stackAmount < 0)
-      buy(p, -stackAmount);
-    
-    // Overslot Items to drop on floor
-    List<ItemStack> floor = Lists.newArrayList();
-    
-    Inventory playerInv = p.getInventory();
-    ItemStack offer = new ItemStack(item);
-    
-    if (unlimited) {
-      while (stackAmount --> 0)
-        floor.addAll(playerInv.addItem(offer).values());
-      
-    } else {
-      Inventory chestInv = getInventory();
-      ItemStack[] contents = chestInv.getContents();
-      
-      int totalAmount = stackAmount * item.getAmount();
-      // Take items from chest and offer to player's inventory
-      for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
-        ItemStack chestItem = contents[i];
-        if (chestItem == null || !isShoppingItem(chestItem))
-          continue;
-        
-        int takeAmount = Math.min(totalAmount, chestItem.getAmount());
-        chestItem.setAmount(chestItem.getAmount() - takeAmount);
-        
-        offer.setAmount(takeAmount);
-        floor.addAll(playerInv.addItem(offer).values());
-        
-        totalAmount -= takeAmount;
-      }
-      
-      chestInv.setContents(contents);
-      setSignText();
-    }
-    
-    for (ItemStack stack : floor) {
-      p.getWorld().dropItem(p.getLocation(), stack);
     }
   }
 
@@ -424,7 +314,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    * @param lines The array of lines to change. Index is line number.
    */
   private void setSignText(@NotNull String[] lines) {
-    for (Sign sign : getShopSigns()) {
+    for (Sign sign : getAttached()) {
       if (Arrays.equals(sign.getLines(), lines))
         continue;
       
@@ -438,18 +328,6 @@ public class ContainerQuickShop implements ContainerShop, Managed {
   @Override
   public void setUnlimited(boolean unlimited) {
     this.unlimited = unlimited;
-    setSignText();
-    save();
-  }
-
-  /**
-   * Changes a shop type to Buying or Selling. Also updates the signs nearby.
-   *
-   * @param shopType The new type (ShopType.BUYING or ShopType.SELLING)
-   */
-  @Override
-  public void setShopType(@NotNull ShopType shopType) {
-    this.shopType = shopType;
     setSignText();
     save();
   }
@@ -471,25 +349,25 @@ public class ContainerQuickShop implements ContainerShop, Managed {
         player,
         ownerName());
     
-    String section = shopType.name().toLowerCase();
+    String section = type().name().toLowerCase();
     lines[1] = Shop.getLocaleManager().get(
         "signs.".concat(section),
         player,
         unlimited ?
             Shop.getLocaleManager().get("signs.unlimited", player) :
-            (String.valueOf(shopType == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()))
+            (String.valueOf(type() == ShopType.SELLING ? getRemainingStock() : getRemainingSpace()))
         );
     
-    String stacks = item.getAmount() > 1 ? " * " + item.getAmount() : "";
+    String stacks = stack.stack().getAmount() > 1 ? " * " + stack.stack().getAmount() : "";
     lines[2] = Shop.getLocaleManager().get(
         "signs.item",
         player,
-        ItemUtils.getItemStackName(getItem()) + stacks);
+        ItemUtils.getItemStackName(stack.stack()) + stacks);
     
     lines[3] = Shop.getLocaleManager().get(
         "signs.price",
         player,
-        JavaUtils.format(price));
+        price.stack());
     
     setSignText(lines);
   }
@@ -504,7 +382,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
       sb.append(" Unlimited: true");
     }
     sb.append(" Price: ").append(getPrice());
-    sb.append(" Item: ").append(getItem());
+    sb.append(" Item: ").append(stack.stack());
     return sb.toString();
   }
   
@@ -518,7 +396,7 @@ public class ContainerQuickShop implements ContainerShop, Managed {
    */
   @NotNull
   @Override
-  public List<Sign> getShopSigns() {
+  public List<Sign> getAttached() {
     OfflinePlayer player = Bukkit.getOfflinePlayer(getOwner());
     String signHeader =
         Shop.getLocaleManager().get("signs.header", player, ownerName());
@@ -562,8 +440,8 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     if (nextTo == null)
       return false;
     
-    if (nextTo.isShoppingItem(getItem())) {
-      return getShopType() != nextTo.getShopType();
+    if (nextTo.isStack(stack.stack())) {
+      return type() != nextTo.type();
     } else {
       return false;
     }
@@ -578,31 +456,21 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     return BlockUtils.isDoubleChest(this.getLocation().block());
   }
 
-  /**
-   * Check shop is or not still Valid.
-   *
-   * @return isValid
-   */
-  @Override
-  public boolean isValid() {
-    return ShopUtils.canBeShop(location.block());
-  }
-
   @Override
   @Nullable
-  public DisplayItem getDisplay() {
+  public Display display() {
     return this.display;
   }
 
-  /** Load ContainerShop. */
   @Override
-  public void onLoad() {
+  public void load() {
     if (isLoaded || Util.fireCancellableEvent(new ShopLoadEvent(this)))
       return;
 
     isLoaded = true;
     
-    // check price restriction // FIXME move
+    // check price restriction // FIXME FIX FEATURE
+    /*
     Entry<Double, Double> priceRestriction = Util.getPriceRestriction(this.item.getType());
 
     if (priceRestriction != null) {
@@ -613,19 +481,19 @@ public class ContainerQuickShop implements ContainerShop, Managed {
       price = fix;
       save();
     }
+    */
     
     setSignText();
-    checkDisplay();
+    //checkDisplay();
   }
 
-  /** Unload ContainerShop. */
   @Override
-  public void onUnload() {
+  public void unload() {
     if (!isLoaded)
       return;
     
     if (display != null) {
-      display.remove();
+      //display.remove();
     }
     
     save();
@@ -633,16 +501,6 @@ public class ContainerQuickShop implements ContainerShop, Managed {
     
     ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
     Bukkit.getPluginManager().callEvent(shopUnloadEvent);
-  }
-
-  @Override
-  public void onClick() {
-    ShopClickEvent event = new ShopClickEvent(this);
-    if (Util.fireCancellableEvent(event))
-      return;
-    
-    setSignText();
-    checkDisplay();
   }
 
   @Override

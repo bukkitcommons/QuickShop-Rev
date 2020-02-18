@@ -14,6 +14,7 @@ import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.database.Database;
 import cc.bukkit.shop.database.Dispatcher;
 import cc.bukkit.shop.database.connector.MySQLConnector;
+import cc.bukkit.shop.stack.Stack;
 
 /**
  * A Util to execute all SQLs.
@@ -109,7 +110,7 @@ public class DatabaseHelper {
     return st.execute(createTable);
   }
 
-  public void createShop(@NotNull String owner, double price, @NotNull ItemStack item,
+  public void createShop(@NotNull String owner, Stack shopStack, @NotNull ItemStack item,
       int unlimited, int shopType, @NotNull String world, int x, int y, int z) throws SQLException {
     deleteShop(x, y, z, world); // First purge old exist shop before create new shop.
     
@@ -118,7 +119,7 @@ public class DatabaseHelper {
         + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
     sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
-    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
+    sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopStack.stack()));
     sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
     sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
     sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
@@ -199,7 +200,7 @@ public class DatabaseHelper {
   }
 
   public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited,
-      int shopType, double price, int x, int y, int z, String world) throws SQLException {
+      int shopType, Stack price, int x, int y, int z, String world) throws SQLException {
     
       String sqlString = "UPDATE " + DatabaseConfig.databasePrefix
           + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
@@ -208,7 +209,7 @@ public class DatabaseHelper {
       sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(unlimited));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopType));
-      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price.stack()));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));

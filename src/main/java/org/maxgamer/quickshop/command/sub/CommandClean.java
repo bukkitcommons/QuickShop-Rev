@@ -16,10 +16,10 @@ import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import com.google.common.collect.Lists;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.ShopType;
+import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class CommandClean extends QuickShopCommand {
@@ -39,31 +39,27 @@ public class CommandClean extends QuickShopCommand {
   }
   
   private static void handleCleanShops(World world, CommandSender sender, boolean force) {
-    sender.sendMessage(Shop.getLocaleManager().get("command.cleaning", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("command.cleaning"));
 
-    List<ContainerShop> pendingRemoval = Lists.newArrayList();
+    List<ChestShop> pendingRemoval = Lists.newArrayList();
     int[] count = {0, 0};
     
     Shop.getLoader().getAllShops().forEach(data -> {
       try {
-        ContainerShop shop;
+        ChestShop shop;
         ShopViewer viewer = Shop.getManager().getLoadedShopAt(data.location());
         // Do not create shop instance for loaded shop to avoid dupe display
-        shop = viewer.isPresent() ? viewer.get() :
-          new ContainerQuickShop(
-            ShopLocation.from(world, data.x(), data.y(), data.z()),
-            data.price(), ItemUtils.deserialize(data.item()),
-            data.moderators(), data.unlimited(), data.type(), false);
+        shop = viewer.isPresent() ? viewer.get() : null;
         
         if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0) {
-          if (!ShopUtils.canBeShopIgnoreBlocklist(shop.getLocation().block().getState())) {
+          if (!ShopUtils.canBeShopIgnoreBlocklist(shop.location().block().getState())) {
             pendingRemoval.add(shop);
             return;
           }
           
           if (!force) {
             ItemStack[] contents =
-                ((InventoryHolder) shop.getLocation().block().getState()).getInventory().getContents();
+                ((InventoryHolder) data.location().block().getState()).getInventory().getContents();
             
             for (ItemStack i : contents)
               if (i != null) {
@@ -72,23 +68,25 @@ public class CommandClean extends QuickShopCommand {
               }
           }
           
-          ContainerQuickShop cs = (ContainerQuickShop) shop;
-          if (!cs.isDualShop()) {
-            pendingRemoval.add(shop);
-            count[0]++;
+          if (shop != null) {
+            ContainerQuickShop cs = (ContainerQuickShop) shop;
+            if (!cs.isDualShop()) { // FIXME
+              pendingRemoval.add(shop);
+              count[0]++;
+            }
           }
         }
-      } catch (IllegalStateException | InvalidConfigurationException e) {
+      } catch (IllegalStateException e) {
         e.printStackTrace();
         //pendingRemoval.add(shop); // The shop is not there anymore, remove it
       }
     });
 
-    for (ContainerShop shop : pendingRemoval)
+    for (ChestShop shop : pendingRemoval)
       QuickShopLoader.instance().delete(shop);
 
     Shop.getMessager().clean();
-    sender.sendMessage(Shop.getLocaleManager().get("command.cleaned", sender, "" + count[0]));
+    sender.sendMessage(Shop.getLocaleManager().get("command.cleaned", "" + count[0]));
     
     if (!force && count[1] > 0)
       sender.sendMessage(

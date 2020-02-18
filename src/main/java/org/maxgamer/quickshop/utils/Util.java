@@ -29,9 +29,9 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import com.google.common.io.Files;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
 import cc.bukkit.shop.database.connector.MySQLConnector;
 import cc.bukkit.shop.logger.ShopLogger;
+import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.Getter;
 

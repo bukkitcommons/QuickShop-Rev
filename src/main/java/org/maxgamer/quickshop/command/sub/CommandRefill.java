@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
 
@@ -25,7 +26,7 @@ public class CommandRefill extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(Shop.getLocaleManager().get("tabcomplete.amount", sender));
+    list.add(Shop.getLocaleManager().get("tabcomplete.amount"));
 
     return list;
   }
@@ -39,7 +40,7 @@ public class CommandRefill extends QuickShopCommand {
     }
 
     if (cmdArg.length < 1) {
-      sender.sendMessage(Shop.getLocaleManager().get("command.no-amount-given", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("command.no-amount-given"));
       return;
     }
 
@@ -48,14 +49,14 @@ public class CommandRefill extends QuickShopCommand {
     try {
       add = Integer.parseInt(cmdArg[0]);
     } catch (NumberFormatException e) {
-      sender.sendMessage(Shop.getLocaleManager().get("thats-not-a-number", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("thats-not-a-number"));
       return;
     }
 
     final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
 
     if (!bIt.hasNext()) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
       return;
     }
 
@@ -67,11 +68,11 @@ public class CommandRefill extends QuickShopCommand {
         continue;
       }
 
-      shop.get().fill(add);
-      sender.sendMessage(Shop.getLocaleManager().get("refill-success", sender));
+      shop.<ChestShop>get().fill(add);
+      sender.sendMessage(Shop.getLocaleManager().get("refill-success"));
       return;
     }
 
-    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender));
+    sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop"));
   }
 }

@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ItemPreviewer;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.BlockViewer;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -51,7 +51,7 @@ public class CommandPreview extends QuickShopCommand {
           
           return ViewAction.NEXT;
         })
-        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop", sender)));
+        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop")));
     }
     
     sender.sendMessage("Can't run this command from Console");
@@ -75,7 +75,7 @@ public class CommandPreview extends QuickShopCommand {
     }
   }
   
-  private final static void handleShop(@NotNull Player player, @NotNull ContainerShop shop) {
-    new ItemPreviewer(shop.getItem(), player).show();
+  private final static void handleShop(@NotNull Player player, @NotNull ChestShop shop) {
+    new ItemPreviewer(shop.stack(), player).show();
   }
 }

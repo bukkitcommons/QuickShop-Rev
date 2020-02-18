@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.maxgamer</groupId>
 	<artifactId>QuickShop</artifactId>
-	<version>rev.3.1.5</version>
+	<version>rev.3.2.0</version>
 
 	<licenses>
 		<license>
@@ -17,7 +17,7 @@
 		<package>org.maxgamer.quickshop</package>
 		<developer>Ghost-chu</developer>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<apiVersion>1.1.5</apiVersion>
+		<apiVersion>1.2.0-SNAPSHOT</apiVersion>
 	</properties>
 	<issueManagement>
 		<url>https://github.com/${developer}/${name}/issues</url>

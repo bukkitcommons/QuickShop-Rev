@@ -20,8 +20,9 @@ import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.ShopLocation;
-import cc.bukkit.shop.action.data.ShopCreator;
+import cc.bukkit.shop.action.ShopCreator;
+import cc.bukkit.shop.misc.ShopLocation;
+import cc.bukkit.shop.stack.Stack;
 
 public class CommandCreate extends QuickShopCommand {
   @Override
@@ -35,7 +36,7 @@ public class CommandCreate extends QuickShopCommand {
       @NotNull String[] cmdArg) {
     final ArrayList<String> list = new ArrayList<>();
 
-    list.add(Shop.getLocaleManager().get("tabcomplete.price", sender));
+    list.add(Shop.getLocaleManager().get("tabcomplete.price"));
 
     return list;
   }
@@ -52,7 +53,7 @@ public class CommandCreate extends QuickShopCommand {
     final ItemStack item = p.getInventory().getItemInMainHand();
 
     if (item.getType() == Material.AIR) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-anythings-in-your-hand", sender));
+      sender.sendMessage(Shop.getLocaleManager().get("no-anythings-in-your-hand"));
       return;
     }
 
@@ -83,13 +84,13 @@ public class CommandCreate extends QuickShopCommand {
 
       if (BlockUtils.getSecondHalf(b).isPresent()
           && !QuickShopPermissionManager.instance().has(p, "quickshop.create.double")) {
-        p.sendMessage(Shop.getLocaleManager().get("no-double-chests", sender));
+        p.sendMessage(Shop.getLocaleManager().get("no-double-chests"));
         return;
       }
 
       if (Util.isBlacklisted(item) && !QuickShopPermissionManager.instance().has(p,
           "quickshop.bypass." + item.getType().name())) {
-        p.sendMessage(Shop.getLocaleManager().get("blacklisted-item", sender));
+        p.sendMessage(Shop.getLocaleManager().get("blacklisted-item"));
         return;
       }
 
@@ -97,7 +98,7 @@ public class CommandCreate extends QuickShopCommand {
       Shop.getActions().setAction(p.getUniqueId(),
           ShopCreator.create(
               ShopLocation.of(b.getLocation()),
-              b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), item));
+              b.getRelative(BlockUtils.yawToFace(p.getLocation().getYaw())), Stack.of(item)));
 
       if (cmdArg.length >= 1) {
         Shop.getActions().handleChat(p, cmdArg[0], false);
@@ -106,7 +107,7 @@ public class CommandCreate extends QuickShopCommand {
       }
 
       p.sendMessage(
-          Shop.getLocaleManager().get("how-much-to-trade-for", sender, ItemUtils.getItemStackName(item)));
+          Shop.getLocaleManager().get("how-much-to-trade-for", ItemUtils.getItemStackName(item)));
       Util.debug("Created by wait chat");
       return;
     }

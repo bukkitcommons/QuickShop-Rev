@@ -1,19 +1,14 @@
 package org.maxgamer.quickshop.utils;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -28,25 +23,16 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import cc.bukkit.shop.ContainerShop;
+import cc.bukkit.shop.BasicShop;
+import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.feature.Displayed;
 import cc.bukkit.shop.hologram.DisplayInfo;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
-import lombok.Getter;
 import lombok.SneakyThrows;
 
 public class ItemUtils {
-  static short tookLongTimeCostTimes;
-  private static EnumSet<Material> blacklist = EnumSet.noneOf(Material.class);
-  @Getter
-  private static List<String> debugLogs = new LinkedList<>();
-  private static EnumMap<Material, Entry<Double, Double>> restrictedPrices =
-      new EnumMap<>(Material.class);
-  private static EnumSet<Material> blockListedBlocks = EnumSet.noneOf(Material.class);
-  private static List<String> worldBlacklist = new ArrayList<>();
-  
-
   public final static Gson GSON = new Gson();
   
   public static boolean isDisplayItem(@Nullable ItemStack itemStack) {
@@ -76,23 +62,27 @@ public class ItemUtils {
           ShopViewer viewer =
               Shop.getManager().getLoadedShopAt(BlockUtils.deserializeLocation(shopProtectionFlag.getShopLocationData()));
           
-          viewer.ifPresent(shop -> {
-            if (shop.getDisplay().getDisplayLocation().distance(item.getLocation()) > 0.6) {
+          viewer.ifPresent((BasicShop shop) -> {
+            if (!(shop instanceof ChestShop))
+              return;
+            
+            ChestShop chest = (ChestShop) shop;
+            if (((Displayed) shop).scheme().<Location>scheme((ChestShop) shop).distance(item.getLocation()) > 0.6) {
               item.remove();
               Util.debug("Removed a duped item display entity by distance > 0.6");
               return;
             }
             
-            if (shop.getDisplay().getDisplay() == null)
+            if (chest.display().stack() == null)
               return;
             
-            if (!shop.getDisplay().getDisplay().getUniqueId().equals(item.getUniqueId())) {
+            if (!chest.display().<Entity>stack().getUniqueId().equals(item.getUniqueId())) {
               item.remove();
               Util.debug("Removed a duped item display entity by uuid not equals");
               return;
             }
             
-            if (((EntityDisplay) shop.getDisplay()).data().type().entityType() != item.getType()) {
+            if (((EntityDisplay) chest.display()).data().type().entityType() != item.getType()) {
               item.remove();
               Util.debug("Removed a duped item display entity by type not equals");
               return;
@@ -118,7 +108,7 @@ public class ItemUtils {
    * @param itemStack Target ItemStack
    * @return Contains protect flag.
    */
-  public static boolean isDisplayItem(@Nullable ItemStack itemStack, @Nullable ContainerShop shop) {
+  public static boolean isDisplayItem(@Nullable ItemStack itemStack, @Nullable ChestShop shop) {
     if (itemStack == null || !itemStack.hasItemMeta())
       return false;
     
@@ -140,7 +130,7 @@ public class ItemUtils {
           return true;
         }
         if (shopProtectionFlag.getShopLocationData() != null) {
-          return shop == null ? true : shopProtectionFlag.getShopLocationData().equals(shop.getLocation().toString());
+          return shop == null ? true : shopProtectionFlag.getShopLocationData().equals(shop.location().toString());
         }
         if (shop == null && shopProtectionFlag.getShopItemStackData() != null) {
           return true;
@@ -160,7 +150,7 @@ public class ItemUtils {
    * @param shop The shop
    * @return New itemStack with protect flag.
    */
-  public static ItemStack createGuardItemStack(@NotNull ItemStack itemStack, @NotNull ContainerShop shop) {
+  public static ItemStack createGuardItemStack(@NotNull ItemStack itemStack, @NotNull ChestShop shop) {
     itemStack = new ItemStack(itemStack);
     itemStack.setAmount(1);
     
@@ -188,6 +178,7 @@ public class ItemUtils {
    * @return ItemStack iStack
    * @throws InvalidConfigurationException when failed deserialize config
    */
+  @SuppressWarnings({"deprecation", "unchecked"})
   @Nullable
   public static ItemStack deserialize(@NotNull String config) throws InvalidConfigurationException {
     DumperOptions yamlOptions = new DumperOptions();
