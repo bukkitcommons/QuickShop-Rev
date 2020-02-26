@@ -9,38 +9,36 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import cc.bukkit.shop.Shop;
 
 public class CommandAmount extends QuickShopCommand {
-
-  @NotNull
-  @Override
-  public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    final ArrayList<String> list = new ArrayList<>();
-
-    list.add(Shop.getLocaleManager().get("tabcomplete.amount"));
-
-    return list;
-  }
-
-  @Override
-  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    if (cmdArg.length < 1) {
-      sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
-      return;
+    
+    @NotNull
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+        final ArrayList<String> list = new ArrayList<>();
+        
+        list.add(Shop.getLocaleManager().get("tabcomplete.amount"));
+        
+        return list;
     }
-
-    if (!(sender instanceof Player)) {
-      sender.sendMessage("This command can't be run by console");
-      return;
+    
+    @Override
+    public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+        if (cmdArg.length < 1) {
+            sender.sendMessage(Shop.getLocaleManager().get("command.wrong-args"));
+            return;
+        }
+        
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("This command can't be run by console");
+            return;
+        }
+        
+        final Player player = (Player) sender;
+        
+        if (!Shop.getActions().hasAction(player.getUniqueId())) {
+            sender.sendMessage(Shop.getLocaleManager().get("no-pending-action"));
+            return;
+        }
+        
+        Shop.getActions().handleChat(player, cmdArg[0], false);
     }
-
-    final Player player = (Player) sender;
-
-    if (!Shop.getActions().hasAction(player.getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-pending-action"));
-      return;
-    }
-
-    Shop.getActions().handleChat(player, cmdArg[0], false);
-  }
 }

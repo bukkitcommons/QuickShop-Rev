@@ -9,7 +9,7 @@ import com.koloboke.compile.KolobokeMap;
 @NotThreadSafe
 @ConcurrentModificationUnchecked
 public abstract class LongHashMap<V> implements HashLongObjMap<V> {
-  public static <V> LongHashMap<V> withExpectedSize(int expectedSize) {
-    return new KolobokeLongHashMap<V>(expectedSize);
-  }
+    public static <V> LongHashMap<V> withExpectedSize(int expectedSize) {
+        return new KolobokeLongHashMap<V>(expectedSize);
+    }
 }

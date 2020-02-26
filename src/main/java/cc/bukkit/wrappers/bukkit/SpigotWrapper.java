@@ -11,42 +11,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SpigotWrapper implements BukkitWrapper {
-  @Override
-  public void teleportEntity(
-      @NotNull Entity entity,
-      @NotNull Location location,
-      @Nullable PlayerTeleportEvent.TeleportCause cause) {
+    @Override
+    public void teleportEntity(@NotNull Entity entity, @NotNull Location location, @Nullable PlayerTeleportEvent.TeleportCause cause) {
+        
+        if (cause == null)
+            entity.teleport(location);
+        else
+            entity.teleport(location, cause);
+    }
     
-    if (cause == null)
-      entity.teleport(location);
-    else
-      entity.teleport(location, cause);
-  }
-
-  @Override
-  public void getChunkAt(
-      @NotNull World world,
-      @NotNull Location location,
-      @NotNull CompletableFuture<Chunk> futureTask) {
+    @Override
+    public void getChunkAt(@NotNull World world, @NotNull Location location, @NotNull CompletableFuture<Chunk> futureTask) {
+        
+        futureTask.complete(world.getChunkAt(location));
+    }
     
-    futureTask.complete(world.getChunkAt(location));
-  }
-
-  @Override
-  public void getChunkAt(
-      @NotNull World world,
-      int x, int z,
-      @NotNull CompletableFuture<Chunk> futureTask) {
+    @Override
+    public void getChunkAt(@NotNull World world, int x, int z, @NotNull CompletableFuture<Chunk> futureTask) {
+        
+        futureTask.complete(world.getChunkAt(x, z));
+    }
     
-    futureTask.complete(world.getChunkAt(x, z));
-  }
-
-  @Override
-  public void getChunkAt(
-      @NotNull World world,
-      @NotNull Block block,
-      @NotNull CompletableFuture<Chunk> futureTask) {
-    
-    futureTask.complete(world.getChunkAt(block));
-  }
+    @Override
+    public void getChunkAt(@NotNull World world, @NotNull Block block, @NotNull CompletableFuture<Chunk> futureTask) {
+        
+        futureTask.complete(world.getChunkAt(block));
+    }
 }

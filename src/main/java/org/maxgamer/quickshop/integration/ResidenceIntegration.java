@@ -15,90 +15,84 @@ import cc.bukkit.shop.integration.IntegratedPlugin;
 
 @Configuration("configs/integrations.yml")
 public class ResidenceIntegration implements IntegratedPlugin {
-  @Node("integration.residence.create")
-  public static List<String> createLimits = Lists.newArrayList();
-  @Node("integration.residence.trade")
-  public static List<String> tradeLimits = Lists.newArrayList();
-
-  @Override
-  public @NotNull String getName() {
-    return "Residence";
-  }
-
-  @Override
-  public boolean canCreateShopHere(@NotNull Player player, @NotNull Location location) {
-    ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
-
-    for (String limit : ResidenceIntegration.createLimits) {
-      if ("FLAG".equalsIgnoreCase(limit)) {
-        if (residence == null) {
-          // Check world permission
-          if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
-              .playerHas(player, Flags.getFlag("quickshop-create"), false)) {
-            return false;
-          }
-        } else {
-          if (!residence.getPermissions().playerHas(player, Flags.getFlag("quickshop-create"),
-              false)) {
-            return false;
-          }
-        }
-      }
-      // Not flag
-      if (residence == null) {
-        if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
-            .playerHas(player, Flags.getFlag(limit), false)) {
-          return false;
-        }
-      } else {
-        if (!residence.getPermissions().playerHas(player, Flags.getFlag(limit), false)) {
-          return false;
-        }
-      }
+    @Node("integration.residence.create")
+    public static List<String> createLimits = Lists.newArrayList();
+    @Node("integration.residence.trade")
+    public static List<String> tradeLimits = Lists.newArrayList();
+    
+    @Override
+    public @NotNull String getName() {
+        return "Residence";
     }
-    return false;
-  }
-
-  @Override
-  public boolean canTradeShopHere(@NotNull Player player, @NotNull Location location) {
-    ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
-
-    for (String limit : ResidenceIntegration.tradeLimits) {
-      if ("FLAG".equalsIgnoreCase(limit)) {
-        if (residence == null) {
-          // Check world permission
-          if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
-              .playerHas(player, Flags.getFlag("quickshop-trade"), false)) {
-            return false;
-          }
-        } else {
-          if (!residence.getPermissions().playerHas(player, Flags.getFlag("quickshop-trade"),
-              true)) {
-            return false;
-          }
+    
+    @Override
+    public boolean canCreateShopHere(@NotNull Player player, @NotNull Location location) {
+        ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
+        
+        for (String limit : ResidenceIntegration.createLimits) {
+            if ("FLAG".equalsIgnoreCase(limit)) {
+                if (residence == null) {
+                    // Check world permission
+                    if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName()).playerHas(player, Flags.getFlag("quickshop-create"), false)) {
+                        return false;
+                    }
+                } else {
+                    if (!residence.getPermissions().playerHas(player, Flags.getFlag("quickshop-create"), false)) {
+                        return false;
+                    }
+                }
+            }
+            // Not flag
+            if (residence == null) {
+                if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName()).playerHas(player, Flags.getFlag(limit), false)) {
+                    return false;
+                }
+            } else {
+                if (!residence.getPermissions().playerHas(player, Flags.getFlag(limit), false)) {
+                    return false;
+                }
+            }
         }
-      }
-      // Not flag
-      if (residence == null) {
-        if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName())
-            .playerHas(player, Flags.getFlag(limit), false)) {
-          return false;
-        }
-      } else {
-        if (!residence.getPermissions().playerHas(player, Flags.getFlag(limit), false)) {
-          return false;
-        }
-      }
+        return false;
     }
-    return false;
-  }
-
-  @Override
-  public void load() {
-    FlagPermissions.addFlag("quickshop.create");
-    FlagPermissions.addFlag("quickshop.trade");
-  }
-
-  @Override
-  public void unload() {}
+    
+    @Override
+    public boolean canTradeShopHere(@NotNull Player player, @NotNull Location location) {
+        ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);
+        
+        for (String limit : ResidenceIntegration.tradeLimits) {
+            if ("FLAG".equalsIgnoreCase(limit)) {
+                if (residence == null) {
+                    // Check world permission
+                    if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName()).playerHas(player, Flags.getFlag("quickshop-trade"), false)) {
+                        return false;
+                    }
+                } else {
+                    if (!residence.getPermissions().playerHas(player, Flags.getFlag("quickshop-trade"), true)) {
+                        return false;
+                    }
+                }
+            }
+            // Not flag
+            if (residence == null) {
+                if (!Residence.getInstance().getWorldFlags().getPerms(location.getWorld().getName()).playerHas(player, Flags.getFlag(limit), false)) {
+                    return false;
+                }
+            } else {
+                if (!residence.getPermissions().playerHas(player, Flags.getFlag(limit), false)) {
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public void load() {
+        FlagPermissions.addFlag("quickshop.create");
+        FlagPermissions.addFlag("quickshop.trade");
+    }
+    
+    @Override
+    public void unload() {}
 }

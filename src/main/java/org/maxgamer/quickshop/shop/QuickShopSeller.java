@@ -13,65 +13,63 @@ import cc.bukkit.shop.seller.ChestSeller;
 import cc.bukkit.shop.stack.ItemStacked;
 
 public class QuickShopSeller extends ContainerQuickShop implements ChestSeller {
-  public QuickShopSeller(@NotNull ShopLocation shopLocation, double price,
-      @NotNull ItemStacked item, @NotNull ShopModerator moderator, boolean unlimited,
-      @NotNull ShopType type) {
-    super(shopLocation, price, item, moderator, unlimited, type);
-  }
-
-  /**
-   * Sells amount of item to Player p. Does NOT check our inventory, or balances
-   *
-   * @param p The player to sell to
-   * @param stackAmount The amount to sell
-   */
-  @Override
-  public void sell(@NotNull Player p, int stackAmount) {
-    int amount = stackAmount;
-    if (amount <= 0)
-      return;
-    
-    // Overslot Items to drop on floor
-    List<ItemStack> floor = Lists.newArrayList();
-    
-    Inventory playerInv = p.getInventory();
-    ItemStack offer = new ItemStack(stack.stack());
-    
-    if (unlimited) {
-      while (amount --> 0)
-        floor.addAll(playerInv.addItem(offer).values());
-      
-    } else {
-      Inventory chestInv = getInventory();
-      ItemStack[] contents = chestInv.getContents();
-      
-      int totalAmount = amount * stack.stack().getAmount();
-      // Take items from chest and offer to player's inventory
-      for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
-        ItemStack chestItem = contents[i];
-        if (chestItem == null || !isStack(chestItem))
-          continue;
-        
-        int takeAmount = Math.min(totalAmount, chestItem.getAmount());
-        chestItem.setAmount(chestItem.getAmount() - takeAmount);
-        
-        offer.setAmount(takeAmount);
-        floor.addAll(playerInv.addItem(offer).values());
-        
-        totalAmount -= takeAmount;
-      }
-      
-      chestInv.setContents(contents);
-      setSignText();
+    public QuickShopSeller(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStacked item, @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
+        super(shopLocation, price, item, moderator, unlimited, type);
     }
     
-    for (ItemStack stack : floor) {
-      p.getWorld().dropItem(p.getLocation(), stack);
+    /**
+     * Sells amount of item to Player p. Does NOT check our inventory, or balances
+     *
+     * @param p           The player to sell to
+     * @param stackAmount The amount to sell
+     */
+    @Override
+    public void sell(@NotNull Player p, int stackAmount) {
+        int amount = stackAmount;
+        if (amount <= 0)
+            return;
+        
+        // Overslot Items to drop on floor
+        List<ItemStack> floor = Lists.newArrayList();
+        
+        Inventory playerInv = p.getInventory();
+        ItemStack offer = new ItemStack(stack.stack());
+        
+        if (unlimited) {
+            while (amount-- > 0)
+                floor.addAll(playerInv.addItem(offer).values());
+            
+        } else {
+            Inventory chestInv = getInventory();
+            ItemStack[] contents = chestInv.getContents();
+            
+            int totalAmount = amount * stack.stack().getAmount();
+            // Take items from chest and offer to player's inventory
+            for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
+                ItemStack chestItem = contents[i];
+                if (chestItem == null || !isStack(chestItem))
+                    continue;
+                
+                int takeAmount = Math.min(totalAmount, chestItem.getAmount());
+                chestItem.setAmount(chestItem.getAmount() - takeAmount);
+                
+                offer.setAmount(takeAmount);
+                floor.addAll(playerInv.addItem(offer).values());
+                
+                totalAmount -= takeAmount;
+            }
+            
+            chestInv.setContents(contents);
+            setSignText();
+        }
+        
+        for (ItemStack stack : floor) {
+            p.getWorld().dropItem(p.getLocation(), stack);
+        }
     }
-  }
-
-  @Override
-  public @NotNull ShopType type() {
-    return ShopType.SELLING;
-  }
+    
+    @Override
+    public @NotNull ShopType type() {
+        return ShopType.SELLING;
+    }
 }

@@ -9,7 +9,7 @@ import com.koloboke.compile.KolobokeMap;
 @NotThreadSafe
 @ConcurrentModificationUnchecked
 public abstract class ObjectsHashMap<K, V> implements HashObjObjMap<K, V> {
-  public static <K, V> ObjectsHashMap<K, V> withExpectedSize(int expectedSize) {
-    return new KolobokeObjectsHashMap<K, V>(expectedSize);
-  }
+    public static <K, V> ObjectsHashMap<K, V> withExpectedSize(int expectedSize) {
+        return new KolobokeObjectsHashMap<K, V>(expectedSize);
+    }
 }

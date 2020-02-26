@@ -15,55 +15,55 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class InvDisplayProtecter implements Listener {
-  @EventHandler(ignoreCancelled = true)
-  public void invEvent(InventoryInteractEvent e) {
-    Inventory inventory = e.getInventory();
-    ItemStack[] stacks = inventory.getContents();
-
-    for (ItemStack itemStack : stacks) {
-      if (!ItemPreviewer.isPreviewItem(itemStack)) {
-        continue;
-      }
-
-      e.setCancelled(true);
-      e.setResult(Result.DENY);
+    @EventHandler(ignoreCancelled = true)
+    public void invEvent(InventoryInteractEvent e) {
+        Inventory inventory = e.getInventory();
+        ItemStack[] stacks = inventory.getContents();
+        
+        for (ItemStack itemStack : stacks) {
+            if (!ItemPreviewer.isPreviewItem(itemStack)) {
+                continue;
+            }
+            
+            e.setCancelled(true);
+            e.setResult(Result.DENY);
+        }
     }
-  }
-
-  @EventHandler(ignoreCancelled = true)
-  public void invEvent(InventoryMoveItemEvent e) {
-    if (ItemPreviewer.isPreviewItem(e.getItem())) {
-      e.setCancelled(true);
+    
+    @EventHandler(ignoreCancelled = true)
+    public void invEvent(InventoryMoveItemEvent e) {
+        if (ItemPreviewer.isPreviewItem(e.getItem())) {
+            e.setCancelled(true);
+        }
     }
-  }
-
-  @EventHandler
-  public void invEvent(InventoryClickEvent e) {
-    if (ItemPreviewer.isPreviewItem(e.getCurrentItem())) {
-      e.setCancelled(true);
-      e.setResult(Result.DENY);
+    
+    @EventHandler
+    public void invEvent(InventoryClickEvent e) {
+        if (ItemPreviewer.isPreviewItem(e.getCurrentItem())) {
+            e.setCancelled(true);
+            e.setResult(Result.DENY);
+        }
     }
-  }
-
-  @EventHandler
-  public void invEvent(InventoryDragEvent e) {
-    if (ItemPreviewer.isPreviewItem(e.getOldCursor())) {
-      e.setCancelled(true);
-      e.setResult(Result.DENY);
+    
+    @EventHandler
+    public void invEvent(InventoryDragEvent e) {
+        if (ItemPreviewer.isPreviewItem(e.getOldCursor())) {
+            e.setCancelled(true);
+            e.setResult(Result.DENY);
+        }
     }
-  }
-
-  @EventHandler
-  public void invEvent(InventoryPickupItemEvent e) {
-    Inventory inventory = e.getInventory();
-    ItemStack[] stacks = inventory.getContents();
-
-    for (ItemStack itemStack : stacks) {
-      if (!ItemPreviewer.isPreviewItem(itemStack)) {
-        continue;
-      }
-
-      e.setCancelled(true);
+    
+    @EventHandler
+    public void invEvent(InventoryPickupItemEvent e) {
+        Inventory inventory = e.getInventory();
+        ItemStack[] stacks = inventory.getContents();
+        
+        for (ItemStack itemStack : stacks) {
+            if (!ItemPreviewer.isPreviewItem(itemStack)) {
+                continue;
+            }
+            
+            e.setCancelled(true);
+        }
     }
-  }
 }

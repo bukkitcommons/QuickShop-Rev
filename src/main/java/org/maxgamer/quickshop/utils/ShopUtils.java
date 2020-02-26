@@ -22,188 +22,183 @@ import cc.bukkit.shop.event.ShopPreCreateEvent;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class ShopUtils {
-  @NotNull
-  private final static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
-  
-  public static String formatPrice(double d) {
-    return decimalFormat.format(d);
-  }
-
-  /**
-   * Checks other plugins to make sure they can use the chest they're making a shop.
-   *
-   * @param player The player to check
-   * @param block The block to check
-   * @return True if they're allowed to place a shop there.
-   */
-  public static boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
-    try {
-      if (BaseConfig.enableLimits) {
-        UUID uuid = player.getUniqueId();
-        long owned = Shop.getLoader().getAllShops()
-            .stream() // ASYNC
-            .filter(shop ->
-            shop.moderators().getOwner().equals(uuid))
-            .count();
-
-        int max = QuickShop.instance().getShopLimit(player);
-
-        if (owned >= max && ShopUtils.canBeShop(block)) {
-          player.sendMessage(
-              Shop.getLocaleManager().get("reached-maximum-can-create", player,
-                  String.valueOf(owned), String.valueOf(max)));
-
-          return false;
+    @NotNull
+    private final static DecimalFormat decimalFormat = new DecimalFormat(BaseConfig.decimalFormat);
+    
+    public static String formatPrice(double d) {
+        return decimalFormat.format(d);
+    }
+    
+    /**
+     * Checks other plugins to make sure they can use the chest they're making a
+     * shop.
+     *
+     * @param player The player to check
+     * @param block  The block to check
+     * @return True if they're allowed to place a shop there.
+     */
+    public static boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
+        try {
+            if (BaseConfig.enableLimits) {
+                UUID uuid = player.getUniqueId();
+                long owned = Shop.getLoader().getAllShops().stream() // ASYNC
+                        .filter(shop -> shop.moderators().getOwner().equals(uuid)).count();
+                
+                int max = QuickShop.instance().getShopLimit(player);
+                
+                if (owned >= max && ShopUtils.canBeShop(block)) {
+                    player.sendMessage(Shop.getLocaleManager().get("reached-maximum-can-create", player, String.valueOf(owned), String.valueOf(max)));
+                    
+                    return false;
+                }
+            }
+            
+            QuickShop.instance().getNcpExemptor().toggleProtectionListeners(false, player);
+            if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
+                Util.debug("PermissionChecker canceled shop creation");
+                return false;
+            }
+            
+            ShopPreCreateEvent event = new ShopPreCreateEvent(player, block.getLocation());
+            if (Util.fireCancellableEvent(event))
+                return false;
+            
+        } finally {
+            QuickShop.instance().getNcpExemptor().toggleProtectionListeners(true, player);
         }
-      }
-
-      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(false, player);
-      if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
-        Util.debug("PermissionChecker canceled shop creation");
-        return false;
-      }
-
-      ShopPreCreateEvent event = new ShopPreCreateEvent(player, block.getLocation());
-      if (Util.fireCancellableEvent(event))
-        return false;
-
-    } finally {
-      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(true, player);
-    }
-
-    return true;
-  }
-  
-  /**
-   * Gets the shop a sign is attached to
-   *
-   * @param b The location of the sign
-   * @return The shop
-   */
-  public static ShopViewer getShopBySign(@NotNull Block sign) {
-    final Optional<Block> shopBlock = BlockUtils.getSignAttached(sign);
-    
-    return shopBlock.isPresent() ?
-        Shop.getManager()
-          .getLoadedShopAt(shopBlock.get()) : ShopViewer.empty();
-  }
-
-  public static boolean canBeShop(@NotNull World world, int x, int y, int z) {
-    BlockState state = world.getBlockAt(x, y, z).getState();
-    return canBeShop(state);
-  }
-  
-  public static boolean canBeShop(@NotNull Block block) {
-    // Specificed types by configuration
-    if (Util.isBlocklisted(block.getType()) || Util.isBlacklistWorld(block.getWorld())) {
-      return false;
-    }
-    return canBeShopIgnoreBlocklist(block.getState());
-  }
-  
-  public static boolean canBeShop(@NotNull BlockState state) {
-    if (Util.isBlocklisted(state.getType()) || Util.isBlacklistWorld(state.getWorld())) {
-      return false;
-    }
-    return canBeShopIgnoreBlocklist(state);
-  }
-
-  /**
-   * Returns true if the given block could be used to make a shop out of.
-   *
-   * @param b The block to check, Possibly a chest, dispenser, etc.
-   * @return True if it can be made into a shop, otherwise false.
-   */
-  public static boolean canBeShopIgnoreBlocklist(@NotNull BlockState state) {
-    if (state instanceof EnderChest) { // BlockState for Mod supporting
-      return QuickShop.instance().getOpenInvPlugin() != null;
-    }
-
-    return state instanceof InventoryHolder;
-  }
-
-  /**
-   * Counts the number of items in the given inventory where Util.matches(inventory item, item) is
-   * true.
-   *
-   * @param inv The inventory to search
-   * @param item The ItemStack to search for
-   * @return The number of items that match in this inventory.
-   */
-  public static int countStacks(@Nullable Inventory inv, @NotNull ItemStack item) {
-    if (inv == null)
-      return 0;
-    
-    int items = 0;
-    for (ItemStack iStack : inv.getStorageContents()) {
-      if (iStack == null || iStack.getType() == Material.AIR)
-        continue;
-      
-      if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
-        items += iStack.getAmount();
-      }
-    }
-    
-    return items / item.getAmount();
-  }
-
-  /**
-   * Returns the number of items that can be given to the inventory safely.
-   *
-   * @param inv The inventory to count
-   * @param item The item prototype. Material, durabiltiy and enchants must match for 'stackability'
-   *        to occur.
-   * @return The number of items that can be given to the inventory safely.
-   */
-  public static int countSpace(@Nullable Inventory inv, @NotNull ItemStack item) {
-    if (inv == null)
-      return 0;
-    
-    int space = 0;
-
-    ItemStack[] contents = inv.getStorageContents();
-    for (ItemStack iStack : contents) {
-      if (iStack == null || iStack.getType() == Material.AIR) {
-        space += item.getMaxStackSize();
-      } else if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
-        space += (item.getMaxStackSize() - iStack.getAmount());
-      }
-    }
-    
-    return space;
-  }
-
-  /**
-   * Checks whether someone else's shop is within reach of a hopper being placed by a player.
-   *
-   * @param b The block being placed.
-   * @param p The player performing the action.
-   * @return true if a nearby shop was found, false otherwise.
-   */
-  public static boolean isOtherShopWithinHopperReach(@NotNull Block b, @NotNull Player p) {
-    // Check 5 relative positions that can be affected by a hopper: behind, in front of, to the
-    // right,
-    // to the left and underneath.
-    Block[] blocks = new Block[5];
-    blocks[0] = b.getRelative(0, 0, -1);
-    blocks[1] = b.getRelative(0, 0, 1);
-    blocks[2] = b.getRelative(1, 0, 0);
-    blocks[3] = b.getRelative(-1, 0, 0);
-    blocks[4] = b.getRelative(0, 1, 0);
-    for (Block c : blocks) {
-      ShopViewer firstShop = Shop.getManager().getLoadedShopAt(c.getLocation());
-      // If firstShop is null but is container, it can be used to drain contents from a shop created
-      // on secondHalf.
-      Optional<Location> secondHalf = BlockUtils.getSecondHalf(c);
-      ShopViewer secondShop =
-          secondHalf.isPresent() ?
-              Shop.getManager().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
-      
-      if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner())
-          || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
+        
         return true;
-      }
     }
-    return false;
-  }
+    
+    /**
+     * Gets the shop a sign is attached to
+     *
+     * @param b The location of the sign
+     * @return The shop
+     */
+    public static ShopViewer getShopBySign(@NotNull Block sign) {
+        final Optional<Block> shopBlock = BlockUtils.getSignAttached(sign);
+        
+        return shopBlock.isPresent() ? Shop.getManager().getLoadedShopAt(shopBlock.get()) : ShopViewer.empty();
+    }
+    
+    public static boolean canBeShop(@NotNull World world, int x, int y, int z) {
+        BlockState state = world.getBlockAt(x, y, z).getState();
+        return canBeShop(state);
+    }
+    
+    public static boolean canBeShop(@NotNull Block block) {
+        // Specificed types by configuration
+        if (Util.isBlocklisted(block.getType()) || Util.isBlacklistWorld(block.getWorld())) {
+            return false;
+        }
+        return canBeShopIgnoreBlocklist(block.getState());
+    }
+    
+    public static boolean canBeShop(@NotNull BlockState state) {
+        if (Util.isBlocklisted(state.getType()) || Util.isBlacklistWorld(state.getWorld())) {
+            return false;
+        }
+        return canBeShopIgnoreBlocklist(state);
+    }
+    
+    /**
+     * Returns true if the given block could be used to make a shop out of.
+     *
+     * @param b The block to check, Possibly a chest, dispenser, etc.
+     * @return True if it can be made into a shop, otherwise false.
+     */
+    public static boolean canBeShopIgnoreBlocklist(@NotNull BlockState state) {
+        if (state instanceof EnderChest) { // BlockState for Mod supporting
+            return QuickShop.instance().getOpenInvPlugin() != null;
+        }
+        
+        return state instanceof InventoryHolder;
+    }
+    
+    /**
+     * Counts the number of items in the given inventory where
+     * Util.matches(inventory item, item) is true.
+     *
+     * @param inv  The inventory to search
+     * @param item The ItemStack to search for
+     * @return The number of items that match in this inventory.
+     */
+    public static int countStacks(@Nullable Inventory inv, @NotNull ItemStack item) {
+        if (inv == null)
+            return 0;
+        
+        int items = 0;
+        for (ItemStack iStack : inv.getStorageContents()) {
+            if (iStack == null || iStack.getType() == Material.AIR)
+                continue;
+            
+            if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
+                items += iStack.getAmount();
+            }
+        }
+        
+        return items / item.getAmount();
+    }
+    
+    /**
+     * Returns the number of items that can be given to the inventory safely.
+     *
+     * @param inv  The inventory to count
+     * @param item The item prototype. Material, durabiltiy and enchants must match
+     *             for 'stackability' to occur.
+     * @return The number of items that can be given to the inventory safely.
+     */
+    public static int countSpace(@Nullable Inventory inv, @NotNull ItemStack item) {
+        if (inv == null)
+            return 0;
+        
+        int space = 0;
+        
+        ItemStack[] contents = inv.getStorageContents();
+        for (ItemStack iStack : contents) {
+            if (iStack == null || iStack.getType() == Material.AIR) {
+                space += item.getMaxStackSize();
+            } else
+                if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
+                    space += (item.getMaxStackSize() - iStack.getAmount());
+                }
+        }
+        
+        return space;
+    }
+    
+    /**
+     * Checks whether someone else's shop is within reach of a hopper being placed
+     * by a player.
+     *
+     * @param b The block being placed.
+     * @param p The player performing the action.
+     * @return true if a nearby shop was found, false otherwise.
+     */
+    public static boolean isOtherShopWithinHopperReach(@NotNull Block b, @NotNull Player p) {
+        // Check 5 relative positions that can be affected by a hopper: behind, in front
+        // of, to the
+        // right,
+        // to the left and underneath.
+        Block[] blocks = new Block[5];
+        blocks[0] = b.getRelative(0, 0, -1);
+        blocks[1] = b.getRelative(0, 0, 1);
+        blocks[2] = b.getRelative(1, 0, 0);
+        blocks[3] = b.getRelative(-1, 0, 0);
+        blocks[4] = b.getRelative(0, 1, 0);
+        for (Block c : blocks) {
+            ShopViewer firstShop = Shop.getManager().getLoadedShopAt(c.getLocation());
+            // If firstShop is null but is container, it can be used to drain contents from
+            // a shop created
+            // on secondHalf.
+            Optional<Location> secondHalf = BlockUtils.getSecondHalf(c);
+            ShopViewer secondShop = secondHalf.isPresent() ? Shop.getManager().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
+            
+            if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner()) || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -14,71 +14,65 @@ import cc.bukkit.shop.viewer.ShopViewer;
 import cc.bukkit.shop.viewer.ViewAction;
 
 public class CommandRemove extends QuickShopCommand {
-
-  @Override
-  public void onCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
-    if (args.length == 4) { // With world param, can be executed by console
-      handleAt(sender, args[0], args[1], args[2], args[3]);
-      return;
-    }
     
-    if (sender instanceof Player) {
-      Player player = (Player) sender;
-      
-      if (args.length == 3) { // With pos param
-        handleAt(sender, player.getWorld().getName(), args);
+    @Override
+    public void onCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 4) { // With world param, can be executed by console
+            handleAt(sender, args[0], args[1], args[2], args[3]);
+            return;
+        }
+        
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            
+            if (args.length == 3) { // With pos param
+                handleAt(sender, player.getWorld().getName(), args);
+                return;
+            }
+            
+            BlockViewer viwer = BlockViewer.get(((Player) sender), 10);
+            viwer.forEach(block -> {
+                ShopViewer shopViewer = Shop.getManager().getLoadedShopAt(block);
+                
+                if (shopViewer.isPresent()) {
+                    handleShop(sender, shopViewer.get());
+                    return ViewAction.BREAK;
+                }
+                
+                return ViewAction.NEXT;
+            }).ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop")));
+            
+            return;
+        }
+        
+        sender.sendMessage(ChatColor.RED + "Only players may use that command.");
         return;
-      }
-      
-      BlockViewer viwer = BlockViewer.get(((Player) sender), 10);
-      viwer
-        .forEach(block -> {
-          ShopViewer shopViewer = Shop.getManager().getLoadedShopAt(block);
-
-          if (shopViewer.isPresent()) {
-            handleShop(sender, shopViewer.get());
-            return ViewAction.BREAK;
-          }
-          
-          return ViewAction.NEXT;
-        })
-        .ifNone(() -> sender.sendMessage(Shop.getLocaleManager().get("not-looking-at-shop")));
-      
-      return;
     }
     
-    sender.sendMessage(ChatColor.RED + "Only players may use that command.");
-    return;
-  }
-  
-  private final static void handleAt(@NotNull CommandSender sender, @NotNull String world, @NotNull String... pos) {
-    try {
-      ShopViewer viewer = Shop.getManager().getLoadedShopAt(world,
-          Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
-      
-      if (viewer.isEmpty()) {
-        // FIXME not exist
-        sender.sendMessage(Shop.getLocaleManager().get("shop-not-exist"));
-        return;
-      }
-      
-      handleShop(sender, viewer.get());
-    } catch (NumberFormatException e) {
-      sender.sendMessage(Shop.getLocaleManager().get("not-a-integer"));
-    }
-  }
-  
-  private final static void handleShop(@NotNull CommandSender sender, @NotNull ChestShop shop) {
-    if (!QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy") &&
-        !shop.isModerator(((Player) sender).getUniqueId())) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-permission"));
-      return;
+    private final static void handleAt(@NotNull CommandSender sender, @NotNull String world, @NotNull String... pos) {
+        try {
+            ShopViewer viewer = Shop.getManager().getLoadedShopAt(world, Integer.parseInt(pos[0]), Integer.parseInt(pos[1]), Integer.parseInt(pos[2]));
+            
+            if (viewer.isEmpty()) {
+                // FIXME not exist
+                sender.sendMessage(Shop.getLocaleManager().get("shop-not-exist"));
+                return;
+            }
+            
+            handleShop(sender, viewer.get());
+        } catch (NumberFormatException e) {
+            sender.sendMessage(Shop.getLocaleManager().get("not-a-integer"));
+        }
     }
     
-    Shop.getLoader().delete(shop);
-    
-    sender.sendMessage(
-        Shop.getLocaleManager().get(
-            "command.now-selling", ItemUtils.getItemStackName(shop.stack())));
-  }
+    private final static void handleShop(@NotNull CommandSender sender, @NotNull ChestShop shop) {
+        if (!QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy") && !shop.isModerator(((Player) sender).getUniqueId())) {
+            sender.sendMessage(Shop.getLocaleManager().get("no-permission"));
+            return;
+        }
+        
+        Shop.getLoader().delete(shop);
+        
+        sender.sendMessage(Shop.getLocaleManager().get("command.now-selling", ItemUtils.getItemStackName(shop.stack())));
+    }
 }

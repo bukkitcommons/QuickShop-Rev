@@ -20,86 +20,85 @@ import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.action.ShopData;
 
 public class CommandFind extends QuickShopCommand {
-  @Override
-  public List<String> permissions() {
-    return Collections.singletonList("quickshop.find");
-  }
-
-  @Override
-  public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel,
-      @NotNull String[] cmdArg) {
-    if (!(sender instanceof Player)) {
-      sender.sendMessage(Shop.getLocaleManager().get("Only player can run this command"));
-      return;
+    @Override
+    public List<String> permissions() {
+        return Collections.singletonList("quickshop.find");
     }
-
-    if (cmdArg.length < 1) {
-      sender.sendMessage(Shop.getLocaleManager().get("command.no-type-given"));
-      return;
-    }
-
-    final StringBuilder sb = new StringBuilder(cmdArg[0]);
-
-    for (int i = 1; i < cmdArg.length; i++) {
-      sb.append(" ").append(cmdArg[i]);
-    }
-
-    final String lookFor = sb.toString().toLowerCase();
-    final Player p = (Player) sender;
-    final Location loc = p.getEyeLocation().clone();
-    final double minDistance = BaseConfig.findDistance;
-    double minDistanceSquared = minDistance * minDistance;
-    final int chunkRadius = (int) minDistance / 16 + 1;
-    ShopData closest = null;
-    CompletableFuture<Chunk> future = new CompletableFuture<>();
-    QuickShop.instance().getBukkitAPIWrapper().getChunkAt(loc.getWorld(), loc, future);
-    final Chunk c;
-    try {
-      c = future.get();
-    } catch (Exception asyncErr) {
-      sender.sendMessage("Cannot execute the command, see console for details.");
-      QuickShop.instance().getSentryErrorReporter().sendError(asyncErr, "Unknown errors");
-      QuickShop.instance().getSentryErrorReporter().ignoreThrow();
-      asyncErr.printStackTrace();
-      return;
-    }
-    for (int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++) {
-      for (int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++) {
-        Chunk d = c.getWorld().getChunkAt(x, z);
-        @NotNull Optional<Map<Long, ShopData>> inChunk = Shop.getLoader().getShopsInChunk(d);
-
-        if (!inChunk.isPresent()) {
-          continue;
+    
+    @Override
+    public void onCommand(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] cmdArg) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage(Shop.getLocaleManager().get("Only player can run this command"));
+            return;
         }
-
+        
+        if (cmdArg.length < 1) {
+            sender.sendMessage(Shop.getLocaleManager().get("command.no-type-given"));
+            return;
+        }
+        
+        final StringBuilder sb = new StringBuilder(cmdArg[0]);
+        
+        for (int i = 1; i < cmdArg.length; i++) {
+            sb.append(" ").append(cmdArg[i]);
+        }
+        
+        final String lookFor = sb.toString().toLowerCase();
+        final Player p = (Player) sender;
+        final Location loc = p.getEyeLocation().clone();
+        final double minDistance = BaseConfig.findDistance;
+        double minDistanceSquared = minDistance * minDistance;
+        final int chunkRadius = (int) minDistance / 16 + 1;
+        ShopData closest = null;
+        CompletableFuture<Chunk> future = new CompletableFuture<>();
+        QuickShop.instance().getBukkitAPIWrapper().getChunkAt(loc.getWorld(), loc, future);
+        final Chunk c;
         try {
-          for (ShopData shop : inChunk.get().values()) {
-            if (!ItemUtils.getItemStackName(ItemUtils.deserialize(shop.item())).toLowerCase().contains(lookFor)) {
-              continue;
-            }
-
-            if (shop.location().bukkit().distanceSquared(loc) >= minDistanceSquared) {
-              continue;
-            }
-
-            closest = shop;
-            minDistanceSquared = shop.location().bukkit().distanceSquared(loc);
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
+            c = future.get();
+        } catch (Exception asyncErr) {
+            sender.sendMessage("Cannot execute the command, see console for details.");
+            QuickShop.instance().getSentryErrorReporter().sendError(asyncErr, "Unknown errors");
+            QuickShop.instance().getSentryErrorReporter().ignoreThrow();
+            asyncErr.printStackTrace();
+            return;
         }
-      }
+        for (int x = -chunkRadius + c.getX(); x < chunkRadius + c.getX(); x++) {
+            for (int z = -chunkRadius + c.getZ(); z < chunkRadius + c.getZ(); z++) {
+                Chunk d = c.getWorld().getChunkAt(x, z);
+                @NotNull
+                Optional<Map<Long, ShopData>> inChunk = Shop.getLoader().getShopsInChunk(d);
+                
+                if (!inChunk.isPresent()) {
+                    continue;
+                }
+                
+                try {
+                    for (ShopData shop : inChunk.get().values()) {
+                        if (!ItemUtils.getItemStackName(ItemUtils.deserialize(shop.item())).toLowerCase().contains(lookFor)) {
+                            continue;
+                        }
+                        
+                        if (shop.location().bukkit().distanceSquared(loc) >= minDistanceSquared) {
+                            continue;
+                        }
+                        
+                        closest = shop;
+                        minDistanceSquared = shop.location().bukkit().distanceSquared(loc);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+        if (closest == null) {
+            sender.sendMessage(Shop.getLocaleManager().get("no-nearby-shop", cmdArg[0]));
+            return;
+        }
+        
+        final Location lookat = closest.location().bukkit().clone().add(0.5, 0.5, 0.5);
+        // Hack fix to make /qs find not used by /back
+        QuickShop.instance().getBukkitAPIWrapper().teleportEntity(p, Util.lookAt(loc, lookat).add(0, -1.62, 0), PlayerTeleportEvent.TeleportCause.UNKNOWN);
+        p.sendMessage(Shop.getLocaleManager().get("nearby-shop-this-way", "" + (int) Math.floor(Math.sqrt(minDistanceSquared))));
     }
-
-    if (closest == null) {
-      sender.sendMessage(Shop.getLocaleManager().get("no-nearby-shop", cmdArg[0]));
-      return;
-    }
-
-    final Location lookat = closest.location().bukkit().clone().add(0.5, 0.5, 0.5);
-    // Hack fix to make /qs find not used by /back
-    QuickShop.instance().getBukkitAPIWrapper().teleportEntity(p, Util.lookAt(loc, lookat).add(0, -1.62, 0),
-        PlayerTeleportEvent.TeleportCause.UNKNOWN);
-    p.sendMessage(Shop.getLocaleManager().get("nearby-shop-this-way", "" + (int) Math.floor(Math.sqrt(minDistanceSquared))));
-  }
 }

@@ -20,62 +20,62 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class ItemPreviewer implements Listener {
-
-  @Nullable
-  private Inventory inventory;
-  @NotNull
-  private ItemStack itemStack;
-  @NotNull
-  private Player player;
-
-  /**
-   * Create a preview item GUI for a player.
-   *
-   * @param itemStack The item you want create.
-   * @param player Target player.
-   */
-  public ItemPreviewer(@NotNull ItemStack itemStack, @NotNull Player player) {
-    this.player = player;
     
-    NBTItem nbtItem = new NBTItem(itemStack);
-    nbtItem.setBoolean("isQuickShopPreview", Boolean.TRUE);
-    this.itemStack = nbtItem.getItem();
-  }
-
-  public static boolean isPreviewItem(@Nullable ItemStack stack) {
-    if (stack == null || stack.getType() == Material.AIR)
-      return false;
+    @Nullable
+    private Inventory inventory;
+    @NotNull
+    private ItemStack itemStack;
+    @NotNull
+    private Player player;
     
-    NBTItem nbtItem = new NBTItem(stack);
-    return nbtItem.hasKey("isQuickShopPreview");
-  }
-
-  public void close() {
-    if (inventory == null) {
-      return;
+    /**
+     * Create a preview item GUI for a player.
+     *
+     * @param itemStack The item you want create.
+     * @param player    Target player.
+     */
+    public ItemPreviewer(@NotNull ItemStack itemStack, @NotNull Player player) {
+        this.player = player;
+        
+        NBTItem nbtItem = new NBTItem(itemStack);
+        nbtItem.setBoolean("isQuickShopPreview", Boolean.TRUE);
+        this.itemStack = nbtItem.getItem();
     }
-    for (HumanEntity player : inventory.getViewers()) {
-      player.closeInventory();
-    }
-    inventory = null; // Destory
-  }
-
-  /** Open the preview GUI for player. */
-  public void show() {
-    if (inventory != null)
-      close();
-    if (player.isSleeping())
-      return;
     
-    ShopInventoryPreviewEvent shopInventoryPreview = new ShopInventoryPreviewEvent(player, itemStack);
-    if (Util.fireCancellableEvent(shopInventoryPreview))
-      return;
-    
-    final int size = 9;
-    inventory = Bukkit.createInventory(null, 9, Shop.getLocaleManager().get("menu.preview", player));
-    for (int i = 0; i < size; i++) {
-      inventory.setItem(i, shopInventoryPreview.getItemStack());
+    public static boolean isPreviewItem(@Nullable ItemStack stack) {
+        if (stack == null || stack.getType() == Material.AIR)
+            return false;
+        
+        NBTItem nbtItem = new NBTItem(stack);
+        return nbtItem.hasKey("isQuickShopPreview");
     }
-    player.openInventory(inventory);
-  }
+    
+    public void close() {
+        if (inventory == null) {
+            return;
+        }
+        for (HumanEntity player : inventory.getViewers()) {
+            player.closeInventory();
+        }
+        inventory = null; // Destory
+    }
+    
+    /** Open the preview GUI for player. */
+    public void show() {
+        if (inventory != null)
+            close();
+        if (player.isSleeping())
+            return;
+        
+        ShopInventoryPreviewEvent shopInventoryPreview = new ShopInventoryPreviewEvent(player, itemStack);
+        if (Util.fireCancellableEvent(shopInventoryPreview))
+            return;
+        
+        final int size = 9;
+        inventory = Bukkit.createInventory(null, 9, Shop.getLocaleManager().get("menu.preview", player));
+        for (int i = 0; i < size; i++) {
+            inventory.setItem(i, shopInventoryPreview.getItemStack());
+        }
+        player.openInventory(inventory);
+    }
 }

@@ -48,519 +48,449 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
 public class QuickShopLocaleManager implements LocaleManager {
-  private FileConfiguration pluginLocale;
-  
-  @NotNull
-  public MinecraftLocale minecraftLocale;
-  
-  public QuickShopLocaleManager() {
-    minecraftLocale = new MinecraftLocale(new File(QuickShop.instance().getDataFolder(), "cache"));
-  }
-  
-  /**
-   * Get Enchantment's i18n name.
-   *
-   * @param key The Enchantment.
-   * @return Enchantment's i18n name.
-   */
-  @Override
-  public String get(@NotNull Enchantment enchantment) {
-    return minecraftLocale.get(enchantment);
-  }
-  
-  @Override
-  public String get(@NotNull String loc, @NotNull Object... args) {
-    return get(loc, null, args);
-  }
-
-  /**
-   * get in messages.yml
-   *
-   * @param loc location
-   * @param args args
-   * @param player The sender will send the message to
-   * @return message
-   */
-  @Override
-  public String get(@NotNull String loc, @Nullable OfflinePlayer player, @NotNull Object... args) {
+    private FileConfiguration pluginLocale;
     
-    String raw = pluginLocale.getString(loc);
-    if (raw == null) {
-      Util.debug("ERR: MsgUtil cannot find the the phrase at " + loc
-          + ", printing the all readed datas: " + pluginLocale);
-
-      return loc;
+    @NotNull
+    public MinecraftLocale minecraftLocale;
+    
+    public QuickShopLocaleManager() {
+        minecraftLocale = new MinecraftLocale(new File(QuickShop.instance().getDataFolder(), "cache"));
     }
-    String filled = JavaUtils.fillArgs(raw, args);
     
-    if (player instanceof OfflinePlayer) {
-      if (QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled()) {
-        try {
-          filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
-          Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
-        } catch (Exception ignored) {
-          if (((OfflinePlayer) player).getPlayer() != null) {
-            try {
-              filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(((OfflinePlayer) player).getPlayer(), filled);
-            } catch (Exception ignore) {
+    /**
+     * Get Enchantment's i18n name.
+     *
+     * @param key The Enchantment.
+     * @return Enchantment's i18n name.
+     */
+    @Override
+    public String get(@NotNull Enchantment enchantment) {
+        return minecraftLocale.get(enchantment);
+    }
+    
+    @Override
+    public String get(@NotNull String loc, @NotNull Object... args) {
+        return get(loc, null, args);
+    }
+    
+    /**
+     * get in messages.yml
+     *
+     * @param loc    location
+     * @param args   args
+     * @param player The sender will send the message to
+     * @return message
+     */
+    @Override
+    public String get(@NotNull String loc, @Nullable OfflinePlayer player, @NotNull Object... args) {
+        
+        String raw = pluginLocale.getString(loc);
+        if (raw == null) {
+            Util.debug("ERR: MsgUtil cannot find the the phrase at " + loc + ", printing the all readed datas: " + pluginLocale);
+            
+            return loc;
+        }
+        String filled = JavaUtils.fillArgs(raw, args);
+        
+        if (player instanceof OfflinePlayer) {
+            if (QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled()) {
+                try {
+                    filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
+                    Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
+                } catch (Exception ignored) {
+                    if (((OfflinePlayer) player).getPlayer() != null) {
+                        try {
+                            filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders(((OfflinePlayer) player).getPlayer(), filled);
+                        } catch (Exception ignore) {}
+                    }
+                }
             }
-          }
         }
-      }
+        return filled;
     }
-    return filled;
-  }
-  
-  public void sendParsed(@NotNull UUID player, @NotNull String message, boolean unlimited) {
-    if (BaseConfig.ignoreUnlimitedMessages && unlimited) {
-      return; // Ignore unlimited shops messages.
-    }
-    String[] msgData = message.split("##########");
-    Player p = Bukkit.getPlayer(player);
-    if (p != null) {
-      try {
-        sendItemHologram(p, msgData[0], ItemUtils.deserialize(msgData[1]), msgData[2]);
-      } catch (InvalidConfigurationException e) {
-        p.sendMessage(msgData[0] + msgData[1] + msgData[2]);
-      } catch (ArrayIndexOutOfBoundsException e2) {
-        try {
-          sendItemHologram(p, msgData[0], ItemUtils.deserialize(msgData[1]), "");
-        } catch (Exception any) {
-          p.sendMessage(message);
+    
+    public void sendParsed(@NotNull UUID player, @NotNull String message, boolean unlimited) {
+        if (BaseConfig.ignoreUnlimitedMessages && unlimited) {
+            return; // Ignore unlimited shops messages.
         }
-      }
-    }
-  }
-
-  /**
-   * Get potion effect's i18n name.
-   *
-   * @param potion potionType
-   * @return Potion's i18n name.
-   */
-  @Override
-  public String get(@NotNull PotionEffectType potion) {
-    return minecraftLocale.get(potion);
-  }
-
-  @Override
-  @SneakyThrows
-  public void load() throws InvalidConfigurationException {
-    minecraftLocale.load(BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language);
-    loadPluginLocales();
-  }
-  
-  private final static String DEFAULT_LOCALE;
-  
-  static {
-    Locale defaultLocale = Locale.getDefault();
-    
-    DEFAULT_LOCALE = BaseConfig.language.equalsIgnoreCase("default") ?
-      (defaultLocale.getLanguage().toLowerCase(Locale.ROOT)
-      .concat("_")
-      .concat(defaultLocale.getCountry().toUpperCase(Locale.ROOT))) : BaseConfig.language;
-  }
-
-  public void loadPluginLocales() throws InvalidConfigurationException, IOException {
-    String locale = BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language;
-    locale = locale.replace('-', '_');
-    
-    File messages = new File(Shop.instance().getDataFolder(), "messages.json");
-    if (!messages.exists()) {
-      InputStream stream = ResourceAccessor.get("messages/".concat(locale = DEFAULT_LOCALE).concat(".json")).get();
-      byte[] buffer = new byte[stream.available()];
-      stream.read(buffer);
-      Files.write(buffer, messages);
-    }
-    
-    Util.parseColours(pluginLocale = JsonReader.read(messages));
-    /* Print to console this language file's author, contributors, and region */
-    ShopLogger.instance().info(get("translation-author"));
-    ShopLogger.instance().info(get("translation-contributors"));
-    ShopLogger.instance().info(get("translation-country"));
-    /* Save the upgraded messages.yml */
-  }
-
-  @Override
-  @SneakyThrows
-  public void sendItemHologram(
-      @NotNull Player player,
-      @NotNull String left,
-      @NotNull ItemStack itemStack,
-      @NotNull String right) {
-    
-    String json = ItemNMS.toJson(itemStack);
-    if (json == null)
-      return;
-    
-    TextComponent centerItem = new TextComponent(left + ItemUtils.getItemStackName(itemStack) + right);
-    centerItem.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(json).create()));
-    player.spigot().sendMessage(centerItem);
-  }
-
-  /**
-   * Send controlPanel infomation to sender
-   *
-   * @param sender Target sender
-   * @param shop Target shop
-   */
-  @Override
-  public void sendControlPanelInfo(@NotNull Player sender, @NotNull BasicShop shop) {
-    if (!QuickShopPermissionManager.instance().has(sender, "quickshop.use")) {
-      return;
-    }
-    if (BaseConfig.sneakToControl) {
-      if (sender instanceof Player) {
-        if (!sender.isSneaking()) { // sneaking
-          return;
+        String[] msgData = message.split("##########");
+        Player p = Bukkit.getPlayer(player);
+        if (p != null) {
+            try {
+                sendItemHologram(p, msgData[0], ItemUtils.deserialize(msgData[1]), msgData[2]);
+            } catch (InvalidConfigurationException e) {
+                p.sendMessage(msgData[0] + msgData[1] + msgData[2]);
+            } catch (ArrayIndexOutOfBoundsException e2) {
+                try {
+                    sendItemHologram(p, msgData[0], ItemUtils.deserialize(msgData[1]), "");
+                } catch (Exception any) {
+                    p.sendMessage(message);
+                }
+            }
         }
-      }
     }
-    ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(sender);
-    chatSheetPrinter.printHeader();
-    chatSheetPrinter.printLine(get("controlpanel.infomation", sender));
-    // Owner
-    if (!QuickShopPermissionManager.instance().has(sender, "quickshop.setowner")) {
-      chatSheetPrinter.printLine(get("menu.owner", sender, shop.ownerName()));
-    } else {
-      chatSheetPrinter
-          .printSuggestableCmdLine(
-              get("controlpanel.setowner", sender,
-                  shop.ownerName() + ((BaseConfig.showOwnerUUIDForOp && shop.unlimited())
-                          ? (" (" + shop.getOwner() + ")")
-                          : "")),
-              get("controlpanel.setowner-hover", sender),
-              get("controlpanel.commands.setowner", sender));
+    
+    /**
+     * Get potion effect's i18n name.
+     *
+     * @param potion potionType
+     * @return Potion's i18n name.
+     */
+    @Override
+    public String get(@NotNull PotionEffectType potion) {
+        return minecraftLocale.get(potion);
     }
-
-    // Unlimited
-    if (QuickShopPermissionManager.instance().has(sender, "quickshop.unlimited")) {
-      String text =
-          get("controlpanel.unlimited", sender, get(shop.unlimited()));
-      String hoverText = get("controlpanel.unlimited-hover", sender);
-      String clickCommand = get("controlpanel.commands.unlimited", sender,
-          shop.location().worldName(),
-          String.valueOf(shop.location().x()),
-          String.valueOf(shop.location().y()),
-          String.valueOf(shop.location().z()));
-      chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
+    
+    @Override
+    @SneakyThrows
+    public void load() throws InvalidConfigurationException {
+        minecraftLocale.load(BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language);
+        loadPluginLocales();
     }
-    // Buying/Selling Mode
-    if (QuickShopPermissionManager.instance().has(sender, "quickshop.create.buy")
-        && sender.hasPermission("quickshop.create.sell")) {
-      if (shop.is(ShopType.SELLING)) {
-        String text = get("controlpanel.mode-selling", sender);
-        String hoverText = get("controlpanel.mode-selling-hover", sender);
-        String clickCommand = get("controlpanel.commands.buy", sender,
-            shop.location().worldName(),
-            String.valueOf(shop.location().x()),
-            String.valueOf(shop.location().y()),
-            String.valueOf(shop.location().z()));
-        chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
-      } else {
-        String text = get("controlpanel.mode-buying", sender);
-        String hoverText = get("controlpanel.mode-buying-hover", sender);
-        String clickCommand = get("controlpanel.commands.sell", sender,
-            shop.location().worldName(),
-            String.valueOf(shop.location().x()),
-            String.valueOf(shop.location().y()),
-            String.valueOf(shop.location().z()));
-        chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
-      }
+    
+    private final static String DEFAULT_LOCALE;
+    
+    static {
+        Locale defaultLocale = Locale.getDefault();
+        
+        DEFAULT_LOCALE = BaseConfig.language.equalsIgnoreCase("default") ? (defaultLocale.getLanguage().toLowerCase(Locale.ROOT).concat("_").concat(defaultLocale.getCountry().toUpperCase(Locale.ROOT))) : BaseConfig.language;
     }
-    // Set Price
-    if (QuickShopPermissionManager.instance().has(sender, "quickshop.other.price")
-        || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
-      String text = get("controlpanel.price", sender,
-          BaseConfig.decimalFormatPrice ? ShopUtils.formatPrice(shop.price()) : "" + shop.price());
-      String hoverText = get("controlpanel.price-hover", sender);
-      String clickCommand = get("controlpanel.commands.price", sender);
-      chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
-    }
-    // Refill
-    if (QuickShopPermissionManager.instance().has(sender, "quickshop.refill")) {
-      String text =
-          get("controlpanel.refill", sender, String.valueOf(shop.price()));
-      String hoverText = get("controlpanel.refill-hover", sender);
-      String clickCommand = get("controlpanel.commands.refill", sender);
-      chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
-    }
-    // Refill
-    if (QuickShopPermissionManager.instance().has(sender, "quickshop.empty")) {
-      String text =
-          get("controlpanel.empty", sender, String.valueOf(shop.price()));
-      String hoverText = get("controlpanel.empty-hover", sender);
-      String clickCommand = get("controlpanel.commands.empty", sender,
-          shop.location().worldName(),
-          String.valueOf(shop.location().x()),
-          String.valueOf(shop.location().y()),
-          String.valueOf(shop.location().z()));
-      chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
-    }
-    // Remove
-    if (QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy")
-        || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
-      String text =
-          get("controlpanel.remove", sender, String.valueOf(shop.price()));
-      String hoverText = get("controlpanel.remove-hover", sender);
-      String clickCommand = get("controlpanel.commands.remove", sender,
-          shop.location().worldName(),
-          String.valueOf(shop.location().x()),
-          String.valueOf(shop.location().y()),
-          String.valueOf(shop.location().z()));
-      chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
-    }
-
-    chatSheetPrinter.printFooter();
-  }
-
-  /**
-   * Send globalAlert to ops, console, log file.
-   *
-   * @param content The content to send.
-   */
-  @Override
-  public void sendGlobalAlert(@NotNull String content) {
-    sendMessageToOps(content);
-    ShopLogger.instance().warning(content);
-    QuickShop.instance().getLogWatcher().log(content);
-  }
-
-  /**
-   * Send the ItemPreview chat msg by NMS.
-   *
-   * @param shop Target shop
-   * @param itemStack Target ItemStack
-   * @param player Target player
-   * @param normalText The text you will see
-   */
-  @Override
-  public void sendItemholochat(@NotNull BasicShop shop, @NotNull ItemStack itemStack,
-      @NotNull Player player, @NotNull String normalText) {
-    try {
-      String json = ItemNMS.toJson(itemStack);
-      if (json == null) {
-        return;
-      }
-      TextComponent normalmessage =
-          new TextComponent(normalText + "   " + get("menu.preview", player));
-      ComponentBuilder cBuilder = new ComponentBuilder(json);
-      if (QuickShopPermissionManager.instance().has(player, "quickshop.preview")) {
-        normalmessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-            get("menu.commands.preview", player,
-                shop.location().worldName(),
-                String.valueOf(shop.location().x()),
-                String.valueOf(shop.location().y()),
-                String.valueOf(shop.location().z()))));
-      }
-      normalmessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, cBuilder.create()));
-      player.spigot().sendMessage(normalmessage);
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-  }
-
-  /**
-   * Send a message for all online Ops.
-   *
-   * @param message The message you want send
-   */
-  @Override
-  public void sendMessageToOps(@NotNull String message) {
-    Bukkit.getOnlinePlayers()
-          .stream()
-          .filter(player -> player.isOp() || QuickShopPermissionManager.instance().has(player, "quickshop.alert"))
-          .forEach(player -> player.sendMessage(message));
-  }
-
-  /**
-   * Send a purchaseSuccess message for a player.
-   *
-   * @param p Target player
-   * @param shop Target shop
-   * @param amount Trading item amounts.
-   */
-  @Override
-  public void sendPurchaseSuccess(@NotNull Player p, @NotNull BasicShop shop, int amount, @NotNull ShopSnapshot info) {
-    ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
-    chatSheetPrinter.printHeader();
-    chatSheetPrinter.printLine(get("menu.successful-purchase", p));
-    int stacks = info.stack().<ItemStack>stack().getAmount();
-    String stackMessage = stacks > 1 ? " * " + stacks : "";
-    chatSheetPrinter.printLine(get("menu.item-name-and-price", p, "" + amount,
-        ItemUtils.getItemStackName(shop.stack()) + stackMessage, JavaUtils.format((amount * shop.<Double>price()))));
-    Map<Enchantment, Integer> enchs = new HashMap<>();
-    if (shop.<ItemStack>stack().hasItemMeta()
-        && Objects.requireNonNull(shop.<ItemStack>stack().getItemMeta()).hasEnchants()) {
-      enchs = shop.<ItemStack>stack().getItemMeta().getEnchants();
-    }
-    if (!enchs.isEmpty()) {
-      chatSheetPrinter.printCenterLine(get("menu.enchants", p));
-      for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-        chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
-      }
-    }
-    if (shop.<ItemStack>stack().getItemMeta() instanceof EnchantmentStorageMeta) {
-      EnchantmentStorageMeta stor = (EnchantmentStorageMeta) shop.<ItemStack>stack().getItemMeta();
-      stor.getStoredEnchants();
-      enchs = stor.getStoredEnchants();
-      if (!enchs.isEmpty()) {
-        chatSheetPrinter.printCenterLine(get("menu.stored-enchants", p));
-        for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-          chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
+    
+    public void loadPluginLocales() throws InvalidConfigurationException, IOException {
+        String locale = BaseConfig.language.equalsIgnoreCase("default") ? DEFAULT_LOCALE : BaseConfig.language;
+        locale = locale.replace('-', '_');
+        
+        File messages = new File(Shop.instance().getDataFolder(), "messages.json");
+        if (!messages.exists()) {
+            InputStream stream = ResourceAccessor.get("messages/".concat(locale = DEFAULT_LOCALE).concat(".json")).get();
+            byte[] buffer = new byte[stream.available()];
+            stream.read(buffer);
+            Files.write(buffer, messages);
         }
-      }
+        
+        Util.parseColours(pluginLocale = JsonReader.read(messages));
+        /* Print to console this language file's author, contributors, and region */
+        ShopLogger.instance().info(get("translation-author"));
+        ShopLogger.instance().info(get("translation-contributors"));
+        ShopLogger.instance().info(get("translation-country"));
+        /* Save the upgraded messages.yml */
     }
-    chatSheetPrinter.printFooter();
-  }
-
-  /**
-   * Send a sellSuccess message for a player.
-   *
-   * @param p Target player
-   * @param shop Target shop
-   * @param amount Trading item amounts.
-   */
-  @Override
-  public void sendSellSuccess(@NotNull Player p, @NotNull BasicShop shop, int amount) {
-    ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
-    chatSheetPrinter.printHeader();
-    chatSheetPrinter.printLine(get("menu.successfully-sold", p));
-    String stackMessage = shop.<ItemStack>stack().getAmount() > 1 ? " * " + shop.<ItemStack>stack().getAmount() : "";
-    chatSheetPrinter.printLine(get("menu.item-name-and-price", p, "" + amount,
-        ItemUtils.getItemStackName(shop.stack()) + stackMessage, JavaUtils.format((amount * shop.<Double>price()))));
-    if (BaseConfig.showTax) {
-      double tax = BaseConfig.taxRate;
-      double total = amount * shop.<Double>price();
-      if (tax != 0) {
-        if (!p.getUniqueId().equals(shop.getOwner())) {
-          chatSheetPrinter
-              .printLine(get("menu.sell-tax", p, JavaUtils.format((tax * total))));
+    
+    @Override
+    @SneakyThrows
+    public void sendItemHologram(@NotNull Player player, @NotNull String left, @NotNull ItemStack itemStack, @NotNull String right) {
+        
+        String json = ItemNMS.toJson(itemStack);
+        if (json == null)
+            return;
+        
+        TextComponent centerItem = new TextComponent(left + ItemUtils.getItemStackName(itemStack) + right);
+        centerItem.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(json).create()));
+        player.spigot().sendMessage(centerItem);
+    }
+    
+    /**
+     * Send controlPanel infomation to sender
+     *
+     * @param sender Target sender
+     * @param shop   Target shop
+     */
+    @Override
+    public void sendControlPanelInfo(@NotNull Player sender, @NotNull BasicShop shop) {
+        if (!QuickShopPermissionManager.instance().has(sender, "quickshop.use")) {
+            return;
+        }
+        if (BaseConfig.sneakToControl) {
+            if (sender instanceof Player) {
+                if (!sender.isSneaking()) { // sneaking
+                    return;
+                }
+            }
+        }
+        ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(sender);
+        chatSheetPrinter.printHeader();
+        chatSheetPrinter.printLine(get("controlpanel.infomation", sender));
+        // Owner
+        if (!QuickShopPermissionManager.instance().has(sender, "quickshop.setowner")) {
+            chatSheetPrinter.printLine(get("menu.owner", sender, shop.ownerName()));
         } else {
-          chatSheetPrinter.printLine(get("menu.sell-tax-self", p));
+            chatSheetPrinter.printSuggestableCmdLine(get("controlpanel.setowner", sender, shop.ownerName() + ((BaseConfig.showOwnerUUIDForOp && shop.unlimited()) ? (" (" + shop.getOwner() + ")") : "")), get("controlpanel.setowner-hover", sender), get("controlpanel.commands.setowner", sender));
         }
-      }
-    }
-    Map<Enchantment, Integer> enchs = new HashMap<>();
-    if (shop.<ItemStack>stack().hasItemMeta()
-        && Objects.requireNonNull(shop.<ItemStack>stack().getItemMeta()).hasEnchants()) {
-      enchs = shop.<ItemStack>stack().getItemMeta().getEnchants();
-    }
-    if (!enchs.isEmpty()) {
-      chatSheetPrinter.printCenterLine(get("menu.enchants", p));
-      for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-        chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
-      }
-    }
-    if (shop.<ItemStack>stack().getItemMeta() instanceof EnchantmentStorageMeta) {
-      EnchantmentStorageMeta stor = (EnchantmentStorageMeta) shop.<ItemStack>stack().getItemMeta();
-      stor.getStoredEnchants();
-      enchs = stor.getStoredEnchants();
-      if (!enchs.isEmpty()) {
-        chatSheetPrinter.printCenterLine(get("menu.stored-enchants", p));
-        for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-          chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
+        
+        // Unlimited
+        if (QuickShopPermissionManager.instance().has(sender, "quickshop.unlimited")) {
+            String text = get("controlpanel.unlimited", sender, get(shop.unlimited()));
+            String hoverText = get("controlpanel.unlimited-hover", sender);
+            String clickCommand = get("controlpanel.commands.unlimited", sender, shop.location().worldName(), String.valueOf(shop.location().x()), String.valueOf(shop.location().y()), String.valueOf(shop.location().z()));
+            chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
         }
-      }
-    }
-    chatSheetPrinter.printFooter();
-  }
-
-  /**
-   * Send a shop infomation to a player.
-   *
-   * @param p Target player
-   * @param shop The shop
-   */
-  @Override
-  public void sendShopInfo(@NotNull Player p, @NotNull BasicShop shop) {
-    // Potentially faster with an array?
-    ItemStack items = shop.stack();
-    ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
-    chatSheetPrinter.printHeader();
-    chatSheetPrinter.printLine(get("menu.shop-information", p));
-    chatSheetPrinter.printLine(get("menu.owner", p, shop.ownerName()));
-    // Enabled
-    String stackMessage = shop.<ItemStack>stack().getAmount() > 1 ? " * " + shop.<ItemStack>stack().getAmount() : "";
-    sendItemholochat(shop, items, p,
-        ChatColor.DARK_PURPLE + get("tableformat.left_begin", p) + " "
-            + get("menu.item", p, ItemUtils.getItemStackName(items) + stackMessage));
-    if (ItemUtils.hasDurability(items.getType())) {
-      chatSheetPrinter.printLine(
-          get("menu.damage-percent-remaining", p, ItemUtils.getToolPercentage(items)));
-    }
-    if (shop.is(ShopType.SELLING)) {
-      if (shop.unlimited()) {
-        chatSheetPrinter.printLine(
-            get("menu.stock", p, "" + get("signs.unlimited", p)));
-      } else {
-        chatSheetPrinter
-            .printLine(get("menu.stock", p, "" + shop.getRemainingStock()));
-      }
-    } else {
-      if (shop.unlimited()) {
-        chatSheetPrinter.printLine(
-            get("menu.space", p, "" + get("signs.unlimited", p)));
-      } else {
-        chatSheetPrinter
-            .printLine(get("menu.space", p, "" + shop.getRemainingSpace()));
-      }
-    }
-    Util.debug("Item type " + shop.<ItemStack>stack().getType());
-    chatSheetPrinter.printLine(get("menu.price-per", p,
-        ItemUtils.getItemStackName(shop.stack()), JavaUtils.format(shop.<Double>price() / shop.<ItemStack>stack().getAmount())));
-    if (shop.is(ShopType.BUYING)) {
-      chatSheetPrinter.printLine(get("menu.this-shop-is-buying", p));
-    } else {
-      chatSheetPrinter.printLine(get("menu.this-shop-is-selling", p));
-    }
-    Map<Enchantment, Integer> enchs = new HashMap<>();
-    if (items.hasItemMeta() && Objects.requireNonNull(items.getItemMeta()).hasEnchants()) {
-      enchs = items.getItemMeta().getEnchants();
-    }
-    if (!enchs.isEmpty()) {
-      chatSheetPrinter.printCenterLine(get("menu.enchants", p, ""));
-      for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-        chatSheetPrinter.printLine(
-            ChatColor.YELLOW + get(entries.getKey()) + " " + entries.getValue());
-      }
-    }
-    if (items.getItemMeta() instanceof EnchantmentStorageMeta) {
-      EnchantmentStorageMeta stor = (EnchantmentStorageMeta) items.getItemMeta();
-      enchs = stor.getStoredEnchants();
-      if (!enchs.isEmpty()) {
-        chatSheetPrinter.printLine(get("menu.stored-enchants", p));
-        for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
-          chatSheetPrinter.printLine(
-              ChatColor.YELLOW + get(entries.getKey()) + " " + entries.getValue());
+        // Buying/Selling Mode
+        if (QuickShopPermissionManager.instance().has(sender, "quickshop.create.buy") && sender.hasPermission("quickshop.create.sell")) {
+            if (shop.is(ShopType.SELLING)) {
+                String text = get("controlpanel.mode-selling", sender);
+                String hoverText = get("controlpanel.mode-selling-hover", sender);
+                String clickCommand = get("controlpanel.commands.buy", sender, shop.location().worldName(), String.valueOf(shop.location().x()), String.valueOf(shop.location().y()), String.valueOf(shop.location().z()));
+                chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
+            } else {
+                String text = get("controlpanel.mode-buying", sender);
+                String hoverText = get("controlpanel.mode-buying-hover", sender);
+                String clickCommand = get("controlpanel.commands.sell", sender, shop.location().worldName(), String.valueOf(shop.location().x()), String.valueOf(shop.location().y()), String.valueOf(shop.location().z()));
+                chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
+            }
         }
-      }
+        // Set Price
+        if (QuickShopPermissionManager.instance().has(sender, "quickshop.other.price") || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
+            String text = get("controlpanel.price", sender, BaseConfig.decimalFormatPrice ? ShopUtils.formatPrice(shop.price()) : "" + shop.price());
+            String hoverText = get("controlpanel.price-hover", sender);
+            String clickCommand = get("controlpanel.commands.price", sender);
+            chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
+        }
+        // Refill
+        if (QuickShopPermissionManager.instance().has(sender, "quickshop.refill")) {
+            String text = get("controlpanel.refill", sender, String.valueOf(shop.price()));
+            String hoverText = get("controlpanel.refill-hover", sender);
+            String clickCommand = get("controlpanel.commands.refill", sender);
+            chatSheetPrinter.printSuggestableCmdLine(text, hoverText, clickCommand);
+        }
+        // Refill
+        if (QuickShopPermissionManager.instance().has(sender, "quickshop.empty")) {
+            String text = get("controlpanel.empty", sender, String.valueOf(shop.price()));
+            String hoverText = get("controlpanel.empty-hover", sender);
+            String clickCommand = get("controlpanel.commands.empty", sender, shop.location().worldName(), String.valueOf(shop.location().x()), String.valueOf(shop.location().y()), String.valueOf(shop.location().z()));
+            chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
+        }
+        // Remove
+        if (QuickShopPermissionManager.instance().has(sender, "quickshop.other.destroy") || shop.getOwner().equals(((OfflinePlayer) sender).getUniqueId())) {
+            String text = get("controlpanel.remove", sender, String.valueOf(shop.price()));
+            String hoverText = get("controlpanel.remove-hover", sender);
+            String clickCommand = get("controlpanel.commands.remove", sender, shop.location().worldName(), String.valueOf(shop.location().x()), String.valueOf(shop.location().y()), String.valueOf(shop.location().z()));
+            chatSheetPrinter.printExecuteableCmdLine(text, hoverText, clickCommand);
+        }
+        
+        chatSheetPrinter.printFooter();
     }
-    if (items.getItemMeta() instanceof PotionMeta) {
-      PotionMeta potionMeta = (PotionMeta) items.getItemMeta();
-      PotionEffectType potionEffectType = potionMeta.getBasePotionData().getType().getEffectType();
-      if (potionEffectType != null) {
-        chatSheetPrinter.printLine(get("menu.effects", p));
-        chatSheetPrinter.printLine(ChatColor.YELLOW + get(potionEffectType));
-      }
-      potionMeta.getCustomEffects().forEach((potionEffect -> chatSheetPrinter
-          .printLine(ChatColor.YELLOW + get(potionEffect.getType()))));
+    
+    /**
+     * Send globalAlert to ops, console, log file.
+     *
+     * @param content The content to send.
+     */
+    @Override
+    public void sendGlobalAlert(@NotNull String content) {
+        sendMessageToOps(content);
+        ShopLogger.instance().warning(content);
+        QuickShop.instance().getLogWatcher().log(content);
     }
-    chatSheetPrinter.printFooter();
-  }
-
-  @Override
-  public void load(@NotNull String locale) throws IOException {
-    minecraftLocale.load(locale);
-  }
-
-  @Override
-  public String get(@NotNull String key) {
-    return pluginLocale.getString(key);
-  }
-
-  @Override
-  public MinecraftLocaleProvider getMinecraftLocale() {
-    return minecraftLocale;
-  }
+    
+    /**
+     * Send the ItemPreview chat msg by NMS.
+     *
+     * @param shop       Target shop
+     * @param itemStack  Target ItemStack
+     * @param player     Target player
+     * @param normalText The text you will see
+     */
+    @Override
+    public void sendItemholochat(@NotNull BasicShop shop, @NotNull ItemStack itemStack, @NotNull Player player, @NotNull String normalText) {
+        try {
+            String json = ItemNMS.toJson(itemStack);
+            if (json == null) {
+                return;
+            }
+            TextComponent normalmessage = new TextComponent(normalText + "   " + get("menu.preview", player));
+            ComponentBuilder cBuilder = new ComponentBuilder(json);
+            if (QuickShopPermissionManager.instance().has(player, "quickshop.preview")) {
+                normalmessage.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, get("menu.commands.preview", player, shop.location().worldName(), String.valueOf(shop.location().x()), String.valueOf(shop.location().y()), String.valueOf(shop.location().z()))));
+            }
+            normalmessage.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, cBuilder.create()));
+            player.spigot().sendMessage(normalmessage);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+    
+    /**
+     * Send a message for all online Ops.
+     *
+     * @param message The message you want send
+     */
+    @Override
+    public void sendMessageToOps(@NotNull String message) {
+        Bukkit.getOnlinePlayers().stream().filter(player -> player.isOp() || QuickShopPermissionManager.instance().has(player, "quickshop.alert")).forEach(player -> player.sendMessage(message));
+    }
+    
+    /**
+     * Send a purchaseSuccess message for a player.
+     *
+     * @param p      Target player
+     * @param shop   Target shop
+     * @param amount Trading item amounts.
+     */
+    @Override
+    public void sendPurchaseSuccess(@NotNull Player p, @NotNull BasicShop shop, int amount, @NotNull ShopSnapshot info) {
+        ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
+        chatSheetPrinter.printHeader();
+        chatSheetPrinter.printLine(get("menu.successful-purchase", p));
+        int stacks = info.stack().<ItemStack>stack().getAmount();
+        String stackMessage = stacks > 1 ? " * " + stacks : "";
+        chatSheetPrinter.printLine(get("menu.item-name-and-price", p, "" + amount, ItemUtils.getItemStackName(shop.stack()) + stackMessage, JavaUtils.format((amount * shop.<Double>price()))));
+        Map<Enchantment, Integer> enchs = new HashMap<>();
+        if (shop.<ItemStack>stack().hasItemMeta() && Objects.requireNonNull(shop.<ItemStack>stack().getItemMeta()).hasEnchants()) {
+            enchs = shop.<ItemStack>stack().getItemMeta().getEnchants();
+        }
+        if (!enchs.isEmpty()) {
+            chatSheetPrinter.printCenterLine(get("menu.enchants", p));
+            for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
+                chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
+            }
+        }
+        if (shop.<ItemStack>stack().getItemMeta() instanceof EnchantmentStorageMeta) {
+            EnchantmentStorageMeta stor = (EnchantmentStorageMeta) shop.<ItemStack>stack().getItemMeta();
+            stor.getStoredEnchants();
+            enchs = stor.getStoredEnchants();
+            if (!enchs.isEmpty()) {
+                chatSheetPrinter.printCenterLine(get("menu.stored-enchants", p));
+                for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
+                    chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
+                }
+            }
+        }
+        chatSheetPrinter.printFooter();
+    }
+    
+    /**
+     * Send a sellSuccess message for a player.
+     *
+     * @param p      Target player
+     * @param shop   Target shop
+     * @param amount Trading item amounts.
+     */
+    @Override
+    public void sendSellSuccess(@NotNull Player p, @NotNull BasicShop shop, int amount) {
+        ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
+        chatSheetPrinter.printHeader();
+        chatSheetPrinter.printLine(get("menu.successfully-sold", p));
+        String stackMessage = shop.<ItemStack>stack().getAmount() > 1 ? " * " + shop.<ItemStack>stack().getAmount() : "";
+        chatSheetPrinter.printLine(get("menu.item-name-and-price", p, "" + amount, ItemUtils.getItemStackName(shop.stack()) + stackMessage, JavaUtils.format((amount * shop.<Double>price()))));
+        if (BaseConfig.showTax) {
+            double tax = BaseConfig.taxRate;
+            double total = amount * shop.<Double>price();
+            if (tax != 0) {
+                if (!p.getUniqueId().equals(shop.getOwner())) {
+                    chatSheetPrinter.printLine(get("menu.sell-tax", p, JavaUtils.format((tax * total))));
+                } else {
+                    chatSheetPrinter.printLine(get("menu.sell-tax-self", p));
+                }
+            }
+        }
+        Map<Enchantment, Integer> enchs = new HashMap<>();
+        if (shop.<ItemStack>stack().hasItemMeta() && Objects.requireNonNull(shop.<ItemStack>stack().getItemMeta()).hasEnchants()) {
+            enchs = shop.<ItemStack>stack().getItemMeta().getEnchants();
+        }
+        if (!enchs.isEmpty()) {
+            chatSheetPrinter.printCenterLine(get("menu.enchants", p));
+            for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
+                chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
+            }
+        }
+        if (shop.<ItemStack>stack().getItemMeta() instanceof EnchantmentStorageMeta) {
+            EnchantmentStorageMeta stor = (EnchantmentStorageMeta) shop.<ItemStack>stack().getItemMeta();
+            stor.getStoredEnchants();
+            enchs = stor.getStoredEnchants();
+            if (!enchs.isEmpty()) {
+                chatSheetPrinter.printCenterLine(get("menu.stored-enchants", p));
+                for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
+                    chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()));
+                }
+            }
+        }
+        chatSheetPrinter.printFooter();
+    }
+    
+    /**
+     * Send a shop infomation to a player.
+     *
+     * @param p    Target player
+     * @param shop The shop
+     */
+    @Override
+    public void sendShopInfo(@NotNull Player p, @NotNull BasicShop shop) {
+        // Potentially faster with an array?
+        ItemStack items = shop.stack();
+        ChatSheetPrinter chatSheetPrinter = new ChatSheetPrinter(p);
+        chatSheetPrinter.printHeader();
+        chatSheetPrinter.printLine(get("menu.shop-information", p));
+        chatSheetPrinter.printLine(get("menu.owner", p, shop.ownerName()));
+        // Enabled
+        String stackMessage = shop.<ItemStack>stack().getAmount() > 1 ? " * " + shop.<ItemStack>stack().getAmount() : "";
+        sendItemholochat(shop, items, p, ChatColor.DARK_PURPLE + get("tableformat.left_begin", p) + " " + get("menu.item", p, ItemUtils.getItemStackName(items) + stackMessage));
+        if (ItemUtils.hasDurability(items.getType())) {
+            chatSheetPrinter.printLine(get("menu.damage-percent-remaining", p, ItemUtils.getToolPercentage(items)));
+        }
+        if (shop.is(ShopType.SELLING)) {
+            if (shop.unlimited()) {
+                chatSheetPrinter.printLine(get("menu.stock", p, "" + get("signs.unlimited", p)));
+            } else {
+                chatSheetPrinter.printLine(get("menu.stock", p, "" + shop.getRemainingStock()));
+            }
+        } else {
+            if (shop.unlimited()) {
+                chatSheetPrinter.printLine(get("menu.space", p, "" + get("signs.unlimited", p)));
+            } else {
+                chatSheetPrinter.printLine(get("menu.space", p, "" + shop.getRemainingSpace()));
+            }
+        }
+        Util.debug("Item type " + shop.<ItemStack>stack().getType());
+        chatSheetPrinter.printLine(get("menu.price-per", p, ItemUtils.getItemStackName(shop.stack()), JavaUtils.format(shop.<Double>price() / shop.<ItemStack>stack().getAmount())));
+        if (shop.is(ShopType.BUYING)) {
+            chatSheetPrinter.printLine(get("menu.this-shop-is-buying", p));
+        } else {
+            chatSheetPrinter.printLine(get("menu.this-shop-is-selling", p));
+        }
+        Map<Enchantment, Integer> enchs = new HashMap<>();
+        if (items.hasItemMeta() && Objects.requireNonNull(items.getItemMeta()).hasEnchants()) {
+            enchs = items.getItemMeta().getEnchants();
+        }
+        if (!enchs.isEmpty()) {
+            chatSheetPrinter.printCenterLine(get("menu.enchants", p, ""));
+            for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
+                chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()) + " " + entries.getValue());
+            }
+        }
+        if (items.getItemMeta() instanceof EnchantmentStorageMeta) {
+            EnchantmentStorageMeta stor = (EnchantmentStorageMeta) items.getItemMeta();
+            enchs = stor.getStoredEnchants();
+            if (!enchs.isEmpty()) {
+                chatSheetPrinter.printLine(get("menu.stored-enchants", p));
+                for (Entry<Enchantment, Integer> entries : enchs.entrySet()) {
+                    chatSheetPrinter.printLine(ChatColor.YELLOW + get(entries.getKey()) + " " + entries.getValue());
+                }
+            }
+        }
+        if (items.getItemMeta() instanceof PotionMeta) {
+            PotionMeta potionMeta = (PotionMeta) items.getItemMeta();
+            PotionEffectType potionEffectType = potionMeta.getBasePotionData().getType().getEffectType();
+            if (potionEffectType != null) {
+                chatSheetPrinter.printLine(get("menu.effects", p));
+                chatSheetPrinter.printLine(ChatColor.YELLOW + get(potionEffectType));
+            }
+            potionMeta.getCustomEffects().forEach((potionEffect -> chatSheetPrinter.printLine(ChatColor.YELLOW + get(potionEffect.getType()))));
+        }
+        chatSheetPrinter.printFooter();
+    }
+    
+    @Override
+    public void load(@NotNull String locale) throws IOException {
+        minecraftLocale.load(locale);
+    }
+    
+    @Override
+    public String get(@NotNull String key) {
+        return pluginLocale.getString(key);
+    }
+    
+    @Override
+    public MinecraftLocaleProvider getMinecraftLocale() {
+        return minecraftLocale;
+    }
 }
