@@ -67,7 +67,7 @@ public class ItemUtils {
                         ChestShop chest = (ChestShop) shop;
                         if (chest.data().get(DisplayAttribute.LOCATION, chest.location().bukkit()).distance(item.getLocation()) > 0.6) {
                             item.remove();
-                            Util.debug("Removed a duped item display entity by distance > 0.6");
+                            Util.trace("Removed a duped item display entity by distance > 0.6");
                             return;
                         }
                         
@@ -76,13 +76,13 @@ public class ItemUtils {
                         
                         if (!chest.display().<Entity>stack().getUniqueId().equals(item.getUniqueId())) {
                             item.remove();
-                            Util.debug("Removed a duped item display entity by uuid not equals");
+                            Util.trace("Removed a duped item display entity by uuid not equals");
                             return;
                         }
                         
                         if (chest.display().<Entity>sample().getType() != item.getType()) {
                             item.remove();
-                            Util.debug("Removed a duped item display entity by type not equals");
+                            Util.trace("Removed a duped item display entity by type not equals");
                             return;
                         }
                     });
@@ -92,7 +92,7 @@ public class ItemUtils {
                         
                         if (!QuickShop.instance().getItemMatcher().matches(itemStack, displayItem)) {
                             item.remove();
-                            Util.debug("Removed a duped item display entity by not matches");
+                            Util.trace("Removed a duped item display entity by not matches");
                         }
                     }
             } catch (JsonSyntaxException e) {
@@ -196,11 +196,11 @@ public class ItemUtils {
                 // Try load the itemDataVersion to do some checks.
                 // noinspection deprecation
                 if (itemDataVersion > Bukkit.getUnsafe().getDataVersion()) {
-                    Util.debug("WARNING: DataVersion not matched with ItemStack: " + config);
+                    Util.trace("WARNING: DataVersion not matched with ItemStack: " + config);
                     // okay we need some things to do
                     if (BaseConfig.forceLoadDowngradeItems) {
                         // okay it enabled
-                        Util.debug("QuickShop is trying force loading " + config);
+                        Util.trace("QuickShop is trying force loading " + config);
                         if (BaseConfig.forceLoadDowngradeItemsMethod == 0) { // Mode 0
                             // noinspection deprecation
                             item.put("v", Bukkit.getUnsafe().getDataVersion() - 1);
@@ -212,7 +212,7 @@ public class ItemUtils {
                         root.put("item", item);
                         config = yaml.dump(root);
                         
-                        Util.debug("Updated, we will try load as hacked ItemStack: " + config);
+                        Util.trace("Updated, we will try load as hacked ItemStack: " + config);
                     } else {
                         ShopLogger.instance().warning("Cannot load ItemStack " + config + " because it saved from higher Minecraft server version, the action will fail and you will receive a exception, PLELASE DON'T REPORT TO QUICKSHOP!");
                         ShopLogger.instance().warning("You can try force load this ItemStack by our hacked ItemStack read util(shop.force-load-downgrade-items), but beware, the data may damaged if you load on this lower Minecraft server version, Please backup your world and database before enable!");
@@ -246,7 +246,7 @@ public class ItemUtils {
      */
     public static String getToolPercentage(@NotNull ItemStack item) {
         if (!(item.getItemMeta() instanceof Damageable)) {
-            Util.debug(item.getType().name() + " not Damageable.");
+            Util.trace(item.getType().name() + " not Damageable.");
             return "Error: NaN";
         }
         double dura = ((Damageable) item.getItemMeta()).getDamage();
@@ -275,7 +275,7 @@ public class ItemUtils {
             return;
         }
         if (inv.getHolder() == null) {
-            Util.debug("Skipped plugin gui inventory check.");
+            Util.trace("Skipped plugin gui inventory check.");
             return;
         }
         try {
@@ -291,7 +291,7 @@ public class ItemUtils {
                         return; // Virtual GUI
                     }
                     inv.setItem(i, new ItemStack(Material.AIR));
-                    Util.debug("Found a displayitem in an inventory, Scheduling to removal...");
+                    Util.trace("Found a displayitem in an inventory, Scheduling to removal...");
                     Shop.getLocaleManager().sendGlobalAlert("[InventoryCheck] Found displayItem in inventory at " + location + ", Item is " + itemStack.getType().name());
                 }
             }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -27,7 +28,6 @@ import org.maxgamer.quickshop.command.QuickShopCommandManager;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DatabaseConfig;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
-import org.maxgamer.quickshop.configuration.MatcherConfig;
 import org.maxgamer.quickshop.database.DatabaseHelper;
 import org.maxgamer.quickshop.economy.ReserveEconProvider;
 import org.maxgamer.quickshop.economy.VaultEconProvider;
@@ -56,9 +56,11 @@ import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.NoCheatPlusExemptor;
 import org.maxgamer.quickshop.utils.SentryErrorReporter;
 import org.maxgamer.quickshop.utils.Util;
+
 import com.google.common.collect.Maps;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
+
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopPlugin;
 import cc.bukkit.shop.configuration.ConfigurationData;
@@ -130,11 +132,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         return QuickShopActionManager.instance();
     }
     
-    @Override
-    public String getVersion() {
-        return getDescription().getVersion();
-    }
-    
     /*
      * Exclusive implements
      */
@@ -149,7 +146,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     private final IssuesHelper issuesHelper = IssuesHelper.create();
     
     @NotNull
-    private NoCheatPlusExemptor ncpExemptor = new NoCheatPlusExemptor();
+    private final NoCheatPlusExemptor ncpExemptor = new NoCheatPlusExemptor();
     
     @NotNull
     private final Metrics metrics = new Metrics(this, 6392);
@@ -194,11 +191,9 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
      */
     public int getShopLimit(@NotNull Player p) {
         int max = BaseConfig.defaultLimits;
-        for (Entry<String, Integer> entry : shopPermLimits.entrySet()) {
-            if (entry.getValue() > max && QuickShopPermissionManager.instance().has(p, entry.getKey())) {
+        for (Entry<String, Integer> entry : shopPermLimits.entrySet())
+            if (entry.getValue() > max && QuickShopPermissionManager.instance().has(p, entry.getKey()))
                 max = entry.getValue();
-            }
-        }
         return max;
     }
     
@@ -241,7 +236,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         
         if (!core.isValid()) {
             issuesHelper.econError();
-            Util.debug("Economy provider is not vaild: " + core.getName());
+            Util.trace("Economy provider is not vaild: " + core.getName());
             return false;
         }
         
@@ -255,11 +250,21 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     public void reloadConfig() {
         super.reloadConfig(); // This cannot be removed, or NPE
         
-        configurationManager.load(QuickShop.class);
-        configurationManager.load(BaseConfig.class);
-        configurationManager.load(DisplayConfig.class);
-        configurationManager.load(MatcherConfig.class);
-        configurationManager.load(DatabaseConfig.class);
+        try {
+            ClassPath classPath = ClassPath.from(QuickShop.class.getClassLoader());
+            Set<ClassInfo> info = classPath.getTopLevelClasses("org.maxgamer.quickshop.configuration");
+            
+            info.forEach(clazz -> {
+                if (clazz.getSimpleName().endsWith("Config"))
+                    try {
+                        configurationManager.load(Class.forName(clazz.getName()));
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+            });
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
         
         if (BaseConfig.logActions)
             logWatcher = new LogWriter(new File(getDataFolder(), "qs.log"));
@@ -269,14 +274,14 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         super();
         singleton = this;
         Shop.setPlugin(this);
-        ShopLogger.initalize(this, BaseConfig.useLog4j);
+        ShopLogger.initalize(this);
     }
     
     protected QuickShop(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
         super(loader, description, dataFolder, file);
         singleton = this;
         Shop.setPlugin(this);
-        ShopLogger.initalize(this, BaseConfig.useLog4j);
+        ShopLogger.initalize(this);
     }
     
     @Override
@@ -284,51 +289,47 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         if (issuesHelper.hasErrored())
             return;
         
-        this.integrationManager.callIntegrationsLoad(IntegrateStage.UNLOAD);
+        integrationManager.callIntegrationsLoad(IntegrateStage.UNLOAD);
         getLogger().info("QuickShop is finishing remaining work, this may need a while...");
         
-        Util.debug("Closing all GUIs...");
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        Util.trace("Closing all GUIs...");
+        for (Player player : Bukkit.getOnlinePlayers())
             player.closeInventory();
-        }
-        Util.debug("Unloading all shops...");
+        Util.trace("Unloading all shops...");
         try {
             Shop.getManager().clear();
         } catch (Throwable th) {
             // ignore, we didn't care that
         }
         
-        Util.debug("Cleaning up database queues...");
+        Util.trace("Cleaning up database queues...");
         dispatcher.close();
         
-        Util.debug("Unregistering tasks...");
+        Util.trace("Unregistering tasks...");
         // if (itemWatcherTask != null)
         // itemWatcherTask.cancel();
-        if (logWatcher != null) {
+        if (logWatcher != null)
             logWatcher.close(); // Closes the file
-        }
         /* Unload UpdateWatcher */
         UpdateWatcher.uninit();
-        Util.debug("Cleaning up resources and unloading all shops...");
+        Util.trace("Cleaning up resources and unloading all shops...");
         /* Remove all display items, and any dupes we can find */
         Shop.getActions().clear();
         Shop.getManager().clear();
         /* Close Database */
-        if (database != null) {
+        if (database != null)
             try {
-                this.database.getConnection().close();
+                database.getConnection().close();
             } catch (SQLException e) {
-                if (getSentryErrorReporter() != null) {
-                    this.getSentryErrorReporter().ignoreThrow();
-                }
+                if (getSentryErrorReporter() != null)
+                    getSentryErrorReporter().ignoreThrow();
                 e.printStackTrace();
             }
-        }
         
         // this.reloadConfig();
-        Util.debug("Calling integrations...");
-        this.integrationManager.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
-        Util.debug("All shutdown work is finished.");
+        Util.trace("Calling integrations...");
+        integrationManager.callIntegrationsLoad(IntegrateStage.POST_UNLOAD);
+        Util.trace("All shutdown work is finished.");
     }
     
     public void reloadPlugin() {
@@ -353,10 +354,9 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
     public void enablePlugin() {
         try {
             Field logger = Reflections.getField(JavaPlugin.class, "logger");
-            if (logger != null) {
+            if (logger != null)
                 logger.set(this, ShopLogger.instance());
-                // Note: Do this after onLoad
-            }
+            // Note: Do this after onLoad
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -365,7 +365,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         ChatColor sideColor = fine ? org.bukkit.ChatColor.DARK_GREEN : ChatColor.DARK_RED;
         ChatColor coreColor = fine ? org.bukkit.ChatColor.GREEN : ChatColor.RED;
         
-        System.out.println(sideColor + "  __  __   ||   \r\n" + coreColor + "" + " /  \\(_    ||   QuickShop - Rev\r\n" + coreColor + "" + " \\_\\/__)   ||   Version  " + getVersion().substring(4) + "\r\n" + sideColor + "           ||   ");
+        System.out.println(sideColor + "  __  __   ||   \r\n" + coreColor + "" + " /  \\(_    ||   QuickShop - Rev\r\n" + coreColor + "" + " \\_\\/__)   ||   Version  " + getDescription().getVersion().substring(4) + "\r\n" + sideColor + "           ||   ");
         
         getLogger().info("Developers: " + JavaUtils.list2String(getDescription().getAuthors()));
         getLogger().info("Original Author: Netherfoam, Timtower, KaiNoMood");
@@ -505,22 +505,17 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         /* Initalize the tools */
         // Create the shop manager.
         // This should be inited before shop manager
-        if (DisplayConfig.displayItems) {
-            if (getConfig().getBoolean("shop.display-auto-despawn")) {
+        if (DisplayConfig.displayItems)
+            if (getConfig().getBoolean("shop.display-auto-despawn"))
                 Bukkit.getScheduler().runTaskTimer(QuickShop.instance(), new SyncDisplayDespawner(), 20, getConfig().getInt("shop.display-check-time"));
-            }
-        }
-        this.permissionChecker = new BuildPerms();
+        permissionChecker = new BuildPerms();
         
-        if (BaseConfig.enableLimits) {
-            for (Map<String, Integer> key : BaseConfig.limitRanks) {
+        if (BaseConfig.enableLimits)
+            for (Map<String, Integer> key : BaseConfig.limitRanks)
                 for (Entry<String, Integer> e : key.entrySet())
                     shopPermLimits.put(e.getKey(), e.getValue());
-            }
-        }
-        if (getConfig().getInt("shop.find-distance") > 100) {
+        if (getConfig().getInt("shop.find-distance") > 100)
             getLogger().severe("Shop.find-distance is too high! It may cause lag! Pick a number under 100!");
-        }
         
         /*
          * Load all shops
@@ -553,7 +548,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
             return;
         }
         
-        Util.debug("Registering shop watcher...");
+        Util.trace("Registering shop watcher...");
         Bukkit.getScheduler().runTaskTimer(this, new ScheduledSignUpdater(), 40, 40);
         if (logWatcher != null) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, logWatcher, 0, 10);
@@ -573,13 +568,12 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         
         getLogger().info("QuickShop Loaded! " + (System.currentTimeMillis() - start) + " ms.");
         
-        this.integrationManager.callIntegrationsLoad(IntegrateStage.POST_ENABLE);
+        integrationManager.callIntegrationsLoad(IntegrateStage.POST_ENABLE);
         
         try {
             String[] easterEgg = new FunnyEasterEgg().getRandomEasterEgg();
-            if (!(easterEgg == null)) {
+            if (!(easterEgg == null))
                 Arrays.stream(easterEgg).forEach(str -> getLogger().info(str));
-            }
         } catch (Throwable ignore) {}
     }
     
@@ -589,7 +583,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
             Set<ClassInfo> info = classPath.getTopLevelClasses("org.maxgamer.quickshop.integration");
             
             info.forEach(clazz -> {
-                if (clazz.getSimpleName().endsWith("Integration")) {
+                if (clazz.getSimpleName().endsWith("Integration"))
                     try {
                         String pluginName = StringUtils.substringBefore(clazz.getName(), "Integration");
                         
@@ -605,7 +599,6 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
-                }
             });
         } catch (Throwable t) {
             t.printStackTrace();
@@ -646,9 +639,8 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
                 YamlComments.save(data.file(), src);
             
             connector = new MySQLConnector(DatabaseConfig.host, user, pass, DatabaseConfig.name, DatabaseConfig.port, DatabaseConfig.enableSSL);
-        } else {
+        } else
             connector = new SQLiteConnector(new File(getDataFolder(), "shops.db"));
-        }
         
         ShopLogger.instance().info("Database Connector: " + connector.getClass().getSimpleName());
         database = new Database(connector);

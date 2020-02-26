@@ -112,7 +112,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
             String[] passthroughArgs = new String[args.length - 1];
             System.arraycopy(args, 1, passthroughArgs, 0, passthroughArgs.length);
             
-            Util.debug("Execute command: " + container.label() + " - " + subLabel);
+            Util.trace("Execute command: " + container.label() + " - " + subLabel);
             container.executor().onCommand(sender, subLabel, passthroughArgs);
             return true;
         }
@@ -164,7 +164,7 @@ public class QuickShopCommandManager implements TabCompleter, CommandExecutor {
             String[] passthroughArgs = new String[args.length - 1];
             System.arraycopy(args, 1, passthroughArgs, 0, passthroughArgs.length);
             
-            Util.debug("Execute compeletor: " + container.label());
+            Util.trace("Execute compeletor: " + container.label());
             return container.executor().onTabComplete(sender, label, passthroughArgs);
         }
         

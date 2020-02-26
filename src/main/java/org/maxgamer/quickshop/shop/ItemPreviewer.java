@@ -68,7 +68,7 @@ public class ItemPreviewer implements Listener {
             return;
         
         ShopInventoryPreviewEvent shopInventoryPreview = new ShopInventoryPreviewEvent(player, itemStack);
-        if (Util.fireCancellableEvent(shopInventoryPreview))
+        if (Util.callCancellableEvent(shopInventoryPreview))
             return;
         
         final int size = 9;

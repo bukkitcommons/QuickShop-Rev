@@ -55,12 +55,12 @@ public class ShopUtils {
             
             QuickShop.instance().getNcpExemptor().toggleProtectionListeners(false, player);
             if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
-                Util.debug("PermissionChecker canceled shop creation");
+                Util.trace("PermissionChecker canceled shop creation");
                 return false;
             }
             
             ShopPreCreateEvent event = new ShopPreCreateEvent(player, block.getLocation());
-            if (Util.fireCancellableEvent(event))
+            if (Util.callCancellableEvent(event))
                 return false;
             
         } finally {

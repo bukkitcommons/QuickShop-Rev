@@ -47,7 +47,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
             registry.register(this.createFlag);
             registry.register(this.tradeFlag);
             ShopLogger.instance().info(ChatColor.GREEN + getName() + " flags register successfully.");
-            Util.debug("Success register " + getName() + " flags.");
+            Util.trace("Success register " + getName() + " flags.");
         } catch (FlagConflictException e) {
             e.printStackTrace();
         }
@@ -67,7 +67,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
         com.sk89q.worldedit.util.Location wgLoc = BukkitAdapter.adapt(location);
         boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
         if (canBypass) {
-            Util.debug("Player " + player.getName() + " bypassing the protection checks, because player have bypass permission in WorldGuard");
+            Util.trace("Player " + player.getName() + " bypassing the protection checks, because player have bypass permission in WorldGuard");
             return true;
         }
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
@@ -105,7 +105,7 @@ public class WorldGuardIntegration implements IntegratedPlugin {
         com.sk89q.worldedit.util.Location wgLoc = BukkitAdapter.adapt(location);
         boolean canBypass = WorldGuard.getInstance().getPlatform().getSessionManager().hasBypass(localPlayer, BukkitAdapter.adapt(location.getWorld()));
         if (canBypass) {
-            Util.debug("Player " + player.getName() + " bypassing the protection checks, because player have bypass permission in WorldGuard");
+            Util.trace("Player " + player.getName() + " bypassing the protection checks, because player have bypass permission in WorldGuard");
             return true;
         }
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();

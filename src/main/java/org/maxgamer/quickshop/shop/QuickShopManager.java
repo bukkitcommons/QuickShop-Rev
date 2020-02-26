@@ -147,14 +147,14 @@ public class QuickShopManager implements ShopManager {
             return;
         
         ShopCreateEvent event = new ShopCreateEvent(shop, player);
-        if (Util.fireCancellableEvent(event))
+        if (Util.callCancellableEvent(event))
             return;
         
         // Create sign
         if (info.sign() != null && BaseConfig.autoSign) {
             if (!BlockUtils.isAir(info.sign().getType()) && !(BlockUtils.isWallSign(info.sign().getType()) && Arrays.stream(((org.bukkit.block.Sign) info.sign().getState()).getLines()).allMatch(String::isEmpty))) {
                 
-                Util.debug("Sign cannot placed cause no enough space(Not air block)");
+                Util.trace("Sign cannot placed cause no enough space(Not air block)");
                 return;
             }
             
@@ -190,9 +190,9 @@ public class QuickShopManager implements ShopManager {
                 
                 Map<Long, ShopData> inChunk = Shop.getLoader().getShopsMap().computeIfAbsent(location.worldName(), s -> LongHashMap.withExpectedSize(8)).computeIfAbsent(Utils.chunkKey(location.x() >> 4, location.z() >> 4), s -> LongHashMap.withExpectedSize(16));
                 
-                Util.debug("Putting into memory shop database: " + location.toString());
+                Util.trace("Putting into memory shop database: " + location.toString());
                 
-                ShopData data = new ShopData(Util.serializeItem(info.stack().stack()), shop.moderator().serialize(), shop.location().worldName(), shop.type(), Stack.of(shop.price()), shop.unlimited(), shop.location().x(), shop.location().y(), shop.location().z());
+                ShopData data = new ShopData(Util.serializeItemStack(info.stack().stack()), shop.moderator().serialize(), shop.location().worldName(), shop.type(), Stack.of(shop.price()), shop.unlimited(), shop.location().x(), shop.location().y(), shop.location().z());
                 
                 inChunk.put(location.blockKey(), data);
                 
@@ -269,7 +269,7 @@ public class QuickShopManager implements ShopManager {
         @Nullable
         Map<Long, BasicShop> inChunk = getLoadedShopsInChunk(loc.getChunk());
         if (inChunk == null) {
-            Util.debug("Chunk not found: " + loc);
+            Util.trace("Chunk not found: " + loc);
             return ShopViewer.empty();
         }
         

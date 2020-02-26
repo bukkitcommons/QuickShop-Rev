@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
+
 import cc.bukkit.shop.version.VersionData;
 
 public class CommandUpdate extends QuickShopCommand {
@@ -35,7 +37,7 @@ public class CommandUpdate extends QuickShopCommand {
                 return;
             } else {
                 VersionData versionData = data.get();
-                sender.sendMessage(ChatColor.GREEN + "Found a new version: " + versionData.version() + " (Current " + QuickShop.instance().getVersion() + " )");
+                sender.sendMessage(ChatColor.GREEN + "Found a new version: " + versionData.version() + " (Current " + QuickShop.instance().getDescription().getVersion() + " )");
             }
         });
     }

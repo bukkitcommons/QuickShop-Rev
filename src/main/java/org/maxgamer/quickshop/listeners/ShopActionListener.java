@@ -56,7 +56,7 @@ public class ShopActionListener implements Listener {
         Block block = e.getClickedBlock();
         if (block == null)
             return;
-        Util.debug(ChatColor.YELLOW + "> Handling interact");
+        Util.trace(ChatColor.YELLOW + "> Handling interact");
         
         ShopViewer viewer = Shop.getManager().getLoadedShopFrom(block);
         /*
@@ -70,12 +70,12 @@ public class ShopActionListener implements Listener {
          * Control handling
          */
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            Util.debug("STAGE -1");
+            Util.trace("STAGE -1");
             
             viewer.nonNull().filter(shop -> !BaseConfig.sneakToControl || e.getPlayer().isSneaking()).filter(shop -> shop.getOwner().equals(e.getPlayer().getUniqueId()) || e.getPlayer().isOp())
                     
                     .accept((ChestShop shop) -> {
-                        Util.debug(ChatColor.GREEN + "Handling control");
+                        Util.trace(ChatColor.GREEN + "Handling control");
                         
                         Shop.getLocaleManager().sendControlPanelInfo(e.getPlayer(), shop);
                         shop.setSignText();
@@ -84,7 +84,7 @@ public class ShopActionListener implements Listener {
             return;
         }
         
-        Util.debug("STAGE 0");
+        Util.trace("STAGE 0");
         Player player = e.getPlayer();
         
         /*
@@ -93,7 +93,7 @@ public class ShopActionListener implements Listener {
         viewer.nonNull().filter(shop -> !BaseConfig.sneakToTrade || e.getPlayer().isSneaking()).filter(shop -> QuickShopPermissionManager.instance().has(player, "quickshop.use"))
                 
                 .accept((ChestShop shop) -> {
-                    Util.debug(ChatColor.GREEN + "Handling trade");
+                    Util.trace(ChatColor.GREEN + "Handling trade");
                     
                     Shop.getLocaleManager().sendShopInfo(player, shop);
                     shop.setSignText();
@@ -136,7 +136,7 @@ public class ShopActionListener implements Listener {
                     QuickShopActionManager.instance().setAction(player.getUniqueId(), new ShopSnapshot(shop));
                 });
         
-        Util.debug("STAGE 1");
+        Util.trace("STAGE 1");
         ItemStack item = e.getItem();
         
         /*
@@ -150,10 +150,10 @@ public class ShopActionListener implements Listener {
                 .filter(shop -> !BaseConfig.sneakToCreat || player.isSneaking()).filter(shop -> ShopUtils.canBuildShop(player, block))
                 
                 .accept(shop -> {
-                    Util.debug(ChatColor.GREEN + "Handling creation.");
+                    Util.trace(ChatColor.GREEN + "Handling creation.");
                     
                     if (!ShopUtils.canBeShopIgnoreBlocklist(block.getState())) {
-                        Util.debug("Block cannot be shop.");
+                        Util.trace("Block cannot be shop.");
                         return;
                         /*
                          * if (!QuickShop.getPermissionManager().hasPermission(player,
@@ -205,7 +205,7 @@ public class ShopActionListener implements Listener {
                     player.sendMessage(Shop.getLocaleManager().get("how-much-to-trade-for", player, ItemUtils.getItemStackName(Objects.requireNonNull(e.getItem()))));
                 });
         
-        Util.debug(ChatColor.YELLOW + "> Handled interact");
+        Util.trace(ChatColor.YELLOW + "> Handled interact");
     }
     
     @EventHandler
@@ -256,7 +256,7 @@ public class ShopActionListener implements Listener {
         
         ShopUtils.getShopBySign(block).ifPresent(() -> {
             event.setCancelled(true);
-            Util.debug("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
+            Util.trace("Disallow " + event.getPlayer().getName() + " dye the shop sign.");
         });
     }
     
@@ -286,7 +286,7 @@ public class ShopActionListener implements Listener {
             else
                 player.sendMessage(Shop.getLocaleManager().get("shop-purchase-cancelled", player));
             
-            Util.debug(player.getName() + " too far with the shop location.");
+            Util.trace(player.getName() + " too far with the shop location.");
             Shop.getActions().removeAction(player.getUniqueId());
         }
     }

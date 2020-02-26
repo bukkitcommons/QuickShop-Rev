@@ -68,14 +68,14 @@ public class JavaUtils {
         try {
             String formated = QuickShop.instance().getEconomy().format(n);
             if (formated == null || formated.isEmpty()) {
-                Util.debug("Use alternate-currency-symbol to formatting, Cause economy plugin returned null");
+                Util.trace("Use alternate-currency-symbol to formatting, Cause economy plugin returned null");
                 return BaseConfig.currencySymbol + n;
             } else {
                 return formated;
             }
         } catch (NumberFormatException e) {
-            Util.debug("format", e.getMessage());
-            Util.debug("format", "Use alternate-currency-symbol to formatting, Cause NumberFormatException");
+            Util.trace("format", e.getMessage());
+            Util.trace("format", "Use alternate-currency-symbol to formatting, Cause NumberFormatException");
             return BaseConfig.currencySymbol + n;
         }
     }

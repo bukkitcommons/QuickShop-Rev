@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -30,9 +31,11 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonSyntaxException;
+
 import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.action.ShopData;
@@ -93,22 +96,18 @@ public class QuickShopLoader implements ShopLoader, Listener {
     public List<ShopData> getAllShops() {
         List<ShopData> shops = Lists.newArrayList();
         
-        for (Map<Long, Map<Long, ShopData>> worldShops : shopsMap.values()) {
-            for (Map<Long, ShopData> shopData : worldShops.values()) {
+        for (Map<Long, Map<Long, ShopData>> worldShops : shopsMap.values())
+            for (Map<Long, ShopData> shopData : worldShops.values())
                 shops.addAll(shopData.values());
-            }
-        }
-        
+            
         return shops;
     }
     
     @Override
     public void forEachShops(@NotNull Consumer<ShopData> consumer) {
-        for (Map<Long, Map<Long, ShopData>> worldShops : shopsMap.values()) {
-            for (Map<Long, ShopData> chunkShops : worldShops.values()) {
+        for (Map<Long, Map<Long, ShopData>> worldShops : shopsMap.values())
+            for (Map<Long, ShopData> chunkShops : worldShops.values())
                 chunkShops.values().forEach(shop -> consumer.accept(shop));
-            }
-        }
     }
     
     /**
@@ -164,8 +163,8 @@ public class QuickShopLoader implements ShopLoader, Listener {
     @Override
     public void delete(@NotNull BasicShop shop) {
         ShopDeleteEvent shopDeleteEvent = new ShopDeleteEvent(shop, false);
-        if (Util.fireCancellableEvent(shopDeleteEvent)) {
-            Util.debug("Shop deletion was canceled because a plugin canceled it.");
+        if (Util.callCancellableEvent(shopDeleteEvent)) {
+            Util.trace("Shop deletion was canceled because a plugin canceled it.");
             return;
         }
         
@@ -195,11 +194,10 @@ public class QuickShopLoader implements ShopLoader, Listener {
     public void delete(@NotNull ShopData data) throws SQLException {
         ShopViewer viewer = Shop.getManager().getLoadedShopAt(data.world(), data.x(), data.y(), data.z());
         
-        if (viewer.isPresent()) {
+        if (viewer.isPresent())
             delete(viewer.<BasicShop>get());
-        } else {
+        else
             QuickShop.instance().getDatabaseHelper().deleteShop(data.x(), data.y(), data.z(), data.world());
-        }
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
@@ -213,11 +211,10 @@ public class QuickShopLoader implements ShopLoader, Listener {
             Bukkit.getScheduler().runTask(QuickShop.instance(), () -> {
                 inChunk.get().values().forEach(shop -> {
                     try {
-                        if (ShopUtils.canBeShop(event.getWorld(), shop.x(), shop.y(), shop.z())) {
+                        if (ShopUtils.canBeShop(event.getWorld(), shop.x(), shop.y(), shop.z()))
                             Shop.getManager().load(event.getWorld(), shop);
-                        } else {
+                        else
                             QuickShop.instance().getDatabaseHelper().deleteShop(shop.x(), shop.y(), shop.z(), shop.world());
-                        }
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
@@ -286,7 +283,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
             }
             
             if (!canLoad(data)) {
-                Util.debug("Somethings gone wrong, skipping the loading...");
+                Util.trace("Somethings gone wrong, skipping the loading...");
                 durTotalShopsNano = System.nanoTime() - onPerShop;
                 continue;
             }
@@ -294,19 +291,17 @@ public class QuickShopLoader implements ShopLoader, Listener {
             Map<Long, Map<Long, ShopData>> inWorld = shopsMap.computeIfAbsent(world.getName(), s -> new HashMap<>(3));
             Map<Long, ShopData> inChunk = inWorld.computeIfAbsent(Utils.chunkKey(data.x() >> 4, data.z() >> 4), s -> Maps.newHashMap());
             
-            if (Util.isChunkLoaded(world, data.x() >> 4, data.z() >> 4)) {
+            if (world.isChunkLoaded(data.x() >> 4, data.z() >> 4)) {
                 // Load to World
                 if (ShopUtils.canBeShop(world, data.x(), data.y(), data.z())) {
                     loadedShops++;
                     worldLoadedShops++;
                     Shop.getManager().load(world, data);
                     inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), data);
-                } else {
+                } else
                     QuickShop.instance().getDatabaseHelper().deleteShop(data.x(), data.y(), data.z(), data.world());
-                }
-            } else {
+            } else
                 inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), data);
-            }
             
             shops++;
             worldShops++;
@@ -317,12 +312,11 @@ public class QuickShopLoader implements ShopLoader, Listener {
             long averagePerShop = durTotalShopsNano / worldLoadedShops;
             
             ShopLogger.instance().info("Loaded " + ChatColor.GREEN + worldLoadedShops + ChatColor.RESET + " of " + shops + " shops in " + world.getName() + " (Total: " + (durTotalShopsNano / 1000000) + "ms, Avg Per: " + averagePerShop + " ns)");
-        } else {
+        } else
             if (worldShops > 0)
                 ShopLogger.instance().info("Found " + ChatColor.GREEN + worldShops + ChatColor.RESET + " shops in " + world.getName() + " and would be loaded when needed");
             else
                 ShopLogger.instance().info("No shop was found in " + world.getName());
-        }
     }
     
     public static boolean canLoad(@NotNull ShopData info) {
@@ -347,7 +341,7 @@ public class QuickShopLoader implements ShopLoader, Listener {
         } catch (InvalidConfigurationException e) {
             e.printStackTrace();
             ShopLogger.instance().warning("Failed load shop data, because target config can't deserialize the ItemStack.");
-            Util.debug("Failed to load data to the ItemStack: " + itemConfig);
+            Util.trace("Failed to load data to the ItemStack: " + itemConfig);
             return null;
         }
     }

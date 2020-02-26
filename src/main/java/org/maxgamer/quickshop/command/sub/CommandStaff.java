@@ -141,7 +141,7 @@ public class CommandStaff extends QuickShopCommand {
                     
                     break;
                 default:
-                    Util.debug("No any args matched");
+                    Util.trace("No any args matched");
                     break;
             }
         }

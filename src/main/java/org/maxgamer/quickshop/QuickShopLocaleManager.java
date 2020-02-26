@@ -86,7 +86,7 @@ public class QuickShopLocaleManager implements LocaleManager {
         
         String raw = pluginLocale.getString(loc);
         if (raw == null) {
-            Util.debug("ERR: MsgUtil cannot find the the phrase at " + loc + ", printing the all readed datas: " + pluginLocale);
+            Util.trace("ERR: MsgUtil cannot find the the phrase at " + loc + ", printing the all readed datas: " + pluginLocale);
             
             return loc;
         }
@@ -96,7 +96,7 @@ public class QuickShopLocaleManager implements LocaleManager {
             if (QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled()) {
                 try {
                     filled = me.clip.placeholderapi.PlaceholderAPI.setPlaceholders((OfflinePlayer) player, filled);
-                    Util.debug("Processed message " + filled + " by PlaceHolderAPI.");
+                    Util.trace("Processed message " + filled + " by PlaceHolderAPI.");
                 } catch (Exception ignored) {
                     if (((OfflinePlayer) player).getPlayer() != null) {
                         try {
@@ -440,7 +440,7 @@ public class QuickShopLocaleManager implements LocaleManager {
                 chatSheetPrinter.printLine(get("menu.space", p, "" + shop.getRemainingSpace()));
             }
         }
-        Util.debug("Item type " + shop.<ItemStack>stack().getType());
+        Util.trace("Item type " + shop.<ItemStack>stack().getType());
         chatSheetPrinter.printLine(get("menu.price-per", p, ItemUtils.getItemStackName(shop.stack()), JavaUtils.format(shop.<Double>price() / shop.<ItemStack>stack().getAmount())));
         if (shop.is(ShopType.BUYING)) {
             chatSheetPrinter.printLine(get("menu.this-shop-is-buying", p));

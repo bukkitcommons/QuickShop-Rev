@@ -57,7 +57,7 @@ public class CommandSuperCreate extends QuickShopCommand {
             final Block b = bIt.next();
             
             if (!ShopUtils.canBeShop(b)) {
-                Util.debug("Block cannot be shop.");
+                Util.trace("Block cannot be shop.");
                 continue;
             }
             
@@ -65,7 +65,7 @@ public class CommandSuperCreate extends QuickShopCommand {
                 // As of the new checking system, most plugins will tell the
                 // player why they can't create a shop there.
                 // So telling them a message would cause spam etc.
-                Util.debug("Util report you can't build shop there.");
+                Util.trace("Util report you can't build shop there.");
                 return;
             }
             

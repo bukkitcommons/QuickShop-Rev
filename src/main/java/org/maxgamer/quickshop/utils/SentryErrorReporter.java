@@ -30,6 +30,7 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.Plugin;
@@ -39,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
+
 import cc.bukkit.paste.Paste;
 import io.sentry.SentryClient;
 import io.sentry.SentryClientFactory;
@@ -53,7 +55,7 @@ public class SentryErrorReporter {
     private Context context;
     private boolean disable;
     private boolean enabled;
-    private List<Class<?>> ignoredException = new ArrayList<>();
+    private final List<Class<?>> ignoredException = new ArrayList<>();
     private QuickShop plugin;
     /* Pre-init it if it called before the we create it... */
     private SentryClient sentryClient;
@@ -64,7 +66,7 @@ public class SentryErrorReporter {
         this.plugin = plugin;
         // sentryClient = Sentry.init(dsn);
         sentryClient = SentryClientFactory.sentryClient(dsn);
-        ;
+        
         context = sentryClient.getContext();
         // context.addTag("plugin_version", Shop.getVersion());
         context.addTag("system_os", System.getProperty("os.name"));
@@ -79,8 +81,8 @@ public class SentryErrorReporter {
         context.addTag("server_plugins", getPluginInfo());
         context.setUser(new UserBuilder().setId(BaseConfig.serverUUID).setUsername(BaseConfig.serverUUID).build());
         sentryClient.setServerName(Bukkit.getServer().getName() + " @ " + Bukkit.getServer().getVersion());
-        sentryClient.setRelease(plugin.getVersion());
-        sentryClient.setEnvironment(Util.isDevEdition(plugin.getVersion()) ? "development" : "production");
+        sentryClient.setRelease(plugin.getDescription().getVersion());
+        sentryClient.setEnvironment("rev");
         plugin.getLogger().setFilter(new QuickShopExceptionFilter()); // Redirect log request
                                                                       // passthrough our error catcher.
         Bukkit.getLogger().setFilter(new GlobalExceptionFilter());
@@ -115,28 +117,23 @@ public class SentryErrorReporter {
      * @return dupecated
      */
     public boolean canReport(@NotNull Throwable throwable) {
-        if (!enabled) {
+        if (!enabled)
             return false;
-        }
-        if (!UpdateWatcher.isLatest()) { // We only receive latest reports.
+        if (!UpdateWatcher.isLatest())
             return false;
-        }
-        if (!checkWasCauseByQS(throwable)) {
+        if (!checkWasCauseByQS(throwable))
             return false;
-        }
         StackTraceElement stackTraceElement;
-        if (throwable.getStackTrace().length < 3) {
+        if (throwable.getStackTrace().length < 3)
             stackTraceElement = throwable.getStackTrace()[1];
-        } else {
+        else
             stackTraceElement = throwable.getStackTrace()[2];
-        }
         String text = stackTraceElement.getClassName() + "#" + stackTraceElement.getMethodName() + "#" + stackTraceElement.getLineNumber();
         if (!reported.contains(text)) {
             reported.add(text);
             return true;
-        } else {
+        } else
             return false;
-        }
     }
     
     /**
@@ -146,25 +143,20 @@ public class SentryErrorReporter {
      * @return Cause or not
      */
     public boolean checkWasCauseByQS(@Nullable Throwable throwable) {
-        if (throwable == null) {
+        if (throwable == null)
             return false;
-        }
-        if (throwable.getMessage() == null) {
+        if (throwable.getMessage() == null)
             return false;
-        }
-        if (throwable.getMessage().contains("Could not pass event")) {
+        if (throwable.getMessage().contains("Could not pass event"))
             return throwable.getMessage().contains("QuickShop");
-        }
-        while (throwable.getCause() != null) {
+        while (throwable.getCause() != null)
             throwable = throwable.getCause();
-        }
         long element = Arrays.stream(throwable.getStackTrace()).limit(5).filter(stackTraceElement -> stackTraceElement.getClassName().contains("org.maxgamer.quickshop")).count();
-        if (element > 0) {
+        if (element > 0)
             return true;
-        } else
-            if (throwable.getCause() != null) {
+        else
+            if (throwable.getCause() != null)
                 return checkWasCauseByQS(throwable.getCause());
-            }
         return false;
     }
     
@@ -197,51 +189,49 @@ public class SentryErrorReporter {
         
         try {
             if (tempDisable) {
-                Util.debug("Ignore a throw, cause this throw flagged not reporting.");
-                this.tempDisable = true;
+                Util.trace("Ignore a throw, cause this throw flagged not reporting.");
+                tempDisable = true;
                 return null;
             }
             if (disable) {
-                Util.debug("Ignore a throw, cause report now is disabled.");
-                this.disable = true;
+                Util.trace("Ignore a throw, cause report now is disabled.");
+                disable = true;
                 return null;
             }
-            Util.debug("Preparing for reporting errors...");
+            Util.trace("Preparing for reporting errors...");
             if (!enabled) {
-                Util.debug("Errors not sended, cause ErrorReport not enabled.");
+                Util.trace("Errors not sended, cause ErrorReport not enabled.");
                 return null;
             }
             
             if (!checkWasCauseByQS(throwable)) {
                 throwable.printStackTrace();
-                Util.debug("Errors not sended, cause it not throw by QuickShop");
+                Util.trace("Errors not sended, cause it not throw by QuickShop");
                 return null;
             }
             
             if (!canReport(throwable)) {
-                Util.debug("This errors not sended, cause it disallow send.(Already sended?)");
+                Util.trace("This errors not sended, cause it disallow send.(Already sended?)");
                 return null;
             }
             if (ignoredException.contains(throwable.getClass())) {
-                Util.debug("Errors not sended, cause type is blocked.");
+                Util.trace("Errors not sended, cause type is blocked.");
                 return null;
             }
-            for (String record : context) {
+            for (String record : context)
                 this.context.recordBreadcrumb(new BreadcrumbBuilder().setMessage(record).build());
-            }
             String pasteURL = "Failed to paste.";
             try {
                 Paste paste = new Paste(plugin);
                 pasteURL = paste.paste(paste.genNewPaste());
-                if (pasteURL != null && !pasteURL.isEmpty()) {
+                if (pasteURL != null && !pasteURL.isEmpty())
                     lastPaste = pasteURL;
-                }
             } catch (Throwable ex) {
                 // Ignore
-                pasteURL = this.lastPaste;
+                pasteURL = lastPaste;
             }
             this.context.addTag("paste", pasteURL);
-            this.sentryClient.sendException(throwable);
+            sentryClient.sendException(throwable);
             this.context.clearBreadcrumbs();
             plugin.getLogger().warning("A exception was thrown, QuickShop already caught this exception and reported it, switch to debug mode to see the full errors.");
             plugin.getLogger().warning("====QuickShop Error Report BEGIN===");
@@ -249,9 +239,8 @@ public class SentryErrorReporter {
             plugin.getLogger().warning("Event    ID: " + this.context.getLastEventId());
             plugin.getLogger().warning("Server   ID: " + BaseConfig.serverUUID);
             plugin.getLogger().warning("====QuickShop Error Report E N D===");
-            if (BaseConfig.developerMode) {
+            if (BaseConfig.developerMode)
                 throwable.printStackTrace();
-            }
             return this.context.getLastEventId();
         } catch (Throwable th) {
             th.printStackTrace();
@@ -266,9 +255,8 @@ public class SentryErrorReporter {
     
     private String getPluginInfo() {
         StringBuilder buffer = new StringBuilder();
-        for (Plugin bplugin : Bukkit.getPluginManager().getPlugins()) {
+        for (Plugin bplugin : Bukkit.getPluginManager().getPlugins())
             buffer.append("\t").append(bplugin.getName()).append("@").append(bplugin.isEnabled() ? "Enabled" : "Disabled").append("\n");
-        }
         return buffer.toString();
     }
     
@@ -282,19 +270,16 @@ public class SentryErrorReporter {
          */
         @Override
         public boolean isLoggable(@NotNull LogRecord record) {
-            if (!enabled) {
+            if (!enabled)
                 return true;
-            }
             Level level = record.getLevel();
-            if (level != Level.WARNING && level != Level.SEVERE) {
+            if (level != Level.WARNING && level != Level.SEVERE)
                 return true;
-            }
             if (BaseConfig.developerMode) {
                 sendError(record.getThrown(), record.getMessage());
                 return true;
-            } else {
+            } else
                 return sendError(record.getThrown(), record.getMessage()) == null;
-            }
         }
     }
     
@@ -308,23 +293,20 @@ public class SentryErrorReporter {
          */
         @Override
         public boolean isLoggable(@NotNull LogRecord record) {
-            if (!enabled) {
+            if (!enabled)
                 return true;
-            }
             Level level = record.getLevel();
-            if (level != Level.WARNING && level != Level.SEVERE) {
+            if (level != Level.WARNING && level != Level.SEVERE)
                 return true;
-            }
             if (record.getThrown() == null) {
-                Util.debug("Error not sended cause thrown is null");
+                Util.trace("Error not sended cause thrown is null");
                 return true;
             }
             if (BaseConfig.developerMode) {
                 sendError(record.getThrown(), record.getMessage());
                 return true;
-            } else {
+            } else
                 return sendError(record.getThrown(), record.getMessage()) == null;
-            }
         }
     }
 }

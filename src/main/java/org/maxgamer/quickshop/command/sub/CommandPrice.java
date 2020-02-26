@@ -60,7 +60,7 @@ public class CommandPrice extends QuickShopCommand {
                     price = Long.parseLong(cmdArg[0]);
                 } catch (NumberFormatException ex2) {
                     // input is number, but not Integer
-                    Util.debug(ex2.getMessage());
+                    Util.trace(ex2.getMessage());
                     p.sendMessage(Shop.getLocaleManager().get("not-a-integer", p, cmdArg[0]));
                     return;
                 }
@@ -70,7 +70,7 @@ public class CommandPrice extends QuickShopCommand {
             
         } catch (NumberFormatException ex) {
             // No number input
-            Util.debug(ex.getMessage());
+            Util.trace(ex.getMessage());
             p.sendMessage(Shop.getLocaleManager().get("not-a-number", p, cmdArg[0]));
             return;
         }

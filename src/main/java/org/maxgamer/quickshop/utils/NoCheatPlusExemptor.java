@@ -10,14 +10,14 @@ public class NoCheatPlusExemptor {
     
     private void disableListeners(@NotNull Player player) {
         if (Bukkit.getPluginManager().isPluginEnabled("NoCheatPlus")) {
-            Util.debug("Calling NoCheatPlus ignore " + player.getName() + " cheats detection until we finished permission checks.");
+            Util.trace("Calling NoCheatPlus ignore " + player.getName() + " cheats detection until we finished permission checks.");
             NCPExemptionManager.exemptPermanently(player);
         }
     }
     
     private void enableListeners(@NotNull Player player) {
         if (Bukkit.getPluginManager().isPluginEnabled("NoCheatPlus")) {
-            Util.debug("Calling NoCheatPlus continue follow " + player.getName() + " cheats detection.");
+            Util.trace("Calling NoCheatPlus continue follow " + player.getName() + " cheats detection.");
             NCPExemptionManager.unexempt(player);
         }
     }

@@ -108,12 +108,12 @@ public class DatabaseHelper {
     public void createShop(@NotNull String owner, Stack shopStack, @NotNull ItemStack item, int unlimited, int shopType, @NotNull String world, int x, int y, int z) throws SQLException {
         deleteShop(x, y, z, world); // First purge old exist shop before create new shop.
         
-        Util.debug("Creates shop");
+        Util.trace("Creates shop");
         String sqlString = "INSERT INTO " + DatabaseConfig.databasePrefix + "shops (owner, price, itemConfig, x, y, z, world, unlimited, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopStack.stack()));
-        sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
+        sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItemStack(item)));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));
@@ -191,7 +191,7 @@ public class DatabaseHelper {
         String sqlString = "UPDATE " + DatabaseConfig.databasePrefix + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
         
         sqlString = StringUtils.replaceOnce(sqlString, "?", proc(owner));
-        sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
+        sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItemStack(item)));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(unlimited));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopType));
         sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));

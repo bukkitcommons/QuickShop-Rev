@@ -3,7 +3,9 @@ package org.maxgamer.quickshop.configuration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
 import com.google.common.collect.Lists;
+
 import cc.bukkit.shop.configuration.annotation.Configuration;
 import cc.bukkit.shop.configuration.annotation.Node;
 
@@ -23,9 +25,6 @@ public class BaseConfig {
     
     @Node(value = "settings.plugin.language")
     public static String language = "default";
-    
-    @Node(value = "settings.plugin.logger.use-log4j")
-    public static boolean useLog4j = true;
     
     @Node(value = "settings.plugin.logger.log-actions")
     public static boolean logActions = true;

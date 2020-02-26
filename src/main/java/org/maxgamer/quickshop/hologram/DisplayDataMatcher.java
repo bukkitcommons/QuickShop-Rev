@@ -96,7 +96,7 @@ public abstract class DisplayDataMatcher {
             return matchDataFor(specifics, item, displayType);
         else
             if (specifics != null)
-                Util.debug("Specifics Is Not A List: " + specifics);
+                Util.trace("Specifics Is Not A List: " + specifics);
             
         return null; // Handled by upstream method
     }
@@ -107,7 +107,7 @@ public abstract class DisplayDataMatcher {
         boolean needVaildate = false;
         
         for (Object o : specifics) {
-            Util.debug("Specific: " + o);
+            Util.trace("Specific: " + o);
             if (o instanceof Map) {
                 Map<?, ?> specificMap = Map.class.cast(o);
                 // <String, Map<String, ?>>

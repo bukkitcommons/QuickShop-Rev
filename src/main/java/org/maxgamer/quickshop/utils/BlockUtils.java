@@ -95,7 +95,7 @@ public class BlockUtils {
     }
     
     public static Location deserializeLocation(@NotNull String location) {
-        Util.debug("will deserilize: " + location);
+        Util.trace("will deserilize: " + location);
         String[] sections = location.split(",");
         String worldName = StringUtils.substringBetween(sections[0], "{name=", "}");
         String x = sections[1].substring(2);

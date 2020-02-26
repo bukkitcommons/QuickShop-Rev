@@ -35,13 +35,13 @@ public class DisplayDroppedItem extends EntityDisplay implements Display {
             return;
         
         ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent = new ShopDisplayItemSpawnEvent(shop, displayItemStack, (@NotNull DisplayData) DisplayDataMatcher.create(displayItemStack));
-        if (Util.fireCancellableEvent(shopDisplayItemSpawnEvent))
+        if (Util.callCancellableEvent(shopDisplayItemSpawnEvent))
             return;
             
         // this.entity = this.shop.location().world().dropItem(getDisplayLocation(),
         // this.displayItemStack);
         
-        Util.debug("Spawned item @ " + this.entity.getLocation() + " with UUID " + this.entity.getUniqueId());
+        Util.trace("Spawned item @ " + this.entity.getLocation() + " with UUID " + this.entity.getUniqueId());
         
         ((Item) this.entity).setItemStack(this.displayItemStack);
         

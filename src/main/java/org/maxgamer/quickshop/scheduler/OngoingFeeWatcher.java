@@ -18,9 +18,9 @@ import cc.bukkit.shop.action.ShopData;
 public class OngoingFeeWatcher extends BukkitRunnable {
     @Override
     public void run() {
-        Util.debug("Run task for ongoing fee...");
+        Util.trace("Run task for ongoing fee...");
         if (QuickShop.instance().getEconomy() == null) {
-            Util.debug("Economy hadn't get ready.");
+            Util.trace("Economy hadn't get ready.");
             return;
         }
         int cost = BaseConfig.ongoingFeeCostPerShop;
@@ -47,7 +47,7 @@ public class OngoingFeeWatcher extends BukkitRunnable {
                     } catch (Exception ignored) {}
                 }
             } else {
-                Util.debug("Shop was ignored for ongoing fee cause it is unlimited and ignoreUnlimited = true : " + shop);
+                Util.trace("Shop was ignored for ongoing fee cause it is unlimited and ignoreUnlimited = true : " + shop);
             }
         });
     }

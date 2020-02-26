@@ -20,27 +20,27 @@ public class ArmorStandDisplay extends EntityDisplay implements Display {
     
     public void spawn() {
         if (shop.location().world() == null) {
-            Util.debug("Canceled the displayItem spawning because the location in the world is null.");
+            Util.trace("Canceled the displayItem spawning because the location in the world is null.");
             return;
         }
         
         if (displayItemStack == null) {
-            Util.debug("Canceled the displayItem spawning because the ItemStack is null.");
+            Util.trace("Canceled the displayItem spawning because the ItemStack is null.");
             return;
         }
         
         if (entity != null && entity.isValid() && !entity.isDead()) {
-            Util.debug("Warning: Spawning the armorStand for DisplayItem when there is already an existing armorStand may cause a duplicated armorStand!");
+            Util.trace("Warning: Spawning the armorStand for DisplayItem when there is already an existing armorStand may cause a duplicated armorStand!");
             StackTraceElement[] traces = Thread.currentThread().getStackTrace();
             for (StackTraceElement trace : traces) {
-                Util.debug(trace.getClassName() + "#" + trace.getMethodName() + "#" + trace.getLineNumber());
+                Util.trace(trace.getClassName() + "#" + trace.getMethodName() + "#" + trace.getLineNumber());
             }
         }
         
         ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent = new ShopDisplayItemSpawnEvent(shop, displayItemStack, (@NotNull DisplayData) data);
         Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
         if (shopDisplayItemSpawnEvent.isCancelled()) {
-            Util.debug("Cancelled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
+            Util.trace("Cancelled the displayItem from spawning because a plugin setCancelled the spawning event, usually it is a QuickShop Add on");
             return;
         }
         
@@ -56,7 +56,7 @@ public class ArmorStandDisplay extends EntityDisplay implements Display {
          * armorStand.setCanMove(false); armorStand.setCanPickupItems(false); // Set
          * pose data.setPoseForArmorStand(armorStand); });
          */
-        Util.debug("Spawned armor stand @ " + this.entity.getLocation() + " with UUID " + this.entity.getUniqueId());
+        Util.trace("Spawned armor stand @ " + this.entity.getLocation() + " with UUID " + this.entity.getUniqueId());
         // Helmet must be set after spawning
         ArmorStand armorStand = (ArmorStand) entity;
         armorStand.setItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD), displayItemStack);

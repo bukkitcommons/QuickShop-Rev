@@ -210,7 +210,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     @Override
     public void setPrice(Object newPrice) {
         ShopPriceChangeEvent event = new ShopPriceChangeEvent(newPrice, price, false, this, Reason.RESTRICT);
-        if (Util.fireCancellableEvent(event))
+        if (Util.callCancellableEvent(event))
             return;
         
         price = (double) event.getNewPrice();
@@ -221,7 +221,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     /** Upates the shop into the database. */
     @Override
     public void save() {
-        if (Util.fireCancellableEvent(new ShopSaveEvent(this)))
+        if (Util.callCancellableEvent(new ShopSaveEvent(this)))
             return;
         
         try {
@@ -361,7 +361,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
             Sign sign = (Sign) block.getState();
             String[] lines = sign.getLines();
             
-            Util.debug("Line: " + lines[0] + ChatColor.RESET + ", Header: " + signHeader);
+            Util.trace("Line: " + lines[0] + ChatColor.RESET + ", Header: " + signHeader);
             
             if (lines[0].equals(signHeader) || Arrays.stream(lines).allMatch(String::isEmpty))
                 signs.add(sign);
@@ -396,7 +396,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     
     @Override
     public void load() {
-        if (isLoaded || Util.fireCancellableEvent(new ShopLoadEvent(this)))
+        if (isLoaded || Util.callCancellableEvent(new ShopLoadEvent(this)))
             return;
         
         isLoaded = true;

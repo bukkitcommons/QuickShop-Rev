@@ -55,19 +55,19 @@ public class CommandCreate extends QuickShopCommand {
         }
         
         final BlockIterator bIt = new BlockIterator((LivingEntity) sender, 10);
-        Util.debug("Creating shop");
+        Util.trace("Creating shop");
         
         while (bIt.hasNext()) {
             final Block b = bIt.next();
-            Util.debug("Checking block for shop creation: " + b);
+            Util.trace("Checking block for shop creation: " + b);
             
             if (!ShopUtils.canBeShop(b)) {
-                Util.debug("Block cannot be shop.");
+                Util.trace("Block cannot be shop.");
                 continue;
             }
             
             if (p.isOnline() && !QuickShop.instance().getPermissionChecker().canBuild(p, b)) {
-                Util.debug("Failed permission build check, canceled");
+                Util.trace("Failed permission build check, canceled");
                 return;
             }
             
@@ -75,7 +75,7 @@ public class CommandCreate extends QuickShopCommand {
                 // As of the new checking system, most plugins will tell the
                 // player why they can't create a shop there.
                 // So telling them a message would cause spam etc.
-                Util.debug("Util report you can't build shop there.");
+                Util.trace("Util report you can't build shop there.");
                 return;
             }
             
@@ -94,12 +94,12 @@ public class CommandCreate extends QuickShopCommand {
             
             if (cmdArg.length >= 1) {
                 Shop.getActions().handleChat(p, cmdArg[0], false);
-                Util.debug("Created by handle chat");
+                Util.trace("Created by handle chat");
                 return;
             }
             
             p.sendMessage(Shop.getLocaleManager().get("how-much-to-trade-for", ItemUtils.getItemStackName(item)));
-            Util.debug("Created by wait chat");
+            Util.trace("Created by wait chat");
             return;
         }
     }

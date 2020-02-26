@@ -57,12 +57,12 @@ public class QuickShopItemMatcher implements ItemStackMatcher {
         }
         
         if (matchesAmount && requireStack.getAmount() != givenStack.getAmount()) {
-            Util.debug("Amount not match.");
+            Util.trace("Amount not match.");
             return false;
         }
         
         if (requireStack.hasItemMeta() != givenStack.hasItemMeta()) {
-            Util.debug("Meta existence not match.");
+            Util.trace("Meta existence not match.");
             return false;
         }
         

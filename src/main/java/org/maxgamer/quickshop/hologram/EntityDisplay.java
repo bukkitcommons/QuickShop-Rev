@@ -72,7 +72,7 @@ public abstract class EntityDisplay implements GenericDisplay {
         if (entity.isValid()) {
             // fixPosition();
         } else {
-            Util.debug("Spawning display at: " + location);
+            Util.trace("Spawning display at: " + location);
             // display.spawn();
         }
         
@@ -95,7 +95,7 @@ public abstract class EntityDisplay implements GenericDisplay {
                     
                     if (ItemUtils.isDisplayItem(stand.getItem(EquipmentSlot.valueOf(data.get(DisplayAttribute.SLOT, "HEAD"))))) {
                         
-                        Util.debug("Removed a duped ArmorStand display entity.");
+                        Util.trace("Removed a duped ArmorStand display entity.");
                         entity.remove();
                     }
                     break;
