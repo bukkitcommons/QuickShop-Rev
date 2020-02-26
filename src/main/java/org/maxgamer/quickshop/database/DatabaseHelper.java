@@ -200,7 +200,7 @@ public class DatabaseHelper {
   }
 
   public void updateShop(@NotNull String owner, @NotNull ItemStack item, int unlimited,
-      int shopType, Stack price, int x, int y, int z, String world) throws SQLException {
+      int shopType, double price, int x, int y, int z, String world) throws SQLException {
     
       String sqlString = "UPDATE " + DatabaseConfig.databasePrefix
           + "shops SET owner = ?, itemConfig = ?, unlimited = ?, type = ?, price = ? WHERE x = ? AND y = ? and z = ? and world = ?";
@@ -209,7 +209,7 @@ public class DatabaseHelper {
       sqlString = StringUtils.replaceOnce(sqlString, "?", proc(Util.serializeItem(item)));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(unlimited));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(shopType));
-      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price.stack()));
+      sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(price));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(x));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(y));
       sqlString = StringUtils.replaceOnce(sqlString, "?", String.valueOf(z));

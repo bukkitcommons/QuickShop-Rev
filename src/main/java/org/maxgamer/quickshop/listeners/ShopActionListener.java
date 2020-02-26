@@ -28,7 +28,6 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
-import org.maxgamer.quickshop.shop.QuickShopManager;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
@@ -112,7 +111,7 @@ public class ShopActionListener implements Listener {
         Shop.getLocaleManager().sendShopInfo(player, shop);
         shop.setSignText();
         
-        double price = shop.price().stack();
+        double price = shop.price();
         double money = QuickShop.instance().getEconomy().getBalance(player.getUniqueId());
 
         if (shop.is(ShopType.SELLING)) {
@@ -121,7 +120,7 @@ public class ShopActionListener implements Listener {
               (int) Math.floor(money / price));
 
           // Consider shop remaining stock
-          if (!shop.isUnlimited()) {
+          if (!shop.unlimited()) {
             afforable = Math.min(afforable, shop.getRemainingStock());
           }
 
@@ -134,7 +133,7 @@ public class ShopActionListener implements Listener {
           int stackAmount = ShopUtils.countStacks(player.getInventory(), shop.stack());
           int ownerAfforableItems = (int) (ownerBalance / price);
 
-          if (!shop.isUnlimited()) {
+          if (!shop.unlimited()) {
             stackAmount = Math.min(stackAmount, shop.getRemainingSpace());
             stackAmount = Math.min(stackAmount, ownerAfforableItems);
           } else if (BaseConfig.payUnlimitedShopOwners) {
@@ -166,7 +165,7 @@ public class ShopActionListener implements Listener {
         QuickShopPermissionManager.instance().has(player, "quickshop.create.sell"))
       
       .filter(shop -> !BaseConfig.sneakToCreat || player.isSneaking())
-      .filter(shop -> QuickShopManager.canBuildShop(player, block))
+      .filter(shop -> ShopUtils.canBuildShop(player, block))
       
       .accept(shop -> {
         Util.debug(ChatColor.GREEN + "Handling creation.");

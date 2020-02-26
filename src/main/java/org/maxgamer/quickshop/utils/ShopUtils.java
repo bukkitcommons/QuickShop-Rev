@@ -2,6 +2,7 @@ package org.maxgamer.quickshop.utils;
 
 import java.text.DecimalFormat;
 import java.util.Optional;
+import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import cc.bukkit.shop.Shop;
+import cc.bukkit.shop.event.ShopPreCreateEvent;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class ShopUtils {
@@ -25,6 +27,51 @@ public class ShopUtils {
   
   public static String formatPrice(double d) {
     return decimalFormat.format(d);
+  }
+
+  /**
+   * Checks other plugins to make sure they can use the chest they're making a shop.
+   *
+   * @param player The player to check
+   * @param block The block to check
+   * @return True if they're allowed to place a shop there.
+   */
+  public static boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
+    try {
+      if (BaseConfig.enableLimits) {
+        UUID uuid = player.getUniqueId();
+        long owned = Shop.getLoader().getAllShops()
+            .stream() // ASYNC
+            .filter(shop ->
+            shop.moderators().getOwner().equals(uuid))
+            .count();
+
+        int max = QuickShop.instance().getShopLimit(player);
+
+        if (owned >= max && ShopUtils.canBeShop(block)) {
+          player.sendMessage(
+              Shop.getLocaleManager().get("reached-maximum-can-create", player,
+                  String.valueOf(owned), String.valueOf(max)));
+
+          return false;
+        }
+      }
+
+      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(false, player);
+      if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
+        Util.debug("PermissionChecker canceled shop creation");
+        return false;
+      }
+
+      ShopPreCreateEvent event = new ShopPreCreateEvent(player, block.getLocation());
+      if (Util.fireCancellableEvent(event))
+        return false;
+
+    } finally {
+      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(true, player);
+    }
+
+    return true;
   }
   
   /**

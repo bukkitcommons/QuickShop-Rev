@@ -43,7 +43,6 @@ import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.manager.ShopActionManager;
 import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.seller.SellerShop;
-import cc.bukkit.shop.stack.Stack;
 import cc.bukkit.shop.viewer.ShopViewer;
 
 public class QuickShopActionManager implements ShopActionManager {
@@ -94,7 +93,7 @@ public class QuickShopActionManager implements ShopActionManager {
 
     // No enough shop space
     int space = shop.getRemainingSpace();
-    if (!shop.isUnlimited() && space < amount) {
+    if (!shop.unlimited() && space < amount) {
       p.sendMessage(
           Shop.getLocaleManager().get("shop-has-no-space", p, "" + space,
               ItemUtils.getItemStackName(shop.stack())));
@@ -130,7 +129,7 @@ public class QuickShopActionManager implements ShopActionManager {
     if (tax < 0)
       tax = 0; // Tax was disabled.
 
-    double totalPrice = amount * shop.price().<Double>stack();
+    double totalPrice = amount * shop.<Double>price();
     if (QuickShopPermissionManager.instance().has(p, "quickshop.tax")) {
       tax = 0;
       Util.debug("Disable the Tax for player " + p.getName()
@@ -141,7 +140,7 @@ public class QuickShopActionManager implements ShopActionManager {
     }
 
     // Paying - withdraw owner
-    boolean shouldPayOwner = !shop.isUnlimited() || BaseConfig.payUnlimitedShopOwners;
+    boolean shouldPayOwner = !shop.unlimited() || BaseConfig.payUnlimitedShopOwners;
     if (shouldPayOwner) {
       boolean withdrawOwner = QuickShop.instance().getEconomy().withdraw(shop.getOwner(), totalPrice); // Withdraw owner's money
       if (!withdrawOwner) {
@@ -178,14 +177,14 @@ public class QuickShopActionManager implements ShopActionManager {
       String msg = "\n" + Shop.getLocaleManager().get("shop-out-of-space", p, "" + shop.location().x(),
           "" + shop.location().y(), "" + shop.location().z());
       
-      if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
+      if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
         Shop.getMessager().send(shop.getOwner(), msg);
     } else {
       String msg = Shop.getLocaleManager().get("player-sold-to-your-store", p, p.getName(),
           String.valueOf(amount), "##########" + Util.serializeItem(shop.stack()) + "##########");
       
-      if (!shop.isUnlimited() || !BaseConfig.ignoreUnlimitedMessages)
-        ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(p.getUniqueId(), msg, shop.isUnlimited());
+      if (!shop.unlimited() || !BaseConfig.ignoreUnlimitedMessages)
+        ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(p.getUniqueId(), msg, shop.unlimited());
     }
     
     shop.buy(p, amount);
@@ -358,7 +357,7 @@ public class QuickShopActionManager implements ShopActionManager {
     /*
      * Creates the shop
      */
-    ContainerQuickShop shop = new QuickShopSeller(info.location(), Stack.of(price), info.stack().stack(),
+    ContainerQuickShop shop = new QuickShopSeller(info.location(), price, info.stack().stack(),
         new ShopModerator(p.getUniqueId()), false, ShopType.SELLING);
 
     ShopCreateEvent e = new ShopCreateEvent(shop, p);
@@ -400,7 +399,7 @@ public class QuickShopActionManager implements ShopActionManager {
 
     if (shop.isDualShop()) {
       ChestShop nextTo = shop.getAttachedShop();
-      if (nextTo.price().<Double>stack() > shop.price().<Double>stack()) {
+      if (nextTo.<Double>price() > shop.price()) {
         // The one next to it must always be a
         // buying shop.
         p.sendMessage(Shop.getLocaleManager().get("buying-more-than-selling", p));
@@ -418,7 +417,7 @@ public class QuickShopActionManager implements ShopActionManager {
     int stock = shop.getRemainingStock();
     
     amount = amount == -1 ? stock : amount;
-    stock = shop.isUnlimited() ? Integer.MAX_VALUE : stock;
+    stock = shop.unlimited() ? Integer.MAX_VALUE : stock;
     String stacks = info.stack().<ItemStack>stack().getAmount() > 1 ? " * " + info.stack().<ItemStack>stack().getAmount() : "";
     if (stock < amount) {
       p.sendMessage(Shop.getLocaleManager().get("shop-stock-too-low", p, String.valueOf(stock),
@@ -441,7 +440,7 @@ public class QuickShopActionManager implements ShopActionManager {
     }
     // Money handling
     double tax = BaseConfig.taxRate;
-    double total = amount * shop.price().<Integer>stack();
+    double total = amount * shop.<Double>price();
     if (QuickShopPermissionManager.instance().has(p, "quickshop.tax")) {
       tax = 0;
       Util.debug("Disable the Tax for player " + p.getName()
@@ -461,7 +460,7 @@ public class QuickShopActionManager implements ShopActionManager {
               Objects.requireNonNull(format(QuickShop.instance().getEconomy().getBalance(p.getUniqueId())))));
       return;
     }
-    boolean shouldPayOwner = !shop.isUnlimited() || BaseConfig.payUnlimitedShopOwners;
+    boolean shouldPayOwner = !shop.unlimited() || BaseConfig.payUnlimitedShopOwners;
     if (shouldPayOwner) {
       double depositMoney = total * (1 - tax);
       boolean successB = QuickShop.instance().getEconomy().deposit(shop.getOwner(), depositMoney);
@@ -493,7 +492,7 @@ public class QuickShopActionManager implements ShopActionManager {
           "" + shop.location().y(), "" + shop.location().z(),
           ItemUtils.getItemStackName(shop.stack()));
     
-    ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(shop.getOwner(), msg, shop.isUnlimited());
+    ((QuickShopLocaleManager) QuickShop.instance().getLocaleManager()).sendParsed(shop.getOwner(), msg, shop.unlimited());
     
     shop.sell(p, amount);
     Shop.getLocaleManager().sendPurchaseSuccess(p, shop, amount, info);

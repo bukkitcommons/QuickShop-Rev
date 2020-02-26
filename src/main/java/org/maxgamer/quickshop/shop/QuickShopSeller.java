@@ -11,10 +11,9 @@ import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.seller.ChestSeller;
 import cc.bukkit.shop.stack.ItemStacked;
-import cc.bukkit.shop.stack.Stack;
 
 public class QuickShopSeller extends ContainerQuickShop implements ChestSeller {
-  public QuickShopSeller(@NotNull ShopLocation shopLocation, Stack price,
+  public QuickShopSeller(@NotNull ShopLocation shopLocation, double price,
       @NotNull ItemStacked item, @NotNull ShopModerator moderator, boolean unlimited,
       @NotNull ShopType type) {
     super(shopLocation, price, item, moderator, unlimited, type);

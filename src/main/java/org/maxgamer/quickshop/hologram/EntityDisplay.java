@@ -7,11 +7,11 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
-import org.maxgamer.quickshop.shop.DisplayData;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.hologram.DisplayAttribute;
+import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.hologram.GenericDisplay;
 import cc.bukkit.shop.misc.ShopLocation;
 import lombok.Data;
@@ -96,7 +96,7 @@ public abstract class EntityDisplay implements GenericDisplay {
           ArmorStand stand = (ArmorStand) entity;
           
           if (ItemUtils.isDisplayItem(
-              stand.getItem(EquipmentSlot.valueOf(data.attribute(DisplayAttribute.SLOT, "HEAD"))))) {
+              stand.getItem(EquipmentSlot.valueOf(data.get(DisplayAttribute.SLOT, "HEAD"))))) {
             
             Util.debug("Removed a duped ArmorStand display entity.");
             entity.remove();

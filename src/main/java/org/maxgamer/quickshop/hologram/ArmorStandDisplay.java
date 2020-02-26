@@ -4,13 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.inventory.EquipmentSlot;
 import org.jetbrains.annotations.NotNull;
-import org.maxgamer.quickshop.shop.DisplayData;
 import org.maxgamer.quickshop.utils.Util;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.event.ShopDisplayItemSpawnEvent;
 import cc.bukkit.shop.hologram.Display;
 import cc.bukkit.shop.hologram.DisplayAttribute;
-import cc.bukkit.shop.hologram.DisplayScheme;
+import cc.bukkit.shop.hologram.DisplayData;
 import lombok.ToString;
 
 @ToString
@@ -41,7 +40,7 @@ public class ArmorStandDisplay extends EntityDisplay implements Display {
     }
 
     ShopDisplayItemSpawnEvent shopDisplayItemSpawnEvent =
-        new ShopDisplayItemSpawnEvent(shop, displayItemStack, (@NotNull DisplayScheme) data);
+        new ShopDisplayItemSpawnEvent(shop, displayItemStack, (@NotNull DisplayData) data);
     Bukkit.getPluginManager().callEvent(shopDisplayItemSpawnEvent);
     if (shopDisplayItemSpawnEvent.isCancelled()) {
       Util.debug(
@@ -74,6 +73,6 @@ public class ArmorStandDisplay extends EntityDisplay implements Display {
         + this.entity.getUniqueId());
     // Helmet must be set after spawning
     ArmorStand armorStand = (ArmorStand) entity;
-    armorStand.setItem(data.attribute(DisplayAttribute.SLOT, EquipmentSlot.HEAD), displayItemStack);
+    armorStand.setItem(data.get(DisplayAttribute.SLOT, EquipmentSlot.HEAD), displayItemStack);
   }
 }

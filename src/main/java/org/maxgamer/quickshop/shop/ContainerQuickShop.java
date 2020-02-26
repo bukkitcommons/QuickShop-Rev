@@ -23,7 +23,6 @@ import org.maxgamer.quickshop.configuration.DisplayConfig;
 import org.maxgamer.quickshop.hologram.ArmorStandDisplay;
 import org.maxgamer.quickshop.hologram.DisplayDataMatcher;
 import org.maxgamer.quickshop.hologram.DisplayDroppedItem;
-import org.maxgamer.quickshop.hologram.EntityDisplay;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
@@ -39,35 +38,35 @@ import cc.bukkit.shop.event.ShopPriceChangeEvent.Reason;
 import cc.bukkit.shop.event.ShopSaveEvent;
 import cc.bukkit.shop.event.ShopUnloadEvent;
 import cc.bukkit.shop.hologram.Display;
-import cc.bukkit.shop.hologram.DisplayScheme;
+import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.moderator.ShopModerator;
 import cc.bukkit.shop.stack.ItemStacked;
-import cc.bukkit.shop.stack.Stack;
 import cc.bukkit.shop.stack.StackItem;
-import cc.bukkit.shop.stack.Stacked;
 import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 @Getter
 @Setter
 @EqualsAndHashCode
+@Accessors(fluent = true)
 public abstract class ContainerQuickShop implements GenericChestShop {
   @NotNull
   protected final ItemStacked stack;
   @NotNull
   protected final ShopLocation location;
   @Nullable
-  protected EntityDisplay display;
+  protected Display display;
   
   @EqualsAndHashCode.Exclude
   protected boolean isLoaded = false;
   
   protected ShopModerator moderator;
-  protected Stacked price;
+  protected double price;
   protected DisplayData displayData;
   protected boolean unlimited;
   
@@ -76,8 +75,8 @@ public abstract class ContainerQuickShop implements GenericChestShop {
   public abstract ShopType type();
   
   @Override
-  public @NotNull DisplayScheme scheme() {
-    return (@NotNull DisplayScheme) displayData;
+  public @NotNull DisplayData data() {
+    return displayData;
   }
   
   @Override
@@ -86,18 +85,8 @@ public abstract class ContainerQuickShop implements GenericChestShop {
   }
 
   @Override
-  public Stacked price() {
+  public Double price() {
     return price;
-  }
-
-  @Override
-  public @NotNull ShopModerator moderator() {
-    return moderator;
-  }
-
-  @Override
-  public @NotNull ShopLocation location() {
-    return location;
   }
 
   protected ContainerQuickShop(@NotNull ContainerQuickShop s) {
@@ -122,7 +111,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     }
   }
   
-  public ContainerQuickShop(@NotNull ShopLocation shopLocation, Stack price, @NotNull ItemStacked item,
+  public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStacked item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type) {
     this(shopLocation, price, item, moderator, unlimited, type, true);
   }
@@ -138,7 +127,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
    * @param type The shop type
    * @param unlimited The unlimited
    */
-  public ContainerQuickShop(@NotNull ShopLocation shopLocation, Stack price, @NotNull ItemStacked item,
+  public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStacked item,
       @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type, boolean spawnDisplay) {
     this.location = shopLocation;
     this.price = price;
@@ -221,12 +210,12 @@ public abstract class ContainerQuickShop implements GenericChestShop {
    * @param price The new price of the shop.
    */
   @Override
-  public void setPrice(Stack newPrice) {
+  public void setPrice(Object newPrice) {
     ShopPriceChangeEvent event = new ShopPriceChangeEvent(newPrice, price, false, this, Reason.RESTRICT);
     if (Util.fireCancellableEvent(event))
       return;
     
-    price = event.getNewPrice();
+    price = (double) event.getNewPrice();
     setSignText();
     save();
   }
@@ -245,7 +234,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
                   stack.stack(),
                   unlimited ? 1 : 0,
                   displayData.type().id(),
-                  price.stack(),
+                  price,
                   location.x(),
                   location.y(),
                   location.z(),
@@ -363,7 +352,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     lines[3] = Shop.getLocaleManager().get(
         "signs.price",
         player,
-        price.stack());
+        price);
     
     setSignText(lines);
   }
@@ -374,10 +363,10 @@ public abstract class ContainerQuickShop implements GenericChestShop {
         + (location.world() == null ? "unloaded world" : location.world().getName()) + "("
         + location.x() + ", " + location.y() + ", " + location.z() + ")");
     sb.append(" Owner: ").append(this.ownerName()).append(" - ").append(getOwner());
-    if (isUnlimited()) {
+    if (unlimited()) {
       sb.append(" Unlimited: true");
     }
-    sb.append(" Price: ").append(getPrice());
+    sb.append(" Price: ").append(price());
     sb.append(" Item: ").append(stack.stack());
     return sb.toString();
   }
@@ -441,21 +430,6 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     } else {
       return false;
     }
-  }
-
-  /**
-   * Different with isDoubleShop, this method only check the shop is created on the double chest.
-   *
-   * @return true if create on double chest.
-   */
-  public boolean isDoubleChestShop() {
-    return BlockUtils.isDoubleChest(this.getLocation().block());
-  }
-
-  @Override
-  @Nullable
-  public Display display() {
-    return this.display;
   }
 
   @Override

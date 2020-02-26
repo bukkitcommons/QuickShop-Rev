@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
+import org.maxgamer.quickshop.utils.BlockUtils;
 import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -55,7 +56,7 @@ public class CommandInfo extends QuickShopCommand {
             nostock++;
           }
 
-          if (shop instanceof ContainerQuickShop && ((ContainerQuickShop) shop).isDoubleChestShop()) {
+          if (shop instanceof ContainerQuickShop && BlockUtils.isDoubleChest(shop.location().block())) {
             doubleschests++;
           }
         }

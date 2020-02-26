@@ -13,21 +13,15 @@ import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.configuration.DisplayConfig;
-import org.maxgamer.quickshop.shop.DisplayData;
+import org.maxgamer.quickshop.shop.QuickShopDisplayData;
 import org.maxgamer.quickshop.utils.Util;
+import com.google.common.collect.Maps;
 import cc.bukkit.shop.hologram.DisplayAttribute;
+import cc.bukkit.shop.hologram.DisplayData;
 import cc.bukkit.shop.hologram.DisplayType;
 import lombok.RequiredArgsConstructor;
 
 public abstract class DisplayDataMatcher {
-  /**
-   * Obtain an default display data with default display type. 
-   * @return The empty data
-   */
-  public static DisplayData create() {
-    return new DisplayData(DisplayType.valueOf(DisplayConfig.displayType));
-  }
-  
   /**
    * Matches from configuration and creates the display data for the given item
    * @param item The item to load display data for
@@ -35,7 +29,7 @@ public abstract class DisplayDataMatcher {
    */
   public static DisplayData create(@NotNull ItemStack item) {
     try {
-      DisplayData def = new DisplayData(DisplayType.valueOf(DisplayConfig.displayType));
+      DisplayData def = new QuickShopDisplayData(DisplayType.valueOf(DisplayConfig.displayType), item);
 
       YamlConfiguration conf =
           QuickShop.instance().getConfigurationManager().get(DisplayConfig.class).conf();
@@ -67,7 +61,7 @@ public abstract class DisplayDataMatcher {
       return def;
     } catch (Throwable e) {
       e.printStackTrace();
-      return new DisplayData(DisplayType.DROPPED_ITEM);
+      return new QuickShopDisplayData(DisplayType.DROPPED_ITEM, item);
     }
   }
   
@@ -255,7 +249,8 @@ public abstract class DisplayDataMatcher {
             needVaildate = true;
           }
 
-          DisplayData data = new DisplayData(displayType);
+          Map<DisplayAttribute, Object> attrs = Maps.newEnumMap(DisplayAttribute.class);
+          QuickShopDisplayData data = new QuickShopDisplayData(displayType, item, attrs);
           
           /*
            * Loads armor stand attributes
@@ -270,14 +265,14 @@ public abstract class DisplayDataMatcher {
 
                 if (attrKeys.length == 1) {
                   temp = Map.class.cast(attributes).get(rootKey);
-                  data.put(attr, temp == null ? ObjectUtils.NULL : temp);
+                  attrs.put(attr, temp == null ? ObjectUtils.NULL : temp);
                 } else {
                   // Nested Map
                   if ((temp = Map.class.cast(attributes).get(rootKey)) instanceof Map) {
                     String subKey = attrKeys[1].toLowerCase(Locale.ROOT);
                     Object value = Map.class.cast(temp).get(subKey);
 
-                    data.put(attr, value == null ? ObjectUtils.NULL : value);
+                    attrs.put(attr, value == null ? ObjectUtils.NULL : value);
                   }
                 }
               }

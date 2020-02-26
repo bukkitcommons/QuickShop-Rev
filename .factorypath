@@ -2,12 +2,13 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.9.9/jackson-dataformat-yaml-2.9.9.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/net/milkbowl/vault/VaultAPI/1.6/VaultAPI-1.6.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/net/tnemc/Reserve/0.1.0.12/Reserve-0.1.0.12.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/bstats/bstats-bukkit/1.7/bstats-bukkit-1.7.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="EXTJAR" id="H:\QuickShop-Reremake\lib\OpenInv.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/projectlombok/lombok/1.18.8/lombok-1.18.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/koloboke/koloboke-compile/0.5.1/koloboke-compile-0.5.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/koloboke/koloboke-impl-common-jdk8/1.0.0/koloboke-impl-common-jdk8-1.0.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/koloboke/koloboke-api-jdk8/1.0.0/koloboke-api-jdk8-1.0.0.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/cc/bukkit/shop/Shop/1.1.3/Shop-1.1.3.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/cc/bukkit/shop/Shop/1.2.0-SNAPSHOT/Shop-1.2.0-SNAPSHOT.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/sentry/sentry/1.7.27/sentry-1.7.27.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/fasterxml/jackson/core/jackson-core/2.9.9/jackson-core-2.9.9.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/jetbrains/annotations/17.0.0/annotations-17.0.0.jar" enabled="true" runInBatchMode="false"/>
@@ -38,7 +39,6 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/flywaydb/flyway-core/3.0/flyway-core-3.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/io/papermc/paperlib/1.0.2/paperlib-1.0.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/sk89q/commandbook/2.3/commandbook-2.3.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/bstats/bstats-bukkit/1.5/bstats-bukkit-1.5.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/github/intellectualsites/plotsquared/PlotSquared-API/4.400/PlotSquared-API-4.400.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/sk89q/worldedit/worldedit-core/7.0.0/worldedit-core-7.0.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/sk89q/worldedit/worldedit-libs/core/7.0.0/core-7.0.0.jar" enabled="true" runInBatchMode="false"/>

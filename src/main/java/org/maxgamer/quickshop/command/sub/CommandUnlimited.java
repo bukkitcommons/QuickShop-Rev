@@ -78,10 +78,10 @@ public class CommandUnlimited extends QuickShopCommand {
       return;
     }
     
-    shop.setUnlimited(!shop.isUnlimited());
+    shop.setUnlimited(!shop.unlimited());
     Shop.getLocaleManager().sendControlPanelInfo((@NotNull Player) sender, shop);
 
-    if (shop.isUnlimited())
+    if (shop.unlimited())
       sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.unlimited"));
     else
       sender.sendMessage(Shop.getLocaleManager().get("command.toggle-unlimited.limited"));

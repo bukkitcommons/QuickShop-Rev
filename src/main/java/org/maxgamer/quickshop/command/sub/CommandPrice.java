@@ -127,7 +127,7 @@ public class CommandPrice extends QuickShopCommand {
         continue;
       }
       
-      if (shop.get().price().<Double>stack() == price) {
+      if (shop.get().price().equals(price)) {
         // Stop here if there isn't a price change
         sender.sendMessage(Shop.getLocaleManager().get("no-price-change", p));
         return;
@@ -154,7 +154,7 @@ public class CommandPrice extends QuickShopCommand {
       // Update the shop
       shop.get().setPrice(Stack.of(price));
       sender.sendMessage(
-          Shop.getLocaleManager().get("price-is-now", p, QuickShop.instance().getEconomy().format(shop.get().price().<Double>stack())));
+          Shop.getLocaleManager().get("price-is-now", p, QuickShop.instance().getEconomy().format(shop.get().<Double>price())));
       // Chest shops can be double shops.
       if (!(shop.get() instanceof ContainerQuickShop)) {
         return;
@@ -174,12 +174,12 @@ public class CommandPrice extends QuickShopCommand {
       }
 
       if (cs.is(ShopType.SELLING)) {
-        if (cs.price().<Double>stack() < nextTo.price().<Double>stack()) {
+        if (cs.price() < nextTo.<Double>price()) {
           sender.sendMessage(Shop.getLocaleManager().get("buying-more-than-selling", p));
         }
       }
       // Buying
-      else if (cs.price().<Double>stack() > nextTo.price().<Double>stack()) {
+      else if (cs.price() > nextTo.<Double>price()) {
         sender.sendMessage(Shop.getLocaleManager().get("buying-more-than-selling", p));
       }
 

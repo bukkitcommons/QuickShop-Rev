@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
-import org.maxgamer.quickshop.hologram.EntityDisplay;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import com.google.gson.Gson;
@@ -26,7 +25,7 @@ import com.google.gson.JsonSyntaxException;
 import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
-import cc.bukkit.shop.feature.Displayed;
+import cc.bukkit.shop.hologram.DisplayAttribute;
 import cc.bukkit.shop.hologram.DisplayInfo;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -67,7 +66,7 @@ public class ItemUtils {
               return;
             
             ChestShop chest = (ChestShop) shop;
-            if (((Displayed) shop).scheme().<Location>scheme((ChestShop) shop).distance(item.getLocation()) > 0.6) {
+            if (chest.data().get(DisplayAttribute.LOCATION, chest.location().bukkit()).distance(item.getLocation()) > 0.6) {
               item.remove();
               Util.debug("Removed a duped item display entity by distance > 0.6");
               return;
@@ -82,7 +81,7 @@ public class ItemUtils {
               return;
             }
             
-            if (((EntityDisplay) chest.display()).data().type().entityType() != item.getType()) {
+            if (chest.display().<Entity>sample().getType() != item.getType()) {
               item.remove();
               Util.debug("Removed a duped item display entity by type not equals");
               return;

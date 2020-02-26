@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -34,7 +33,6 @@ import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.action.ShopCreator;
 import cc.bukkit.shop.action.ShopData;
 import cc.bukkit.shop.event.ShopCreateEvent;
-import cc.bukkit.shop.event.ShopPreCreateEvent;
 import cc.bukkit.shop.feature.Concrete;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.manager.ShopManager;
@@ -85,12 +83,12 @@ public class QuickShopManager implements ShopManager {
     if (data.type() == ShopType.SELLING)
       shop = new QuickShopSeller(
           ShopLocation.from(world, data.x(), data.y(), data.z()),
-          Stack.of(data.price()), StackItem.of(ItemUtils.deserialize(data.item())),
+          (double) data.price().stack(), StackItem.of(ItemUtils.deserialize(data.item())),
           data.moderators(), data.unlimited(), data.type());
     else
       shop = new QuickShopBuyer(
           ShopLocation.from(world, data.x(), data.y(), data.z()),
-          Stack.of(data.price()), StackItem.of(ItemUtils.deserialize(data.item())),
+          (double) data.price().stack(), StackItem.of(ItemUtils.deserialize(data.item())),
           data.moderators(), data.unlimited(), data.type());
 
     inChunk.put(Utils.blockKey(data.x(), data.y(), data.z()), shop);
@@ -113,51 +111,6 @@ public class QuickShopManager implements ShopManager {
     shop.load();
 
     return shop;
-  }
-
-  /**
-   * Checks other plugins to make sure they can use the chest they're making a shop.
-   *
-   * @param player The player to check
-   * @param block The block to check
-   * @return True if they're allowed to place a shop there.
-   */
-  public static boolean canBuildShop(@NotNull Player player, @NotNull Block block) {
-    try {
-      if (BaseConfig.enableLimits) {
-        UUID uuid = player.getUniqueId();
-        long owned = Shop.getLoader().getAllShops()
-            .stream() // ASYNC
-            .filter(shop ->
-            shop.moderators().getOwner().equals(uuid))
-            .count();
-
-        int max = QuickShop.instance().getShopLimit(player);
-
-        if (owned >= max && ShopUtils.canBeShop(block)) {
-          player.sendMessage(
-              Shop.getLocaleManager().get("reached-maximum-can-create", player,
-                  String.valueOf(owned), String.valueOf(max)));
-
-          return false;
-        }
-      }
-
-      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(false, player);
-      if (!QuickShop.instance().getPermissionChecker().canBuild(player, block)) {
-        Util.debug("PermissionChecker canceled shop creation");
-        return false;
-      }
-
-      ShopPreCreateEvent event = new ShopPreCreateEvent(player, block.getLocation());
-      if (Util.fireCancellableEvent(event))
-        return false;
-
-    } finally {
-      QuickShop.instance().getNcpExemptor().toggleProtectionListeners(true, player);
-    }
-
-    return true;
   }
 
   /**
@@ -257,7 +210,7 @@ public class QuickShopManager implements ShopManager {
         .getDatabaseHelper()
         .createShop(shop.moderator().serialize(),
             Stack.of(shop.price()), shop.stack(),
-            shop.isUnlimited() ? 1 : 0, shop.type().toID(),
+            shop.unlimited() ? 1 : 0, shop.type().toID(),
                 location.worldName(),
                 location.x(), location.y(), location.z());
 
@@ -273,7 +226,7 @@ public class QuickShopManager implements ShopManager {
 
         ShopData data = new ShopData(Util.serializeItem(info.stack().stack()), shop.moderator().serialize(),
             shop.location().worldName(), shop.type(), Stack.of(shop.price()),
-            shop.isUnlimited(), shop.location().x(), shop.location().y(), shop.location().z());
+            shop.unlimited(), shop.location().x(), shop.location().y(), shop.location().z());
 
         inChunk.put(location.blockKey(), data);
 

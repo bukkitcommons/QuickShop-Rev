@@ -15,7 +15,7 @@ import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 
 public class JavaUtils {
-  public static String fillArgs(@Nullable String raw, @Nullable String... args) {
+  public static String fillArgs(@Nullable String raw, @Nullable Object... args) {
     if (raw == null) {
       return "Invalid message: null";
     }
@@ -26,7 +26,7 @@ public class JavaUtils {
       return raw;
     }
     for (int i = 0; i < args.length; i++) {
-      raw = StringUtils.replace(raw, "{" + i + "}", args[i] == null ? "" : args[i]);
+      raw = StringUtils.replace(raw, "{" + i + "}", (String) args[i] == null ? "" : (String) args[i]);
     }
     return raw;
   }

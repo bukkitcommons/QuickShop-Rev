@@ -13,7 +13,6 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import cc.bukkit.shop.misc.ShopLocation;
 
 public class BlockUtils {
 
@@ -59,10 +58,9 @@ public class BlockUtils {
     return false;
   }
   
-  public static Location getCenter(@NotNull ShopLocation shopLocation) {
+  public static Location getCenter(@NotNull Location location) {
     // This is always '+' instead of '-' even in negative pos
-    return new Location(shopLocation.world(), shopLocation.x() + .5, shopLocation.y() + .5,
-        shopLocation.z() + .5);
+    return location.clone().add(.5, .5, .5);
   }
 
   public static final BlockFace[] axis =
