@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,7 +28,9 @@ import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
+
 import com.google.common.collect.Maps;
+
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -62,7 +65,7 @@ public class QuickShopActionManager implements ShopActionManager {
     /*
      * Action manager
      */
-    private Map<UUID, ShopActionData> actionData = Maps.newConcurrentMap();
+    private final Map<UUID, ShopActionData> actionData = Maps.newConcurrentMap();
     
     @Override
     public boolean hasAction(@NotNull UUID player) {
@@ -123,10 +126,9 @@ public class QuickShopActionManager implements ShopActionManager {
             tax = 0;
             Util.trace("Disable the Tax for player " + p.getName() + " cause they have permission quickshop.tax");
         }
-        if (shop.moderator().isModerator(p.getUniqueId())) {
+        if (shop.moderator().isModerator(p.getUniqueId()))
             tax = 0; // Is staff or owner, so we won't will take them tax
-        }
-        
+            
         // Paying - withdraw owner
         boolean shouldPayOwner = !shop.unlimited() || BaseConfig.payUnlimitedShopOwners;
         if (shouldPayOwner) {
@@ -147,11 +149,9 @@ public class QuickShopActionManager implements ShopActionManager {
         if (!depositSeller) {
             ShopLogger.instance().warning("Failed to deposit the money " + moneyAfterTax + " to player " + p.getName());
             /* Rollback the trade */
-            if (shouldPayOwner) {
-                if (!QuickShop.instance().getEconomy().deposit(shop.getOwner(), totalPrice)) {
+            if (shouldPayOwner)
+                if (!QuickShop.instance().getEconomy().deposit(shop.getOwner(), totalPrice))
                     ShopLogger.instance().warning("Failed to rollback the purchase actions for player " + Bukkit.getOfflinePlayer(shop.getOwner()).getName());
-                }
-            }
             p.sendMessage(Shop.getLocaleManager().get("purchase-failed", p));
             return false;
         }
@@ -180,6 +180,7 @@ public class QuickShopActionManager implements ShopActionManager {
         Bukkit.getPluginManager().callEvent(se);
         
         ((ChestShop) shop).setSignText(); // Update the signs count\
+        Shop.getManager().save(shop);
         return true;
     }
     
@@ -194,9 +195,8 @@ public class QuickShopActionManager implements ShopActionManager {
             if (!QuickShop.instance().getPermissionChecker().canBuild(p, info.location())) {
                 p.sendMessage(Shop.getLocaleManager().get("no-permission", p) + ": Some 3rd party plugin denied the permission checks, did you have permission built in there?");
                 Util.trace("Failed to create shop: Protection check failed:");
-                for (RegisteredListener belisteners : BlockExpEvent.getHandlerList().getRegisteredListeners()) {
+                for (RegisteredListener belisteners : BlockExpEvent.getHandlerList().getRegisteredListeners())
                     Util.trace(belisteners.getPlugin().getName());
-                }
                 return;
             }
             QuickShop.instance().getNcpExemptor().toggleProtectionListeners(true, p);
@@ -217,12 +217,10 @@ public class QuickShopActionManager implements ShopActionManager {
             return;
         }
         
-        if (info.location().block().getType() == Material.ENDER_CHEST) {
-            if (!QuickShopPermissionManager.instance().has(p, "quickshop.create.enderchest")) {
+        if (info.location().block().getType() == Material.ENDER_CHEST)
+            if (!QuickShopPermissionManager.instance().has(p, "quickshop.create.enderchest"))
                 return;
-            }
-        }
-        
+            
         if (BaseConfig.autoSign && !BaseConfig.allowNoSign) {
             
             if (info.sign() == null) {
@@ -253,7 +251,7 @@ public class QuickShopActionManager implements ShopActionManager {
         double minPrice = BaseConfig.minimumPrice == -1 ? Integer.MIN_VALUE : BaseConfig.minimumPrice;
         
         try {
-            if (BaseConfig.integerPriceOnly) {
+            if (BaseConfig.integerPriceOnly)
                 try {
                     price = Integer.parseInt(message);
                 } catch (NumberFormatException ex2) {
@@ -262,7 +260,7 @@ public class QuickShopActionManager implements ShopActionManager {
                     p.sendMessage(Shop.getLocaleManager().get("not-a-integer", p, message));
                     return;
                 }
-            } else {
+            else {
                 price = Double.parseDouble(message);
                 String strFormat = new DecimalFormat("#.#########").format(Math.abs(price)).replace(",", ".");
                 String[] processedDouble = strFormat.split(".");
@@ -288,40 +286,35 @@ public class QuickShopActionManager implements ShopActionManager {
                 p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p, (decFormat) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
                 return;
             }
-        } else {
+        } else
             if (price < minPrice) {
                 p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p, (decFormat) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
                 return;
             }
-        }
         
         double price_limit = BaseConfig.maximumPrice == -1 ? Integer.MAX_VALUE : BaseConfig.maximumPrice;
-        if (price_limit != -1) {
+        if (price_limit != -1)
             if (price > price_limit) {
                 p.sendMessage(Shop.getLocaleManager().get("price-too-high", p, (decFormat) ? ShopUtils.formatPrice(price_limit) : "" + price_limit));
                 return;
             }
-        }
         
         // Check price restriction
         Entry<Double, Double> priceRestriction = Util.getPriceRestriction(info.stack().<ItemStack>stack().getType());
-        if (priceRestriction != null) {
-            if (price < priceRestriction.getKey() || price > priceRestriction.getValue()) {
+        if (priceRestriction != null)
+            if (price < priceRestriction.getKey() || price > priceRestriction.getValue())
                 // p.sendMessage(ChatColor.RED+"Restricted prices for
                 // "+info.stack().getType()+": min "+priceRestriction.getKey()+", max
                 // "+priceRestriction.getValue());
                 p.sendMessage(Shop.getLocaleManager().get("restricted-prices", p, ItemUtils.getItemStackName(info.stack().stack()), String.valueOf(priceRestriction.getKey()), String.valueOf(priceRestriction.getValue())));
-            }
-        }
-        
+            
         if (!QuickShop.instance().getIntegrationManager().callIntegrationsCanCreate(p, info.location().bukkit())) {
             Util.trace("Cancelled by integrations");
             return;
         }
         
-        if (!BaseConfig.lock) {
+        if (!BaseConfig.lock)
             p.sendMessage(Shop.getLocaleManager().get("shops-arent-locked", p));
-        }
         
         /*
          * Creates the shop
@@ -337,9 +330,8 @@ public class QuickShopActionManager implements ShopActionManager {
         // This must be called after the event has been called.
         // Else, if the event is cancelled, they won't get their
         // money back.
-        if (QuickShopPermissionManager.instance().has(p, "quickshop.bypasscreatefee")) {
+        if (QuickShopPermissionManager.instance().has(p, "quickshop.bypasscreatefee"))
             createCost = 0;
-        }
         
         if (createCost > 0) {
             if (!QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), createCost)) {
@@ -348,9 +340,8 @@ public class QuickShopActionManager implements ShopActionManager {
             }
             try {
                 String taxAccount = BaseConfig.taxAccount;
-                if (taxAccount != null) {
+                if (taxAccount != null)
                     QuickShop.instance().getEconomy().deposit(Bukkit.getOfflinePlayer(taxAccount).getUniqueId(), createCost);
-                }
             } catch (Exception e2) {
                 e2.printStackTrace();
                 ShopLogger.instance().log(Level.WARNING, "QuickShop can't pay tax to account in config.yml, Please set tax account name to a existing player!");
@@ -362,13 +353,12 @@ public class QuickShopActionManager implements ShopActionManager {
         // Figures out which way we should put the sign on and
         // sets its text.
         
-        if (shop.isDualShop()) {
-            ChestShop nextTo = shop.getAttachedShop();
-            if (nextTo.<Double>price() > shop.price()) {
+        if (shop.converse().isPresent()) {
+            ShopViewer nextTo = shop.getAttachedShop();
+            if (nextTo.isPresent() && nextTo.get().<Double>price() > shop.price())
                 // The one next to it must always be a
                 // buying shop.
                 p.sendMessage(Shop.getLocaleManager().get("buying-more-than-selling", p));
-            }
         }
     }
     
@@ -389,15 +379,14 @@ public class QuickShopActionManager implements ShopActionManager {
             p.sendMessage(Shop.getLocaleManager().get("negative-amount", p));
             return;
         }
-        int pSpace = ShopUtils.countSpace(p.getInventory(), shop.stack());
+        int pSpace = ShopUtils.countSpaces(p.getInventory(), shop.stack());
         if (amount > pSpace) {
             p.sendMessage(Shop.getLocaleManager().get("not-enough-space", p, String.valueOf(pSpace)));
             return;
         }
         ShopPurchaseEvent e = new ShopPurchaseEvent(shop, p, amount);
-        if (Util.callCancellableEvent(e)) {
+        if (Util.callCancellableEvent(e))
             return; // Cancelled
-        }
         // Money handling
         double tax = BaseConfig.taxRate;
         double total = amount * shop.<Double>price();
@@ -405,13 +394,11 @@ public class QuickShopActionManager implements ShopActionManager {
             tax = 0;
             Util.trace("Disable the Tax for player " + p.getName() + " cause they have permission quickshop.tax");
         }
-        if (tax < 0) {
+        if (tax < 0)
             tax = 0; // Tax was disabled.
-        }
-        if (shop.moderator().isModerator(p.getUniqueId())) {
+        if (shop.moderator().isModerator(p.getUniqueId()))
             tax = 0; // Is staff or owner, so we won't will take them tax
-        }
-        
+            
         boolean successA = QuickShop.instance().getEconomy().withdraw(p.getUniqueId(), total); // Withdraw
                                                                                                // owner's
                                                                                                // money
@@ -426,9 +413,8 @@ public class QuickShopActionManager implements ShopActionManager {
             if (!successB) {
                 ShopLogger.instance().warning("Failed to deposit the money for player " + Bukkit.getOfflinePlayer(shop.getOwner()));
                 /* Rollback the trade */
-                if (!QuickShop.instance().getEconomy().deposit(p.getUniqueId(), depositMoney)) {
+                if (!QuickShop.instance().getEconomy().deposit(p.getUniqueId(), depositMoney))
                     ShopLogger.instance().warning("Failed to rollback the purchase actions for player " + Bukkit.getOfflinePlayer(shop.getOwner()).getName());
-                }
                 p.sendMessage(Shop.getLocaleManager().get("purchase-failed", p));
                 return;
             }
@@ -436,11 +422,10 @@ public class QuickShopActionManager implements ShopActionManager {
         
         String msg;
         // Notify the shop owner
-        if (BaseConfig.showTax) {
+        if (BaseConfig.showTax)
             msg = Shop.getLocaleManager().get("player-bought-from-your-store-tax", p, p.getName(), "" + amount, "##########" + Util.serializeItemStack(shop.stack()) + "##########", JavaUtils.format((tax * total)));
-        } else {
+        else
             msg = Shop.getLocaleManager().get("player-bought-from-your-store", p, p.getName(), "" + amount, "##########" + Util.serializeItemStack(shop.stack()) + "##########");
-        }
         // Transfers the item from A to B
         if (stock == amount)
             msg += "\n" + Shop.getLocaleManager().get("shop-out-of-stock", p, "" + shop.location().x(), "" + shop.location().y(), "" + shop.location().z(), ItemUtils.getItemStackName(shop.stack()));
@@ -492,21 +477,20 @@ public class QuickShopActionManager implements ShopActionManager {
                 return;
             }
         } catch (NumberFormatException e) {
-            if (message.equalsIgnoreCase(BaseConfig.tradeAllWord)) {
+            if (message.equalsIgnoreCase(BaseConfig.tradeAllWord))
                 amount = -1;
-            } else {
+            else {
                 p.sendMessage(Shop.getLocaleManager().get("not-a-integer", p, message));
                 Util.trace("Receive the chat " + message + " and it format failed: " + e.getMessage());
                 return;
             }
         }
         
-        if (shop instanceof BuyerShop) {
+        if (shop instanceof BuyerShop)
             buy(p, message, (BuyerShop) shop, amount, info);
-        } else
-            if (shop instanceof SellerShop) {
+        else
+            if (shop instanceof SellerShop)
                 sell(p, message, (SellerShop) shop, amount, info);
-            }
     }
     
     @Override
@@ -527,12 +511,10 @@ public class QuickShopActionManager implements ShopActionManager {
                 return;
             }
             
-            if (info.action() == ShopAction.CREATE) {
+            if (info.action() == ShopAction.CREATE)
                 create(p, (ShopCreator) info, message, bypassProtectionChecks);
-            }
-            if (info.action() == ShopAction.TRADE) {
+            if (info.action() == ShopAction.TRADE)
                 trade(p, (ShopSnapshot) info, message);
-            }
         };
         
         if (sync)

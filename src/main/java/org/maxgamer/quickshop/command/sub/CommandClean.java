@@ -2,6 +2,7 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -13,7 +14,9 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.shop.QuickShopLoader;
 import org.maxgamer.quickshop.utils.ShopUtils;
+
 import com.google.common.collect.Lists;
+
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -66,7 +69,7 @@ public class CommandClean extends QuickShopCommand {
                     
                     if (shop != null) {
                         ContainerQuickShop cs = (ContainerQuickShop) shop;
-                        if (!cs.isDualShop()) { // FIXME
+                        if (cs.converse().isEmpty()) { // FIXME
                             pendingRemoval.add(shop);
                             count[0]++;
                         }

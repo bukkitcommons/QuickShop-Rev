@@ -2,11 +2,13 @@ package org.maxgamer.quickshop.command.sub;
 
 import java.util.Collections;
 import java.util.List;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.utils.ItemUtils;
+
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.BlockViewer;
@@ -82,9 +84,9 @@ public class CommandBuy extends QuickShopCommand {
         
         // shop.setShopType(ShopType.BUYING); // FIXME
         shop.setSignText();
-        shop.save();
+        Shop.getManager().save(shop);
         
         Shop.getLocaleManager().sendControlPanelInfo((Player) sender, shop);
-        sender.sendMessage(Shop.getLocaleManager().get("command.now-buying", ItemUtils.getItemStackName(shop.stack())));
+        sender.sendMessage(cc.bukkit.shop.Shop.getLocaleManager().get("command.now-buying", ItemUtils.getItemStackName(shop.stack())));
     }
 }

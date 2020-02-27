@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
+
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
-import cc.bukkit.shop.ChestShop;
+
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.logger.ShopLogger;
@@ -55,7 +56,7 @@ public class CommandPrice extends QuickShopCommand {
         final double minPrice = BaseConfig.minimumPrice;
         
         try {
-            if (BaseConfig.integerPriceOnly) {
+            if (BaseConfig.integerPriceOnly)
                 try {
                     price = Long.parseLong(cmdArg[0]);
                 } catch (NumberFormatException ex2) {
@@ -64,9 +65,8 @@ public class CommandPrice extends QuickShopCommand {
                     p.sendMessage(Shop.getLocaleManager().get("not-a-integer", p, cmdArg[0]));
                     return;
                 }
-            } else {
+            else
                 price = Double.parseDouble(cmdArg[0]);
-            }
             
         } catch (NumberFormatException ex) {
             // No number input
@@ -82,12 +82,11 @@ public class CommandPrice extends QuickShopCommand {
                 p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p, (format) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
                 return;
             }
-        } else {
+        } else
             if (price < minPrice) {
                 p.sendMessage(Shop.getLocaleManager().get("price-too-cheap", p, (format) ? ShopUtils.formatPrice(minPrice) : "" + minPrice));
                 return;
             }
-        }
         
         final double price_limit = BaseConfig.maximumPrice;
         
@@ -98,9 +97,8 @@ public class CommandPrice extends QuickShopCommand {
         
         double fee = 0;
         
-        if (BaseConfig.priceModFee > 0) {
+        if (BaseConfig.priceModFee > 0)
             fee = BaseConfig.priceModFee;
-        }
         
         /*
          * if (fee > 0 && plugin.getEconomy().getBalance(p.getUniqueId()) < fee) {
@@ -119,9 +117,8 @@ public class CommandPrice extends QuickShopCommand {
             final Block b = bIt.next();
             final ShopViewer shop = Shop.getManager().getLoadedShopAt(b.getLocation());
             
-            if (shop.isEmpty() || (!shop.get().moderator().isModerator(p.getUniqueId()) && !QuickShopPermissionManager.instance().has(sender, "quickshop.other.price"))) {
+            if (shop.isEmpty() || (!shop.get().moderator().isModerator(p.getUniqueId()) && !QuickShopPermissionManager.instance().has(sender, "quickshop.other.price")))
                 continue;
-            }
             
             if (shop.get().price().equals(price)) {
                 // Stop here if there isn't a price change
@@ -147,34 +144,27 @@ public class CommandPrice extends QuickShopCommand {
             shop.get().setPrice(Stack.of(price));
             sender.sendMessage(Shop.getLocaleManager().get("price-is-now", p, QuickShop.instance().getEconomy().format(shop.get().<Double>price())));
             // Chest shops can be double shops.
-            if (!(shop.get() instanceof ContainerQuickShop)) {
+            if (!(shop.get() instanceof ContainerQuickShop))
                 return;
-            }
             
             final ContainerQuickShop cs = (ContainerQuickShop) shop.get();
             
-            if (!cs.isDualShop()) {
+            if (cs.converse().isEmpty())
                 return;
-            }
             
-            final ChestShop nextTo = cs.getAttachedShop();
-            
-            if (nextTo == null) {
-                // TODO: 24/11/2019 Send message about that issue.
+            ShopViewer nextTo = cs.getAttachedShop();
+            if (nextTo.isEmpty())
                 return;
-            }
             
             if (cs.is(ShopType.SELLING)) {
-                if (cs.price() < nextTo.<Double>price()) {
+                if (cs.price() < nextTo.get().<Double>price())
                     sender.sendMessage(Shop.getLocaleManager().get("buying-more-than-selling", p));
-                }
             }
             // Buying
             else
-                if (cs.price() > nextTo.<Double>price()) {
+                if (cs.price() > nextTo.get().<Double>price())
                     sender.sendMessage(Shop.getLocaleManager().get("buying-more-than-selling", p));
-                }
-            
+                
             return;
         }
         

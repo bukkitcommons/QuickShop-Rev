@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.command.sub;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -12,6 +13,7 @@ import org.maxgamer.quickshop.command.QuickShopCommand;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.shop.ContainerQuickShop;
 import org.maxgamer.quickshop.utils.BlockUtils;
+
 import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -38,11 +40,10 @@ public class CommandInfo extends QuickShopCommand {
                 chunks++;
                 // noinspection unchecked
                 for (ShopData data : inChunk.values()) {
-                    if (data.type() == ShopType.BUYING) {
+                    if (data.type() == ShopType.BUYING)
                         buying++;
-                    } else {
+                    else
                         selling++;
-                    }
                     
                     try {
                         shop = Shop.getManager().load(Bukkit.getWorld(data.world()), data);
@@ -50,16 +51,14 @@ public class CommandInfo extends QuickShopCommand {
                         continue;
                     }
                     
-                    if (shop instanceof ContainerQuickShop && ((ContainerQuickShop) shop).isDualShop()) {
+                    if (shop instanceof ContainerQuickShop && ((ContainerQuickShop) shop).converse().isPresent())
                         doubles++;
-                    } else
-                        if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0) {
+                    else
+                        if (data.type() == ShopType.SELLING && shop.getRemainingStock() == 0)
                             nostock++;
-                        }
-                    
-                    if (shop instanceof ContainerQuickShop && BlockUtils.isDoubleChest(shop.location().block())) {
+                        
+                    if (shop instanceof ContainerQuickShop && BlockUtils.isDoubleChest(shop.location().block()))
                         doubleschests++;
-                    }
                 }
             }
         }

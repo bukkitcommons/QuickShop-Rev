@@ -1,50 +1,46 @@
 package org.maxgamer.quickshop.listeners;
 
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
-import org.bukkit.inventory.Inventory;
 import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
-import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
+import org.maxgamer.quickshop.scheduler.SlackServices;
 import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
+
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.viewer.ShopViewer;
+import lombok.val;
 
 public class BlockListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        Player player = event.getPlayer();
+        val player = event.getPlayer();
         
-        Block block = event.getBlock();
-        BlockState state = block.getState();
+        val block = event.getBlock();
+        val state = block.getState();
         ShopViewer viewer;
         
         if (state instanceof Sign) {
-            Sign sign = (Sign) block.getState();
+            val sign = (Sign) block.getState();
             
             if (BaseConfig.locketteEnable && sign.getLine(0).equals(BaseConfig.lockettePrivateText) || sign.getLine(0).equals(BaseConfig.locketteMoreUsersText))
                 return;
             
             viewer = ShopUtils.getShopBySign(block);
-        } else {
+        } else
             viewer = Shop.getManager().getLoadedShopAt(block);
-        }
         
         viewer.nonNull().accept((ChestShop shop) -> {
-            boolean isOwner = shop.moderator().isOwner(player.getUniqueId());
+            val isOwner = shop.moderator().isOwner(player.getUniqueId());
             if (!isOwner && !QuickShopPermissionManager.instance().has(player, "quickshop.other.destroy")) {
                 event.setCancelled(true);
                 player.sendMessage(Shop.getLocaleManager().get("no-permission", player));
@@ -58,9 +54,8 @@ public class BlockListener implements Listener {
                     event.setCancelled(true);
                     player.sendMessage(Shop.getLocaleManager().get("no-creative-break", player, Shop.getLocaleManager().get(tool)));
                     return;
-                } else {
+                } else
                     player.sendMessage(Shop.getLocaleManager().get("break-shop-use-supertool", player));
-                }
             }
             
             Shop.getActions().removeAction(player.getUniqueId());
@@ -72,20 +67,24 @@ public class BlockListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void onInventoryMove(InventoryMoveItemEvent event) {
         if (BaseConfig.updateSignOnInvMove) {
-            final Inventory inventory = event.getDestination();
-            final Location location = inventory.getLocation();
+            val inventory = event.getDestination();
+            val location = inventory.getLocation();
             
-            if (location != null) {
+            if (location != null)
                 // Delayed task. Event triggers when item is moved, not when it is received.
-                Shop.getManager().getLoadedShopFrom(location).ifPresent((ChestShop shop) -> ScheduledSignUpdater.schedule(shop));
-            }
+                Shop.getManager().getLoadedShopFrom(location).ifPresent((ChestShop shop) -> {
+                    SlackServices.schedule(shop, s -> {
+                        s.setSignText();
+                        Shop.getManager().save(s);
+                    });
+                });
         }
     }
     
     @EventHandler(ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
         BlockUtils.getSecondHalf(event.getBlock()).ifPresent(chest -> {
-            final Player player = event.getPlayer();
+            val player = event.getPlayer();
             
             if (!QuickShopPermissionManager.instance().has(player, "quickshop.create.double") && Shop.getManager().hasLoadedShopAt(chest)) {
                 event.setCancelled(true);

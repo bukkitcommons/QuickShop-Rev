@@ -43,7 +43,7 @@ import org.maxgamer.quickshop.messages.QuickShopMessager;
 import org.maxgamer.quickshop.permission.QuickShopPermissionManager;
 import org.maxgamer.quickshop.scheduler.LogWriter;
 import org.maxgamer.quickshop.scheduler.OngoingFeeWatcher;
-import org.maxgamer.quickshop.scheduler.ScheduledSignUpdater;
+import org.maxgamer.quickshop.scheduler.SlackServices;
 import org.maxgamer.quickshop.scheduler.SyncDisplayDespawner;
 import org.maxgamer.quickshop.scheduler.UpdateWatcher;
 import org.maxgamer.quickshop.shop.QuickShopActionManager;
@@ -549,7 +549,7 @@ public final class QuickShop extends JavaPlugin implements ShopPlugin {
         }
         
         Util.trace("Registering shop watcher...");
-        Bukkit.getScheduler().runTaskTimer(this, new ScheduledSignUpdater(), 40, 40);
+        Bukkit.getScheduler().runTaskTimer(this, new SlackServices(), 40, 40);
         if (logWatcher != null) {
             Bukkit.getScheduler().runTaskTimerAsynchronously(this, logWatcher, 0, 10);
             getLogger().info("Log actions is enabled, actions will log in the qs.log file!");

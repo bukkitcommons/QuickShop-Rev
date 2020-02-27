@@ -1,11 +1,15 @@
 package org.maxgamer.quickshop.shop;
 
 import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
 import com.google.common.collect.Lists;
+
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.misc.ShopLocation;
 import cc.bukkit.shop.moderator.ShopModerator;
@@ -35,11 +39,10 @@ public class QuickShopSeller extends ContainerQuickShop implements ChestSeller {
         Inventory playerInv = p.getInventory();
         ItemStack offer = new ItemStack(stack.stack());
         
-        if (unlimited) {
+        if (unlimited)
             while (amount-- > 0)
                 floor.addAll(playerInv.addItem(offer).values());
-            
-        } else {
+        else {
             Inventory chestInv = getInventory();
             ItemStack[] contents = chestInv.getContents();
             
@@ -61,11 +64,11 @@ public class QuickShopSeller extends ContainerQuickShop implements ChestSeller {
             
             chestInv.setContents(contents);
             setSignText();
+            Shop.getManager().save(this);
         }
         
-        for (ItemStack stack : floor) {
+        for (ItemStack stack : floor)
             p.getWorld().dropItem(p.getLocation(), stack);
-        }
     }
     
     @Override

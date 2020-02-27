@@ -2,14 +2,12 @@ package org.maxgamer.quickshop.shop;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -27,7 +25,10 @@ import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
+
 import com.google.common.collect.Lists;
+
+import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.GenericChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -35,7 +36,6 @@ import cc.bukkit.shop.event.ShopLoadEvent;
 import cc.bukkit.shop.event.ShopModeratorChangedEvent;
 import cc.bukkit.shop.event.ShopPriceChangeEvent;
 import cc.bukkit.shop.event.ShopPriceChangeEvent.Reason;
-import cc.bukkit.shop.event.ShopSaveEvent;
 import cc.bukkit.shop.event.ShopUnloadEvent;
 import cc.bukkit.shop.hologram.Display;
 import cc.bukkit.shop.hologram.DisplayData;
@@ -48,6 +48,7 @@ import cc.bukkit.shop.viewer.ShopViewer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.val;
 import lombok.experimental.Accessors;
 
 @Getter
@@ -90,16 +91,16 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     }
     
     protected ContainerQuickShop(@NotNull ContainerQuickShop s) {
-        this.displayData = s.displayData;
-        this.unlimited = s.unlimited;
-        this.price = s.price;
+        displayData = s.displayData;
+        unlimited = s.unlimited;
+        price = s.price;
         
-        this.stack = StackItem.of(new ItemStack(s.stack()));
-        this.location = s.location.clone();
-        this.moderator = s.moderator.clone();
+        stack = StackItem.of(new ItemStack(s.stack()));
+        location = s.location.clone();
+        moderator = s.moderator.clone();
         
         if (DisplayConfig.displayItems) {
-            DisplayData data = DisplayDataMatcher.create(this.stack.stack());
+            DisplayData data = DisplayDataMatcher.create(stack.stack());
             switch (data.type()) {
                 case ARMOR_STAND:
                     display = new ArmorStandDisplay(this, data);
@@ -127,15 +128,15 @@ public abstract class ContainerQuickShop implements GenericChestShop {
      * @param unlimited    The unlimited
      */
     public ContainerQuickShop(@NotNull ShopLocation shopLocation, double price, @NotNull ItemStacked item, @NotNull ShopModerator moderator, boolean unlimited, @NotNull ShopType type, boolean spawnDisplay) {
-        this.location = shopLocation;
+        location = shopLocation;
         this.price = price;
         this.moderator = moderator;
-        this.stack = StackItem.of(new ItemStack(item.stack()));
+        stack = StackItem.of(new ItemStack(item.stack()));
         this.unlimited = unlimited;
         
-        if (spawnDisplay) {
+        if (spawnDisplay)
             if (DisplayConfig.displayItems) {
-                DisplayData data = DisplayDataMatcher.create(this.stack.stack());
+                DisplayData data = DisplayDataMatcher.create(stack.stack());
                 switch (data.type()) {
                     case ARMOR_STAND:
                         display = new ArmorStandDisplay(this, data);
@@ -145,22 +146,15 @@ public abstract class ContainerQuickShop implements GenericChestShop {
                         break;
                 }
             }
-        }
     }
     
-    /**
-     * Add an item to shops chest.
-     *
-     * @param stack  The itemstack. The amount does not matter, just everything else
-     * @param amount The amount to add to the shop.
-     */
     @Override
     public void fill(int amount) {
         if (unlimited)
             return;
         
-        Inventory inv = getInventory();
-        ItemStack offer = new ItemStack(stack.stack());
+        val inv = getInventory();
+        val offer = new ItemStack(stack.stack());
         
         while (amount-- > 0)
             inv.addItem(offer);
@@ -168,32 +162,16 @@ public abstract class ContainerQuickShop implements GenericChestShop {
         setSignText();
     }
     
-    /**
-     * Returns the number of items this shop has in stock.
-     *
-     * @return The number of items available for purchase.
-     */
     @Override
     public int getRemainingStock() {
         return unlimited ? -1 : ShopUtils.countStacks(getInventory(), stack.stack());
     }
     
-    /**
-     * Returns the number of free spots in the chest for the particular item.
-     *
-     * @return remaining space
-     */
     @Override
     public int getRemainingSpace() {
-        return unlimited ? -1 : ShopUtils.countSpace(getInventory(), stack.stack());
+        return unlimited ? -1 : ShopUtils.countSpaces(getInventory(), stack.stack());
     }
     
-    /**
-     * Returns true if the ItemStack matches what this shop is selling/buying
-     *
-     * @param stack The ItemStack
-     * @return True if the ItemStack is the same (Excludes amounts)
-     */
     @Override
     public boolean isStack(@Nullable Object that) {
         if (that instanceof ItemStack)
@@ -209,29 +187,12 @@ public abstract class ContainerQuickShop implements GenericChestShop {
      */
     @Override
     public void setPrice(Object newPrice) {
-        ShopPriceChangeEvent event = new ShopPriceChangeEvent(newPrice, price, false, this, Reason.RESTRICT);
+        val event = new ShopPriceChangeEvent(newPrice, price, false, this, Reason.UNKNOWN);
         if (Util.callCancellableEvent(event))
             return;
         
         price = (double) event.getNewPrice();
         setSignText();
-        save();
-    }
-    
-    /** Upates the shop into the database. */
-    @Override
-    public void save() {
-        if (Util.callCancellableEvent(new ShopSaveEvent(this)))
-            return;
-        
-        try {
-            QuickShop.instance().getDatabaseHelper().updateShop(moderator.serialize(), stack.stack(), unlimited ? 1 : 0, displayData.type().id(), price, location.x(), location.y(), location.z(), location.worldName());
-            
-        } catch (Throwable t) {
-            ShopLogger.instance().severe("Could not update a shop in the database! Changes will revert after a reboot!");
-            
-            t.printStackTrace();
-        }
     }
     
     /**
@@ -240,14 +201,13 @@ public abstract class ContainerQuickShop implements GenericChestShop {
      * @return the shop that shares it's inventory with this one. Will return null
      *         if this shop is not attached to another.
      */
-    @Nullable
-    public ContainerQuickShop getAttachedShop() {
-        Optional<Location> c = BlockUtils.getSecondHalf(location.block());
-        if (!c.isPresent())
-            return null;
-        
-        ShopViewer shop = Shop.getManager().getLoadedShopAt(c.get());
-        return (ContainerQuickShop) shop.get();
+    @NotNull
+    public ShopViewer getAttachedShop() {
+        val c = BlockUtils.getSecondHalf(location.block());
+        if (c.isPresent())
+            return Shop.getManager().getLoadedShopAt(c.get());
+        else
+            return ShopViewer.empty();
     }
     
     @Nullable
@@ -255,7 +215,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
         try {
             if (QuickShop.instance().getOpenInvPlugin().isPresent() && location.block().getType() == Material.ENDER_CHEST) {
                 
-                com.lishid.openinv.OpenInv openInv = ((com.lishid.openinv.OpenInv) QuickShop.instance().getOpenInvPlugin().get());
+                val openInv = ((com.lishid.openinv.OpenInv) QuickShop.instance().getOpenInvPlugin().get());
                 
                 return openInv.getSpecialEnderChest(openInv.loadPlayer(Bukkit.getOfflinePlayer(moderator.getOwner())), Bukkit.getOfflinePlayer((moderator.getOwner())).isOnline()).getBukkitInventory();
             }
@@ -265,8 +225,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
         }
         
         try {
-            InventoryHolder container = (InventoryHolder) location.block().getState();
-            return container.getInventory();
+            return ((InventoryHolder) location.block().getState()).getInventory();
         } catch (Throwable t) {
             ShopLogger.instance().severe("The container of a shop have probably gone, with current block type: " + location.block().getType() + " @ " + location);
             
@@ -281,7 +240,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
      * @param lines The array of lines to change. Index is line number.
      */
     private void setSignText(@NotNull String[] lines) {
-        for (Sign sign : getAttached()) {
+        for (val sign : getAttached()) {
             if (Arrays.equals(sign.getLines(), lines))
                 continue;
             
@@ -296,7 +255,6 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     public void setUnlimited(boolean unlimited) {
         this.unlimited = unlimited;
         setSignText();
-        save();
     }
     
     /** Updates signs attached to the shop */
@@ -305,16 +263,16 @@ public abstract class ContainerQuickShop implements GenericChestShop {
         if (!Util.isChunkLoaded(location))
             return;
         
-        String[] lines = new String[4];
+        val lines = new String[4];
         
-        OfflinePlayer player = QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled() ? Bukkit.getOfflinePlayer(getOwner()) : null;
+        val player = QuickShop.instance().getPlaceHolderAPI().isPresent() && QuickShop.instance().getPlaceHolderAPI().get().isEnabled() ? Bukkit.getOfflinePlayer(getOwner()) : null;
         
         lines[0] = Shop.getLocaleManager().get("signs.header", player, ownerName());
         
-        String section = type().name().toLowerCase();
+        val section = type().name().toLowerCase();
         lines[1] = Shop.getLocaleManager().get("signs.".concat(section), player, unlimited ? Shop.getLocaleManager().get("signs.unlimited", player) : (String.valueOf(type() == ShopType.SELLING ? getRemainingStock() : getRemainingSpace())));
         
-        String stacks = stack.stack().getAmount() > 1 ? " * " + stack.stack().getAmount() : "";
+        val stacks = stack.stack().getAmount() > 1 ? " * " + stack.stack().getAmount() : "";
         lines[2] = Shop.getLocaleManager().get("signs.item", player, ItemUtils.getItemStackName(stack.stack()) + stacks);
         
         lines[3] = Shop.getLocaleManager().get("signs.price", player, price);
@@ -324,11 +282,10 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Shop " + (location.world() == null ? "unloaded world" : location.world().getName()) + "(" + location.x() + ", " + location.y() + ", " + location.z() + ")");
-        sb.append(" Owner: ").append(this.ownerName()).append(" - ").append(getOwner());
-        if (unlimited()) {
+        val sb = new StringBuilder("Shop " + (location.world() == null ? "unloaded world" : location.world().getName()) + "(" + location.x() + ", " + location.y() + ", " + location.z() + ")");
+        sb.append(" Owner: ").append(ownerName()).append(" - ").append(getOwner());
+        if (unlimited())
             sb.append(" Unlimited: true");
-        }
         sb.append(" Price: ").append(price());
         sb.append(" Item: ").append(stack.stack());
         return sb.toString();
@@ -346,12 +303,12 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     @NotNull
     @Override
     public List<Sign> getAttached() {
-        OfflinePlayer player = Bukkit.getOfflinePlayer(getOwner());
-        String signHeader = Shop.getLocaleManager().get("signs.header", player, ownerName());
+        val player = Bukkit.getOfflinePlayer(getOwner());
+        val signHeader = Shop.getLocaleManager().get("signs.header", player, ownerName());
         
         List<Sign> signs = Lists.newArrayListWithCapacity(4);
         
-        Block chest = location.block();
+        val chest = location.block();
         for (BlockFace face : SIGN_FACES) {
             Block block = chest.getRelative(face);
             
@@ -382,16 +339,18 @@ public abstract class ContainerQuickShop implements GenericChestShop {
      * @return true if this shop is a double chest, and the other half is
      *         selling/buying the same as this is buying/selling.
      */
-    public boolean isDualShop() {
-        ContainerQuickShop nextTo = getAttachedShop();
-        if (nextTo == null)
-            return false;
+    public ShopViewer converse() {
+        ShopViewer nextTo = getAttachedShop();
+        if (nextTo.isEmpty())
+            return ShopViewer.empty();
         
-        if (nextTo.isStack(stack.stack())) {
-            return type() != nextTo.type();
-        } else {
-            return false;
-        }
+        if (nextTo.get().isStack(stack.stack()))
+            if (type() != nextTo.<BasicShop>get().type())
+                return nextTo;
+            else
+                return ShopViewer.empty();
+        else
+            return ShopViewer.empty();
     }
     
     @Override
@@ -426,7 +385,6 @@ public abstract class ContainerQuickShop implements GenericChestShop {
             // display.remove();
         }
         
-        save();
         isLoaded = false;
         
         ShopUnloadEvent shopUnloadEvent = new ShopUnloadEvent(this);
@@ -435,14 +393,12 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     
     @Override
     public @NotNull String ownerName() {
-        if (unlimited) {
-            return Shop.getLocaleManager().get("admin-shop", Bukkit.getOfflinePlayer(this.getOwner()));
-        }
+        if (unlimited)
+            return Shop.getLocaleManager().get("admin-shop", Bukkit.getOfflinePlayer(getOwner()));
         
         String name = Bukkit.getOfflinePlayer(getOwner()).getName();
-        if (name == null || name.isEmpty()) {
-            return Shop.getLocaleManager().get("unknown-owner", Bukkit.getOfflinePlayer(this.getOwner()));
-        }
+        if (name == null || name.isEmpty())
+            return Shop.getLocaleManager().get("unknown-owner", Bukkit.getOfflinePlayer(getOwner()));
         
         return name;
     }
@@ -453,7 +409,7 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     @NotNull
     @Override
     public Set<UUID> getStaffs() {
-        return this.moderator.getStaffs();
+        return moderator.getStaffs();
     }
     
     @Override
@@ -473,41 +429,35 @@ public abstract class ContainerQuickShop implements GenericChestShop {
     
     @Override
     public boolean removeStaff(@NotNull UUID player) {
-        boolean result = this.moderator.removeStaff(player);
-        save();
-        if (result) {
-            Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-        }
+        val result = moderator.removeStaff(player);
+        if (result)
+            Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, moderator));
         return result;
     }
     
     @Override
     public @NotNull UUID getOwner() {
-        return this.moderator.getOwner();
+        return moderator.getOwner();
     }
     
     @Override
     public void setOwner(@NotNull UUID owner) {
-        this.moderator.setOwner(owner);
-        Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-        this.setSignText();
-        save();
+        moderator.setOwner(owner);
+        Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, moderator));
+        setSignText();
     }
     
     @Override
     public boolean addStaff(@NotNull UUID player) {
-        boolean result = this.moderator.addStaff(player);
-        save();
-        if (result) {
-            Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-        }
+        val result = moderator.addStaff(player);
+        if (result)
+            Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, moderator));
         return result;
     }
     
     @Override
     public void clearStaffs() {
-        this.moderator.clearStaffs();
-        Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, this.moderator));
-        save();
+        moderator.clearStaffs();
+        Bukkit.getPluginManager().callEvent(new ShopModeratorChangedEvent(this, moderator));
     }
 }

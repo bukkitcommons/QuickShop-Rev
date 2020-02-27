@@ -3,9 +3,11 @@ package org.maxgamer.quickshop.shop;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -26,13 +28,16 @@ import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
 import org.maxgamer.quickshop.utils.collection.LongHashMap;
 import org.maxgamer.quickshop.utils.collection.ObjectsHashMap;
+
 import com.google.gson.JsonSyntaxException;
+
 import cc.bukkit.shop.BasicShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.action.ShopCreator;
 import cc.bukkit.shop.action.ShopData;
 import cc.bukkit.shop.event.ShopCreateEvent;
+import cc.bukkit.shop.event.ShopSaveEvent;
 import cc.bukkit.shop.feature.Concrete;
 import cc.bukkit.shop.logger.ShopLogger;
 import cc.bukkit.shop.manager.ShopManager;
@@ -162,13 +167,12 @@ public class QuickShopManager implements ShopManager {
             info.sign().setType(Util.getSignMaterial());
             
             BlockState signState = info.sign().getState();
-            if (isWaterLogged) {
+            if (isWaterLogged)
                 try {
                     BlockDataWrapper.handleWaterLogged(signState);
                 } catch (NoClassDefFoundError | ClassNotFoundException e) {
-                    ;
+                    
                 }
-            }
             
             BlockFace releativeFace = info.location().block().getFace(info.sign());
             ShopLogger.instance().warning("face " + releativeFace);
@@ -202,11 +206,10 @@ public class QuickShopManager implements ShopManager {
                 boolean backupSuccess = Util.backupDatabase();
                 
                 try {
-                    if (backupSuccess) {
+                    if (backupSuccess)
                         QuickShop.instance().getDatabaseHelper().deleteShop(location.x(), location.y(), location.z(), location.worldName());
-                    } else {
+                    else
                         ShopLogger.instance().warning("Failed to backup the database, all changes will revert after a reboot.");
-                    }
                 } catch (SQLException error2) {
                     // Failed removing
                     ShopLogger.instance().warning("Failed to autofix the database, all changes will revert after a reboot.");
@@ -257,9 +260,8 @@ public class QuickShopManager implements ShopManager {
     public Map<Long, BasicShop> getLoadedShopsInChunk(@NotNull String world, int chunkX, int chunkZ) {
         @Nullable
         Map<Long, Map<Long, BasicShop>> inWorld = loadedShops.get(world);
-        if (inWorld == null) {
+        if (inWorld == null)
             return null;
-        }
         
         return inWorld.get(Utils.chunkKey(chunkX, chunkZ));
     }
@@ -352,6 +354,64 @@ public class QuickShopManager implements ShopManager {
      */
     @Override
     public void unload(@NotNull BasicShop shop) {
+        unload(shop, true);
+    }
+    
+    @Override
+    public void unload(@NotNull Chunk chunk) {
+        Map<Long, Map<Long, BasicShop>> inWorld = loadedShops.get(chunk.getWorld().getName());
+        
+        if (inWorld != null) {
+            Map<Long, BasicShop> inChunk = inWorld.get(Utils.chunkKey(chunk));
+            
+            if (inChunk != null) {
+                Iterator<BasicShop> iterator = inChunk.values().iterator();
+                while (iterator.hasNext()) {
+                    iterator.next().unload();
+                    iterator.remove();
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void unload(@NotNull World world) {
+        Map<Long, Map<Long, BasicShop>> inWorld = loadedShops.get(world.getName());
+        
+        if (inWorld != null) {
+            Iterator<Map<Long, BasicShop>> chunks = inWorld.values().iterator();
+            
+            while (chunks.hasNext()) {
+                Map<Long, BasicShop> inChunk = chunks.next();
+                
+                Iterator<BasicShop> iterator = inChunk.values().iterator();
+                while (iterator.hasNext()) {
+                    iterator.next().unload();
+                    iterator.remove();
+                }
+                
+                chunks.remove();
+            }
+        }
+    }
+    
+    @Override
+    public void save(@NotNull BasicShop shop) {
+        if (Util.callCancellableEvent(new ShopSaveEvent(shop)))
+            return;
+        
+        try {
+            QuickShop.instance().getDatabaseHelper().updateShop(shop.moderator().serialize(), shop.stack(), shop.unlimited() ? 1 : 0, shop.type().toID(), shop.price(), shop.location().x(), shop.location().y(), shop.location().z(), shop.location().worldName());
+            
+        } catch (Throwable t) {
+            ShopLogger.instance().severe("Could not update a shop in the database! Changes will revert after a reboot!");
+            
+            t.printStackTrace();
+        }
+    }
+    
+    @Override
+    public void unload(@NotNull BasicShop shop, boolean save) {
         @NotNull
         ShopLocation location = shop.location();
         
@@ -365,5 +425,26 @@ public class QuickShopManager implements ShopManager {
         }
         
         shop.unload();
+        if (save)
+            save(shop);
+    }
+    
+    @Override
+    public void unload(@NotNull Chunk chunk, boolean save) {
+        Map<Long, Map<Long, BasicShop>> inWorld = loadedShops.get(chunk.getWorld().getName());
+        
+        if (inWorld != null) {
+            Map<Long, BasicShop> inChunk = inWorld.get(Utils.chunkKey(chunk));
+            
+            if (inChunk != null) {
+                Iterator<BasicShop> iterator = inChunk.values().iterator();
+                while (iterator.hasNext()) {
+                    BasicShop shop = iterator.next();
+                    unload(shop);
+                    save(shop);
+                    iterator.remove();
+                }
+            }
+        }
     }
 }

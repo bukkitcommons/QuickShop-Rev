@@ -3,6 +3,7 @@ package org.maxgamer.quickshop.utils;
 import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.UUID;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.maxgamer.quickshop.QuickShop;
 import org.maxgamer.quickshop.configuration.BaseConfig;
+
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.event.ShopPreCreateEvent;
 import cc.bukkit.shop.viewer.ShopViewer;
@@ -89,16 +91,14 @@ public class ShopUtils {
     
     public static boolean canBeShop(@NotNull Block block) {
         // Specificed types by configuration
-        if (Util.isBlocklisted(block.getType()) || Util.isBlacklistWorld(block.getWorld())) {
+        if (Util.isBlocklisted(block.getType()) || Util.isBlacklistWorld(block.getWorld()))
             return false;
-        }
         return canBeShopIgnoreBlocklist(block.getState());
     }
     
     public static boolean canBeShop(@NotNull BlockState state) {
-        if (Util.isBlocklisted(state.getType()) || Util.isBlacklistWorld(state.getWorld())) {
+        if (Util.isBlocklisted(state.getType()) || Util.isBlacklistWorld(state.getWorld()))
             return false;
-        }
         return canBeShopIgnoreBlocklist(state);
     }
     
@@ -109,9 +109,8 @@ public class ShopUtils {
      * @return True if it can be made into a shop, otherwise false.
      */
     public static boolean canBeShopIgnoreBlocklist(@NotNull BlockState state) {
-        if (state instanceof EnderChest) { // BlockState for Mod supporting
+        if (state instanceof EnderChest)
             return QuickShop.instance().getOpenInvPlugin() != null;
-        }
         
         return state instanceof InventoryHolder;
     }
@@ -133,9 +132,8 @@ public class ShopUtils {
             if (iStack == null || iStack.getType() == Material.AIR)
                 continue;
             
-            if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
+            if (QuickShop.instance().getItemMatcher().matches(item, iStack, false))
                 items += iStack.getAmount();
-            }
         }
         
         return items / item.getAmount();
@@ -149,22 +147,20 @@ public class ShopUtils {
      *             for 'stackability' to occur.
      * @return The number of items that can be given to the inventory safely.
      */
-    public static int countSpace(@Nullable Inventory inv, @NotNull ItemStack item) {
+    public static int countSpaces(@Nullable Inventory inv, @NotNull ItemStack item) {
         if (inv == null)
             return 0;
         
         int space = 0;
         
         ItemStack[] contents = inv.getStorageContents();
-        for (ItemStack iStack : contents) {
-            if (iStack == null || iStack.getType() == Material.AIR) {
+        for (ItemStack iStack : contents)
+            if (iStack == null || iStack.getType() == Material.AIR)
                 space += item.getMaxStackSize();
-            } else
-                if (QuickShop.instance().getItemMatcher().matches(item, iStack, false)) {
+            else
+                if (QuickShop.instance().getItemMatcher().matches(item, iStack, false))
                     space += (item.getMaxStackSize() - iStack.getAmount());
-                }
-        }
-        
+                
         return space;
     }
     
@@ -195,9 +191,8 @@ public class ShopUtils {
             Optional<Location> secondHalf = BlockUtils.getSecondHalf(c);
             ShopViewer secondShop = secondHalf.isPresent() ? Shop.getManager().getLoadedShopAt(secondHalf.get()) : ShopViewer.empty();
             
-            if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner()) || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner())) {
+            if (firstShop.isPresent() && !p.getUniqueId().equals(firstShop.get().getOwner()) || secondShop.isPresent() && !p.getUniqueId().equals(secondShop.get().getOwner()))
                 return true;
-            }
         }
         return false;
     }

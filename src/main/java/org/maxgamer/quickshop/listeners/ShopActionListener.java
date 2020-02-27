@@ -2,6 +2,7 @@ package org.maxgamer.quickshop.listeners;
 
 import java.util.Arrays;
 import java.util.Objects;
+
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -32,6 +33,7 @@ import org.maxgamer.quickshop.utils.BlockUtils;
 import org.maxgamer.quickshop.utils.ItemUtils;
 import org.maxgamer.quickshop.utils.ShopUtils;
 import org.maxgamer.quickshop.utils.Util;
+
 import cc.bukkit.shop.ChestShop;
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
@@ -79,6 +81,7 @@ public class ShopActionListener implements Listener {
                         
                         Shop.getLocaleManager().sendControlPanelInfo(e.getPlayer(), shop);
                         shop.setSignText();
+                        Shop.getManager().save(shop);
                     });
             
             return;
@@ -97,18 +100,18 @@ public class ShopActionListener implements Listener {
                     
                     Shop.getLocaleManager().sendShopInfo(player, shop);
                     shop.setSignText();
+                    Shop.getManager().save(shop);
                     
                     double price = shop.price();
                     double money = QuickShop.instance().getEconomy().getBalance(player.getUniqueId());
                     
                     if (shop.is(ShopType.SELLING)) {
                         // Consider player inv space, money afforable
-                        int afforable = Math.min(ShopUtils.countSpace(player.getInventory(), shop.stack()), (int) Math.floor(money / price));
+                        int afforable = Math.min(ShopUtils.countSpaces(player.getInventory(), shop.stack()), (int) Math.floor(money / price));
                         
                         // Consider shop remaining stock
-                        if (!shop.unlimited()) {
+                        if (!shop.unlimited())
                             afforable = Math.min(afforable, shop.getRemainingStock());
-                        }
                         
                         if (afforable < 0)
                             afforable = 0;
@@ -123,10 +126,9 @@ public class ShopActionListener implements Listener {
                             stackAmount = Math.min(stackAmount, shop.getRemainingSpace());
                             stackAmount = Math.min(stackAmount, ownerAfforableItems);
                         } else
-                            if (BaseConfig.payUnlimitedShopOwners) {
+                            if (BaseConfig.payUnlimitedShopOwners)
                                 stackAmount = Math.min(stackAmount, ownerAfforableItems);
-                            }
-                        
+                            
                         if (stackAmount < 0)
                             stackAmount = 0;
                         
@@ -173,9 +175,8 @@ public class ShopActionListener implements Listener {
                         return;
                     }
                     
-                    if (block.getType() == Material.ENDER_CHEST && !QuickShopPermissionManager.instance().has(player, "quickshop.create.enderchest")) {
+                    if (block.getType() == Material.ENDER_CHEST && !QuickShopPermissionManager.instance().has(player, "quickshop.create.enderchest"))
                         return;
-                    }
                     
                     // Finds out where the sign should be placed for the shop
                     Block expectedSign = null;
@@ -188,9 +189,8 @@ public class ShopActionListener implements Listener {
                     while (bIt.hasNext()) {
                         final Block n = bIt.next();
                         
-                        if (n.equals(block)) {
+                        if (n.equals(block))
                             break;
-                        }
                         
                         expectedSign = n;
                     }
@@ -221,7 +221,10 @@ public class ShopActionListener implements Listener {
             Location chest = event.getInventory().getLocation();
             
             if (chest != null)
-                Shop.getManager().getLoadedShopAt(chest).ifPresent(ChestShop::setSignText);
+                Shop.getManager().getLoadedShopAt(chest).ifPresent((ChestShop shop) -> {
+                    shop.setSignText();
+                    Shop.getManager().save(shop);
+                });
             
         } catch (NullPointerException npe) {
             return;

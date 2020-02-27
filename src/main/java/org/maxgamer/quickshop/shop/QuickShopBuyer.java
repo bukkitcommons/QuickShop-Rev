@@ -5,6 +5,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.maxgamer.quickshop.utils.ItemUtils;
+
+import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.ShopType;
 import cc.bukkit.shop.buyer.ChestBuyer;
 import cc.bukkit.shop.logger.ShopLogger;
@@ -41,9 +43,8 @@ public class QuickShopBuyer extends ContainerQuickShop implements ChestBuyer {
         for (int i = 0; totalAmount > 0 && i < contents.length; i++) {
             ItemStack playerItem = contents[i];
             
-            if (playerItem == null || !isStack(playerItem)) {
+            if (playerItem == null || !isStack(playerItem))
                 continue;
-            }
             
             int buyAmount = Math.min(totalAmount, playerItem.getAmount());
             playerItem.setAmount(playerItem.getAmount() - buyAmount);
@@ -52,15 +53,16 @@ public class QuickShopBuyer extends ContainerQuickShop implements ChestBuyer {
         
         playerInv.setStorageContents(contents);
         
-        if (totalAmount > 0) {
+        if (totalAmount > 0)
             ShopLogger.instance().severe("Could not take all items from a players inventory on purchase! " + p.getName() + ", missing: " + stackAmount + ", item: " + ItemUtils.getItemStackName(stack.stack()) + "!");
-        } else
+        else
             if (!unlimited) {
                 ItemStack offer = new ItemStack(stack.stack());
                 offer.setAmount(stackAmount * stack.stack().getAmount());
                 getInventory().addItem(offer);
                 
                 setSignText();
+                Shop.getManager().save(this);
             }
     }
     

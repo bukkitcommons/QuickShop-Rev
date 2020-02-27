@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,6 +20,7 @@ import org.maxgamer.quickshop.configuration.BaseConfig;
 import org.maxgamer.quickshop.economy.VaultEconProvider;
 import org.maxgamer.quickshop.utils.JavaUtils;
 import org.maxgamer.quickshop.utils.Util;
+
 import cc.bukkit.shop.Shop;
 import cc.bukkit.shop.economy.EconomyProvider;
 import cc.bukkit.shop.economy.EconomyType;
@@ -28,7 +30,7 @@ import lombok.SneakyThrows;
 /** A util to generate a paste report and upload it to EngineHub/Ubuntu Paste */
 @AllArgsConstructor
 public class Paste {
-    private QuickShop plugin;
+    private final QuickShop plugin;
     
     /**
      * Create a server infomation paste
@@ -110,9 +112,8 @@ public class Paste {
         finalReport.append("================================================\n");
         finalReport.append("Plugins:\n");
         finalReport.append("\tTotal: ").append(Bukkit.getPluginManager().getPlugins().length).append("\n");
-        for (Plugin bplugin : Bukkit.getPluginManager().getPlugins()) {
+        for (Plugin bplugin : Bukkit.getPluginManager().getPlugins())
             finalReport.append("\t").append(bplugin.getName()).append("@").append(bplugin.isEnabled() ? "Enabled" : "Disabled").append("\n");
-        }
         finalReport.append("================================================\n");
         finalReport.append("Configurations:\n");
         try {
@@ -137,7 +138,9 @@ public class Paste {
             finalReport.append("\t*********************************\n");
             finalReport.append("\t*********************************\n");
             finalReport.append("\tInternal Debug Log:\n");
-            finalReport.append("\t\t\n").append(JavaUtils.list2String(Util.getDebugLogs()).replaceAll(",", "\n")).append("\n");
+            finalReport.append("\t\t\n");
+            for (String log : Util.getDebugLogs())
+                finalReport.append(log).append("\n");
             finalReport.append("\t*********************************\n");
             // try {
             // finalReport.append("\t*********************************\n");
@@ -224,19 +227,18 @@ public class Paste {
     @Nullable
     public String paste(@NotNull String content, int type) {
         PasteInterface paster;
-        if (type == 0) {
+        if (type == 0)
             try {
                 // EngineHub Pastebin
                 paster = new EngineHubPaster();
                 return paster.pasteTheText(content);
             } catch (Exception ignore) {}
-        } else {
+        else
             try {
                 // Ubuntu Pastebin
                 paster = new UbuntuPaster();
                 return paster.pasteTheText(content);
             } catch (Exception ignore) {}
-        }
         return null;
     }
 }
