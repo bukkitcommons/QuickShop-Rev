@@ -15,7 +15,7 @@
     "no-price-change": "&cCena nie została zmieniona!",
     "you-cant-afford-a-new-shop": "&cMusisz mieć {0} aby zrobić nowy sklep.",
     "player-bought-from-your-store-tax": "&c{0} zakupił {1} {2} z twojego sklepu, i zapłacił {3} podatku.",
-    "you-cant-afford-to-change-price": "&cMusisz mieć {0} aby zmienić cenę w sklepie.",
+    "you-cant-afford-to-change-price": "&cZmiana ceny w sklepie kosztuje {0}.",
     "success-created-shop": "&aUtworzono sklep.",
     "success-removed-shop": "&aSklep usunięty.",
     "shops-arent-locked": "&cPamiętaj, że sklepy NIE są chronione przed kradzieżą! Jeśli chcesz zatrzymać złodziei, zamknij je za pomocą LWC, Lockette itd.!",
